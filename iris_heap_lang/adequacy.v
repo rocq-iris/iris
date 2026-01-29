@@ -1,7 +1,8 @@
 From iris.algebra Require Import auth.
 From iris.base_logic.lib Require Import mono_nat.
 From iris.proofmode Require Import proofmode.
-From iris.program_logic Require Export weakestpre adequacy.
+From iris.program_logic Require Import weakestpre.
+From iris.program_logic Require Export adequacy.
 From iris.heap_lang Require Import proofmode notation.
 From iris.prelude Require Import options.
 

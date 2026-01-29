@@ -1,3 +1,4 @@
+From stdpp Require Import gmap.
 From iris.program_logic Require Export adequacy.
 From iris.heap_lang Require Export lang notation tactics.
 From iris.prelude Require Import options.
