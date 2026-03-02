@@ -5,25 +5,25 @@ From iris.prelude Require Import options.
 (* The sections add extra BI assumptions, which is only picked up with "Type"*. *)
 Set Default Proof Using "Type*".
 
-(** This proves that in an affine BI (i.e., a BI that enjoys [P ∗ Q ⊢ P]), the
-classical excluded middle ([P ∨ ¬P]) axiom makes the separation conjunction
-trivial, i.e., it gives [P -∗ P ∗ P] and [P ∧ Q -∗ P ∗ Q].
+(** This proves that the excluded-middle [P ∨ ¬P] axiom makes the separating
+conjunction trivial for affine propositions, i.e., [P -∗ P ∗ P]. If every
+proposition is affine we additionally get [P ∧ Q -∗ P ∗ Q].
 
 Our proof essentially follows the structure of the proof of Theorem 3 in
-https://scholar.princeton.edu/sites/default/files/qinxiang/files/putting_order_to_the_separation_logic_jungle_revised_version.pdf *)
+https://www.cs.princeton.edu/~appel/papers/bringing-order.pdf *)
 Module affine_em. Section affine_em.
-  Context {PROP : bi} `{!BiAffine PROP}.
+  Context {PROP : bi}.
   Context (em : ∀ P : PROP, ⊢ P ∨ ¬P).
   Implicit Types P Q : PROP.
 
-  Lemma sep_dup P : P -∗ P ∗ P.
+  Lemma sep_dup P `{!Affine P} : P -∗ P ∗ P.
   Proof.
     iIntros "HP". iDestruct (em P) as "[HP'|HnotP]".
     - iFrame "HP HP'".
-    - iExFalso. by iApply "HnotP".
+    - iExFalso. iApply "HnotP". by iModIntro.
   Qed.
 
-  Lemma and_sep P Q : P ∧ Q -∗ P ∗ Q.
+  Lemma and_sep `{!BiAffine PROP} P Q : P ∧ Q -∗ P ∗ Q.
   Proof.
     iIntros "HPQ". iDestruct (sep_dup with "HPQ") as "[HPQ HPQ']".
     iSplitL "HPQ".
@@ -34,18 +34,23 @@ End affine_em. End affine_em.
 
 (** This proves that the combination of Löb induction [(▷ P → P) ⊢ P] and the
 classical excluded-middle [P ∨ ¬P] axiom makes the later operator trivial, i.e.,
-it gives [▷ P] for any [P], or equivalently [▷ P ≡ True]. *)
+it gives [▷ P] for any [P], or equivalently [▷ P ≡ True]. In an SBI, the
+excluded-middle axiom results in inconsistency (proof of [False]) due to
+[later_soundness : (⊢ ▷ P) → ⊢ P]. *)
 Module löb_em. Section löb_em.
-  Context {PROP : bi} `{!BiLöb PROP}.
+  Context {PROP : bi}.
   Context (em : ∀ P : PROP, ⊢ P ∨ ¬P).
   Implicit Types P : PROP.
 
-  Lemma later_anything P : ⊢@{PROP} ▷ P.
+  Lemma later_anything `{!BiLöb PROP} P : ⊢@{PROP} ▷ P.
   Proof.
     iDestruct (em (▷ False)) as "#[HP|HnotP]".
     - iNext. done.
     - iExFalso. iLöb as "IH". iSpecialize ("HnotP" with "IH"). done.
   Qed.
+
+  Lemma later_inconsistent `{!Sbi PROP} : ⊢@{PROP} False.
+  Proof. apply later_soundness, later_anything. Qed.
 End löb_em. End löb_em.
 
 (** This proves that we need the ▷ in a "Saved Proposition" construction with
