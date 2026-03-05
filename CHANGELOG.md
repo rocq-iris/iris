@@ -3,7 +3,7 @@ way the logic is used on paper.  We also document changes in the Coq
 development; every API-breaking change should be listed, but not every new
 lemma.
 
-## Iris 4.5.0 (2026-02-12)
+## Iris 4.5.0 (2026-03-05)
 
 This version of Iris supports Rocq 9.0, 9.1, and 9.2.
 Support for Coq 8.19 and 8.20 has been dropped.
@@ -126,6 +126,8 @@ Simcha van Collem, Tej Chajed, Yiqun Liu, and Zichen Zhang.
 
 **Changes in `base_logic`:**
 
+* Generalize lemma `ghost_map_lookup_big` to allow fractional permissions. (by
+  Johannes Hostert)
 * Change `cinv` construction to add lemma `cinv_acc_1` to access the invariant
   non-atomically given full ownership of the token. (by Benjamin Peters)
 * Add `Contractive` instance for `na_inv`.
@@ -160,7 +162,7 @@ Simcha van Collem, Tej Chajed, Yiqun Liu, and Zichen Zhang.
   The previous specification of the `newlock` operation required the resource
   protected by the lock to be chosen and provided immediately. It is now
   possible to do it at a later time. (by Alessio Duè)
-* Tweak the semantics of `Resolve` to require that the prophecy is in the set 
+* Tweak the semantics of `Resolve` to require that the prophecy is in the set
   `σ.(used_proph_id)` of so-far-created prophecies. (by Johannes Hostert and
   Zichen Zhang)
 * Prove `wp_resolve_strong` which lets the user retain ownership of the proph
@@ -173,7 +175,7 @@ Simcha van Collem, Tej Chajed, Yiqun Liu, and Zichen Zhang.
 * Prove `wp_fork_fupd` which allows more fancy updates when forking. (by Johannes
   Hostert)
 * Add an `unwrap` function to (unsafely) assert that a value is `SOME v` and extract the
-  value from the optional. (by Marijn van Wezel)  
+  value from the optional. (by Marijn van Wezel)
 
 **Infrastructure:**
 
@@ -291,8 +293,6 @@ and Thomas Somers. Thank you all for your contributions.
   + Various corollaries for total cmras (which include `ucmra`s) are provided.
 * Add lemma `Some_included_totalI`.
 * Simplify lemma `excl_includedI` to use `=` instead of `match`.
-* Generalize lemma `ghost_map_lookup_big` to allow fractional permissions. (by
-  Johannes Hostert)
 
 **Changes in `heap_lang`:**
 
