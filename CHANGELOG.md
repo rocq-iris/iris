@@ -3,11 +3,31 @@ way the logic is used on paper.  We also document changes in the Coq
 development; every API-breaking change should be listed, but not every new
 lemma.
 
-## Iris master
+## Iris 4.5.0 (2026-02-12)
 
-This version newly supports Rocq 9.1, and drops support for Coq 8.19 and 8.20.
+This version of Iris supports Rocq 9.0, 9.1, and 9.2.
+Support for Coq 8.19 and 8.20 has been dropped.
 
 The opam packages have been renamed from `coq-*` to `rocq-*`.
+
+The main changes in this release are:
+
+* We added a new class for a "step-indexed BI logic" (`Sbi`), which gives a
+  generic treatment of step-indexed operations such as "internal validity" `≡`,
+  "internal CMRA validity" `✓`, the "plainly modality" `■`, plain propositions
+  `Plain`, and the soundness lemmas. Each BI logic (e.g., `iProp`, `monPred`,
+  `ironProp`, `siProp`) gets these features for free by inhabiting `Sbi`.
+* The proofmode tactics have been ported to use Rocq's better behaved
+  unification algorithm ("evarconv") instead of legacy unification.
+* The tactics `iNext` and `wp_pure` have been extended with support for for
+  later credits.
+
+This release was managed by Jesper Bengtson, Ralf Jung and Robbert Krebbers,
+with contributions from Alessio Duè, Arnaud Daby-Seesaram,
+Arthur Azevedo de Amorim, Benjamin Peters, Enrico Tassi, Hai Dang,
+Isaac van Bakel, Jan-Oliver Kaiser, Johannes Hostert, Paolo G. Giarrusso,
+Ralf Jung, Robbert Krebbers, Rodolphe Lepigre, Rudy Peterson, Sanjit Bhat,
+Simcha van Collem, Tej Chajed, Yiqun Liu, and Zichen Zhang.
 
 **Changes in `algebra`:**
 
