@@ -155,6 +155,7 @@ iris_heap_lang/proph_erasure.v
 iris_heap_lang/lib/spawn.v
 iris_heap_lang/lib/par.v
 iris_heap_lang/lib/assert.v
+iris_heap_lang/lib/unwrap.v
 iris_heap_lang/lib/lock.v
 iris_heap_lang/lib/rw_lock.v
 iris_heap_lang/lib/spin_lock.v

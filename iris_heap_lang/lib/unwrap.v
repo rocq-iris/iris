@@ -1,5 +1,6 @@
 From iris.heap_lang Require Export lang proofmode notation.
 From iris.heap_lang.lib Require Import assert.
+From iris.prelude Require Import options.
 
 (** The function [unwrap o] (unsafely) asserts that [o] is [SOMEV v],
 and returns the contained value [v]. *)
