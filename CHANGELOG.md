@@ -152,6 +152,8 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
   be available. The interface also provides more laws about `pointsto`. (by Alessio Duè)
 * Prove `wp_fork_fupd` which allows more fancy updates when forking. (by Johannes
   Hostert)
+* Add an `unwrap` function to (unsafely) assert that a value is `SOME v` and extract the
+  value from the optional. (by Marijn van Wezel)  
 
 **Infrastructure:**
 
