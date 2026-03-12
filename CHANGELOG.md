@@ -3,6 +3,10 @@ way the logic is used on paper.  We also document changes in the Coq
 development; every API-breaking change should be listed, but not every new
 lemma.
 
+## Iris master
+
+(currently empty)
+
 ## Iris 4.5.0 (2026-03-05)
 
 This version of Iris supports Rocq 9.0, 9.1, and 9.2.
