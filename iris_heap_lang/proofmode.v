@@ -636,7 +636,9 @@ for every possible evaluation context [K].
   try again.
 
 TC resolution of [lem] premises happens *after* [tac_suc H] got executed. *)
-Ltac wp_apply_core lem tac_suc tac_fail := first
+Ltac wp_apply_core lem tac_suc tac_fail :=
+  iStartProof;
+  first
   [iPoseProofCore lem as false (fun H =>
      lazymatch goal with
      | |- envs_entails _ (wp ?s ?E ?e ?Q) =>

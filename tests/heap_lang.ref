@@ -338,3 +338,9 @@ goal 2 is:
 The command has indeed failed with message:
 Tactic failure: wp_cmpxchg_suc: cannot find 'CmpXchg' in 
 (#() #()).
+"wp_apply_not_wp"
+     : string
+The command has indeed failed with message:
+Tactic failure: iStartProof: goal True not a BI assertion.
+The command has indeed failed with message:
+Tactic failure: iStartProof: goal True not a BI assertion.

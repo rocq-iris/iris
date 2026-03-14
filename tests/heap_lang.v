@@ -563,6 +563,10 @@ Section error_tests.
   Proof.
     Fail wp_cmpxchg_suc.
   Abort.
+
+  Check "wp_apply_not_wp".
+  Lemma wp_apply_not_wp : True.
+  Proof. Fail wp_apply Pred_spec. Fail wp_smart_apply Pred_spec. Abort.
 End error_tests.
 
 (* Test a closed proof *)
