@@ -89,9 +89,9 @@ regular `make -jN` before submitting an MR.
 
 ## How to test effects on reverse dependencies
 
-The `iris-bot` script makes it easy to test the effect of a branch on reverse
-dependencies. It can start tests ensuring they all still build, and it can do
-comparative timing runs.
+The `iris-bot` script (in the `bin` folder) makes it easy to test the effect of
+a branch on reverse dependencies. It can start tests ensuring they all still
+build, and it can do comparative timing runs.
 
 If you have suitable permissions, you can trigger these builds yourself.
 But first, you need to do some setup: you need to create a GitLab access token
@@ -114,10 +114,10 @@ can be used to control the repository in which the branch is situated. Setting
 and similar for `STDPP`.
 
 Supported commands:
-- `./iris-bot build [$filter]`: Builds all reverse dependencies against the
+- `bin/iris-bot build [$filter]`: Builds all reverse dependencies against the
   given branches. The optional `filter` argument only builds projects whose
   names contains that string.
-- `./iris-bot time $project`: Measure the impact of this branch on the build
+- `bin/iris-bot time $project`: Measure the impact of this branch on the build
   time of the given reverse dependency. Only Iris branches are supported for
   now.
 
