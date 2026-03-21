@@ -26,32 +26,26 @@ Section telescopes.
 
   Lemma bi_tforall_forall Ψ : bi_tforall Ψ ⊣⊢ bi_forall Ψ.
   Proof.
-    symmetry. unfold bi_tforall. induction TT as [|X ft IH].
-    - simpl. apply (anti_symm _).
-      + by rewrite (forall_elim TargO).
-      + rewrite -forall_intro; first done.
-        intros p. rewrite (tele_arg_O_inv p) /= //.
-    - simpl. apply (anti_symm _); apply forall_intro; intros a.
-      + rewrite /= -IH. apply forall_intro; intros p.
-        by rewrite (forall_elim (TargS a p)).
-      + destruct a=> /=.
-        setoid_rewrite <- IH.
-        rewrite 2!forall_elim. done.
+    unfold bi_tforall. apply (anti_symm _).
+    - apply forall_intro. induction TT as [|X ft IH].
+      { by intros []. }
+      intros [x xs]; simpl. by rewrite (forall_elim x) IH.
+    - induction TT as [|X ft IH]; simpl.
+      { by rewrite (forall_elim TargO). }
+      apply forall_intro=> x. rewrite -IH. apply forall_intro=> xs.
+      by rewrite (forall_elim (TargS x xs)).
   Qed.
 
   Lemma bi_texist_exist Ψ : bi_texist Ψ ⊣⊢ bi_exist Ψ.
   Proof.
-    symmetry. unfold bi_texist. induction TT as [|X ft IH].
-    - simpl. apply (anti_symm _).
-      + apply exist_elim; intros p.
-        rewrite (tele_arg_O_inv p) //.
-      + by rewrite -(exist_intro TargO).
-    - simpl. apply (anti_symm _); apply exist_elim.
-      + intros p. destruct p => /=.
-        by rewrite -exist_intro -IH -exist_intro.
-      + intros x.
-        rewrite /= -IH. apply exist_elim; intros p.
-        by rewrite -(exist_intro (TargS x p)).
+    unfold bi_texist. apply (anti_symm _).
+    - induction TT as [|X ft IH]; simpl.
+      { by rewrite -(exist_intro TargO). }
+      apply exist_elim=> x. rewrite IH. apply exist_elim=> xs.
+      by rewrite (exist_intro (TargS x xs)).
+    - apply exist_elim. induction TT as [|X ft IH].
+      { by intros []. }
+      intros [x xs]; simpl. by rewrite -(exist_intro x) -IH.
   Qed.
 
   Global Instance bi_tforall_ne n :
