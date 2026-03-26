@@ -74,12 +74,8 @@ packages (see below).
 
 If you are using Iris as part of an artifact submitted for publication with a
 paper, we recommend you make the artifact self-contained so that it can be built
-in the future without relying in any other server to still exist. However, if
-that is for some reason not possible, and if you are using opam to obtain the
-right version of Iris and you used a `dev.*` version, please let us know which
-exact Iris version you artifact relies on so that we can
-[add it to this wiki page](https://gitlab.mpi-sws.org/iris/iris/-/wikis/Pinned-Iris-package-versions)
-and avoid removing it from our opam repository in the future.
+in the future with the exact right version of Iris and without relying in any
+other server to still exist.
 
 ### Working *on* Iris
 
