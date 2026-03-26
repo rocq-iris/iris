@@ -1,5 +1,5 @@
 From iris.algebra Require Import frac agree csum.
-From iris.proofmode Require Import proofmode.
+From iris.base_logic Require Import invariants.
 From iris.program_logic Require Export weakestpre.
 From iris.heap_lang Require Export lang.
 From iris.heap_lang Require Import assert proofmode notation adequacy.

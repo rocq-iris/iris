@@ -1,5 +1,4 @@
 From iris.bi.lib Require Import fractional.
-From iris.proofmode Require Import proofmode.
 From iris.program_logic Require Export atomic.
 From iris.heap_lang Require Export derived_laws.
 From iris.heap_lang Require Import notation proofmode.

@@ -1,6 +1,5 @@
 From stdpp Require Export pretty.
-
-From iris.heap_lang Require Import lang.
+From iris.heap_lang Require Export lang.
 From iris.prelude Require Import options.
 
 (** * Pretty printing for HeapLang values *)

@@ -1,6 +1,7 @@
-From iris.base_logic Require Export invariants.
+From iris.base_logic Require Import invariants.
 From iris.program_logic Require Export weakestpre.
-From iris.heap_lang Require Export lang proofmode notation.
+From iris.heap_lang Require Export lang.
+From iris.heap_lang Require Import proofmode notation.
 From iris.heap_lang.lib Require Export nondet_bool.
 From iris.prelude Require Import options.
 
