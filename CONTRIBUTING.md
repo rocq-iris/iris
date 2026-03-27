@@ -135,3 +135,20 @@ Examples:
   still build against `myname/mybranch`.
 
 [examples]: https://gitlab.mpi-sws.org/iris/examples
+
+### Benchmarking std++ changes
+
+If you want to benchmark the effect of an std++ change, things get a bit more
+complicated. The process is as follows:
+
+- Push the std++ commit you want to benchmark to the `ci-release` branch:
+  ```
+  git push origin <commit>:ci-release -f
+  ```
+- Wait for std++ CI to finish.
+- Your commit should now show up as a new version in [the opam
+  repo](https://gitlab.mpi-sws.org/iris/opam/-/commits/master). It should be
+  called `branch.ci-release.<date>.<num>.<commit>`.
+- In Iris, prepare a branch that changes the std++ version in `rocq-iris.opam`
+  to be that std++ version you just created.
+- Benchmark that Iris branch using the instructions above.
