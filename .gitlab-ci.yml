@@ -117,3 +117,4 @@ trigger-stdpp.dev:
   - if: $CI_PROJECT_NAMESPACE != "iris"
     when: never
   - if: $CI_PIPELINE_SOURCE =~ /^(trigger|api|schedule)$/
+  interruptible: false
