@@ -36,6 +36,8 @@ lemma.
   + (new) `mono_Z_lb_own γ n` becomes `γ ↪◯MZ n`.
   + (new) `saved_prop_own γ dq P` becomes `γ ↪PROP dq P`.
   + (new) `saved_pred_own γ dq Φ` becomes `γ ↪PRED dq Φ`.
+  + (new) `gset_bij_own_auth γ dq L` becomes `γ ↪●BIJ dq L`.
+  + (new) `gset_bij_own_elem γ a b` becomes `γ ↪◯BIJ ⟨a,b⟩`.
 
 **Changes in `program_logic`:**
 
