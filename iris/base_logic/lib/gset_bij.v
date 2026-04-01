@@ -91,8 +91,8 @@ Section gset_bij.
     by iDestruct (gset_bij_own_auth_agree with "H1 H2") as %[[] _].
   Qed.
 
-  Lemma gset_bij_own_valid γ q L :
-    gset_bij_own_auth γ q L -∗ ⌜✓ q ∧ gset_bijective L⌝.
+  Lemma gset_bij_own_valid γ dq L :
+    gset_bij_own_auth γ dq L -∗ ⌜✓ dq ∧ gset_bijective L⌝.
   Proof.
     rewrite gset_bij_own_auth_eq. iIntros "Hauth".
     by iDestruct (own_valid with "Hauth") as %?%gset_bij_auth_dfrac_valid.
@@ -106,24 +106,24 @@ Section gset_bij.
     by iCombine "Hel1 Hel2" gives %?%gset_bij_elem_agree.
   Qed.
 
-  Lemma gset_bij_own_elem_get {γ q L} a b :
+  Lemma gset_bij_own_elem_get {γ dq L} a b :
     (a, b) ∈ L →
-    gset_bij_own_auth γ q L -∗ gset_bij_own_elem γ a b.
+    gset_bij_own_auth γ dq L -∗ gset_bij_own_elem γ a b.
   Proof.
     intros. rewrite gset_bij_own_auth_eq gset_bij_own_elem_eq.
     iApply own_mono. by apply bij_view_included.
   Qed.
 
-  Lemma gset_bij_elem_of {γ q L} a b :
-    gset_bij_own_auth γ q L -∗ gset_bij_own_elem γ a b -∗ ⌜(a, b) ∈ L⌝.
+  Lemma gset_bij_elem_of {γ dq L} a b :
+    gset_bij_own_auth γ dq L -∗ gset_bij_own_elem γ a b -∗ ⌜(a, b) ∈ L⌝.
   Proof.
     iIntros "Hauth Helem". rewrite gset_bij_own_auth_eq gset_bij_own_elem_eq.
     iCombine "Hauth Helem" gives "%Ha".
     iPureIntro. revert Ha. rewrite bij_both_dfrac_valid. intros (_ & _ & ?); done.
   Qed.
 
-  Lemma gset_bij_own_elem_get_big γ q L :
-    gset_bij_own_auth γ q L -∗ [∗ set] ab ∈ L, gset_bij_own_elem γ ab.1 ab.2.
+  Lemma gset_bij_own_elem_get_big γ dq L :
+    gset_bij_own_auth γ dq L -∗ [∗ set] ab ∈ L, gset_bij_own_elem γ ab.1 ab.2.
   Proof.
     iIntros "Hauth". iApply big_sepS_forall. iIntros ([a b] ?) "/=".
     by iApply gset_bij_own_elem_get.
