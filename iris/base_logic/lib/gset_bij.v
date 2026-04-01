@@ -58,8 +58,8 @@ Section gset_bij.
   Context `{gset_bijG Σ A B}.
   Implicit Types (L : gset (A * B)) (a : A) (b : B).
 
-  Global Instance gset_bij_own_auth_timeless γ q L :
-    Timeless (gset_bij_own_auth γ q L).
+  Global Instance gset_bij_own_auth_timeless γ dq L :
+    Timeless (gset_bij_own_auth γ dq L).
   Proof. rewrite gset_bij_own_auth_eq. apply _. Qed.
   Global Instance gset_bij_own_elem_timeless γ a b :
     Timeless (gset_bij_own_elem γ a b).
