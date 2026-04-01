@@ -146,81 +146,83 @@ End saved_anything.
 Notation savedPropG Σ := (savedAnythingG Σ (▶ ∙)).
 Notation savedPropΣ := (savedAnythingΣ (▶ ∙)).
 
+Definition saved_prop_own `{!savedPropG Σ} (γ : gname) (dq : dfrac) (P: iProp Σ) :=
+  saved_anything_own (F := ▶ ∙) γ dq (Next P).
+Global Instance: Params (@saved_prop_own) 4 := {}.
+
+Notation "γ ↪PROP dq P" := (saved_prop_own γ dq P)
+  (at level 20, dq custom dfrac at level 1,
+   format "γ  ↪PROP dq  P").
+
 Section saved_prop.
   Context `{!savedPropG Σ}.
-
-  Definition saved_prop_own (γ : gname) (dq : dfrac) (P: iProp Σ) :=
-    saved_anything_own (F := ▶ ∙) γ dq (Next P).
 
   Global Instance saved_prop_own_contractive γ dq :
     Contractive (saved_prop_own γ dq).
   Proof. solve_contractive. Qed.
 
   Global Instance saved_prop_discarded_persistent γ P :
-    Persistent (saved_prop_own γ DfracDiscarded P).
+    Persistent (γ ↪PROP□ P).
   Proof. apply _. Qed.
 
-  Global Instance saved_prop_fractional γ P : Fractional (λ q, saved_prop_own γ (DfracOwn q) P).
+  Global Instance saved_prop_fractional γ P : Fractional (λ q, γ ↪PROP{#q} P).
   Proof. apply _. Qed.
   Global Instance saved_prop_as_fractional γ P q :
-    AsFractional (saved_prop_own γ (DfracOwn q) P) (λ q, saved_prop_own γ (DfracOwn q) P) q.
+    AsFractional (γ ↪PROP{#q} P) (λ q, γ ↪PROP{#q} P) q.
   Proof. apply _. Qed.
 
   (** Allocation *)
-  Lemma saved_prop_alloc_strong (I : gname → Prop) (P: iProp Σ) dq :
+  Lemma saved_prop_alloc_strong (I : gname → Prop) P dq :
     ✓ dq →
     pred_infinite I →
-    ⊢ |==> ∃ γ, ⌜I γ⌝ ∗ saved_prop_own γ dq P.
+    ⊢ |==> ∃ γ, ⌜I γ⌝ ∗ γ ↪PROP{dq} P.
   Proof. intros ??. by apply saved_anything_alloc_strong. Qed.
 
-  Lemma saved_prop_alloc_cofinite (G : gset gname) (P: iProp Σ) dq :
+  Lemma saved_prop_alloc_cofinite (G : gset gname) P dq :
     ✓ dq →
-    ⊢ |==> ∃ γ, ⌜γ ∉ G⌝ ∗ saved_prop_own γ dq P.
+    ⊢ |==> ∃ γ, ⌜γ ∉ G⌝ ∗ γ ↪PROP{dq} P.
   Proof. by apply saved_anything_alloc_cofinite. Qed.
 
-  Lemma saved_prop_alloc (P : iProp Σ) dq :
+  Lemma saved_prop_alloc P dq :
     ✓ dq →
-    ⊢ |==> ∃ γ, saved_prop_own γ dq P.
+    ⊢ |==> ∃ γ, γ ↪PROP{dq} P.
   Proof. apply saved_anything_alloc. Qed.
 
   (** Validity *)
   Lemma saved_prop_valid γ dq P :
-    saved_prop_own γ dq P -∗ ⌜✓ dq⌝.
+    γ ↪PROP{dq} P -∗ ⌜✓ dq⌝.
   Proof. apply saved_anything_valid. Qed.
   Lemma saved_prop_valid_2 γ dq1 dq2 P Q :
-    saved_prop_own γ dq1 P -∗ saved_prop_own γ dq2 Q -∗ ⌜✓ (dq1 ⋅ dq2)⌝ ∗ ▷ (P ≡ Q).
+    γ ↪PROP{dq1} P -∗ γ ↪PROP{dq2} Q -∗ ⌜✓ (dq1 ⋅ dq2)⌝ ∗ ▷ (P ≡ Q).
   Proof.
     iIntros "HP HQ".
     iCombine "HP HQ" gives "($ & Hag)".
     by iApply later_equivI.
   Qed.
   Lemma saved_prop_agree γ dq1 dq2 P Q :
-    saved_prop_own γ dq1 P -∗ saved_prop_own γ dq2 Q -∗ ▷ (P ≡ Q).
+    γ ↪PROP{dq1} P -∗ γ ↪PROP{dq2} Q -∗ ▷ (P ≡ Q).
   Proof. iIntros "HP HQ". iCombine "HP" "HQ" gives "[_ $]". Qed.
 
   (** Make an element read-only. *)
   Lemma saved_prop_persist γ dq P :
-    saved_prop_own γ dq P ==∗ saved_prop_own γ DfracDiscarded P.
+    γ ↪PROP{dq} P ==∗ γ ↪PROP□ P.
   Proof. apply saved_anything_persist. Qed.
 
   (** Recover fractional ownership for read-only element. *)
   Lemma saved_prop_unpersist γ v :
-    saved_prop_own γ DfracDiscarded v ==∗ ∃ q, saved_prop_own γ (DfracOwn q) v.
+    γ ↪PROP□ v ==∗ ∃ q, γ ↪PROP{#q} v.
   Proof. apply saved_anything_unpersist. Qed.
 
   (** Updates *)
   Lemma saved_prop_update Q γ P :
-    saved_prop_own γ (DfracOwn 1) P ==∗ saved_prop_own γ (DfracOwn 1) Q.
+    γ ↪PROP P ==∗ γ ↪PROP Q.
   Proof. apply saved_anything_update. Qed.
   Lemma saved_prop_update_2 Q γ q1 q2 P1 P2 :
     (q1 + q2 = 1)%Qp →
-    saved_prop_own γ (DfracOwn q1) P1 -∗ saved_prop_own γ (DfracOwn q2) P2 ==∗
-    saved_prop_own γ (DfracOwn q1) Q ∗ saved_prop_own γ (DfracOwn q2) Q.
+    γ ↪PROP{#q1} P1 -∗ γ ↪PROP{#q2} P2 ==∗ γ ↪PROP{#q1} Q ∗ γ ↪PROP{#q2} Q.
   Proof. apply saved_anything_update_2. Qed.
   Lemma saved_prop_update_halves Q γ P1 P2 :
-    saved_prop_own γ (DfracOwn (1/2)) P1 -∗
-    saved_prop_own γ (DfracOwn (1/2)) P2 ==∗
-    saved_prop_own γ (DfracOwn (1/2)) Q ∗ saved_prop_own γ (DfracOwn (1/2)) Q.
+    γ ↪PROP{#1/2} P1 -∗ γ ↪PROP{#1/2} P2 ==∗ γ ↪PROP{#1/2} Q ∗ γ ↪PROP{#1/2} Q.
   Proof. apply saved_anything_update_halves. Qed.
 End saved_prop.
 
@@ -228,82 +230,85 @@ End saved_prop.
 Notation savedPredG Σ A := (savedAnythingG Σ (A -d> ▶ ∙)).
 Notation savedPredΣ A := (savedAnythingΣ (A -d> ▶ ∙)).
 
+Definition saved_pred_own `{!savedPredG Σ A}
+    (γ : gname) (dq : dfrac) (Φ : A → iProp Σ) :=
+  saved_anything_own (F := A -d> ▶ ∙) γ dq (Next ∘ Φ).
+
+Notation "γ ↪PRED dq Φ" := (saved_pred_own γ dq Φ)
+  (at level 20, dq custom dfrac at level 1,
+   format "γ  ↪PRED dq  Φ").
+
 Section saved_pred.
   Context `{!savedPredG Σ A}.
 
-  Definition saved_pred_own (γ : gname) (dq : dfrac) (Φ : A → iProp Σ) :=
-    saved_anything_own (F := A -d> ▶ ∙) γ dq (Next ∘ Φ).
-
-  Global Instance saved_pred_own_contractive `{!savedPredG Σ A} γ dq :
+  Global Instance saved_pred_own_contractive γ dq :
     Contractive (saved_pred_own γ dq : (A -d> iPropO Σ) → iProp Σ).
   Proof.
-    solve_proper_core ltac:(fun _ => first [ intros ?; progress simpl | by auto | f_contractive | f_equiv ]).
+    solve_proper_core ltac:(fun _ =>
+      first [ intros ?; progress simpl | by auto | f_contractive | f_equiv ]).
   Qed.
 
   Global Instance saved_pred_discarded_persistent γ Φ :
-    Persistent (saved_pred_own γ DfracDiscarded Φ).
+    Persistent (γ ↪PRED□ Φ).
   Proof. apply _. Qed.
 
-  Global Instance saved_pred_fractional γ Φ : Fractional (λ q, saved_pred_own γ (DfracOwn q) Φ).
+  Global Instance saved_pred_fractional γ Φ : Fractional (λ q, γ ↪PRED{#q} Φ).
   Proof. apply _. Qed.
   Global Instance saved_pred_as_fractional γ Φ q :
-    AsFractional (saved_pred_own γ (DfracOwn q) Φ) (λ q, saved_pred_own γ (DfracOwn q) Φ) q.
+    AsFractional (γ ↪PRED{#q} Φ) (λ q, γ ↪PRED{#q} Φ) q.
   Proof. apply _. Qed.
 
   (** Allocation *)
-  Lemma saved_pred_alloc_strong (I : gname → Prop) (Φ : A → iProp Σ) dq :
+  Lemma saved_pred_alloc_strong (I : gname → Prop) Φ dq :
     ✓ dq →
     pred_infinite I →
-    ⊢ |==> ∃ γ, ⌜I γ⌝ ∗ saved_pred_own γ dq Φ.
+    ⊢ |==> ∃ γ, ⌜I γ⌝ ∗ γ ↪PRED{dq} Φ.
   Proof. intros ??. by apply saved_anything_alloc_strong. Qed.
 
-  Lemma saved_pred_alloc_cofinite (G : gset gname) (Φ : A → iProp Σ) dq :
+  Lemma saved_pred_alloc_cofinite (G : gset gname) Φ dq :
     ✓ dq →
-    ⊢ |==> ∃ γ, ⌜γ ∉ G⌝ ∗ saved_pred_own γ dq Φ.
+    ⊢ |==> ∃ γ, ⌜γ ∉ G⌝ ∗ γ ↪PRED{dq} Φ.
   Proof. by apply saved_anything_alloc_cofinite. Qed.
 
-  Lemma saved_pred_alloc (Φ : A → iProp Σ) dq :
+  Lemma saved_pred_alloc Φ dq :
     ✓ dq →
-    ⊢ |==> ∃ γ, saved_pred_own γ dq Φ.
+    ⊢ |==> ∃ γ, γ ↪PRED{dq} Φ.
   Proof. apply saved_anything_alloc. Qed.
 
   (** Validity *)
   Lemma saved_pred_valid γ dq Φ :
-    saved_pred_own γ dq Φ -∗ ⌜✓ dq⌝.
+    γ ↪PRED{dq} Φ -∗ ⌜✓ dq⌝.
   Proof. apply saved_anything_valid. Qed.
   Lemma saved_pred_valid_2 γ dq1 dq2 Φ Ψ x :
-    saved_pred_own γ dq1 Φ -∗ saved_pred_own γ dq2 Ψ -∗ ⌜✓ (dq1 ⋅ dq2)⌝ ∗ ▷ (Φ x ≡ Ψ x).
+    γ ↪PRED{dq1} Φ -∗ γ ↪PRED{dq2} Ψ -∗ ⌜✓ (dq1 ⋅ dq2)⌝ ∗ ▷ (Φ x ≡ Ψ x).
   Proof.
     iIntros "HΦ HΨ".
     iCombine "HΦ HΨ" gives "($ & Hag)".
     iApply later_equivI. by iApply (discrete_fun_equivI with "Hag").
   Qed.
   Lemma saved_pred_agree γ dq1 dq2 Φ Ψ x :
-    saved_pred_own γ dq1 Φ -∗ saved_pred_own γ dq2 Ψ -∗ ▷ (Φ x ≡ Ψ x).
+    γ ↪PRED{dq1} Φ -∗ γ ↪PRED{dq2} Ψ -∗ ▷ (Φ x ≡ Ψ x).
   Proof. iIntros "HΦ HΨ". iPoseProof (saved_pred_valid_2 with "HΦ HΨ") as "[_ $]". Qed.
 
   (** Make an element read-only. *)
   Lemma saved_pred_persist γ dq Φ :
-    saved_pred_own γ dq Φ ==∗ saved_pred_own γ DfracDiscarded Φ.
+    γ ↪PRED{dq} Φ ==∗ γ ↪PRED□ Φ.
   Proof. apply saved_anything_persist. Qed.
 
   (** Recover fractional ownership for read-only element. *)
   Lemma saved_pred_unpersist γ Φ:
-    saved_pred_own γ DfracDiscarded Φ ==∗ ∃ q, saved_pred_own γ (DfracOwn q) Φ.
+    γ ↪PRED□ Φ ==∗ ∃ q, γ ↪PRED{#q} Φ.
   Proof. apply saved_anything_unpersist. Qed.
 
   (** Updates *)
   Lemma saved_pred_update Ψ γ Φ :
-    saved_pred_own γ (DfracOwn 1) Φ ==∗ saved_pred_own γ (DfracOwn 1) Ψ.
+    γ ↪PRED Φ ==∗ γ ↪PRED Ψ.
   Proof. apply saved_anything_update. Qed.
   Lemma saved_pred_update_2 Ψ γ q1 q2 Φ1 Φ2 :
     (q1 + q2 = 1)%Qp →
-    saved_pred_own γ (DfracOwn q1) Φ1 -∗ saved_pred_own γ (DfracOwn q2) Φ2 ==∗
-    saved_pred_own γ (DfracOwn q1) Ψ ∗ saved_pred_own γ (DfracOwn q2) Ψ.
+    γ ↪PRED{#q1} Φ1 -∗ γ ↪PRED{#q2} Φ2 ==∗ γ ↪PRED{#q1} Ψ ∗ γ ↪PRED{#q2} Ψ.
   Proof. apply saved_anything_update_2. Qed.
   Lemma saved_pred_update_halves Ψ γ Φ1 Φ2 :
-    saved_pred_own γ (DfracOwn (1/2)) Φ1 -∗
-    saved_pred_own γ (DfracOwn (1/2)) Φ2 ==∗
-    saved_pred_own γ (DfracOwn (1/2)) Ψ ∗ saved_pred_own γ (DfracOwn (1/2)) Ψ.
+    γ ↪PRED{#1/2} Φ1 -∗ γ ↪PRED{#1/2} Φ2 ==∗ γ ↪PRED{#1/2} Ψ ∗ γ ↪PRED{#1/2} Ψ.
   Proof. apply saved_anything_update_halves. Qed.
 End saved_pred.

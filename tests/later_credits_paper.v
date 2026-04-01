@@ -85,11 +85,11 @@ Lemma nested_invariants_example `{!heapGS Σ} `{!ghost_varG Σ loc} γ (l : loc)
   (** Assume that the location [l] is managed through another indirection with a ghost variable [γ],
      a situation you might well encounter as part of more complicated proof setups.
      The ownership of the location [l] itself is kept inside a nested invariant. *)
-  inv (nroot .@ "1") (∃ l : loc, inv (nroot .@ "2") (∃ n : nat, l ↦ #n) ∗ ghost_var γ (1/2) l) -∗
+  inv (nroot .@ "1") (∃ l : loc, inv (nroot .@ "2") (∃ n : nat, l ↦ #n) ∗ γ ↪VAR{#1/2} l) -∗
   (** One half of [γ] is kept outside the invariant to keep knowledge about the location [l].
      We also assume to get one later credit, perhaps from a preceding pure step or from a
      totally different part of the program. *)
-  {{{ ghost_var γ (1/2) l ∗ £ 1 }}} #l <- #42 {{{ v, RET v; True }}}.
+  {{{ γ ↪VAR{#1/2} l ∗ £ 1 }}} #l <- #42 {{{ v, RET v; True }}}.
 Proof.
   iIntros "#Hinv". iIntros (Φ) "!> (Hv & Hcred) Hpost".
   (** We open the outer invariant... *)

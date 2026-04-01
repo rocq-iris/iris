@@ -32,13 +32,13 @@ Section tada.
   }.
   
   Definition tada_lock_state (γ : tada_lock_name) (s : state) : iProp Σ :=
-    ghost_var γ.(tada_lock_name_state) (3/4) s ∗
+    γ.(tada_lock_name_state) ↪VAR{#3/4} s ∗
     if s is Locked then
-      locked γ.(tada_lock_name_lock) ∗ ghost_var γ.(tada_lock_name_state) (1/4) Locked
+      locked γ.(tada_lock_name_lock) ∗ γ.(tada_lock_name_state) ↪VAR{#1/4} Locked
     else True.
   Definition tada_is_lock (γ : tada_lock_name) (lk : val) : iProp Σ :=
     is_lock γ.(tada_lock_name_lock) lk
-      (ghost_var γ.(tada_lock_name_state) (1/4) Free).
+      (γ.(tada_lock_name_state) ↪VAR{#1/4} Free).
 
   Global Instance tada_is_lock_persistent γ lk : Persistent (tada_is_lock γ lk).
   Proof. apply _. Qed.

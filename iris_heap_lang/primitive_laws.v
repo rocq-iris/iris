@@ -27,10 +27,10 @@ Section steps.
   Context `{!heapGS_gen hlc Σ}.
 
   Local Definition steps_auth (n : nat) : iProp Σ :=
-    mono_nat_auth_own heapGS_step_name 1 n.
+    heapGS_step_name ↪●MN n.
 
   Definition steps_lb (n : nat) : iProp Σ :=
-    mono_nat_lb_own heapGS_step_name n.
+    heapGS_step_name ↪◯MN n.
 
   Lemma steps_lb_0 :
     ⊢ |==> steps_lb 0.

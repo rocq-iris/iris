@@ -40,7 +40,7 @@ Proof.
   iModIntro.
   iExists (λ σ ns κs nt, (gen_heap_interp σ.(heap) ∗
                           proph_map_interp κs σ.(used_proph_id) ∗
-                          mono_nat_auth_own γ 1 ns))%I.
+                          γ ↪●MN ns))%I.
   iExists [(λ v, ⌜φ v⌝%I)], (λ _, True)%I, _ => /=.
   iFrame.
   iIntros (es' t2' -> ? ?) " _ H _".

@@ -18,7 +18,7 @@ Proof.
   iExists
     (λ σ ns κs _, (gen_heap_interp σ.(heap) ∗
                    proph_map_interp κs σ.(used_proph_id) ∗
-                   mono_nat_auth_own γ 1 ns)%I),
+                   γ ↪●MN ns)%I),
     id, (λ _, True%I), _; iFrame.
   by iApply (Hwp (HeapGS _ _ _ _ _ _ _ _)).
 Qed.

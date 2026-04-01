@@ -21,14 +21,14 @@ Global Instance subG_mono_natΣ Σ : subG mono_natΣ Σ → mono_natG Σ.
 Proof. solve_inG. Qed.
 
 Local Definition mono_nat_auth_own_def `{!mono_natG Σ}
-    (γ : gname) (q : Qp) (n : nat) : iProp Σ :=
-  own γ (●MN{#q} n).
+    (γ : gname) (dq : dfrac) (n : nat) : iProp Σ :=
+  own γ (●MN{dq} n).
 Local Definition mono_nat_auth_own_aux : seal (@mono_nat_auth_own_def).
 Proof. by eexists. Qed.
 Definition mono_nat_auth_own := mono_nat_auth_own_aux.(unseal).
 Local Definition mono_nat_auth_own_unseal :
   @mono_nat_auth_own = @mono_nat_auth_own_def := mono_nat_auth_own_aux.(seal_eq).
-Global Arguments mono_nat_auth_own {Σ _} γ q n.
+Global Arguments mono_nat_auth_own {Σ _} γ dq n.
 
 Local Definition mono_nat_lb_own_def `{!mono_natG Σ} (γ : gname) (n : nat): iProp Σ :=
   own γ (◯MN n).
@@ -38,6 +38,17 @@ Local Definition mono_nat_lb_own_unseal :
   @mono_nat_lb_own = @mono_nat_lb_own_def := mono_nat_lb_own_aux.(seal_eq).
 Global Arguments mono_nat_lb_own {Σ _} γ n.
 
+Notation "γ ↪●MN dq n" := (mono_nat_auth_own γ dq n)
+  (at level 20, dq custom dfrac at level 1,
+   format "γ  ↪●MN dq  n").
+Notation "γ ↪◯MN n" := (mono_nat_lb_own γ n)
+  (at level 20).
+
+(* Compatibility alias. Do not use for new code.
+This will eventually be deprecated and removed. *)
+Notation mono_nat_auth_own_frac γ q n :=
+  (mono_nat_auth_own γ (DfracOwn q) n) (only parsing).
+
 Local Ltac unseal := rewrite
   ?mono_nat_auth_own_unseal /mono_nat_auth_own_def
   ?mono_nat_lb_own_unseal /mono_nat_lb_own_def.
@@ -46,37 +57,39 @@ Section mono_nat.
   Context `{!mono_natG Σ}.
   Implicit Types (n m : nat).
 
-  Global Instance mono_nat_auth_own_timeless γ q n : Timeless (mono_nat_auth_own γ q n).
+  Global Instance mono_nat_auth_own_timeless γ dq n : Timeless (γ ↪●MN{dq} n).
   Proof. unseal. apply _. Qed.
-  Global Instance mono_nat_lb_own_timeless γ n : Timeless (mono_nat_lb_own γ n).
+  Global Instance mono_nat_auth_own_persistent γ n : Persistent (γ ↪●MN□ n).
   Proof. unseal. apply _. Qed.
-  Global Instance mono_nat_lb_own_persistent γ n : Persistent (mono_nat_lb_own γ n).
+  Global Instance mono_nat_lb_own_timeless γ n : Timeless (γ ↪◯MN n).
+  Proof. unseal. apply _. Qed.
+  Global Instance mono_nat_lb_own_persistent γ n : Persistent (γ ↪◯MN n).
   Proof. unseal. apply _. Qed.
 
   Global Instance mono_nat_auth_own_fractional γ n :
-    Fractional (λ q, mono_nat_auth_own γ q n).
+    Fractional (λ q, γ ↪●MN{#q} n).
   Proof. unseal. intros p q. rewrite -own_op -mono_nat_auth_dfrac_op //. Qed.
   Global Instance mono_nat_auth_own_as_fractional γ q n :
-    AsFractional (mono_nat_auth_own γ q n) (λ q, mono_nat_auth_own γ q n) q.
+    AsFractional (γ ↪●MN{#q} n) (λ q, γ ↪●MN{#q} n) q.
   Proof. split; [auto|apply _]. Qed.
 
-  Lemma mono_nat_auth_own_agree γ q1 q2 n1 n2 :
-    mono_nat_auth_own γ q1 n1 -∗
-    mono_nat_auth_own γ q2 n2 -∗
-    ⌜(q1 + q2 ≤ 1)%Qp ∧ n1 = n2⌝.
+  Lemma mono_nat_auth_own_agree γ dq1 dq2 n1 n2 :
+    γ ↪●MN{dq1} n1 -∗
+    γ ↪●MN{dq2} n2 -∗
+    ⌜✓ (dq1 ⋅ dq2) ∧ n1 = n2⌝.
   Proof.
     unseal. iIntros "H1 H2".
     iCombine "H1 H2" gives %?%mono_nat_auth_dfrac_op_valid; done.
   Qed.
   Lemma mono_nat_auth_own_exclusive γ n1 n2 :
-    mono_nat_auth_own γ 1 n1 -∗ mono_nat_auth_own γ 1 n2 -∗ False.
+    γ ↪●MN n1 -∗ γ ↪●MN n2 -∗ False.
   Proof.
     iIntros "H1 H2".
     by iDestruct (mono_nat_auth_own_agree with "H1 H2") as %[[] _].
   Qed.
 
-  Lemma mono_nat_lb_own_valid γ q n m :
-    mono_nat_auth_own γ q n -∗ mono_nat_lb_own γ m -∗ ⌜(q ≤ 1)%Qp ∧ m ≤ n⌝.
+  Lemma mono_nat_lb_own_valid γ dq n m :
+    γ ↪●MN{dq} n -∗ γ ↪◯MN m -∗ ⌜✓ dq ∧ m ≤ n⌝.
   Proof.
     unseal. iIntros "Hauth Hlb".
     iCombine "Hauth Hlb" gives %Hvalid%mono_nat_both_dfrac_valid.
@@ -87,22 +100,22 @@ Section mono_nat.
   the [mono_nat_auth_own] in the premise as long as the conclusion is introduced
   to the persistent context, for example with [iDestruct (mono_nat_lb_own_get
   with "Hauth") as "#Hfrag"]. *)
-  Lemma mono_nat_lb_own_get γ q n :
-    mono_nat_auth_own γ q n -∗ mono_nat_lb_own γ n.
+  Lemma mono_nat_lb_own_get γ dq n :
+    γ ↪●MN{dq} n -∗ γ ↪◯MN n.
   Proof. unseal. iApply own_mono. apply mono_nat_included. Qed.
 
   Lemma mono_nat_lb_own_le {γ n} n' :
     n' ≤ n →
-    mono_nat_lb_own γ n -∗ mono_nat_lb_own γ n'.
+    γ ↪◯MN n -∗ γ ↪◯MN n'.
   Proof. unseal. intros. iApply own_mono. by apply mono_nat_lb_mono. Qed.
 
   Lemma mono_nat_lb_own_0 γ :
-    ⊢ |==> mono_nat_lb_own γ 0.
+    ⊢ |==> γ ↪◯MN 0.
   Proof. unseal. iApply own_unit. Qed.
 
   Lemma mono_nat_own_alloc_strong P n :
     pred_infinite P →
-    ⊢ |==> ∃ γ, ⌜P γ⌝ ∗ mono_nat_auth_own γ 1 n ∗ mono_nat_lb_own γ n.
+    ⊢ |==> ∃ γ, ⌜P γ⌝ ∗ γ ↪●MN n ∗ γ ↪◯MN n.
   Proof.
     unseal. intros.
     iMod (own_alloc_strong (●MN n ⋅ ◯MN n) P) as (γ) "[% [??]]"; first done.
@@ -110,7 +123,7 @@ Section mono_nat.
     auto with iFrame.
   Qed.
   Lemma mono_nat_own_alloc n :
-    ⊢ |==> ∃ γ, mono_nat_auth_own γ 1 n ∗ mono_nat_lb_own γ n.
+    ⊢ |==> ∃ γ, γ ↪●MN n ∗ γ ↪◯MN n.
   Proof.
     iMod (mono_nat_own_alloc_strong (λ _, True) n) as (γ) "[_ ?]".
     - by apply pred_infinite_True.
@@ -119,11 +132,26 @@ Section mono_nat.
 
   Lemma mono_nat_own_update {γ n} n' :
     n ≤ n' →
-    mono_nat_auth_own γ 1 n ==∗ mono_nat_auth_own γ 1 n' ∗ mono_nat_lb_own γ n'.
+    γ ↪●MN n ==∗ γ ↪●MN n' ∗ γ ↪◯MN n'.
   Proof.
     iIntros (?) "Hauth".
-    iAssert (mono_nat_auth_own γ 1 n') with "[> Hauth]" as "Hauth".
+    iAssert (γ ↪●MN n') with "[> Hauth]" as "Hauth".
     { unseal. iApply (own_update with "Hauth"). by apply mono_nat_update. }
     iModIntro. iSplit; [done|]. by iApply mono_nat_lb_own_get.
+  Qed.
+
+  Lemma mono_nat_own_persist γ dq a :
+    γ ↪●MN{dq} a ==∗ γ ↪●MN□ a.
+  Proof.
+    unseal. iApply own_update. apply mono_nat_auth_persist.
+  Qed.
+  Lemma mono_nat_own_unpersist γ a :
+    γ ↪●MN□ a ==∗ ∃ q, γ ↪●MN{#q} a.
+  Proof.
+    unseal. iIntros "H".
+    iMod (own_updateP with "H") as "H";
+      first by apply mono_nat_auth_unpersist.
+    iDestruct "H" as (? (q&->)) "H".
+    iIntros "!>". iExists q. done.
   Qed.
 End mono_nat.
