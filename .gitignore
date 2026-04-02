@@ -18,9 +18,9 @@
 builddep/
 _RocqProject
 _RocqProject.*
-Makefile.coq
-Makefile.coq.conf
-.Makefile.coq.d
+Makefile.rocq
+Makefile.rocq.conf
+.Makefile.rocq.d
 Makefile.package.*
 .Makefile.package.*
 _opam
