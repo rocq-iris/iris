@@ -12,3 +12,7 @@
 # (https://github.com/coq/coq/issues/6294).
 -w
 -redundant-canonical-projection
+
+# Needs Rocq 9.2.
+-w
+-notation-for-abbreviation
