@@ -231,9 +231,9 @@ goal 2 is:
   v : nat
   q1, q2 : Qp
   ============================
-  "H" : ghost_var l (q1 + q2) v
+  "H" : l ↪VAR{#q1 + q2} v
   --------------------------------------∗
-  ghost_var l (q1 + q2) v
+  l ↪VAR{#q1 + q2} v
 "iMod_WP_mask_mismatch"
      : string
 The command has indeed failed with message:

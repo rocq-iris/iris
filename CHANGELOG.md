@@ -5,7 +5,34 @@ lemma.
 
 ## Iris master
 
-(currently empty)
+**Changes in `base_logic`:**
+
+* Generalize `ghost_var`, `mono_nat_auth` and `mono_Z_auth` to use discardable
+  fractional permissions (`dfrac`) instead of ordinary fractional permissions
+  (`frac`). To aid in porting old code automatically (see the `sed` script
+  below), compatibility aliases have been added: `ghost_var_frac`,
+  `mono_nat_auth_own_frac`, `mono_Z_auth_own_frac`.
+* Add notations for "ghost variable"-like connectives, and make existing ones
+  consistent:
+  + (new) `ghost_var γ dq n` becomes `γ ↪VAR dq n`.
+  + (new) `mono_nat_auth_own γ dq n` becomes `γ ↪●MN dq n`.
+  + (new) `mono_nat_lb_own γ n` becomes `γ ↪◯MN n`.
+  + (new) `mono_Z_auth_own γ dq n` becomes `γ ↪●MZ dq n`.
+  + (new) `mono_Z_lb_own γ n` becomes `γ ↪◯MZ n`.
+  + (new) `saved_prop_own γ dq P` becomes `γ ↪PROP dq P`.
+  + (new) `saved_pred_own γ dq Φ` becomes `γ ↪PRED dq Φ`.
+
+The following `sed` script helps adjust your code to the renaming (on macOS,
+replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
+Note that the script is not idempotent, do not run it twice.
+```
+sed -i -E -f- $(find theories -name "*.v") <<EOF
+# frac → dfrac in ghost state libraries
+s/\bghost_var\b/ghost_var_frac/g
+s/\bmono_nat_auth_own\b/mono_nat_auth_own_frac/g
+s/\bmono_Z_auth_own\b/mono_Z_auth_own_frac/g
+EOF
+```
 
 ## Iris 4.5.0 (2026-03-05)
 

@@ -214,12 +214,12 @@ Section tests_iprop.
   Qed.
 
   Lemma test_embed_fractional `{!ghost_varG Σ A} γ q (a : A) :
-    ⎡ghost_var γ q a⎤ ⊢@{monPredI} ⎡ghost_var γ (q/2) a⎤ ∗ ⎡ghost_var γ (q/2) a⎤.
+    ⎡γ ↪VAR{#q} a⎤ ⊢@{monPredI} ⎡γ  ↪VAR{#q/2} a⎤ ∗ ⎡γ  ↪VAR{#q/2} a⎤.
   Proof. iIntros "[$ $]". Qed.
 
   Lemma test_embed_combine `{!ghost_varG Σ A} γ q (a1 a2 : A) :
-    ▷ ⎡ghost_var γ (q/2) a1⎤ ∗ ▷ ⎡ghost_var γ (q/2) a2⎤ ⊢@{monPredI}
-            ▷⎡ghost_var γ q a1⎤ ∗ ▷ ⌜a1 = a2⌝.
+    ▷ ⎡γ ↪VAR{#q/2} a1⎤ ∗ ▷ ⎡γ ↪VAR{#q/2} a2⎤ ⊢@{monPredI}
+            ▷⎡γ ↪VAR{#q} a1⎤ ∗ ▷ ⌜a1 = a2⌝.
   Proof.
     iIntros "[H1 H2]".
     iCombine "H1 H2" as "$" gives "#H". iNext.
