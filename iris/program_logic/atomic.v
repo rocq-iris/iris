@@ -48,6 +48,10 @@ From iris.program_logic Require Export weakestpre.
 From iris.base_logic Require Import invariants.
 From iris.prelude Require Import options.
 
+(* This warning is misleading for Hoare triple style notation where the first
+terminal can also occur in the middle of a notation. *)
+Local Set Warnings "-closed-notation-not-level-0".
+
 (* This hard-codes the inner mask to be empty, because we have yet to find an
 example where we want it to be anything else.
 

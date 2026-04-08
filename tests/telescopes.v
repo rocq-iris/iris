@@ -74,7 +74,7 @@ Notation "'ACC' @ E1 , E2 {{ ∃ x1 .. xn , α | β | γ } }" :=
                       fun x1 => .. (fun xn => β%I) ..)
             (tele_app (TT:=TeleS (fun x1 => .. (TeleS (fun xn => TeleO)) .. )) $
                       fun x1 => .. (fun xn => γ%I) ..))
-  (at level 20, α, β, γ at level 200, x1 binder, xn binder, only parsing).
+  (α, β, γ at level 200, x1 binder, xn binder, only parsing).
 
 (* Working with abstract telescopes. *)
 Section tests.
@@ -125,7 +125,7 @@ Notation "'TEST1' {{ ∃ x1 .. xn , α } }" :=
   (test1 (X:=TeleS (fun x1 => .. (TeleS (fun xn => TeleO)) .. ))
             (tele_app (TT:=TeleS (fun x1 => .. (TeleS (fun xn => TeleO)) .. )) $
                       fun x1 => .. (fun xn => α%I) ..))
-  (at level 20, α at level 200, x1 binder, xn binder, only parsing).
+  (α at level 200, x1 binder, xn binder, only parsing).
 
 Definition test2 {PROP : bi} {X : tele} (α : X → PROP) : PROP :=
   (▷ ∃.. x, α x)%I.
@@ -134,7 +134,7 @@ Notation "'TEST2' {{ ∃ x1 .. xn , α } }" :=
   (test2 (X:=TeleS (fun x1 => .. (TeleS (fun xn => TeleO)) .. ))
             (tele_app (TT:=TeleS (fun x1 => .. (TeleS (fun xn => TeleO)) .. )) $
                       fun x1 => .. (fun xn => α%I) ..))
-  (at level 20, α at level 200, x1 binder, xn binder, only parsing).
+  (α at level 200, x1 binder, xn binder, only parsing).
 
 Definition test3 {PROP : bi} {X : tele} (α : X → PROP) : PROP :=
   (◇ ∃.. x, α x)%I.
@@ -143,7 +143,7 @@ Notation "'TEST3' {{ ∃ x1 .. xn , α } }" :=
   (test3 (X:=TeleS (fun x1 => .. (TeleS (fun xn => TeleO)) .. ))
             (tele_app (TT:=TeleS (fun x1 => .. (TeleS (fun xn => TeleO)) .. )) $
                       fun x1 => .. (fun xn => α%I) ..))
-  (at level 20, α at level 200, x1 binder, xn binder, only parsing).
+  (α at level 200, x1 binder, xn binder, only parsing).
 
 Check "test1_test".
 Lemma test1_test {PROP : bi}  :
