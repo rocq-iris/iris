@@ -5,8 +5,6 @@ lemma.
 
 ## Iris master
 
-This version of Iris requires Rocq-Stdlib 9.1.0.
-
 **Changes in `base_logic`:**
 
 * Generalize `ghost_var`, `mono_nat_auth` and `mono_Z_auth` to use discardable
