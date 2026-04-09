@@ -30,10 +30,10 @@ Global Instance: Params (@big_opL) 6 := {}.
 Global Arguments big_opL {SI} {M} o {u _ A} _ !_ /.
 Global Typeclasses Opaque big_opL.
 Notation "'[^' o 'list]' k ↦ x ∈ l , P" := (big_opL o (λ k x, P) l)
-  (at level 200, o at level 1, l at level 10, k, x at level 1, right associativity,
+  (at level 200, o at level 1, l at level 200, k, x at level 1, right associativity,
    format "[^ o  list]  k ↦ x  ∈  l ,  P") : stdpp_scope.
 Notation "'[^' o 'list]' x ∈ l , P" := (big_opL o (λ _ x, P) l)
-  (at level 200, o at level 1, l at level 10, x at level 1, right associativity,
+  (at level 200, o at level 1, l at level 200, x at level 1, right associativity,
    format "[^ o  list]  x  ∈  l ,  P") : stdpp_scope.
 
 Local Definition big_opM_def {SI : sidx} {M : ofe}
@@ -46,10 +46,10 @@ Local Definition big_opM_unseal :
   @big_opM = @big_opM_def := big_opM_aux.(seal_eq).
 Global Instance: Params (@big_opM) 9 := {}.
 Notation "'[^' o 'map]' k ↦ x ∈ m , P" := (big_opM o (λ k x, P) m)
-  (at level 200, o at level 1, m at level 10, k, x at level 1, right associativity,
+  (at level 200, o at level 1, m at level 200, k, x at level 1, right associativity,
    format "[^  o  map]  k ↦ x  ∈  m ,  P") : stdpp_scope.
 Notation "'[^' o 'map]' x ∈ m , P" := (big_opM o (λ _ x, P) m)
-  (at level 200, o at level 1, m at level 10, x at level 1, right associativity,
+  (at level 200, o at level 1, m at level 200, x at level 1, right associativity,
    format "[^ o  map]  x  ∈  m ,  P") : stdpp_scope.
 
 Local Definition big_opS_def {SI : sidx} {M : ofe}
@@ -62,7 +62,7 @@ Local Definition big_opS_unseal :
   @big_opS = @big_opS_def := big_opS_aux.(seal_eq).
 Global Instance: Params (@big_opS) 8 := {}.
 Notation "'[^' o 'set]' x ∈ X , P" := (big_opS o (λ x, P) X)
-  (at level 200, o at level 1, X at level 10, x at level 1, right associativity,
+  (at level 200, o at level 1, X at level 200, x at level 1, right associativity,
    format "[^ o  set]  x  ∈  X ,  P") : stdpp_scope.
 
 Local Definition big_opMS_def {SI : sidx} {M : ofe}
@@ -75,7 +75,7 @@ Local Definition big_opMS_unseal :
   @big_opMS = @big_opMS_def := big_opMS_aux.(seal_eq).
 Global Instance: Params (@big_opMS) 9 := {}.
 Notation "'[^' o 'mset]' x ∈ X , P" := (big_opMS o (λ x, P) X)
-  (at level 200, o at level 1, X at level 10, x at level 1, right associativity,
+  (at level 200, o at level 1, X at level 200, x at level 1, right associativity,
    format "[^ o  mset]  x  ∈  X ,  P") : stdpp_scope.
 
 (** * Properties about big ops *)
