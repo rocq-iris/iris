@@ -12,11 +12,15 @@ Record spec_goal := SpecGoal {
   spec_goal_done : bool
 }.
 
+Section spec_pat.
+(* Rocq anyway cannot generate a useful scheme for this type. *)
+Unset Elimination Schemes.
 Inductive spec_pat :=
   | SIdent : ident → list spec_pat → spec_pat
   | SPureGoal (perform_done : bool) : spec_pat
   | SGoal : spec_goal → spec_pat
   | SAutoFrame : goal_kind → spec_pat.
+End spec_pat.
 
 Definition goal_kind_modal (k : goal_kind) : bool :=
   match k with GModal => true | _ => false end.
