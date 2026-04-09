@@ -252,6 +252,9 @@ Qed.
 (** logical entailement *)
 Inductive uPred_entails {M} (P Q : uPred M) : Prop :=
   { uPred_in_entails : ∀ n x, ✓{n} x → P n x → Q n x }.
+
+(* A small hint DB for local use below. *)
+Local Create HintDb uPred_def discriminated.
 Global Hint Resolve uPred_mono : uPred_def.
 
 (** logical connectives *)

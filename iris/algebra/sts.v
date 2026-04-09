@@ -32,6 +32,9 @@ Local Arguments valid _ _ !_ /.
 Local Arguments op _ _ !_ !_ /.
 Local Arguments core _ _ !_ /.
 
+(* A local hint DB for use in this file. *)
+Local Create HintDb sts.
+
 (** * Definition of STSs *)
 Module sts.
 Structure stsT := Sts {
@@ -75,6 +78,7 @@ Definition up_set (S : states sts) (T : tokens sts) : states sts :=
 
 (** Tactic setup *)
 Local Hint Resolve Step : core.
+
 Local Hint Extern 50 (equiv (A:=propset _) _ _) => set_solver : sts.
 Local Hint Extern 50 (¬equiv (A:=propset _) _ _) => set_solver : sts.
 Local Hint Extern 50 (_ ∈ _) => set_solver : sts.

@@ -2291,4 +2291,5 @@ Global Hint Extern 1 (envs_entails _ (|==> _)) => iModIntro : core.
 Global Hint Extern 1 (envs_entails _ (<absorb> _)) => iModIntro : core.
 Global Hint Extern 2 (envs_entails _ (|={_}=> _)) => iModIntro : core.
 
+Create HintDb iFrame.
 Global Hint Extern 2 (envs_entails _ (_ ∗ _)) => progress iFrame : iFrame.

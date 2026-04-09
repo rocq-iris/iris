@@ -57,6 +57,9 @@ Definition SiProp_downclose (Pi : nat → Prop) : siProp :=
 (** logical entailement *)
 Inductive siProp_entails (P Q : siProp) : Prop :=
   { siProp_in_entails : ∀ n, P n → Q n }.
+
+(* A small hint DB for local use below. *)
+Local Create HintDb siProp_def discriminated.
 Global Hint Resolve siProp_closed : siProp_def.
 
 (** logical connectives *)
