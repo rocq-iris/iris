@@ -93,11 +93,11 @@ Notation "P ={ E1 } [ E2 ]|>=* Q" := (P ={E1}[E2]▷=∗ Q)%I
   (at level 99, E1,E2 at level 50, Q at level 200, only parsing) : bi_scope.
 
 Notation "|={ E }|>=> Q" := (|={E}▷=> Q)%I
-  (at level 99, E at level 50, Q at level 200, only parsing) : bi_scope.
+  (at level 20, E at level 50, Q at level 200, only parsing) : bi_scope.
 Notation "P ={ E }|>=* Q" := (P ={E}▷=∗ Q)%I
   (at level 99, E at level 50, Q at level 200, only parsing) : bi_scope.
 Notation "|={ E1 } [ E2 ]|>=>^ n Q" := (|={E1}[E2]▷=>^n Q)%I
-  (at level 99, E1,E2 at level 50, n at level 9, Q at level 200, only parsing)
+  (at level 20, E1,E2 at level 50, n at level 9, Q at level 200, only parsing)
   : bi_scope.
 Notation "P ={ E1 } [ E2 ]|>=*^ n Q" := (P ={E1}[E2]▷=∗^n Q)%I
   (at level 99, E1,E2 at level 50, n at level 9, Q at level 200, only parsing)

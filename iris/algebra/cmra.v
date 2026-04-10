@@ -44,7 +44,7 @@ Notation "✓{ n } x" := (validN n x)
 Class Valid (A : Type) := valid : A → Prop.
 Global Hint Mode Valid ! : typeclass_instances.
 Global Instance: Params (@valid) 2 := {}.
-Notation "✓ x" := (valid x) (at level 20) : stdpp_scope.
+Notation "✓ x" := (valid x) (at level 20, right associativity) : stdpp_scope.
 
 Definition includedN {SI : sidx} `{!Dist A, Op A} (n : SI) (x y : A) :=
   ∃ z, y ≡{n}≡ x ⋅ z.
