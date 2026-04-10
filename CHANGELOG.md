@@ -5,9 +5,16 @@ lemma.
 
 ## Iris master
 
-**Changes in `program_bi`:**
+**Changes in `algebra`:**
+
+* Change `✓` notation to be explicitly right-associative.
+* Change big-op notations to parse the collection that they iterate over at
+  level 200.
+
+**Changes in `bi`:**
 
 * Change atomic update notations (`AU` and `AACC`) to level 0.
+* Change the update modality notations to level 20.
 
 **Changes in `base_logic`:**
 
