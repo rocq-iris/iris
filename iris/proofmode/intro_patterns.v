@@ -6,6 +6,9 @@ Inductive gallina_ident :=
   | IGallinaNamed : string → gallina_ident
   | IGallinaAnon : gallina_ident.
 
+Section intro_pat.
+(* Rocq anyway cannot generate a useful scheme for this type. *)
+Unset Elimination Schemes.
 Inductive intro_pat :=
   | IIdent : ident → intro_pat
   | IFresh : intro_pat
@@ -25,6 +28,7 @@ Inductive intro_pat :=
   | IAll : intro_pat
   | IClear : sel_pat → intro_pat
   | IClearFrame : sel_pat → intro_pat.
+End intro_pat.
 
 Module intro_pat.
 Inductive stack_item :=
