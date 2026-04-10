@@ -112,7 +112,7 @@ function [foo] into a unary function taking a telescope as the argument. *)
                          tele_app (λ y1, .. (λ yn, Φ%I) .. )
                         ) .. )
   )
-  (at level 20, Eo, Ei, α, β, Φ at level 200, x1 binder, xn binder, y1 binder, yn binder,
+  (at level 0, Eo, Ei, α, β, Φ at level 200, x1 binder, xn binder, y1 binder, yn binder,
    format "'[hv   ' 'AU'  '<{'  '[' ∃∃  x1  ..  xn ,  '/' α  ']' '}>'  '/' @  '[' Eo ,  '/' Ei ']'  '/' '<{'  '[' ∀∀  y1  ..  yn ,  '/' β ,  '/' COMM  Φ  ']' '}>' ']'") : bi_scope.
 
 Notation "'AU' '<{' ∃∃ x1 .. xn , α '}>' @ Eo , Ei '<{' β , 'COMM' Φ '}>'" :=
@@ -123,7 +123,7 @@ Notation "'AU' '<{' ∃∃ x1 .. xn , α '}>' @ Eo , Ei '<{' β , 'COMM' Φ '}>'
                  (tele_app $ λ x1, .. (λ xn, tele_app β%I) .. )
                  (tele_app $ λ x1, .. (λ xn, tele_app Φ%I) .. )
   )
-  (at level 20, Eo, Ei, α, β, Φ at level 200, x1 binder, xn binder,
+  (at level 0, Eo, Ei, α, β, Φ at level 200, x1 binder, xn binder,
    format "'[hv   ' 'AU'  '<{'  '[' ∃∃  x1  ..  xn ,  '/' α  ']' '}>'  '/' @  '[' Eo ,  '/' Ei ']'  '/' '<{'  '[' β ,  '/' COMM  Φ  ']' '}>' ']'") : bi_scope.
 
 Notation "'AU' '<{' α '}>' @ Eo , Ei '<{' ∀∀ y1 .. yn , β , 'COMM' Φ '}>'" :=
@@ -134,7 +134,7 @@ Notation "'AU' '<{' α '}>' @ Eo , Ei '<{' ∀∀ y1 .. yn , β , 'COMM' Φ '}>'
                  (tele_app $ tele_app (λ y1, .. (λ yn, β%I) ..))
                  (tele_app $ tele_app (λ y1, .. (λ yn, Φ%I) ..))
   )
-  (at level 20, Eo, Ei, α, β, Φ at level 200, y1 binder, yn binder,
+  (at level 0, Eo, Ei, α, β, Φ at level 200, y1 binder, yn binder,
    format "'[hv   ' 'AU'  '<{'  '[' α  ']' '}>'  '/' @  '[' Eo ,  '/' Ei ']'  '/' '<{'  '[' ∀∀  y1  ..  yn ,  '/' β ,  '/' COMM  Φ  ']' '}>' ']'") : bi_scope.
 
 Notation "'AU' '<{' α '}>' @ Eo , Ei '<{' β , 'COMM' Φ '}>'" :=
@@ -144,7 +144,7 @@ Notation "'AU' '<{' α '}>' @ Eo , Ei '<{' β , 'COMM' Φ '}>'" :=
                  (tele_app $ tele_app β%I)
                  (tele_app $ tele_app Φ%I)
   )
-  (at level 20, Eo, Ei, α, β, Φ at level 200,
+  (at level 0, Eo, Ei, α, β, Φ at level 200,
    format "'[hv   ' 'AU'  '<{'  '[' α  ']' '}>'  '/' @  '[' Eo ,  '/' Ei ']'  '/' '<{'  '[' β ,  '/' COMM  Φ  ']' '}>' ']'") : bi_scope.
 
 (** Notation: Atomic accessors *)
@@ -161,7 +161,7 @@ Notation "'AACC' '<{' ∃∃ x1 .. xn , α , 'ABORT' P '}>' @ Eo , Ei '<{' ∀�
                       tele_app (λ y1, .. (λ yn, Φ%I) .. )
                      ) .. )
   )
-  (at level 20, Eo, Ei, α, P, β, Φ at level 200, x1 binder, xn binder, y1 binder, yn binder,
+  (at level 0, Eo, Ei, α, P, β, Φ at level 200, x1 binder, xn binder, y1 binder, yn binder,
    format "'[hv     ' 'AACC'  '<{'  '[' ∃∃  x1  ..  xn ,  '/' α ,  '/' ABORT  P  ']' '}>'  '/' @  '[' Eo ,  '/' Ei ']'  '/' '<{'  '[' ∀∀  y1  ..  yn ,  '/' β ,  '/' COMM  Φ  ']' '}>' ']'") : bi_scope.
 
 Notation "'AACC' '<{' ∃∃ x1 .. xn , α , 'ABORT' P '}>' @ Eo , Ei '<{' β , 'COMM' Φ '}>'" :=
@@ -173,7 +173,7 @@ Notation "'AACC' '<{' ∃∃ x1 .. xn , α , 'ABORT' P '}>' @ Eo , Ei '<{' β , 
               (tele_app $ λ x1, .. (λ xn, tele_app β%I) .. )
               (tele_app $ λ x1, .. (λ xn, tele_app Φ%I) .. )
   )
-  (at level 20, Eo, Ei, α, P, β, Φ at level 200, x1 binder, xn binder,
+  (at level 0, Eo, Ei, α, P, β, Φ at level 200, x1 binder, xn binder,
    format "'[hv     ' 'AACC'  '<{'  '[' ∃∃  x1  ..  xn ,  '/' α ,  '/' ABORT  P  ']' '}>'  '/' @  '[' Eo ,  '/' Ei ']'  '/' '<{'  '[' β ,  '/' COMM  Φ  ']' '}>' ']'") : bi_scope.
 
 Notation "'AACC' '<{' α , 'ABORT' P '}>' @ Eo , Ei '<{' ∀∀ y1 .. yn , β , 'COMM' Φ '}>'" :=
@@ -185,7 +185,7 @@ Notation "'AACC' '<{' α , 'ABORT' P '}>' @ Eo , Ei '<{' ∀∀ y1 .. yn , β , 
               (tele_app $ tele_app (λ y1, .. (λ yn, β%I) ..))
               (tele_app $ tele_app (λ y1, .. (λ yn, Φ%I) ..))
   )
-  (at level 20, Eo, Ei, α, P, β, Φ at level 200, y1 binder, yn binder,
+  (at level 0, Eo, Ei, α, P, β, Φ at level 200, y1 binder, yn binder,
    format "'[hv     ' 'AACC'  '<{'  '[' α ,  '/' ABORT  P  ']' '}>'  '/' @  '[' Eo ,  '/' Ei ']'  '/' '<{'  '[' ∀∀  y1  ..  yn ,  '/' β ,  '/' COMM  Φ  ']' '}>' ']'") : bi_scope.
 
 Notation "'AACC' '<{' α , 'ABORT' P '}>' @ Eo , Ei '<{' β , 'COMM' Φ '}>'" :=
@@ -197,7 +197,7 @@ Notation "'AACC' '<{' α , 'ABORT' P '}>' @ Eo , Ei '<{' β , 'COMM' Φ '}>'" :=
               (tele_app $ tele_app β%I)
               (tele_app $ tele_app Φ%I)
   )
-  (at level 20, Eo, Ei, α, P, β, Φ at level 200,
+  (at level 0, Eo, Ei, α, P, β, Φ at level 200,
    format "'[hv     ' 'AACC'  '<{'  '[' α ,  '/' ABORT  P  ']' '}>'  '/' @  '[' Eo ,  '/' Ei ']'  '/' '<{'  '[' β ,  '/' COMM  Φ  ']' '}>' ']'") : bi_scope.
 
 (** Lemmas about AU *)

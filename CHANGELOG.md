@@ -5,6 +5,10 @@ lemma.
 
 ## Iris master
 
+**Changes in `program_bi`:**
+
+* Change atomic update notations (`AU` and `AACC`) to level 0.
+
 **Changes in `base_logic`:**
 
 * Generalize `ghost_var`, `mono_nat_auth` and `mono_Z_auth` to use discardable
@@ -21,6 +25,10 @@ lemma.
   + (new) `mono_Z_lb_own γ n` becomes `γ ↪◯MZ n`.
   + (new) `saved_prop_own γ dq P` becomes `γ ↪PROP dq P`.
   + (new) `saved_pred_own γ dq Φ` becomes `γ ↪PRED dq Φ`.
+
+**Changes in `program_logic`:**
+
+* Change `WP` notations to level 0.
 
 The following `sed` script helps adjust your code to the renaming (on macOS,
 replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).

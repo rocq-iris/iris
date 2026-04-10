@@ -4,6 +4,10 @@ From stdpp Require Export coPset.
 From iris.bi Require Import interface derived_connectives.
 From iris.prelude Require Import options.
 
+(* This warning is misleading for Hoare triple style notation where the first
+terminal can also occur in the middle of a notation. *)
+Local Set Warnings "-closed-notation-not-level-0".
+
 Declare Scope expr_scope.
 Delimit Scope expr_scope with E.
 
@@ -45,15 +49,15 @@ Global Instance: Params (@twp) 8 := {}.
 (** Notations without binder -- only parsing because they overlap with the
 notations with binder. *)
 Notation "'WP' e @ s ; E {{ Φ } }" := (wp s E e%E Φ)
-  (at level 20, e, Φ at level 200, only parsing) : bi_scope.
+  (at level 0, e, Φ at level 200, only parsing) : bi_scope.
 Notation "'WP' e @ E {{ Φ } }" := (wp NotStuck E e%E Φ)
-  (at level 20, e, Φ at level 200, only parsing) : bi_scope.
+  (at level 0, e, Φ at level 200, only parsing) : bi_scope.
 Notation "'WP' e @ E ? {{ Φ } }" := (wp MaybeStuck E e%E Φ)
-  (at level 20, e, Φ at level 200, only parsing) : bi_scope.
+  (at level 0, e, Φ at level 200, only parsing) : bi_scope.
 Notation "'WP' e {{ Φ } }" := (wp NotStuck ⊤ e%E Φ)
-  (at level 20, e, Φ at level 200, only parsing) : bi_scope.
+  (at level 0, e, Φ at level 200, only parsing) : bi_scope.
 Notation "'WP' e ? {{ Φ } }" := (wp MaybeStuck ⊤ e%E Φ)
-  (at level 20, e, Φ at level 200, only parsing) : bi_scope.
+  (at level 0, e, Φ at level 200, only parsing) : bi_scope.
 
 (** Notations with binder. *)
 (** The general approach we use for all these complex notations: an outer '[hv'
@@ -63,19 +67,19 @@ mode" where each '/' becomes a line break. Then, as appropriate, nested boxes
 maximally horizontal and suitably indented inside the parentheses that surround
 them. *)
 Notation "'WP' e @ s ; E {{ v , Q } }" := (wp s E e%E (λ v, Q))
-  (at level 20, e, Q at level 200, v at level 200 as pattern,
+  (at level 0, e, Q at level 200, v at level 200 as pattern,
    format "'[hv' 'WP'  e  '/' @  '[' s ;  '/' E  ']' '/' {{  '[' v ,  '/' Q  ']' } } ']'") : bi_scope.
 Notation "'WP' e @ E {{ v , Q } }" := (wp NotStuck E e%E (λ v, Q))
-  (at level 20, e, Q at level 200, v at level 200 as pattern,
+  (at level 0, e, Q at level 200, v at level 200 as pattern,
    format "'[hv' 'WP'  e  '/' @  E  '/' {{  '[' v ,  '/' Q  ']' } } ']'") : bi_scope.
 Notation "'WP' e @ E ? {{ v , Q } }" := (wp MaybeStuck E e%E (λ v, Q))
-  (at level 20, e, Q at level 200, v at level 200 as pattern,
+  (at level 0, e, Q at level 200, v at level 200 as pattern,
    format "'[hv' 'WP'  e  '/' @  E  '/' ? {{  '[' v ,  '/' Q  ']' } } ']'") : bi_scope.
 Notation "'WP' e {{ v , Q } }" := (wp NotStuck ⊤ e%E (λ v, Q))
-  (at level 20, e, Q at level 200, v at level 200 as pattern,
+  (at level 0, e, Q at level 200, v at level 200 as pattern,
    format "'[hv' 'WP'  e  '/' {{  '[' v ,  '/' Q  ']' } } ']'") : bi_scope.
 Notation "'WP' e ? {{ v , Q } }" := (wp MaybeStuck ⊤ e%E (λ v, Q))
-  (at level 20, e, Q at level 200, v at level 200 as pattern,
+  (at level 0, e, Q at level 200, v at level 200 as pattern,
    format "'[hv' 'WP'  e  '/' ? {{  '[' v ,  '/' Q  ']' } } ']'") : bi_scope.
 
 (* Texan triples *)
@@ -152,31 +156,31 @@ Notation "'{{{' P } } } e ? {{{ 'RET' pat ; Q } } }" :=
 (** Notations without binder -- only parsing because they overlap with the
 notations with binder. *)
 Notation "'WP' e @ s ; E [{ Φ } ]" := (twp s E e%E Φ)
-  (at level 20, e, Φ at level 200, only parsing) : bi_scope.
+  (at level 0, e, Φ at level 200, only parsing) : bi_scope.
 Notation "'WP' e @ E [{ Φ } ]" := (twp NotStuck E e%E Φ)
-  (at level 20, e, Φ at level 200, only parsing) : bi_scope.
+  (at level 0, e, Φ at level 200, only parsing) : bi_scope.
 Notation "'WP' e @ E ? [{ Φ } ]" := (twp MaybeStuck E e%E Φ)
-  (at level 20, e, Φ at level 200, only parsing) : bi_scope.
+  (at level 0, e, Φ at level 200, only parsing) : bi_scope.
 Notation "'WP' e [{ Φ } ]" := (twp NotStuck ⊤ e%E Φ)
-  (at level 20, e, Φ at level 200, only parsing) : bi_scope.
+  (at level 0, e, Φ at level 200, only parsing) : bi_scope.
 Notation "'WP' e ? [{ Φ } ]" := (twp MaybeStuck ⊤ e%E Φ)
-  (at level 20, e, Φ at level 200, only parsing) : bi_scope.
+  (at level 0, e, Φ at level 200, only parsing) : bi_scope.
 
 (** Notations with binder. *)
 Notation "'WP' e @ s ; E [{ v , Q } ]" := (twp s E e%E (λ v, Q))
-  (at level 20, e, Q at level 200, v at level 200 as pattern,
+  (at level 0, e, Q at level 200, v at level 200 as pattern,
    format "'[hv' 'WP'  e  '/' @  '[' s ;  '/' E  ']' '/' [{  '[' v ,  '/' Q  ']' } ] ']'") : bi_scope.
 Notation "'WP' e @ E [{ v , Q } ]" := (twp NotStuck E e%E (λ v, Q))
-  (at level 20, e, Q at level 200, v at level 200 as pattern,
+  (at level 0, e, Q at level 200, v at level 200 as pattern,
    format "'[hv' 'WP'  e  '/' @  E  '/' [{  '[' v ,  '/' Q  ']' } ] ']'") : bi_scope.
 Notation "'WP' e @ E ? [{ v , Q } ]" := (twp MaybeStuck E e%E (λ v, Q))
-  (at level 20, e, Q at level 200, v at level 200 as pattern,
+  (at level 0, e, Q at level 200, v at level 200 as pattern,
    format "'[hv' 'WP'  e  '/' @  E  '/' ? [{  '[' v ,  '/' Q  ']' } ] ']'") : bi_scope.
 Notation "'WP' e [{ v , Q } ]" := (twp NotStuck ⊤ e%E (λ v, Q))
-  (at level 20, e, Q at level 200, v at level 200 as pattern,
+  (at level 0, e, Q at level 200, v at level 200 as pattern,
    format "'[hv' 'WP'  e  '/' [{  '[' v ,  '/' Q  ']' } ] ']'") : bi_scope.
 Notation "'WP' e ? [{ v , Q } ]" := (twp MaybeStuck ⊤ e%E (λ v, Q))
-  (at level 20, e, Q at level 200, v at level 200 as pattern,
+  (at level 0, e, Q at level 200, v at level 200 as pattern,
    format "'[hv' 'WP'  e  '/' ? [{  '[' v ,  '/' Q  ']' } ] ']'") : bi_scope.
 
 (* Texan triples *)
