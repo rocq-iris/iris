@@ -16,3 +16,8 @@
 # Needs Rocq 9.2.
 -w
 -notation-for-abbreviation
+
+# Needs Rocq 9.2 at least for Scheme Rewrite; it is unclear whether the warning
+# is also used for other schemes.
+-w
+-missing-scheme
