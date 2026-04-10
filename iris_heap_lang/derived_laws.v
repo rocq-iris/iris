@@ -191,13 +191,13 @@ Proof.
 Qed.
 
 Lemma twp_store_offset_vec s E l sz (off : fin sz) (vs : vec val sz) v :
-  [[{ l ↦∗ vs }]] #(l +ₗ off) <- v @ s; E [[{ RET #(); l ↦∗ vinsert off v vs }]].
+  [[{ l ↦∗ vs }]] #(l +ₗ off) <- v @ s; E [[{ RET #(); l ↦∗ <[off:=v]> vs }]].
 Proof.
   setoid_rewrite vec_to_list_insert. apply twp_store_offset.
   eexists. by apply vlookup_lookup.
 Qed.
 Lemma wp_store_offset_vec s E l sz (off : fin sz) (vs : vec val sz) v :
-  {{{ ▷ l ↦∗ vs }}} #(l +ₗ off) <- v @ s; E {{{ RET #(); l ↦∗ vinsert off v vs }}}.
+  {{{ ▷ l ↦∗ vs }}} #(l +ₗ off) <- v @ s; E {{{ RET #(); l ↦∗ <[off:=v]> vs }}}.
 Proof.
   iIntros (Φ) ">H HΦ". iApply (twp_wp_step with "HΦ").
   iApply (twp_store_offset_vec with "H"); [by eauto..|]; iIntros "H HΦ".
@@ -223,13 +223,13 @@ Proof.
 Qed.
 
 Lemma twp_xchg_offset_vec s E l sz (off : fin sz) (vs : vec val sz) v :
-  [[{ l ↦∗ vs }]] Xchg #(l +ₗ off) v @ s; E [[{ RET (vs !!! off); l ↦∗ vinsert off v vs }]].
+  [[{ l ↦∗ vs }]] Xchg #(l +ₗ off) v @ s; E [[{ RET (vs !!! off); l ↦∗ <[off:=v]> vs }]].
 Proof.
   setoid_rewrite vec_to_list_insert. apply twp_xchg_offset.
   by apply vlookup_lookup.
 Qed.
 Lemma wp_xchg_offset_vec s E l sz (off : fin sz) (vs : vec val sz) v :
-   {{{ ▷ l ↦∗ vs }}} Xchg #(l +ₗ off) v @ s; E {{{ RET (vs !!! off); l ↦∗ vinsert off v vs }}}.
+   {{{ ▷ l ↦∗ vs }}} Xchg #(l +ₗ off) v @ s; E {{{ RET (vs !!! off); l ↦∗ <[off:=v]> vs }}}.
 Proof.
   iIntros (Φ) ">H HΦ". iApply (twp_wp_step with "HΦ").
   iApply (twp_xchg_offset_vec with "H"); [by eauto..|]; iIntros "H HΦ".
@@ -267,7 +267,7 @@ Lemma twp_cmpxchg_suc_offset_vec s E l sz (off : fin sz) (vs : vec val sz) v1 v2
   vals_compare_safe (vs !!! off) v1 →
   [[{ l ↦∗ vs }]]
     CmpXchg #(l +ₗ off) v1 v2 @ s; E
-  [[{ RET (vs !!! off, #true); l ↦∗ vinsert off v2 vs }]].
+  [[{ RET (vs !!! off, #true); l ↦∗ <[off:=v2]> vs }]].
 Proof.
   intros. setoid_rewrite vec_to_list_insert.
   apply twp_cmpxchg_suc_offset; [|done..].
@@ -278,7 +278,7 @@ Lemma wp_cmpxchg_suc_offset_vec s E l sz (off : fin sz) (vs : vec val sz) v1 v2 
   vals_compare_safe (vs !!! off) v1 →
   {{{ ▷ l ↦∗ vs }}}
     CmpXchg #(l +ₗ off) v1 v2 @ s; E
-  {{{ RET (vs !!! off, #true); l ↦∗ vinsert off v2 vs }}}.
+  {{{ RET (vs !!! off, #true); l ↦∗ <[off:=v2]> vs }}}.
 Proof.
   iIntros (?? Φ) ">H HΦ". iApply (twp_wp_step with "HΦ").
   iApply (twp_cmpxchg_suc_offset_vec with "H"); [by eauto..|]; iIntros "H HΦ".
@@ -356,7 +356,7 @@ Qed.
 Lemma twp_faa_offset_vec s E l sz (off : fin sz) (vs : vec val sz) (i1 i2 : Z) :
   vs !!! off = #i1 →
   [[{ l ↦∗ vs }]] FAA #(l +ₗ off) #i2 @ s; E
-  [[{ RET LitV (LitInt i1); l ↦∗ vinsert off #(i1 + i2) vs }]].
+  [[{ RET LitV (LitInt i1); l ↦∗ <[off:=#(i1 + i2)]> vs }]].
 Proof.
   intros. setoid_rewrite vec_to_list_insert. apply twp_faa_offset.
   by apply vlookup_lookup.
@@ -364,7 +364,7 @@ Qed.
 Lemma wp_faa_offset_vec s E l sz (off : fin sz) (vs : vec val sz) (i1 i2 : Z) :
   vs !!! off = #i1 →
   {{{ ▷ l ↦∗ vs }}} FAA #(l +ₗ off) #i2 @ s; E
-  {{{ RET LitV (LitInt i1); l ↦∗ vinsert off #(i1 + i2) vs }}}.
+  {{{ RET LitV (LitInt i1); l ↦∗ <[off:=#(i1 + i2)]> vs }}}.
 Proof.
   iIntros (? Φ) ">H HΦ". iApply (twp_wp_step with "HΦ").
   iApply (twp_faa_offset_vec with "H"); [by eauto..|]; iIntros "H HΦ".
