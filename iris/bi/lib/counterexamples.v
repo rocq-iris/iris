@@ -85,7 +85,7 @@ Module savedprop. Section savedprop.
   Qed.
 
   (** A bad recursive reference: "Assertion with name [i] does not hold" *)
-  Definition A (i : ident) : PROP := ∃ P, □ ¬ P ∗ saved i P.
+  Definition A (i : ident) : PROP := ∃ P, □ (¬ P ∗ saved i P).
 
   Lemma A_alloc : ⊢ |==> ∃ i, saved i (A i).
   Proof. by apply sprop_alloc_dep. Qed.

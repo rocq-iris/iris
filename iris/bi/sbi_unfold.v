@@ -113,7 +113,7 @@ Section sbi_unfold.
   Qed.
 
   Lemma sbi_unfold_equiv `{!SbiUnfold DownClosed P Pi, !SbiUnfold DownClosed Q Qi} :
-    P ⊣⊢ Q ↔ ∀ n, Pi n ↔ Qi n.
+    (P ⊣⊢ Q) ↔ ∀ n, Pi n ↔ Qi n.
   Proof.
     pose proof @sbi_unfold_closed_weaken.
     rewrite bi.equiv_entails !sbi_unfold_entails. naive_solver.
