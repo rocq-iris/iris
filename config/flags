@@ -26,3 +26,8 @@
 # better alternatives (https://github.com/rocq-prover/rocq/issues/21896).
 -w
 -level-tolerance
+
+# This warning has many false positives
+# (https://github.com/rocq-prover/rocq/issues/21916).
+-w
+-postfix-notation-not-level-1
