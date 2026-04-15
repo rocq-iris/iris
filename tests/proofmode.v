@@ -2596,6 +2596,7 @@ Section mutual_induction.
     intros Hrec. fix REC 1. intros [l]. apply Hrec. clear Hrec.
     induction l as [|t l IH]; constructor; auto.
   Qed.
+  Register Scheme ntree_ind as ind_dep for ntree.
 
   (** Now let's test that we can derive the internal induction principle for
   finitely branching trees in separation logic. There are many variants of the

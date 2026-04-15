@@ -110,7 +110,7 @@ Class atomic_heap := AtomicHeap {
       cmpxchg #l w1 w2 @ ↑atomic_heapN
     <<{ if decide (v = w1)
         then pointsto (H:=H) l (DfracOwn 1) w2 else pointsto (H:=H) l (DfracOwn 1) v
-      | RET (v, #if decide (v = w1) then true else false) }>>;
+      | RET (v, #(if decide (v = w1) then true else false)) }>>;
 }.
 
 Global Arguments alloc : simpl never.
@@ -170,7 +170,7 @@ Section derived.
       CAS #l w1 w2 @ ↑atomic_heapN
     <<{ if decide (v = w1)
         then pointsto l (DfracOwn 1) w2 else pointsto l (DfracOwn 1) v
-      | RET #if decide (v = w1) then true else false }>>.
+      | RET #(if decide (v = w1) then true else false) }>>.
   Proof.
     iIntros (?) "#Hheap %Φ AU".
     awp_apply cmpxchg_spec; [done..|].
@@ -254,7 +254,7 @@ Section proof.
     <<{ ∀∀ (v : val), l ↦ v }>>
       primitive_cmpxchg #l w1 w2 @ ↑atomic_heapN
     <<{ if decide (v = w1) then l ↦ w2 else l ↦ v
-      | RET (v, #if decide (v = w1) then true else false) }>>.
+      | RET (v, #(if decide (v = w1) then true else false)) }>>.
   Proof.
     iIntros (?) "_ %Φ AU". wp_lam. wp_pures.
     iMod "AU" as (v) "[H↦ [_ Hclose]]".

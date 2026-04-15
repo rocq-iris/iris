@@ -30,8 +30,8 @@ Importing Iris has some side effects as the library sets some global options.
 
 This version is known to compile with:
 
- - Rocq version 9.0.1 / 9.1.0 / 9.2.0
- - Rocq stdlib version 9.1.0
+ - Rocq version 9.0.1 / 9.1.1 / 9.2.0
+ - Rocq stdlib version 9.0.0 / 9.1.0
  - A development version of [std++](https://gitlab.mpi-sws.org/iris/stdpp)
 
 Generally we always aim to support the last two stable Rocq releases. Support for

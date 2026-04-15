@@ -37,6 +37,10 @@ lemma.
 
 * Change `WP` notations to level 0.
 
+**Changes in `heap_lang`:**
+
+* Change level of `resolve_proph:` to 99 so that it binds stronger than `;;`.
+
 The following `sed` script helps adjust your code to the renaming (on macOS,
 replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
 Note that the script is not idempotent, do not run it twice.
