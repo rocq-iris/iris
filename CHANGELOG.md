@@ -18,14 +18,18 @@ lemma.
 
 **Changes in `base_logic`:**
 
-* Generalize `ghost_var`, `mono_nat_auth` and `mono_Z_auth` to use discardable
-  fractional permissions (`dfrac`) instead of ordinary fractional permissions
-  (`frac`). To aid in porting old code automatically (see the `sed` script
-  below), compatibility aliases have been added: `ghost_var_frac`,
-  `mono_nat_auth_own_frac`, `mono_Z_auth_own_frac`.
+* Generalize `ghost_var`, `ghost_map_auth`, `mono_nat_auth` and `mono_Z_auth` to
+  use discardable fractional permissions (`dfrac`) instead of ordinary
+  fractional permissions (`frac`). To aid in porting old code automatically (see
+  the `sed` script below), compatibility aliases have been added:
+  `ghost_var_frac`, `ghost_map_auth_frac`, `mono_nat_auth_own_frac`,
+  `mono_Z_auth_own_frac`. These will eventually be removed.
 * Add notations for "ghost variable"-like connectives, and make existing ones
   consistent:
   + (new) `ghost_var γ dq n` becomes `γ ↪VAR dq n`.
+  + (new) `ghost_map_auth γ dq m` becomes `γ ↪●MAP dq m`.
+  + (changed) `k ↪[γ] dq v` becomes `γ ↪◯MAP[k] dq v`.
+    The old notation remains available for now as a compatibility alias.
   + (new) `mono_nat_auth_own γ dq n` becomes `γ ↪●MN dq n`.
   + (new) `mono_nat_lb_own γ n` becomes `γ ↪◯MN n`.
   + (new) `mono_Z_auth_own γ dq n` becomes `γ ↪●MZ dq n`.
@@ -48,6 +52,7 @@ Note that the script is not idempotent, do not run it twice.
 sed -i -E -f- $(find theories -name "*.v") <<EOF
 # frac → dfrac in ghost state libraries
 s/\bghost_var\b/ghost_var_frac/g
+s/\bghost_map_auth\b/ghost_map_auth_frac/g
 s/\bmono_nat_auth_own\b/mono_nat_auth_own_frac/g
 s/\bmono_Z_auth_own\b/mono_Z_auth_own_frac/g
 EOF
