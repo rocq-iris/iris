@@ -7,10 +7,10 @@ issues before stabilization. *)
     list [l]
   - a persistent assertion [γ ↪◯ML l] witnessing that the authoritative
     list is at least [l]
-  - a persistent assertion [γ ↪◯ML (i, a)] witnessing that the index [i]
+  - a persistent assertion [γ ↪◯ML[i] a] witnessing that the index [i]
     is [a] in the authoritative list.
 
-The key rules are [mono_list_lb_own_valid], which asserts that an auth at [l]
+The key rules are [mono_list_auth_lb_own_valid], which asserts that an auth at [l]
 and a lower-bound at [l'] imply that [l' `prefix_of` l], and [mono_list_update],
 which allows one to grow the auth element by appending only. At any time the
 auth list can be "snapshotted" with [mono_list_lb_own_get] to produce a
@@ -60,12 +60,8 @@ Notation "γ ↪●ML dq l" := (mono_list_auth_own γ dq l)
    format "γ  ↪●ML dq  l").
 Notation "γ ↪◯ML l" := (mono_list_lb_own γ l)
   (at level 20, l at level 20).
-(* The following [Notation] is needed so that [γ ↪◯ML (l ++ l')] parses
-correctly *)
-Notation "γ ↪◯ML ( l )" := (mono_list_lb_own γ l)
-  (at level 20, only parsing).
-Notation "γ ↪◯ML ( i , a )" := (mono_list_idx_own γ i a)
-  (at level 20, format "γ  ↪◯ML  ( i ,  a )") : bi_scope.
+Notation "γ ↪◯ML[ i ] a " := (mono_list_idx_own γ i a)
+  (at level 20, format "γ  ↪◯ML[ i ]  a") : bi_scope.
 
 Local Ltac unseal := rewrite
   /mono_list_idx_own ?mono_list_auth_own_unseal /mono_list_auth_own_def
@@ -84,9 +80,9 @@ Section mono_list_own.
   Global Instance mono_list_lb_own_persistent γ l : Persistent (γ ↪◯ML l).
   Proof. unseal. apply _. Qed.
   Global Instance mono_list_idx_own_timeless γ i a :
-    Timeless (γ ↪◯ML (i, a)) := _.
+    Timeless (γ ↪◯ML[i] a) := _.
   Global Instance mono_list_idx_own_persistent γ i a :
-    Persistent (γ ↪◯ML (i, a)) := _.
+    Persistent (γ ↪◯ML[i] a) := _.
 
   Global Instance mono_list_auth_own_fractional γ l :
     Fractional (λ q, γ ↪●ML{#q} l).
@@ -108,14 +104,14 @@ Section mono_list_own.
     iDestruct (mono_list_auth_own_agree with "H1 H2") as %[]; done.
   Qed.
 
-  Lemma mono_list_auth_lb_valid γ dq l1 l2 :
+  Lemma mono_list_auth_lb_own_valid γ dq l1 l2 :
     γ ↪●ML{dq} l1 -∗ γ ↪◯ML l2 -∗ ⌜✓ dq ∧ l2 `prefix_of` l1 ⌝.
   Proof.
     unseal. iIntros "Hauth Hlb".
     by iCombine "Hauth Hlb" gives %?%mono_list_both_dfrac_valid_L.
   Qed.
 
-  Lemma mono_list_lb_valid γ l1 l2 :
+  Lemma mono_list_lb_own_valid γ l1 l2 :
     γ ↪◯ML l1 -∗
     γ ↪◯ML l2 -∗
     ⌜ l1 `prefix_of` l2 ∨ l2 `prefix_of` l1 ⌝.
@@ -125,19 +121,19 @@ Section mono_list_own.
   Qed.
 
   Lemma mono_list_idx_agree γ i a1 a2 :
-    γ ↪◯ML (i, a1) -∗ γ ↪◯ML (i, a2) -∗ ⌜ a1 = a2 ⌝.
+    γ ↪◯ML[i] a1 -∗ γ ↪◯ML[i] a2 -∗ ⌜ a1 = a2 ⌝.
   Proof.
     iDestruct 1 as (l1 Hl1) "H1". iDestruct 1 as (l2 Hl2) "H2".
-    iDestruct (mono_list_lb_valid with "H1 H2") as %Hpre.
+    iDestruct (mono_list_lb_own_valid with "H1 H2") as %Hpre.
     iPureIntro.
     destruct Hpre as [Hpre|Hpre]; eapply prefix_lookup_Some in Hpre; eauto; congruence.
   Qed.
 
   Lemma mono_list_auth_idx_lookup γ dq l i a :
-    γ ↪●ML{dq} l -∗ γ ↪◯ML (i, a) -∗ ⌜ l !! i = Some a ⌝.
+    γ ↪●ML{dq} l -∗ γ ↪◯ML[i] a -∗ ⌜ l !! i = Some a ⌝.
   Proof.
     iIntros "Hauth". iDestruct 1 as (l1 Hl1) "Hl1".
-    iDestruct (mono_list_auth_lb_valid with "Hauth Hl1") as %[_ Hpre].
+    iDestruct (mono_list_auth_lb_own_valid with "Hauth Hl1") as %[_ Hpre].
     iPureIntro.
     eapply prefix_lookup_Some in Hpre; eauto; congruence.
   Qed.
@@ -150,9 +146,13 @@ Section mono_list_own.
     γ ↪◯ML l ⊢ γ ↪◯ML l'.
   Proof. unseal. intros. by apply own_mono, mono_list_lb_mono. Qed.
 
+  Lemma mono_list_lb_own_nil γ :
+    ⊢ |==> γ ↪◯ML [].
+  Proof. unseal. iApply own_unit. Qed.
+
   Lemma mono_list_idx_own_get {γ l} i a :
     l !! i = Some a →
-    γ ↪◯ML l -∗ γ ↪◯ML (i, a).
+    γ ↪◯ML l -∗ γ ↪◯ML[i] a.
   Proof. iIntros (Hli) "Hl". iExists l. by iFrame. Qed.
 
   Lemma mono_list_own_alloc l :
