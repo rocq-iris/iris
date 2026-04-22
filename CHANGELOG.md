@@ -38,6 +38,8 @@ lemma.
   + (new) `saved_pred_own γ dq Φ` becomes `γ ↪PRED dq Φ`.
   + (new) `gset_bij_own_auth γ dq L` becomes `γ ↪●BIJ dq L`.
   + (new) `gset_bij_own_elem γ a b` becomes `γ ↪◯BIJ ⟨a,b⟩`.
+* Rename `mono_nat_lb_own_valid` to `mono_nat_auth_lb_own_valid`
+  and `mono_Z_lb_own_valid` to `mono_Z_auth_lb_own_valid`.
 
 **Changes in `program_logic`:**
 
@@ -57,6 +59,9 @@ s/\bghost_var\b/ghost_var_frac/g
 s/\bghost_map_auth\b/ghost_map_auth_frac/g
 s/\bmono_nat_auth_own\b/mono_nat_auth_own_frac/g
 s/\bmono_Z_auth_own\b/mono_Z_auth_own_frac/g
+# mono_*_lb_own_valid
+s/\bmono_nat_lb_own_valid\b/mono_nat_auth_lb_own_valid/g
+s/\bmono_Z_lb_own_valid\b/mono_Z_auth_lb_own_valid/g
 EOF
 ```
 

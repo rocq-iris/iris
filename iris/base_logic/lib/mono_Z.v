@@ -5,7 +5,7 @@ Provides an authoritative proposition [mono_Z_auth_own γ q n] for the
 underlying number [n] and a persistent proposition [mono_Z_lb_own γ m]
 witnessing that the authoritative nat is at least [m].
 
-The key rules are [mono_Z_lb_own_valid], which asserts that an auth at [n] and
+The key rules are [mono_Z_auth_lb_own_valid], which asserts that an auth at [n] and
 a lower-bound at [m] imply that [m ≤ n], and [mono_Z_update], which allows to
 increase the auth element. At any time the auth nat can be "snapshotted" with
 [mono_Z_get_lb] to produce a persistent lower-bound proposition.
@@ -101,11 +101,11 @@ Section mono_Z.
     by iDestruct (mono_Z_auth_own_agree with "H1 H2") as %[[] _].
   Qed.
 
-  Lemma mono_Z_lb_own_valid γ dq n m :
+  Lemma mono_Z_auth_lb_own_valid γ dq n m :
     γ ↪●MZ{dq} n -∗ γ ↪◯MZ m -∗ ⌜✓ dq ∧ m ≤ n⌝.
   Proof.
     unseal. iIntros "[% Hauth] [% Hlb]".
-    iDestruct (mono_nat_lb_own_valid with "Hauth Hlb") as %Hvalid.
+    iDestruct (mono_nat_auth_lb_own_valid with "Hauth Hlb") as %Hvalid.
     iPureIntro. naive_solver lia.
   Qed.
 
