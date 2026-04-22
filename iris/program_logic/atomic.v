@@ -43,9 +43,10 @@ For an example for how to prove and use logically atomic specifications, see
 From stdpp Require Import namespaces.
 From iris.bi Require Import telescopes.
 From iris.bi.lib Require Export atomic.
+From iris.base_logic Require Import invariants.
 From iris.proofmode Require Import proofmode classes.
 From iris.program_logic Require Export weakestpre.
-From iris.base_logic Require Import invariants.
+From iris.program_logic Require Import language.
 From iris.prelude Require Import options.
 
 (* This warning is misleading for Hoare triple style notation where the first

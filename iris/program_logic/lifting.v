@@ -3,6 +3,7 @@ semantics to the program logic. *)
 
 From iris.proofmode Require Import proofmode.
 From iris.program_logic Require Export weakestpre.
+From iris.program_logic Require Import language.
 From iris.prelude Require Import options.
 
 Section lifting.
