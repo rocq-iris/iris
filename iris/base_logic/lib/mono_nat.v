@@ -3,7 +3,7 @@ RA. Provides an authoritative proposition [mono_nat_auth_own γ q n] for the
 underlying number [n] and a persistent proposition [mono_nat_lb_own γ m]
 witnessing that the authoritative nat is at least [m].
 
-The key rules are [mono_nat_lb_own_valid], which asserts that an auth at [n] and
+The key rules are [mono_nat_auth_lb_own_valid], which asserts that an auth at [n] and
 a lower-bound at [m] imply that [m ≤ n], and [mono_nat_update], which allows to
 increase the auth element. At any time the auth nat can be "snapshotted" with
 [mono_nat_get_lb] to produce a persistent lower-bound proposition. *)
@@ -88,7 +88,7 @@ Section mono_nat.
     by iDestruct (mono_nat_auth_own_agree with "H1 H2") as %[[] _].
   Qed.
 
-  Lemma mono_nat_lb_own_valid γ dq n m :
+  Lemma mono_nat_auth_lb_own_valid γ dq n m :
     γ ↪●MN{dq} n -∗ γ ↪◯MN m -∗ ⌜✓ dq ∧ m ≤ n⌝.
   Proof.
     unseal. iIntros "Hauth Hlb".

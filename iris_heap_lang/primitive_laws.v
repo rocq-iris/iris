@@ -40,7 +40,7 @@ Section steps.
     steps_auth n -∗ steps_lb m -∗ ⌜m ≤ n⌝.
   Proof.
     iIntros "Hauth Hlb".
-    by iDestruct (mono_nat_lb_own_valid with "Hauth Hlb") as %[_ Hle].
+    by iDestruct (mono_nat_auth_lb_own_valid with "Hauth Hlb") as %[_ Hle].
   Qed.
 
   Local Lemma steps_lb_get n :
