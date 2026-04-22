@@ -1,4 +1,3 @@
-From iris.program_logic Require Export language.
 From iris.heap_lang Require Export lang.
 From iris.heap_lang Require Import tactics notation.
 From iris.prelude Require Import options.
