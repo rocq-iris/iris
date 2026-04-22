@@ -97,18 +97,18 @@ Section definitions.
     (* The [⊆] is used to avoid assigning ghost information to the locations in
     the initial heap (see [gen_heap_init]). *)
     ⌜ dom m ⊆ dom σ ⌝ ∗
-    ghost_map_auth (gen_heap_name hG) 1 σ ∗
-    ghost_map_auth (gen_meta_name hG) 1 m.
+    gen_heap_name hG ↪●MAP σ ∗
+    gen_meta_name hG ↪●MAP m.
 
   Local Definition pointsto_def (l : L) (dq : dfrac) (v: V) : iProp Σ :=
-    l ↪[gen_heap_name hG]{dq} v.
+    gen_heap_name hG ↪◯MAP[l]{dq} v.
   Local Definition pointsto_aux : seal (@pointsto_def). Proof. by eexists. Qed.
   Definition pointsto := pointsto_aux.(unseal).
   Local Definition pointsto_unseal : @pointsto = @pointsto_def :=
     pointsto_aux.(seal_eq).
 
   Local Definition meta_token_def (l : L) (E : coPset) : iProp Σ :=
-    ∃ γm, l ↪[gen_meta_name hG]□ γm ∗ own γm (reservation_map_token E).
+    ∃ γm, gen_meta_name hG ↪◯MAP[l]□ γm ∗ own γm (reservation_map_token E).
   Local Definition meta_token_aux : seal (@meta_token_def). Proof. by eexists. Qed.
   Definition meta_token := meta_token_aux.(unseal).
   Local Definition meta_token_unseal :
@@ -118,7 +118,7 @@ Section definitions.
   For [meta_set] to hold, we can pick any positive in [↑ N], which we obtain
   using [coPpick]. *)
   Local Definition meta_def `{Countable A} (l : L) (N : namespace) (x : A) : iProp Σ :=
-    ∃ γm, l ↪[gen_meta_name hG]□ γm ∗
+    ∃ γm, gen_meta_name hG ↪◯MAP[l]□ γm ∗
           own γm (reservation_map_data (coPpick (↑ N)) (to_agree (encode x))).
   Local Definition meta_aux : seal (@meta_def). Proof. by eexists. Qed.
   Definition meta := meta_aux.(unseal).

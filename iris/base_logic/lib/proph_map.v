@@ -44,10 +44,10 @@ Section definitions.
 
   Definition proph_map_interp pvs (ps : gset P) : iProp Σ :=
     ∃ R, ⌜proph_resolves_in_list R pvs ∧
-         dom R ⊆ ps⌝ ∗ ghost_map_auth (proph_map_name pG) 1 R.
+         dom R ⊆ ps⌝ ∗ proph_map_name pG ↪●MAP R.
 
   Local Definition proph_def (p : P) (vs : list V) : iProp Σ :=
-    p ↪[proph_map_name pG] vs.
+    proph_map_name pG ↪◯MAP[p] vs.
   Local Definition proph_aux : seal (@proph_def). Proof. by eexists. Qed.
   Definition proph := proph_aux.(unseal).
   Local Definition proph_unseal : @proph = @proph_def := proph_aux.(seal_eq).
