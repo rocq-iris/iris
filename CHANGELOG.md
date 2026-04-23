@@ -40,10 +40,13 @@ lemma.
 **Changes in `program_logic`:**
 
 * Change `WP` notations to level 0.
+* Do not re-export `language` from `weakestpre` since many `weakestpre` users do
+  not want or need `language` names in scope.
 
 **Changes in `heap_lang`:**
 
 * Change level of `resolve_proph:` to 99 so that it binds stronger than `;;`.
+* Reduce and re-organize re-exports to avoid shadowing issues around `val`.
 
 The following `sed` script helps adjust your code to the renaming (on macOS,
 replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
