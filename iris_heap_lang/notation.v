@@ -1,4 +1,3 @@
-From iris.program_logic Require Import language.
 From iris.heap_lang Require Export lang.
 From iris.prelude Require Import options.
 

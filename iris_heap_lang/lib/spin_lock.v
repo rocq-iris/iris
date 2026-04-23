@@ -1,4 +1,4 @@
-From iris.proofmode Require Import proofmode.
+From iris.base_logic Require Import invariants.
 From iris.program_logic Require Export weakestpre.
 From iris.base_logic Require Import lib.token.
 From iris.heap_lang Require Export lang.

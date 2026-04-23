@@ -1,6 +1,6 @@
 From iris.base_logic.lib Require Import gen_inv_heap invariants.
 From iris.program_logic Require Export weakestpre total_weakestpre.
-From iris.heap_lang Require Import lang adequacy total_adequacy proofmode notation.
+From iris.heap_lang Require Import lang proofmode notation adequacy total_adequacy.
 From iris.prelude Require Import options.
 
 (* For printing tests we want stable names. *)

@@ -1,6 +1,7 @@
 (** Some derived lemmas for ectx-based languages *)
 From iris.proofmode Require Import proofmode.
-From iris.program_logic Require Export ectx_language weakestpre lifting.
+From iris.program_logic Require Export weakestpre.
+From iris.program_logic Require Import ectx_language language lifting.
 From iris.prelude Require Import options.
 
 Section wp.

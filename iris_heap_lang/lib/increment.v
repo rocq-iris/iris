@@ -1,7 +1,7 @@
 From iris.bi.lib Require Import fractional.
-From iris.proofmode Require Import proofmode.
-From iris.base_logic.lib Require Export invariants.
+From iris.base_logic.lib Require Import invariants.
 From iris.program_logic Require Export atomic.
+From iris.heap_lang Require Export lang.
 From iris.heap_lang Require Import proofmode notation atomic_heap par.
 From iris.prelude Require Import options.
 

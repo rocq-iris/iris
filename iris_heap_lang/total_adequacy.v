@@ -1,6 +1,5 @@
-From iris.proofmode Require Import proofmode.
 From iris.base_logic.lib Require Import mono_nat.
-From iris.program_logic Require Export total_adequacy.
+From iris.program_logic Require Import total_adequacy.
 From iris.heap_lang Require Export adequacy.
 From iris.heap_lang Require Import proofmode notation.
 From iris.prelude Require Import options.

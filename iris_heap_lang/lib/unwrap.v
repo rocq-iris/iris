@@ -1,4 +1,5 @@
-From iris.heap_lang Require Export lang proofmode notation.
+From iris.heap_lang Require Export lang.
+From iris.heap_lang Require Import proofmode notation.
 From iris.heap_lang.lib Require Import assert.
 From iris.prelude Require Import options.
 

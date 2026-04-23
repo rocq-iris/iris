@@ -1,6 +1,5 @@
 From iris.algebra Require Import lib.frac_auth numbers auth.
-From iris.proofmode Require Import proofmode.
-From iris.base_logic.lib Require Export invariants.
+From iris.base_logic.lib Require Import invariants.
 From iris.program_logic Require Export weakestpre.
 From iris.heap_lang Require Export lang.
 From iris.heap_lang Require Import proofmode notation.
