@@ -143,28 +143,28 @@ End later_credit_theory.
   This should only be imported by the internal development of fancy updates. *)
 Module le_upd.
   (** Definition of the later-elimination update *)
-  Definition le_upd_pre `{!lcGS Σ}
-      (le_upd : iProp Σ -d> iPropO Σ) : iProp Σ -d> iPropO Σ := λ P,
-    (∀ n, lc_supply n ==∗
-          (lc_supply n ∗ P) ∨ (∃ m, ⌜m < n⌝ ∗ lc_supply m ∗ ▷ le_upd P))%I.
+  Definition le_upd_pre `{!lcGS Σ} (P le_upd : iProp Σ) : iProp Σ :=
+    ∀ n, lc_supply n ==∗
+         (lc_supply n ∗ P) ∨ (∃ m, ⌜m < n⌝ ∗ lc_supply m ∗ ▷ le_upd).
 
-  Local Instance le_upd_pre_contractive `{!lcGS Σ} : Contractive le_upd_pre.
+  Local Instance le_upd_pre_contractive `{!lcGS Σ} P : Contractive (le_upd_pre P).
   Proof. solve_contractive. Qed.
-  Local Definition le_upd_def `{!lcGS Σ} :
-    iProp Σ -d> iPropO Σ := fixpoint le_upd_pre.
+  Local Definition le_upd_def `{!lcGS Σ} (P : iProp Σ) : iProp Σ :=
+    fixpoint (le_upd_pre P).
   Local Definition le_upd_aux : seal (@le_upd_def). Proof. by eexists. Qed.
   Definition le_upd := le_upd_aux.(unseal).
   Local Definition le_upd_unseal : @le_upd = @le_upd_def := le_upd_aux.(seal_eq).
   Global Arguments le_upd {_ _} _.
-  Notation "'|==£>' P" := (le_upd P%I) (at level 20, P at level 200, format "|==£>  P") : bi_scope.
+  Notation "'|==£>' P" := (le_upd P)
+    (at level 20, P at level 200, format "|==£>  P") : bi_scope.
 
   Local Lemma le_upd_unfold `{!lcGS Σ} P:
     (|==£> P) ⊣⊢
     ∀ n, lc_supply n ==∗
-         (lc_supply n ∗ P) ∨ (∃ m, ⌜m < n⌝ ∗ lc_supply m ∗ ▷ le_upd P).
+         (lc_supply n ∗ P) ∨ (∃ m, ⌜m < n⌝ ∗ lc_supply m ∗ ▷ |==£> P).
   Proof.
     by rewrite le_upd_unseal
-      /le_upd_def {1}(fixpoint_unfold le_upd_pre P) {1}/le_upd_pre.
+      /le_upd_def {1}(fixpoint_unfold (le_upd_pre P)) {1}/le_upd_pre.
   Qed.
 
   Section le_upd.
