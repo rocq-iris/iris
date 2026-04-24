@@ -40,6 +40,7 @@ lemma.
   + (new) `gset_bij_own_elem γ a b` becomes `γ ↪◯BIJ ⟨a,b⟩`.
 * Rename `mono_nat_lb_own_valid` to `mono_nat_auth_lb_own_valid`
   and `mono_Z_lb_own_valid` to `mono_Z_auth_lb_own_valid`.
+* Add new logic-level `mono_list` library for append-only lists.
 
 **Changes in `program_logic`:**
 

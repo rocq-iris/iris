@@ -98,6 +98,7 @@ iris/base_logic/lib/gset_bij.v
 iris/base_logic/lib/ghost_map.v
 iris/base_logic/lib/later_credits.v
 iris/base_logic/lib/token.v
+iris/base_logic/lib/mono_list.v
 iris/program_logic/adequacy.v
 iris/program_logic/lifting.v
 iris/program_logic/weakestpre.v
@@ -174,7 +175,6 @@ iris_heap_lang/lib/logatom_lock.v
 
 iris_unstable/algebra/list.v
 iris_unstable/bi/algebra.v
-iris_unstable/base_logic/mono_list.v
 iris_unstable/heap_lang/interpreter.v
 
 iris_deprecated/base_logic/auth.v
