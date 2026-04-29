@@ -280,48 +280,6 @@ Module le_upd.
       - apply le_upd_frame_r.
     Qed.
 
-    (** unfolding the later elimination update *)
-    Lemma le_upd_elim n P :
-      lc_supply n -∗
-      (|==£> P) -∗
-      Nat.iter n (λ P, |==> ▷ P) (|==> ◇ (∃ m, ⌜m ≤ n⌝ ∗ lc_supply m ∗ P)).
-    Proof.
-      induction (Nat.lt_wf_0 n) as [n _ IH].
-      iIntros "Ha". rewrite (le_upd_unfold P) //=.
-      iIntros "Hupd". iSpecialize ("Hupd" with "Ha").
-      destruct n as [|n]; simpl.
-      - iMod "Hupd" as "[[H● ?]| Hf]".
-        { do 2 iModIntro. iExists 0. iFrame. done. }
-        iDestruct "Hf" as (x' Hlt) "_". lia.
-      - iMod "Hupd" as "[[Hc P]|Hupd]".
-        + iModIntro. iNext. iApply iter_modal_intro; last first.
-          { do 2 iModIntro. iExists (S n); iFrame; done. }
-          iIntros (Q) "Q"; iModIntro; by iNext.
-        + iModIntro. iDestruct "Hupd" as (m Hstep) "[Hown Hupd]". iNext.
-          iPoseProof (IH with "Hown Hupd") as "Hit"; first done.
-          clear IH.
-          assert (m ≤ n) as [k ->]%Nat.le_sum by lia.
-          rewrite Nat.add_comm Nat.iter_add.
-          iApply iter_modal_intro.
-          { by iIntros (Q) "$". }
-          iApply (iter_modal_mono with "[] Hit").
-          { iIntros (R S) "Hent H". by iApply "Hent". }
-          iIntros "H". iMod "H". iModIntro. iMod "H" as (m' Hle) "H".
-          iModIntro. iExists m'. iFrame. iPureIntro. lia.
-    Qed.
-
-    Lemma le_upd_elim_complete n P :
-      lc_supply n -∗
-      (|==£> P) -∗
-      Nat.iter (S n) (λ Q, |==> ▷ Q) P.
-    Proof.
-      iIntros "Hlc Hupd". iPoseProof (le_upd_elim with "Hlc Hupd") as "Hit".
-      rewrite Nat.iter_succ_r. iApply (iter_modal_mono with "[] Hit").
-      { clear. iIntros (P Q) "Hent HP". by iApply "Hent". }
-      iIntros "Hupd". iMod "Hupd". iModIntro. iMod "Hupd".
-      iNext. iDestruct "Hupd" as "[%m (_ & _ & $)]".
-    Qed.
-
     (** Proof mode class instances internally needed for people defining their
     [fupd] with [le_upd]. *)
     Global Instance elim_bupd_le_upd p P Q :
@@ -374,20 +332,6 @@ Module le_upd.
       first (apply auth_both_valid; split; done).
     pose (C := LcGS _ _ γLC).
     iModIntro. iExists C. iFrame.
-  Qed.
-
-  Lemma lc_soundness `{!lcGpreS Σ} m (P : iProp Σ) `{!Plain P} :
-    (∀ {Hc: lcGS Σ}, £ m -∗ |==£> P) → ⊢ P.
-  Proof.
-    intros H. apply (laterN_soundness _ (S m)).
-    eapply bupd_soundness; first apply _.
-    iStartProof.
-    iMod (lc_alloc m) as (C) "[H● H◯]".
-    iPoseProof (H C) as "Hc". iSpecialize ("Hc" with "H◯").
-    iPoseProof (le_upd_elim_complete m with "H● Hc") as "H".
-    simpl. iMod "H". iModIntro. iNext.
-    clear H. iInduction m as [|m IH]; simpl; [done|].
-    iMod "H". iNext. by iApply "IH".
   Qed.
 
   (** More flexible soundness theorem *)
@@ -481,6 +425,14 @@ Module le_upd.
     rewrite laterN_later -except_0_into_later -(plainly_elim (▷^n _)).
     iMod (later_credits.le_upd.lc_alloc n) as (Hc) "[Hlc H£]".
     iApply (HP with "H£ Hlc").
+  Qed.
+
+  Lemma lc_soundness `{!lcGpreS Σ} m (P : iProp Σ) `{!Plain P} :
+    (∀ `{!lcGS Σ}, £ m -∗ |==£> P) → ⊢ P.
+  Proof.
+    intros H. apply (le_upd_finally_soundness m); iIntros (?) "H£".
+    iApply le_upd_le_upd_finally. iMod (H with "H£") as "HP"; iModIntro.
+    iApply le_upd_finally_intro. by iApply plain_plainly.
   Qed.
 End le_upd.
 
