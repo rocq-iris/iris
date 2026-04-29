@@ -71,7 +71,7 @@ Section later_credit_theory.
   Qed.
 
   Lemma lc_decrease_supply n m :
-    lc_supply (n + m) -∗ £ n -∗ |==> lc_supply m.
+    lc_supply (n + m) -∗ £ n ==∗ lc_supply m.
   Proof.
     rewrite lc_unseal /lc_def.
     rewrite lc_supply_unseal /lc_supply_def.
@@ -79,6 +79,16 @@ Section later_credit_theory.
     iMod (own_update_2 with "H1 H2") as "Hown".
     { eapply auth_update. eapply (nat_local_update _ _ m 0). lia. }
     by iDestruct "Hown" as "[Hm _]".
+  Qed.
+
+  Lemma lc_increase_supply n m :
+    lc_supply m ==∗ lc_supply (n + m) ∗ £ n.
+  Proof.
+    rewrite lc_unseal /lc_def.
+    rewrite lc_supply_unseal /lc_supply_def.
+    iIntros "H"; iMod (own_update with "H") as "Hown".
+    { eapply auth_update_alloc. eapply (nat_local_update m 0 (n + m) n). lia. }
+    iDestruct "Hown" as "[Hm ?]"; by iFrame.
   Qed.
 
   Lemma lc_succ n :
