@@ -389,6 +389,99 @@ Module le_upd.
     clear H. iInduction m as [|m IH]; simpl; [done|].
     iMod "H". iNext. by iApply "IH".
   Qed.
+
+  (** More flexible soundness theorem *)
+  Definition le_upd_finally_def `{!lcGS Σ} (P : iProp Σ) : iProp Σ :=
+    ∀ m, lc_supply m -∗ ■ ▷^m ◇ P.
+  Local Definition le_upd_finally_aux : seal (@le_upd_finally_def).
+  Proof. by eexists. Qed.
+  Local Definition le_upd_finally := le_upd_finally_aux.(unseal).
+  Local Definition le_upd_finally_unseal :
+    @le_upd_finally = @le_upd_finally_def := le_upd_finally_aux.(seal_eq).
+  Global Arguments le_upd_finally {Σ _}.
+
+  Notation "|==£|> Q" := (le_upd_finally Q) (at level 20, Q at level 200,
+     format "'[  ' |==£|>  '/' Q ']'") : bi_scope.
+
+  Section le_upd_finally.
+    Context `{!lcGS Σ}.
+
+    Global Instance le_upd_finally_ne : NonExpansive le_upd_finally.
+    Proof. rewrite le_upd_finally_unseal. solve_proper. Qed.
+
+    Lemma le_upd_finally_mono P Q : (P ⊢ Q) → (|==£|> P) ⊢ (|==£|> Q).
+    Proof. rewrite le_upd_finally_unseal. solve_proper. Qed.
+
+    Lemma le_upd_finally_intro P : ■ P ⊢ |==£|> P.
+    Proof. rewrite le_upd_finally_unseal. iIntros "#HP %m _ !> !>". done. Qed.
+
+    Lemma le_upd_le_upd_finally P : (|==£> |==£|> P) ⊢ |==£|> P.
+    Proof.
+      rewrite le_upd_finally_unseal /le_upd_finally_def. iIntros "HP %m Hlc".
+      iLöb as "IH" forall (m).
+      iEval (rewrite later_credits.le_upd.le_upd_unfold) in "HP".
+      iMod ("HP" with "Hlc") as "[[Hlc H]|(%m' & %Hm & Hlc & H)]".
+      { by iApply "H". }
+      replace m with (S (m' + (m - m' - 1))) by lia.
+      rewrite /= -later_plainly.
+      iModIntro. rewrite laterN_add -(laterN_intro (m - m' - 1)).
+      iApply ("IH" with "H Hlc").
+    Qed.
+
+    Lemma except_0_le_upd_finally P : (◇ |==£|> P) ⊢ |==£|> P.
+    Proof.
+      rewrite le_upd_finally_unseal /le_upd_finally_def. iIntros "HP %m Hlc".
+      iEval (rewrite -except_0_idemp -except_0_laterN -except_0_plainly).
+      iMod "HP"; iModIntro. by iApply "HP".
+    Qed.
+
+    Lemma le_upd_finally_later P : (£ 1 -∗ |==£|> P) ⊢ |==£|> ▷ ◇ P.
+    Proof.
+      rewrite le_upd_finally_unseal.
+      iIntros "H %m Hlc". rewrite -except_0_intro -laterN_later.
+      iMod (later_credits.lc_increase_supply 1 with "Hlc") as "[Hlc H£]".
+      iApply ("H" with "H£ Hlc").
+    Qed.
+
+    Lemma le_upd_finally_keep P Q `{!Timeless P} :
+      (|==£|> P) ∧ (P -∗ |==£|> Q) ⊢ |==£|> Q.
+    Proof.
+      rewrite le_upd_finally_unseal. iIntros "H %m Hlc".
+      iAssert (■ ▷^m ◇ P)%I as "#HP".
+      { iDestruct "H" as "[H _]". iApply ("H" with "Hlc"). }
+      iDestruct "H" as "[_ H]".
+      iEval (rewrite plainly_elim except_0_into_later
+        -laterN_later timeless_laterN) in "HP".
+      iDestruct "HP" as "[HFalse|HP']".
+      { do 2 iModIntro. by iMod "HFalse". }
+      iApply ("H" with "HP' Hlc").
+    Qed.
+
+    Lemma le_upd_finally_forall {A} (Φ : A → iProp Σ) :
+      (∀ x, |==£|> Φ x) ⊢ |==£|> ∀ x, Φ x.
+    Proof.
+      rewrite le_upd_finally_unseal.
+      iIntros "H %m Hlc %x". iApply ("H" with "Hlc").
+    Qed.
+
+    (* Derived *)
+    Global Instance le_upd_finally_proper : Proper ((⊣⊢) ==> (⊣⊢)) le_upd_finally.
+    Proof. apply: ne_proper. Qed.
+    Global Instance le_upd_finally_mono' : Proper ((⊢) ==> (⊢)) le_upd_finally.
+    Proof. intros P Q. apply le_upd_finally_mono. Qed.
+    Global Instance le_upd_finally_flip_mono' :
+      Proper (flip (⊢) ==> flip (⊢)) le_upd_finally.
+    Proof. intros P Q. apply le_upd_finally_mono. Qed.
+  End le_upd_finally.
+
+  Lemma le_upd_finally_soundness `{!lcGpreS Σ} n P :
+    (∀ `{!lcGS Σ}, £ n ⊢ |==£|> P) → ⊢ P.
+  Proof.
+    rewrite le_upd_finally_unseal. intros HP. apply (laterN_soundness _ (S n)).
+    rewrite laterN_later -except_0_into_later -(plainly_elim (▷^n _)).
+    iMod (later_credits.le_upd.lc_alloc n) as (Hc) "[Hlc H£]".
+    iApply (HP with "H£ Hlc").
+  Qed.
 End le_upd.
 
 (** This should only be imported by the internal development of fancy updates. *)

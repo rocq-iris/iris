@@ -286,6 +286,140 @@ Proof.
   - apply step_fupdN_soundness_no_lc. done.
 Qed.
 
+(** More flexible soundness theorem *)
+Definition fupd_finally_def `{!invGS_gen HasLc Σ}
+    (E : coPset) (P : iProp Σ) : iProp Σ :=
+  wsat -∗ ownE E -∗ |==£|> P.
+Local Definition fupd_finally_aux : seal (@fupd_finally_def).
+Proof. by eexists. Qed.
+Local Definition fupd_finally := fupd_finally_aux.(unseal).
+Local Definition fupd_finally_unseal :
+  @fupd_finally = @fupd_finally_def := fupd_finally_aux.(seal_eq).
+Global Arguments fupd_finally {Σ _}.
+
+Notation "|={ E |}=> Q" := (fupd_finally E Q)
+  (at level 20, E at level 50, Q at level 200,
+   format "'[  ' |={ E |}=>  '/' Q ']'") : bi_scope.
+Notation "P ={ E |}=∗ Q" := (P -∗ fupd_finally E Q)%I
+  (at level 99, E at level 50, Q at level 200,
+   format "'[' P  ={ E |}=∗  '/' '[' Q ']' ']'") : bi_scope.
+Notation "P ={ E |}=∗ Q" := (P -∗ fupd_finally E Q)
+  (at level 99, E at level 50, Q at level 200,
+   format "'[' P  ={ E |}=∗  '/' '[' Q ']' ']'") : stdpp_scope.
+
+Section fupd_finally.
+  Context `{!invGS_gen HasLc Σ}.
+
+  Global Instance fupd_finally_ne E : NonExpansive (fupd_finally E).
+  Proof. rewrite fupd_finally_unseal. solve_proper. Qed.
+
+  Lemma fupd_finally_mono E P Q : (P ⊢ Q) → (|={E|}=> P) ⊢ (|={E|}=> Q).
+  Proof. rewrite fupd_finally_unseal. solve_proper. Qed.
+
+  Lemma fupd_finally_intro E P : ■ P ⊢ |={E|}=> P.
+  Proof.
+    rewrite fupd_finally_unseal.
+    iIntros "#HP _ _". by iApply le_upd_finally_intro.
+  Qed.
+
+  Lemma fupd_fupd_finally E1 E2 P : (|={E1,E2}=> |={E2|}=> P) ⊢ |={E1|}=> P.
+  Proof.
+    rewrite fupd_finally_unseal uPred_fupd_unseal.
+    iIntros "HP Hw HE1". rewrite /uPred_fupd_def /=.
+    iApply le_upd_le_upd_finally.
+    iMod ("HP" with "[$Hw $HE1]") as "HP"; iModIntro.
+    iApply except_0_le_upd_finally. iMod "HP"; iModIntro.
+    iDestruct "HP" as "(Hw & HE2 & HP)". iApply ("HP" with "Hw HE2").
+  Qed.
+
+  Lemma fupd_finally_later E P : (£ 1 -∗ |={E|}=> P) ⊢ |={E|}=> ▷ ◇ P.
+  Proof.
+    rewrite fupd_finally_unseal. iIntros "H Hw HE". iApply le_upd_finally_later.
+    iIntros "H£". iApply ("H" with "H£ Hw HE").
+  Qed.
+
+  Lemma fupd_finally_keep E P Q `{!Timeless P} :
+    (|={E|}=> P) ∧ (P -∗ |={E|}=> Q) ⊢ |={E|}=> Q.
+  Proof.
+    rewrite fupd_finally_unseal. iIntros "H Hw HE".
+    iApply (le_upd_finally_keep P). iSplit.
+    - iDestruct "H" as "[H _]". iApply ("H" with "Hw HE").
+    - iIntros "HP". iDestruct "H" as "[_ H]". iApply ("H" with "HP Hw HE").
+  Qed.
+
+  Lemma fupd_finally_forall {A} E (Φ : A → iProp Σ) :
+    (∀ x, |={E|}=> Φ x) ⊢ |={E|}=> ∀ x, Φ x.
+  Proof.
+    rewrite fupd_finally_unseal. iIntros "H Hw HE".
+    iApply le_upd_finally_forall; iIntros (x). iApply ("H" with "Hw HE").
+  Qed.
+
+  (* Derived *)
+  Global Instance fupd_finally_proper E : Proper ((⊣⊢) ==> (⊣⊢)) (fupd_finally E).
+  Proof. apply: ne_proper. Qed.
+  Global Instance fupd_finally_mono' E : Proper ((⊢) ==> (⊢)) (fupd_finally E).
+  Proof. intros P Q. apply fupd_finally_mono. Qed.
+  Global Instance fupd_finally_flip_mono' E :
+    Proper (flip (⊢) ==> flip (⊢)) (fupd_finally E).
+  Proof. intros P Q. apply fupd_finally_mono. Qed.
+
+  Lemma fupd_finally_and E P Q : (|={E|}=> P) ∧ (|={E|}=> Q) ⊢ |={E|}=> P ∧ Q.
+  Proof. rewrite !and_alt -fupd_finally_forall. by f_equiv=> -[]. Qed.
+  Lemma fupd_finally_wand E P Q : (|={E|}=> P) -∗ ■ (P -∗ Q) -∗ (|={E|}=> Q).
+  Proof.
+    apply entails_wand, wand_intro_r.
+    rewrite -plainly_and_sep_r -plainly_idemp.
+    rewrite (fupd_finally_intro E) fupd_finally_and.
+    by rewrite plainly_and_sep_r plainly_elim wand_elim_r.
+  Qed.
+
+  Lemma fupd_finally_mask_mono E1 E2 P : E1 ⊆ E2 → (|={E1|}=> P) ⊢ |={E2|}=> P.
+  Proof.
+    iIntros (?) "H". iApply fupd_fupd_finally. by iApply fupd_mask_intro_discard.
+  Qed.
+
+  Global Instance from_pure_fupd_finally a E P φ :
+    FromPure a P φ → FromPure a (|={E|}=> P) φ.
+  Proof.
+    rewrite /FromPure=> <-. rewrite -fupd_finally_intro.
+    by apply plainly_intro; [destruct a; simpl; apply _|].
+  Qed.
+
+  Global Instance from_forall_fupd_finally E {A} P (Φ : A → iProp Σ) name :
+    FromForall P Φ name →
+    FromForall (|={E|}=> P) (λ a, |={E|}=> (Φ a))%I name.
+  Proof. rewrite /FromForall=> <-. apply fupd_finally_forall. Qed.
+
+  Global Instance is_except_0_fupd_finally E P : IsExcept0 (|={E|}=> P).
+  Proof.
+    by rewrite /IsExcept0 -{2}(fupd_fupd_finally E E) -except_0_fupd -fupd_intro.
+  Qed.
+
+  Global Instance elim_modal_bupd_fupd_finally p E P Q :
+    ElimModal True p false (|==> P) P (|={E|}=> Q) (|={E|}=> Q).
+  Proof.
+    rewrite /ElimModal intuitionistically_if_elim /= bupd_frame_r wand_elim_r.
+    by rewrite (bupd_fupd E) fupd_fupd_finally.
+  Qed.
+  Global Instance elim_modal_fupd_fupd_finally p E1 E2 P Q :
+    ElimModal True p false (|={E1,E2}=> P) P (|={E1|}=> Q) (|={E2|}=> Q).
+  Proof.
+    rewrite /ElimModal intuitionistically_if_elim /= fupd_frame_r wand_elim_r.
+    by rewrite fupd_fupd_finally.
+  Qed.
+End fupd_finally.
+
+Lemma fupd_finally_soundness `{!invGpreS Σ} n E P :
+  (∀ `{!invGS_gen HasLc Σ}, £ n ⊢ |={E|}=> P) → ⊢ P.
+Proof.
+  rewrite fupd_finally_unseal=> HP.
+  apply (le_upd_finally_soundness n); iIntros (?) "H£".
+  iApply le_upd_le_upd_finally. iMod wsat_alloc as (Hw) "[Hw HE]". iModIntro.
+  iApply (HP (InvG _ _ _ _) with "H£ Hw").
+  rewrite (union_difference_L E ⊤); [|set_solver].
+  rewrite ownE_op; [|set_solver]. iDestruct "HE" as "[$ _]".
+Qed.
+
 (** * Now the Rocq-level tactic [iNext credit:H] *)
 Lemma tac_lc_add_laterN_split `{!invGS_gen HasLc Σ} Δ Δ' Δ'' E i n m m' P :
   envs_lookup i Δ = Some (false, £ m) →
