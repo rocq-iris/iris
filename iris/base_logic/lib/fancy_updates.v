@@ -45,7 +45,7 @@ Global Instance subG_invΣ {Σ} : subG invΣ Σ → invGpreS Σ.
 Proof. solve_inG. Qed.
 
 Local Definition uPred_fupd_def `{!invGS_gen hlc Σ} (E1 E2 : coPset) (P : iProp Σ) : iProp Σ :=
-  wsat ∗ ownE E1 -∗ le_upd_if (if hlc is HasLc then true else false) (◇ (wsat ∗ ownE E2 ∗ P)).
+  wsat ∗ ownE E1 -∗ le_upd_if (if hlc is HasLc then true else false) (wsat ∗ ownE E2 ∗ P).
 Local Definition uPred_fupd_aux : seal (@uPred_fupd_def). Proof. by eexists. Qed.
 Definition uPred_fupd := uPred_fupd_aux.(unseal).
 Global Arguments uPred_fupd {hlc Σ _}.
@@ -58,25 +58,25 @@ Proof.
   - rewrite uPred_fupd_unseal. solve_proper.
   - intros E1 E2 (E1''&->&?)%subseteq_disjoint_union_L.
     rewrite uPred_fupd_unseal /uPred_fupd_def ownE_op //.
-    by iIntros "($ & $ & HE) !> !> [$ $] !> !>".
+    by iIntros "($ & $ & HE) !> [$ $] !>".
   - rewrite uPred_fupd_unseal.
     iIntros (E1 E2 P) ">H [Hw HE]". iApply "H"; by iFrame.
   - rewrite uPred_fupd_unseal.
     iIntros (E1 E2 P Q HPQ) "HP HwE". rewrite -HPQ. by iApply "HP".
   - rewrite uPred_fupd_unseal. iIntros (E1 E2 E3 P) "HP HwE".
-    iMod ("HP" with "HwE") as ">(Hw & HE & HP)". iApply "HP"; by iFrame.
+    iMod ("HP" with "HwE") as "(Hw & HE & HP)". iApply "HP"; by iFrame.
   - intros E1 E2 Ef P HE1Ef. rewrite uPred_fupd_unseal /uPred_fupd_def ownE_op //.
     iIntros "Hvs (Hw & HE1 &HEf)".
-    iMod ("Hvs" with "[Hw HE1]") as ">($ & HE2 & HP)"; first by iFrame.
+    iMod ("Hvs" with "[Hw HE1]") as "($ & HE2 & HP)"; first by iFrame.
     iDestruct (ownE_op' with "[HE2 HEf]") as "[? $]"; first by iFrame.
-    iIntros "!> !>". by iApply "HP".
+    iIntros "!>". by iApply "HP".
   - rewrite uPred_fupd_unseal /uPred_fupd_def. by iIntros (????) "[HwP $]".
 Qed.
 Global Instance uPred_bi_fupd `{!invGS_gen hlc Σ} : BiFUpd (uPredI (iResUR Σ)) :=
   {| bi_fupd_mixin := uPred_fupd_mixin |}.
 
 Global Instance uPred_bi_bupd_fupd `{!invGS_gen hlc Σ} : BiBUpdFUpd (uPredI (iResUR Σ)).
-Proof. rewrite /BiBUpdFUpd uPred_fupd_unseal. by iIntros (E P) ">? [$ $] !> !>". Qed.
+Proof. rewrite /BiBUpdFUpd uPred_fupd_unseal. by iIntros (E P) ">? [$ $] !>". Qed.
 
 (** The interaction laws with the plainly modality are only supported when
   we opt out of the support for later credits. *)
@@ -91,11 +91,20 @@ Proof.
   - iIntros (E Pi) "H [Hw HE]".
     iAssert (▷ ◇ <si_pure> Pi)%I as "#HP".
     { iNext. by iMod ("H" with "[$]") as "(_ & _ & HP)". }
-    iFrame. iIntros "!> !> !>". by iMod "HP".
+    iFrame. iIntros "!> !>". by iMod "HP".
   - iIntros (E A Φi) "HΦ [Hw HE]".
     iAssert (◇ ∀ x : A, <si_pure> Φi x)%I as "#>HP".
     { iIntros (x). by iMod ("HΦ" with "[$Hw $HE]") as "(_&_&?)". }
     by iFrame.
+Qed.
+
+Lemma fupd_pure_keep `{!invGS_gen hlc Σ} φ E2' E1 E2 (Q : iProp Σ) :
+  (|={E1,E2'}=> ⌜ φ ⌝) ∧ (⌜ φ ⌝ ={E1,E2}=∗ Q) ⊢ |={E1,E2}=> Q.
+Proof.
+  rewrite uPred_fupd_unseal. iIntros "H HwE".
+  iApply (le_upd_if_pure_keep _ φ); iSplit.
+  - iDestruct "H" as "[H _]". iMod ("H" with "HwE") as "(?&?&?)"; auto.
+  - iIntros (Hφ). iDestruct "H" as "[_ H]". by iApply "H".
 Qed.
 
 (** Later credits: the laws are only available when we opt into later credit support.*)
@@ -109,8 +118,7 @@ Lemma lc_fupd_elim_later `{!invGS_gen HasLc Σ} E P :
 Proof.
   iIntros "Hf Hupd".
   rewrite uPred_fupd_unseal /uPred_fupd_def.
-  iIntros "[$ $]". iApply (lc_le_upd_elim_later with "Hf").
-  iNext. by iModIntro.
+  iIntros "[$ $]". by iApply (lc_le_upd_elim_later with "Hf").
 Qed.
 
 (** If the goal is a fancy update, this lemma can be used to make a later appear
@@ -237,7 +245,6 @@ Section fupd_finally.
     iIntros "HP Hw HE1". rewrite /uPred_fupd_def /=.
     iApply le_upd_le_upd_finally.
     iMod (le_upd_if_into_le_upd with "(HP [$Hw $HE1])") as "HP"; iModIntro.
-    iApply except_0_le_upd_finally. iMod "HP"; iModIntro.
     iDestruct "HP" as "(Hw & HE2 & HP)". iApply ("HP" with "Hw HE2").
   Qed.
 
