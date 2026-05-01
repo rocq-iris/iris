@@ -379,7 +379,14 @@ Module le_upd.
       iMod "HP"; iModIntro. by iApply "HP".
     Qed.
 
-    Lemma le_upd_finally_later P : (£ 1 -∗ |==£|> P) ⊢ |==£|> ▷ ◇ P.
+    Lemma le_upd_finally_later P : ▷ (|==£|> P) ⊢ |==£|> ▷ ◇ P.
+    Proof.
+      rewrite le_upd_finally_unseal.
+      iIntros "H %m Hlc". rewrite -except_0_intro -laterN_later /= - later_plainly.
+      iNext. iApply ("H" with "Hlc").
+    Qed.
+
+    Lemma le_upd_finally_lc P : (£ 1 -∗ |==£|> P) ⊢ |==£|> ▷ ◇ P.
     Proof.
       rewrite le_upd_finally_unseal.
       iIntros "H %m Hlc". rewrite -except_0_intro -laterN_later.
@@ -460,6 +467,9 @@ Module le_upd_if.
     Proof.
       destruct b; [apply le_upd_intro | apply bupd_intro].
     Qed.
+
+    Lemma le_upd_if_into_le_upd b P : le_upd_if b P ⊢ le_upd P.
+    Proof. destruct b; simpl; auto using bupd_le_upd. Qed.
 
     Lemma le_upd_if_bind b P Q :
       (P -∗ le_upd_if b Q) -∗ (le_upd_if b P) -∗ (le_upd_if b Q).

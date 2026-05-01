@@ -144,7 +144,7 @@ Lemma wp_strong_adequacy Σ Λ `{!invGpreS Σ} s es σ1 n κs t2 σ2 φ
   φ.
 Proof.
   intros Hwp ?. apply (pure_soundness (PROP:=iPropI Σ)).
-  apply (fupd_finally_soundness (2 * steps_sum num_laters_per_step 0 n) ⊤).
+  apply (fupd_finally_soundness HasLc (2 * steps_sum num_laters_per_step 0 n) ⊤).
   iIntros (?) "H£".
   iMod Hwp as (stateI Φ fork_post state_interp_mono) "(Hσ & Hwp & Hφ)".
   iDestruct (big_sepL2_length with "Hwp") as %Hlen1.
