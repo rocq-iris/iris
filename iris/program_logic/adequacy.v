@@ -10,7 +10,7 @@ Import uPred.
 we prove a number of auxiliary results. *)
 
 Section adequacy.
-Context `{!irisGS_gen HasLc Λ Σ}.
+Context `{!irisGS_gen hlc Λ Σ}.
 Implicit Types e : expr Λ.
 Implicit Types P Q : iProp Σ.
 Implicit Types Φ : val Λ → iProp Σ.
@@ -21,36 +21,35 @@ Notation wptp s t Φs := ([∗ list] e;Φ ∈ t;Φs, WP e @ s; ⊤ {{ Φ }})%I.
 Local Lemma wp_step s e1 σ1 ns κ κs e2 σ2 efs nt Φ :
   prim_step e1 σ1 κ e2 σ2 efs →
   state_interp σ1 ns (κ ++ κs) nt -∗
-  £ (2 * S (num_laters_per_step ns)) -∗
-  WP e1 @ s; ⊤ {{ Φ }} ={⊤}=∗
+  £ (S (num_laters_per_step ns)) -∗
+  WP e1 @ s; ⊤ {{ Φ }}
+    ={⊤,∅}=∗ |={∅}▷=>^(S $ num_laters_per_step ns) |={∅,⊤}=>
     state_interp σ2 (S ns) κs (nt + length efs) ∗ WP e2 @ s; ⊤ {{ Φ }} ∗
     wptp s efs (replicate (length efs) fork_post).
 Proof.
   rewrite {1}wp_unfold /wp_pre. iIntros (?) "Hσ Hcred H".
-  replace (2 * S (num_laters_per_step ns))
-    with (S (num_laters_per_step ns) + S (num_laters_per_step ns)) by lia.
-  iDestruct "Hcred" as "[Hcred1 Hcred2]".
   rewrite (val_stuck e1 σ1 κ e2 σ2 efs) //.
-  iMod ("H" $! σ1 ns with "Hσ") as "(_ & H)".
-  iDestruct ("H" with "[//] Hcred1") as "H".
-  iMod (lc_fupd_add_step_fupdN with "Hcred2 H") as ">(?&?&?)".
-  rewrite Nat.add_comm big_sepL2_replicate_r //. by iFrame.
+  iMod ("H" $! σ1 ns with "Hσ") as "(_ & H)". iModIntro.
+  iApply (step_fupdN_wand with "(H [//] Hcred)"). iIntros ">H".
+  by rewrite Nat.add_comm big_sepL2_replicate_r.
 Qed.
 
 Local Lemma wptp_step s es1 es2 κ κs σ1 ns σ2 Φs nt :
   step (es1,σ1) κ (es2, σ2) →
   state_interp σ1 ns (κ ++ κs) nt -∗
-  £ (2 * S (num_laters_per_step ns)) -∗
-  wptp s es1 Φs ={⊤}=∗ ∃ nt',
-    state_interp σ2 (S ns) κs (nt + nt') ∗
-    wptp s es2 (Φs ++ replicate nt' fork_post).
+  £ (S (num_laters_per_step ns)) -∗
+  wptp s es1 Φs -∗
+  ∃ nt', |={⊤,∅}=> |={∅}▷=>^(S $ num_laters_per_step$ ns) |={∅,⊤}=>
+         state_interp σ2 (S ns) κs (nt + nt') ∗
+         wptp s es2 (Φs ++ replicate nt' fork_post).
 Proof.
   iIntros (Hstep) "Hσ Hcred Ht".
   destruct Hstep as [e1' σ1' e2' σ2' efs t2' t3 Hstep]; simplify_eq/=.
   iDestruct (big_sepL2_app_inv_l with "Ht") as (Φs1 Φs2 ->) "[? Ht]".
   iDestruct (big_sepL2_cons_inv_l with "Ht") as (Φ Φs3 ->) "[Ht ?]".
-  iExists _. iMod (wp_step with "Hσ Hcred Ht") as "($ & He2 & Hefs)"; first done.
-  iModIntro. rewrite -(assoc_L app) -app_comm_cons. iFrame.
+  iExists _. iMod (wp_step with "Hσ Hcred Ht") as "H"; first done. iModIntro.
+  iApply (step_fupdN_wand with "H"). iIntros ">($ & He2 & Hefs) !>".
+  rewrite -(assoc_L app) -app_comm_cons. iFrame.
 Qed.
 
 (* The total number of laters used between the physical steps number
@@ -65,22 +64,25 @@ Local Fixpoint steps_sum (num_laters_per_step : nat → nat) (start ns : nat) : 
 Local Lemma wptp_preservation s n es1 es2 κs κs' σ1 ns σ2 Φs nt :
   nsteps n (es1, σ1) κs (es2, σ2) →
   state_interp σ1 ns (κs ++ κs') nt -∗
-  £ (2 * steps_sum num_laters_per_step ns n) -∗
-  wptp s es1 Φs ={⊤}=∗ ∃ nt',
+  £ (steps_sum num_laters_per_step ns n) -∗
+  wptp s es1 Φs
+  ={⊤,∅}=∗ |={∅}▷=>^(steps_sum num_laters_per_step ns n) |={∅,⊤}=> ∃ nt',
     state_interp σ2 (n + ns) κs' (nt + nt') ∗
     wptp s es2 (Φs ++ replicate nt' fork_post).
 Proof.
   revert nt es1 es2 κs κs' σ1 ns σ2 Φs.
   induction n as [|n IH]=> nt es1 es2 κs κs' σ1 ns σ2 Φs /=.
-  { inversion_clear 1; iIntros "? ? ?"; iExists 0; simpl.
-    rewrite Nat.add_0_r right_id_L. by iFrame. }
-  iIntros (Hsteps) "Hσ Hcred He". inv Hsteps as [|?? [t1' σ1']].
-  rewrite (_ : ∀ n m, S (n + m + S (n + m + 0)) = 2 * S n + 2 * m); last lia.
-  iDestruct "Hcred" as "[Hc1 Hc2]". rewrite -(assoc_L (++)).
-  iMod (wptp_step with "Hσ Hc1 He") as (nt') "[Hσ He]"; first eauto; simplify_eq.
-  iMod (IH with "Hσ Hc2 He") as (nt'') "[??]"; first done. iModIntro.
-  rewrite -Nat.add_assoc -(assoc_L app) -replicate_add -Nat.add_succ_r.
-  by eauto with iFrame.
+  { inversion_clear 1; iIntros "? ? ?"; iExists 0=> /=.
+    rewrite Nat.add_0_r right_id_L. iFrame. by iApply fupd_mask_subseteq. }
+  iIntros (Hsteps) "Hσ Hcred He". inversion_clear Hsteps as [|?? [t1' σ1']].
+  rewrite -(assoc_L (++)) Nat.iter_add -{1}plus_Sn_m plus_n_Sm.
+  iDestruct "Hcred" as "[Hc1 Hc2]".
+  iDestruct (wptp_step with "Hσ Hc1 He") as (nt') ">H"; first eauto; simplify_eq.
+  iModIntro. iApply step_fupdN_S_fupd. iApply (step_fupdN_wand with "H").
+  iIntros ">(Hσ & He)". iMod (IH with "Hσ Hc2 He") as "IH"; first done. iModIntro.
+  iApply (step_fupdN_wand with "IH"). iIntros ">IH".
+  iDestruct "IH" as (nt'') "[??]".
+  rewrite -Nat.add_assoc -(assoc_L app) -replicate_add. by eauto with iFrame.
 Qed.
 
 Local Lemma wp_not_stuck κs nt e σ ns Φ :
@@ -104,10 +106,10 @@ Qed.
 End adequacy.
 
 (** Iris's generic adequacy result *)
-Lemma wp_strong_adequacy Σ Λ `{!invGpreS Σ} s es σ1 n κs t2 σ2 φ
+Lemma wp_strong_adequacy_gen hlc Σ Λ `{!invGpreS Σ} s es σ1 n κs t2 σ2 φ
         (num_laters_per_step : nat → nat) :
   (* WP *)
-  (∀ `{Hinv : !invGS_gen HasLc Σ},
+  (∀ `{Hinv : !invGS_gen hlc Σ},
       ⊢ |={⊤}=> ∃
          (stateI : state Λ → nat → list (observation Λ) → nat → iProp Σ)
          (Φs : list (val Λ → iProp Σ))
@@ -115,7 +117,7 @@ Lemma wp_strong_adequacy Σ Λ `{!invGpreS Σ} s es σ1 n κs t2 σ2 φ
          (* Note: existentially quantifying over Iris goal! [iExists _] should
          usually work. *)
          state_interp_mono,
-       let _ : irisGS_gen HasLc Λ Σ := IrisG Hinv stateI fork_post num_laters_per_step
+       let _ : irisGS_gen hlc Λ Σ := IrisG Hinv stateI fork_post num_laters_per_step
                                   state_interp_mono
        in
        stateI σ1 0 κs 0 ∗
@@ -144,20 +146,22 @@ Lemma wp_strong_adequacy Σ Λ `{!invGpreS Σ} s es σ1 n κs t2 σ2 φ
   φ.
 Proof.
   intros Hwp ?. apply (pure_soundness (PROP:=iPropI Σ)).
-  apply (fupd_finally_soundness HasLc (2 * steps_sum num_laters_per_step 0 n) ⊤).
+  apply (laterN_soundness _  (steps_sum num_laters_per_step 0 n + 1)).
+  rewrite laterN_add /= -except_0_into_later.
+  apply (fupd_finally_soundness hlc (steps_sum num_laters_per_step 0 n) ⊤).
   iIntros (?) "H£".
-  iMod Hwp as (stateI Φ fork_post state_interp_mono) "(Hσ & Hwp & Hφ)".
+  iMod Hwp as (stateI Φ fork_post state_interp_mono) "(Hσ & Hwp & Hφ)". clear Hwp.
   iDestruct (big_sepL2_length with "Hwp") as %Hlen1.
   pose (iG := IrisG _ stateI fork_post num_laters_per_step state_interp_mono).
   rewrite -(right_id_L [] (++) κs).
-  iMod (@wptp_preservation _ _ iG with "Hσ H£ Hwp")
-    as (nt') "[Hσ Ht] /="; first done.
-  rewrite Nat.add_0_r.
+  iMod (@wptp_preservation _ _ _ iG with "Hσ H£ Hwp") as "H /="; first done.
+  rewrite Nat.add_0_r. iApply step_fupdN_fupd_finally.
+  iApply (step_fupdN_wand with "H"); iIntros ">(%nt' & Hσ & Ht)".
   iApply (fupd_finally_keep _
     ⌜∀ e2, s = NotStuck → e2 ∈ t2 → not_stuck e2 σ2⌝); iSplit.
   { iIntros (e -> [i He]%list_elem_of_lookup).
     iDestruct (big_sepL2_lookup_l with "Ht") as (Φ' _) "He"; first done.
-    iMod (@wp_not_stuck _ _ iG with "Hσ He") as %?. done. }
+    iMod (@wp_not_stuck _ _ _ iG with "Hσ He") as %?. done. }
   iIntros (?). iMod (wptp_postconditions with "Ht") as "Ht".
   iDestruct (big_sepL2_app_inv_r with "Ht") as (es' t2' ->) "[Hes' Ht2']".
   iDestruct (big_sepL2_length with "Hes'") as %?.
@@ -167,6 +171,10 @@ Proof.
   iMod ("Hφ" with "[//] [] [//] Hσ Hes' Ht2'") as %?; first by rewrite Hlen1.
   done.
 Qed.
+
+(** Adequacy when using later credits (the default) *)
+Definition wp_strong_adequacy := wp_strong_adequacy_gen HasLc.
+Global Arguments wp_strong_adequacy _ _ {_}.
 
 (** Since the full adequacy statement is quite a mouthful, we prove some more
 intuitive and simpler corollaries. These lemmas are morover stated in terms of
@@ -220,12 +228,13 @@ In other words, the state interpretation must ignore [ns] and [nt], the number
 of laters per step must be 0, and the proof of [state_interp_mono] must have
 this specific proof term.
 *)
-Lemma wp_adequacy Σ Λ `{!invGpreS Σ} s e σ φ :
-  (∀ `{Hinv : !invGS_gen HasLc Σ} κs,
+(** Again, we first prove a lemma generic over the usage of credits. *)
+Lemma wp_adequacy_gen (hlc : has_lc) Σ Λ `{!invGpreS Σ} s e σ φ :
+  (∀ `{Hinv : !invGS_gen hlc Σ} κs,
      ⊢ |={⊤}=> ∃
          (stateI : state Λ → list (observation Λ) → iProp Σ)
          (fork_post : val Λ → iProp Σ),
-       let _ : irisGS_gen HasLc Λ Σ :=
+       let _ : irisGS_gen hlc Λ Σ :=
            IrisG Hinv (λ σ _ κs _, stateI σ κs) fork_post (λ _, 0)
                  (λ _ _ _ _, fupd_intro _ _)
        in
@@ -233,7 +242,7 @@ Lemma wp_adequacy Σ Λ `{!invGpreS Σ} s e σ φ :
   adequate s e σ (λ v _, φ v).
 Proof.
   intros Hwp. apply adequate_alt; intros t2 σ2 [n [κs ?]]%erased_steps_nsteps.
-  eapply (wp_strong_adequacy Σ _); [ |done]=> ?.
+  eapply (wp_strong_adequacy_gen hlc Σ _); [ |done]=> ?.
   iMod Hwp as (stateI fork_post) "[Hσ Hwp]".
   iExists (λ σ _ κs _, stateI σ κs), [(λ v, ⌜φ v⌝%I)], fork_post, _ => /=.
   iIntros "{$Hσ $Hwp} !>" (e2 t2' -> ? ?) "_ H _".
@@ -243,12 +252,16 @@ Proof.
   iIntros (v2 t2'' [= -> <-]). by rewrite to_of_val.
 Qed.
 
-Lemma wp_invariance Σ Λ `{!invGpreS Σ} s e1 σ1 t2 σ2 φ :
-  (∀ `{Hinv : !invGS_gen HasLc Σ} κs,
+(** Instance for using credits *)
+Definition wp_adequacy := wp_adequacy_gen HasLc.
+Global Arguments wp_adequacy _ _ {_}.
+
+Lemma wp_invariance_gen (hlc : has_lc) Σ Λ `{!invGpreS Σ} s e1 σ1 t2 σ2 φ :
+  (∀ `{Hinv : !invGS_gen hlc Σ} κs,
      ⊢ |={⊤}=> ∃
          (stateI : state Λ → list (observation Λ) → nat → iProp Σ)
          (fork_post : val Λ → iProp Σ),
-       let _ : irisGS_gen HasLc Λ Σ := IrisG Hinv (λ σ _, stateI σ) fork_post
+       let _ : irisGS_gen hlc Λ Σ := IrisG Hinv (λ σ _, stateI σ) fork_post
               (λ _, 0) (λ _ _ _ _, fupd_intro _ _) in
        stateI σ1 κs 0 ∗ WP e1 @ s; ⊤ {{ _, True }} ∗
        (stateI σ2 [] (pred (length t2)) -∗ ∃ E, |={⊤,E}=> ⌜φ⌝)) →
@@ -256,7 +269,7 @@ Lemma wp_invariance Σ Λ `{!invGpreS Σ} s e1 σ1 t2 σ2 φ :
   φ.
 Proof.
   intros Hwp [n [κs ?]]%erased_steps_nsteps.
-  eapply (wp_strong_adequacy Σ); [done| |done]=> ?.
+  eapply (wp_strong_adequacy_gen hlc Σ); [done| |done]=> ?.
   iMod (Hwp _ κs) as (stateI fork_post) "(Hσ & Hwp & Hφ)".
   iExists (λ σ _, stateI σ), [(λ _, True)%I], fork_post, _ => /=.
   iIntros "{$Hσ $Hwp} !>" (e2 t2' -> _ _) "Hσ H _ /=".
@@ -265,3 +278,6 @@ Proof.
   iDestruct ("Hφ" with "Hσ") as (E) ">Hφ".
   by iApply fupd_mask_intro_discard; first set_solver.
 Qed.
+
+Definition wp_invariance := wp_invariance_gen HasLc.
+Global Arguments wp_invariance _ _ {_}.
