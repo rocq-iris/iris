@@ -73,7 +73,7 @@ Section mono_list_own.
 
   Global Instance mono_list_auth_own_timeless γ dq l : Timeless (γ ↪●ML{dq} l).
   Proof. unseal. apply _. Qed.
-  Global Instance mono_list_auth_own_persistent γ l : Timeless (γ ↪●ML□ l).
+  Global Instance mono_list_auth_own_persistent γ l : Persistent (γ ↪●ML□ l).
   Proof. unseal. apply _. Qed.
   Global Instance mono_list_lb_own_timeless γ l : Timeless (γ ↪◯ML l).
   Proof. unseal. apply _. Qed.
