@@ -156,11 +156,13 @@ Section proofs.
    * open the invariant non-atomically. *)
   Lemma cinv_acc_1 E N γ P :
     ↑N ⊆ E →
-    cinv N γ P -∗ cinv_own γ 1 ={E}=∗ ▷ P ∗ (▷P ={E}=∗ cinv_own γ 1).
+    cinv N γ P -∗ 
+    cinv_own γ 1 ={E}=∗ 
+    ▷ P ∗ (∀ E', ⌜↑N ⊆ E'⌝ -∗ ▷P ={E'}=∗ cinv_own γ 1).
   Proof.
     iIntros (?) "#Hinv Hγ".
     iInv "Hinv" as "[[$ >Hexcl] | >Hγ']" "Hclose".
-    - iMod ("Hclose" with "[$Hγ]") as "_". iIntros "!> HP". 
+    - iMod ("Hclose" with "[$Hγ]") as "_". iIntros "!>" (E' HE') "HP". 
       iInv "Hinv" as "[[_ >Hexcl'] | >$]" "Hclose".
       + iDestruct (cinv_excl_excl with "Hexcl Hexcl'") as %[].
       + iApply "Hclose". eauto with iFrame.
