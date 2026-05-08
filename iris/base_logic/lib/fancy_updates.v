@@ -240,18 +240,28 @@ Section fupd_finally.
     iDestruct "HP" as "(Hw & HE2 & HP)". iApply ("HP" with "Hw HE2").
   Qed.
 
-  (** This lemma is derivable from [fupd_finally_lc] with [hlc:=HasLc], but
+  (** Generate a later credit by removing a later below the modality. This only
+  works if the proposition below the later can be turned into an except-0 [◇]. *)
+  Lemma fupd_finally_lc E P : (£ 1 -∗ |={E|}=> P) ⊢ |={E|}=> ▷ ◇ P.
+  Proof.
+    rewrite fupd_finally_unseal. iIntros "H Hw HE". iApply le_upd_finally_lc.
+    iIntros "H£". iApply ("H" with "H£ Hw HE").
+  Qed.
+
+  Lemma fupd_finally_except_0 E P : (|={E|}=> ◇ P) ⊢ |={E|}=> P.
+  Proof.
+    rewrite fupd_finally_unseal. iIntros "H Hw HE".
+    iApply le_upd_finally_except_0. iApply ("H" with "Hw HE").
+  Qed.
+
+  (** Commute a later out of the modality. This only works if the proposition
+  below the later can be turned into an except-0 [◇].
+  This lemma is derivable from [fupd_finally_lc] with [hlc:=HasLc], but
   not with [hlc:=HasNoLc]. *)
   Lemma fupd_finally_later E P : ▷ (|={E|}=> P) ⊢ |={E|}=> ▷ ◇ P.
   Proof.
     rewrite fupd_finally_unseal. iIntros "H Hw HE". iApply le_upd_finally_later.
     iNext. iApply ("H" with "Hw HE").
-  Qed.
-
-  Lemma fupd_finally_lc E P : (£ 1 -∗ |={E|}=> P) ⊢ |={E|}=> ▷ ◇ P.
-  Proof.
-    rewrite fupd_finally_unseal. iIntros "H Hw HE". iApply le_upd_finally_lc.
-    iIntros "H£". iApply ("H" with "H£ Hw HE").
   Qed.
 
   (* [iApply] this lemma to use your current context for proving a timeless

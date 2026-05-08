@@ -395,13 +395,15 @@ Module le_upd.
       iMod "HP"; iModIntro. by iApply "HP".
     Qed.
 
-    Lemma le_upd_finally_later P : ▷ (|==£|> P) ⊢ |==£|> ▷ ◇ P.
+    Lemma le_upd_finally_except_0 P : (|==£|> ◇ P) ⊢ |==£|> P.
     Proof.
-      rewrite le_upd_finally_unseal.
-      iIntros "H %m Hlc". rewrite -except_0_intro -laterN_later /= -later_plainly.
-      iNext. iApply ("H" with "Hlc").
+      rewrite le_upd_finally_unseal /le_upd_finally_def. iIntros "HP %m Hlc".
+      iEval (rewrite -except_0_idemp). by iApply "HP".
     Qed.
 
+    (** Generate a later credit by removing a later below the modality. This
+    only works if the proposition below the later can be turned into an
+    except-0 [◇]. *)
     Lemma le_upd_finally_lc P : (£ 1 -∗ |==£|> P) ⊢ |==£|> ▷ ◇ P.
     Proof.
       rewrite le_upd_finally_unseal.
@@ -444,6 +446,14 @@ Module le_upd.
     Global Instance le_upd_finally_flip_mono' :
       Proper (flip (⊢) ==> flip (⊢)) le_upd_finally.
     Proof. intros P Q. apply le_upd_finally_mono. Qed.
+
+    (** Commute a later out of the modality. This only works if the proposition
+    below the later can be turned into an except-0 [◇]. *)
+    Lemma le_upd_finally_later P : ▷ (|==£|> P) ⊢ |==£|> ▷ ◇ P.
+    Proof.
+      iIntros "H". iApply le_upd_finally_lc; iIntros "H£".
+      iApply le_upd_le_upd_finally. iApply (le_upd_later_elim with "H£"); auto.
+    Qed.
   End le_upd_finally.
 
   Lemma le_upd_finally_soundness `{!lcGpreS Σ} n P :
