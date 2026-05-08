@@ -352,7 +352,7 @@ Module le_upd.
   [le_upd_finally] (we have [(|==> ■ P) ⊣⊢ ■ P]). This fact is exposed by the
   rule [le_upd_le_upd_finally] combined with the rule [bupd_le_upd]. *)
   Definition le_upd_finally_def `{!lcGS Σ} (P : iProp Σ) : iProp Σ :=
-    ∀ m, lc_supply m -∗ ■ ▷^m ◇ P.
+    ∀ m, lc_supply m -∗ ▷^m ◇ ■ P.
   Local Definition le_upd_finally_aux : seal (@le_upd_finally_def).
   Proof. by eexists. Qed.
   Local Definition le_upd_finally := le_upd_finally_aux.(unseal).
@@ -382,23 +382,21 @@ Module le_upd.
       iEval (rewrite later_credits.le_upd.le_upd_unfold) in "HP".
       iMod ("HP" with "Hlc") as "[[Hlc H]|(%m' & %Hm & Hlc & H)]".
       { by iApply "H". }
-      replace m with (S (m' + (m - m' - 1))) by lia.
-      rewrite /= -later_plainly.
-      iModIntro. rewrite laterN_add -(laterN_intro (m - m' - 1)).
-      iApply ("IH" with "H Hlc").
+      replace m with (S ((m - m' - 1) + m')) by lia. rewrite /= laterN_add.
+      do 2 iNext. iApply ("IH" with "H Hlc").
     Qed.
 
     Lemma except_0_le_upd_finally P : (◇ |==£|> P) ⊢ |==£|> P.
     Proof.
       rewrite le_upd_finally_unseal /le_upd_finally_def. iIntros "HP %m Hlc".
-      iEval (rewrite -except_0_idemp -except_0_laterN -except_0_plainly).
+      iEval (rewrite -except_0_idemp -except_0_laterN).
       iMod "HP"; iModIntro. by iApply "HP".
     Qed.
 
     Lemma le_upd_finally_except_0 P : (|==£|> ◇ P) ⊢ |==£|> P.
     Proof.
       rewrite le_upd_finally_unseal /le_upd_finally_def. iIntros "HP %m Hlc".
-      iEval (rewrite -except_0_idemp). by iApply "HP".
+      iEval (rewrite -except_0_idemp except_0_plainly). by iApply "HP".
     Qed.
 
     (** Generate a later credit by removing a later below the modality. This
@@ -406,8 +404,8 @@ Module le_upd.
     except-0 [◇]. *)
     Lemma le_upd_finally_lc P : (£ 1 -∗ |==£|> P) ⊢ |==£|> ▷ ◇ P.
     Proof.
-      rewrite le_upd_finally_unseal.
-      iIntros "H %m Hlc". rewrite -except_0_intro -laterN_later.
+      rewrite le_upd_finally_unseal. iIntros "H %m Hlc".
+      rewrite -except_0_intro -later_plainly -except_0_plainly -laterN_later.
       iMod (later_credits.lc_increase_supply 1 with "Hlc") as "[Hlc H£]".
       iApply ("H" with "H£ Hlc").
     Qed.
@@ -419,13 +417,12 @@ Module le_upd.
       (|==£|> P) ∧ (P -∗ |==£|> Q) ⊢ |==£|> Q.
     Proof.
       rewrite le_upd_finally_unseal. iIntros "H %m Hlc".
-      iAssert (■ ▷^m ◇ P)%I as "#HP".
+      iAssert (▷^m ◇ ■ P)%I as "#HP".
       { iDestruct "H" as "[H _]". iApply ("H" with "Hlc"). }
       iDestruct "H" as "[_ H]".
-      iEval (rewrite plainly_elim except_0_into_later
-        -laterN_later timeless_laterN) in "HP".
+      iEval (rewrite except_0_into_later -laterN_later timeless_laterN) in "HP".
       iDestruct "HP" as "[HFalse|HP']".
-      { do 2 iModIntro. by iMod "HFalse". }
+      { iNext. by iMod "HFalse". }
       iApply ("H" with "HP' Hlc").
     Qed.
 
@@ -460,7 +457,7 @@ Module le_upd.
     (∀ `{!lcGS Σ}, £ n ⊢ |==£|> P) → ⊢ P.
   Proof.
     rewrite le_upd_finally_unseal. intros HP. apply (laterN_soundness _ (S n)).
-    rewrite laterN_later -except_0_into_later -(plainly_elim (▷^n _)).
+    rewrite laterN_later -except_0_into_later -(plainly_elim P).
     iMod (later_credits.le_upd.lc_alloc n) as (Hc) "[Hlc H£]".
     iApply (HP with "H£ Hlc").
   Qed.
