@@ -8,10 +8,11 @@ From iris.prelude Require Import options.
  * fractional invariant token and an internal exclusive token) using one ghost
  * name. The exclusive token is used to prove `cinv_acc_1`. *)
 Class cinvG Σ := { 
-  #[local] cinv_inG :: inG Σ (prodR (optionR (exclR unitO)) (optionR fracR)) ;
+  #[local] cinv_inG :: inG Σ (prodR (optionR (exclR unitO)) (optionR dfracR)) ;
 }.
 
-Definition cinvΣ : gFunctors := #[GFunctor (prodR (optionR (exclR unitO)) (optionR fracR))].
+Definition cinvΣ : gFunctors :=
+  #[GFunctor (prodR (optionR (exclR unitO)) (optionR dfracR))].
 
 Global Instance subG_cinvΣ {Σ} : subG cinvΣ Σ → cinvG Σ.
 Proof. solve_inG. Qed.
@@ -19,11 +20,12 @@ Proof. solve_inG. Qed.
 Section defs.
   Context `{!invGS_gen hlc Σ, !cinvG Σ}.
 
-  Definition cinv_own (γ : gname) (p : frac) : iProp Σ := own γ (None, Some p).
+  Definition cinv_own (γ : gname) (p : frac) : iProp Σ :=
+    own γ (None, Some (DfracOwn p)).
   Definition cinv_excl γ : iProp Σ := own γ (Some (Excl ()), None).
 
   Definition cinv (N : namespace) (γ : gname) (P : iProp Σ) : iProp Σ :=
-    inv N (P ∗ cinv_excl γ ∨ cinv_own γ 1).
+    inv N (cinv_own γ 1 ∨ P ∗ cinv_excl γ).
 End defs.
 
 Global Instance: Params (@cinv) 5 := {}.
@@ -77,7 +79,7 @@ Section proofs.
   Lemma cinv_iff N γ P Q : cinv N γ P -∗ ▷ □ (P ↔ Q) -∗ cinv N γ Q.
   Proof.
     iIntros "HI #HPQ". iApply (inv_iff with "HI"). iIntros "!> !>".
-    iSplit; iIntros "[[? ?]|$]"; iLeft; iFrame; by iApply "HPQ".
+    iSplit; iIntros "[$|[? ?]]"; iRight; iFrame; by iApply "HPQ".
   Qed.
 
   (*** Allocation rules. *)
@@ -88,7 +90,7 @@ Section proofs.
     ⊢ |={E}=> ∃ γ, ⌜ I γ ⌝ ∗ cinv_own γ 1 ∗ ∀ P, ▷ P ={E}=∗ cinv N γ P.
   Proof.
     iIntros (?). iMod cinv_own_excl_alloc as (γ) "[$ [Hexcl $]]"; first done.
-    iIntros "!>" (P) "P". iApply inv_alloc. iLeft. iFrame.
+    iIntros "!>" (P) "P". iApply inv_alloc. iRight. iFrame.
   Qed.
 
   (** The "open" variants create the invariant in the open state, and delay
@@ -102,7 +104,7 @@ Section proofs.
   Proof.
     iIntros (??). iMod (cinv_own_excl_alloc I) as (γ) "[$ [Hexcl $]]"; first done.
     iIntros "!>" (P). iMod inv_alloc_open as "[$ Hclose]"; first done.
-    iIntros "!> P". iApply "Hclose". iLeft. iFrame.
+    iIntros "!> P". iApply "Hclose". iRight. iFrame.
   Qed.
 
   Lemma cinv_alloc_cofinite (G : gset gname) E N :
@@ -136,9 +138,9 @@ Section proofs.
     ▷ P ∗ cinv_own γ p ∗ (∀ E' : coPset, ▷ P ∨ cinv_own γ 1 ={E',↑N ∪ E'}=∗ True)).
   Proof.
     iIntros (?) "Hinv Hown".
-    iMod (inv_acc_strong with "Hinv") as "[[[$ >Hexcl] | >Hown'] H]"; first done.
-    - iIntros "{$Hown} !>" (E') "[P|Hown]"; iApply "H"; eauto with iFrame.
-    - iDestruct (cinv_own_1_l with "Hown' Hown") as %[].
+    iMod (inv_acc_strong with "Hinv") as "[[>Hown'|[$ >Hexcl]] H]"; first done.
+    { iDestruct (cinv_own_1_l with "Hown' Hown") as %[]. }
+    iIntros "{$Hown} !>" (E') "[P|Hown]"; iApply "H"; eauto with iFrame.
   Qed.
 
   Lemma cinv_acc E N γ p P :
@@ -161,19 +163,35 @@ Section proofs.
     ▷ P ∗ (∀ E', ⌜↑N ⊆ E'⌝ -∗ ▷P ={E'}=∗ cinv_own γ 1).
   Proof.
     iIntros (?) "#Hinv Hγ".
-    iInv "Hinv" as "[[$ >Hexcl] | >Hγ']" "Hclose".
-    - iMod ("Hclose" with "[$Hγ]") as "_". iIntros "!>" (E' HE') "HP". 
-      iInv "Hinv" as "[[_ >Hexcl'] | >$]" "Hclose".
-      + iDestruct (cinv_excl_excl with "Hexcl Hexcl'") as %[].
-      + iApply "Hclose". eauto with iFrame.
-    - iDestruct (cinv_own_1_l with "Hγ Hγ'") as %[].
+    iInv "Hinv" as "[>Hγ'|[$ >Hexcl]]" "Hclose".
+    { iDestruct (cinv_own_1_l with "Hγ Hγ'") as %[]. }
+    iMod ("Hclose" with "[$Hγ]") as "_". iIntros "!>" (E' HE') "HP".
+    iInv "Hinv" as "[>$|[_ >Hexcl']]" "Hclose".
+    - iApply "Hclose". eauto with iFrame.
+    - iDestruct (cinv_excl_excl with "Hexcl Hexcl'") as %[].
   Qed.
 
   (*** Other *)
-  Lemma cinv_cancel E N γ P : ↑N ⊆ E → cinv N γ P -∗ cinv_own γ 1 ={E}=∗ ▷ P.
+  Lemma cinv_cancel E N γ P :
+    ↑N ⊆ E → cinv N γ P -∗ cinv_own γ 1 ={E}=∗ ▷ P.
   Proof.
     iIntros (?) "#Hinv Hγ".
     by iDestruct (cinv_acc_1 with "[$] [$]") as "[$ _]".
+  Qed.
+
+  Lemma cinv_inv N γ q P :
+    cinv N γ P -∗ cinv_own γ q ==∗ inv N P.
+  Proof.
+    iIntros "#Hinv Htok".
+    iAssert (own γ (None, Some DfracDiscarded)) with "[> Htok]" as "#Htok".
+    { iApply (own_update with "Htok").
+      apply prod_update; simpl; first done.
+      apply option_update.
+      apply dfrac_discard_update. }
+    iModIntro. iApply (inv_alter with "Hinv").
+    iIntros "!> !> [Htok2|[$ Hexcl]]".
+    { iExFalso. iCombine "Htok Htok2" gives %[_ ?]. done. }
+    iIntros "HP". iRight. by iFrame.
   Qed.
 
   Global Instance into_inv_cinv N γ P : IntoInv (cinv N γ P) N := {}.
