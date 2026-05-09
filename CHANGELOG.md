@@ -42,6 +42,7 @@ lemma.
   and `mono_Z_lb_own_valid` to `mono_Z_auth_lb_own_valid`.
 * Add new logic-level `mono_list` library for append-only lists.
 * Make lemma `cinv_acc_1` stronger. (by Benjamin Peters)
+* Add lemma `cinv_inv` for "persisting" a cancelable invariant.
 
 **Changes in `program_logic`:**
 
