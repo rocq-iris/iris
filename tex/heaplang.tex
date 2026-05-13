@@ -227,7 +227,7 @@ The $\HLOp$ subscript indicates that this is the HeapLang operator, not the math
 \begin{mathpar}
 \infer
   {(\expr, \pstate) \hstep[\vec\obs] (\val, \pstate', \vec\expr')}
-  {(\ResolveWith \expr at \prophid to \valB, \pstate) \hstep[\vec\obs \dplus [(\prophid, (\val, \valB))]] (\val, \pstate', \vec\expr')}
+  {(\ResolveWith \expr at \prophid to \valB, \pstate) \hstep[\vec\obs \dplus [(\prophid, (\val, \valB))]] (\val, \pstate', \vec\expr')}\text{ if $\prophid \in \pstate.\stateProphs$}
 \end{mathpar}
 \caption{HeapLang impure reduction rules. \\ \small
 Here, $\pstate:\stateHeap$ denotes $\sigma$ with the $\stateHeap$ field updated as indicated.
