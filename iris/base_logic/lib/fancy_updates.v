@@ -98,6 +98,9 @@ Proof.
     by iFrame.
 Qed.
 
+(* [iApply] this lemma to use your current context for proving a pure
+proposition [φ] *without* actually using up the context and masks. You can then
+continue the proof in the second conjunct. *)
 Lemma fupd_pure_keep `{!invGS_gen hlc Σ} φ E2' E1 E2 (Q : iProp Σ) :
   (|={E1,E2'}=> ⌜ φ ⌝) ∧ (⌜ φ ⌝ ={E1,E2}=∗ Q) ⊢ |={E1,E2}=> Q.
 Proof.

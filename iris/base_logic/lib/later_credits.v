@@ -222,6 +222,9 @@ Module le_upd.
       iSplit; [by eauto with lia|]. iNext. by iApply bupd_le_upd.
     Qed.
 
+    (* [iApply] this lemma to use your current context for proving a pure
+    proposition [φ] *without* actually using up the context. You can then
+    continue the proof in the second conjunct. *)
     Lemma le_upd_pure_keep φ Q :
       (|==£> ⌜ φ ⌝) ∧ (⌜ φ ⌝ -∗ |==£> Q) ⊢ |==£> Q.
     Proof.
