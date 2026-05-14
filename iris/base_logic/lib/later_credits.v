@@ -394,10 +394,10 @@ Module le_upd.
       iEval (rewrite -except_0_idemp except_0_plainly). by iApply "HP".
     Qed.
 
-    (** Generate a later credit by removing a later below the modality. This
+    (** Add a later credit by removing a later below the modality. This
     only works if the proposition below the later can be turned into an
     except-0 [◇]. *)
-    Lemma le_upd_finally_lc P : (£ 1 -∗ |==£|> P) ⊢ |==£|> ▷ ◇ P.
+    Lemma le_upd_finally_add_lc P : (£ 1 -∗ |==£|> P) ⊢ |==£|> ▷ ◇ P.
     Proof.
       rewrite le_upd_finally_unseal. iIntros "H %m Hlc".
       rewrite -except_0_intro -later_plainly -except_0_plainly -laterN_later.
@@ -443,7 +443,7 @@ Module le_upd.
     below the later can be turned into an except-0 [◇]. *)
     Lemma le_upd_finally_later P : ▷ (|==£|> P) ⊢ |==£|> ▷ ◇ P.
     Proof.
-      iIntros "H". iApply le_upd_finally_lc; iIntros "H£".
+      iIntros "H". iApply le_upd_finally_add_lc; iIntros "H£".
       iApply le_upd_le_upd_finally. iApply (lc_le_upd_add_later with "H£"); auto.
     Qed.
   End le_upd_finally.

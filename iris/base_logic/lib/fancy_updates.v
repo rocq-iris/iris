@@ -242,10 +242,10 @@ Section fupd_finally.
 
   (** Generate a later credit by removing a later below the modality. This only
   works if the proposition below the later can be turned into an except-0 [◇]. *)
-  Lemma fupd_finally_lc E P : (£ 1 -∗ |={E|}=> P) ⊢ |={E|}=> ▷ ◇ P.
+  Lemma fupd_finally_add_lc E P : (£ 1 -∗ |={E|}=> P) ⊢ |={E|}=> ▷ ◇ P.
   Proof.
-    rewrite fupd_finally_unseal. iIntros "H Hw HE". iApply le_upd_finally_lc.
-    iIntros "H£". iApply ("H" with "H£ Hw HE").
+    rewrite fupd_finally_unseal. iIntros "H Hw HE".
+    iApply le_upd_finally_add_lc. iIntros "H£". iApply ("H" with "H£ Hw HE").
   Qed.
 
   Lemma fupd_finally_except_0 E P : (|={E|}=> ◇ P) ⊢ |={E|}=> P.
