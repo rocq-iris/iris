@@ -381,7 +381,7 @@ Qed.
 Next Obligation.
   intros ? F A1 ? A2 ? B1 ? B2 ? fg; simpl.
   apply view_map_cmra_morphism; [apply _..|]=> n a b [??]; split.
-  - by apply (cmra_morphism_monotoneN _).
+  - by apply (cmra_morphism_monoN _).
   - by apply (cmra_morphism_validN _).
 Qed.
 

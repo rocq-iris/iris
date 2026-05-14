@@ -831,9 +831,9 @@ Section cmra_morphism.
   Context {SI : sidx} {A B : cmra} (f : A → B) `{!CmraMorphism f}.
   Lemma cmra_morphism_core x : f (core x) ≡ core (f x).
   Proof. unfold core. rewrite -cmra_morphism_pcore. by destruct (pcore x). Qed.
-  Lemma cmra_morphism_monotone x y : x ≼ y → f x ≼ f y.
+  Lemma cmra_morphism_mono x y : x ≼ y → f x ≼ f y.
   Proof. intros [z ->]. exists (f z). by rewrite cmra_morphism_op. Qed.
-  Lemma cmra_morphism_monotoneN n x y : x ≼{n} y → f x ≼{n} f y.
+  Lemma cmra_morphism_monoN n x y : x ≼{n} y → f x ≼{n} f y.
   Proof. intros [z ->]. exists (f z). by rewrite cmra_morphism_op. Qed.
   Lemma cmra_morphism_valid x : ✓ x → ✓ f x.
   Proof. rewrite !cmra_valid_validN; eauto using cmra_morphism_validN. Qed.

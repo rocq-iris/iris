@@ -43,6 +43,8 @@ lemma.
 * Add new logic-level `mono_list` library for append-only lists.
 * Make lemma `cinv_acc_1` stronger. (by Benjamin Peters)
 * Add lemma `cinv_inv` for "persisting" a cancelable invariant.
+* Rename `cmra_morphism_monotone` → `cmra_morphism_mono` and
+  `cmra_morphism_monotoneN` → `cmra_morphism_monoN`.
 
 **Changes in `program_logic`:**
 
@@ -68,6 +70,8 @@ s/\bmono_Z_auth_own\b/mono_Z_auth_own_frac/g
 # mono_*_lb_own_valid
 s/\bmono_nat_lb_own_valid\b/mono_nat_auth_lb_own_valid/g
 s/\bmono_Z_lb_own_valid\b/mono_Z_auth_lb_own_valid/g
+# cmra_morphism_monotone
+s/\bcmra_morphism_monotone(N|)\b/cmra_morphism_mono\1/g
 EOF
 ```
 
