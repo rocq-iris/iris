@@ -195,11 +195,6 @@ Module le_upd.
       iMod "Hupd" as "P". iModIntro. iLeft. by iFrame.
     Qed.
 
-    Lemma le_upd_intro P : P ⊢ |==£> P.
-    Proof.
-      iIntros "H"; by iApply bupd_le_upd.
-    Qed.
-
     Lemma le_upd_bind P Q :
       (P -∗ |==£> Q) -∗ (|==£> P) -∗ (|==£> Q).
     Proof.
@@ -217,18 +212,19 @@ Module le_upd.
         iExists _; iFrame. iNext. by iApply ("IH" with "PQ Hupd").
     Qed.
 
-    Lemma le_upd_later_elim P :
-      £ 1 -∗ (▷ |==£> P) -∗ |==£> P.
+    Lemma lc_le_upd_elim_later P : £ 1 -∗ (▷ P) -∗ |==£> P.
     Proof.
-      iIntros "Hc Hl".
-      iEval (rewrite le_upd_unfold). iIntros (n) "Hs".
+      iIntros "Hc Hl". iApply le_upd_unfold. iIntros (n) "Hs". iRight.
       iDestruct (lc_supply_bound with "Hs Hc") as "%".
-      destruct n as [ | n]; first by lia.
-      replace (S n) with (1 + n) by lia.
-      iMod (lc_decrease_supply with "Hs Hc") as "Hs". eauto 10 with iFrame lia.
+      replace n with (1 + (n - 1)) by lia.
+      iMod (lc_decrease_supply with "Hs Hc") as "$"; iModIntro.
+      iSplit; [by eauto with lia|]. iNext. by iApply bupd_le_upd.
     Qed.
 
     (** Derived lemmas *)
+    Lemma le_upd_intro P : P ⊢ |==£> P.
+    Proof. iIntros "H"; by iApply bupd_le_upd. Qed.
+
     Lemma le_upd_mono P Q : (P ⊢ Q) → (|==£> P) ⊢ (|==£> Q).
     Proof.
       intros Hent. iApply le_upd_bind.
@@ -254,11 +250,10 @@ Module le_upd.
     Lemma le_upd_frame_l P R : R ∗ (|==£> P) ⊢ |==£> R ∗ P.
     Proof. rewrite comm le_upd_frame_r comm //. Qed.
 
-    Lemma le_upd_later P :
-      £ 1 -∗ ▷ P -∗ |==£> P.
+    Lemma lc_le_upd_add_later P : £ 1 -∗ ▷ (|==£> P) -∗ |==£> P.
     Proof.
-      iIntros "H1 H2". iApply (le_upd_later_elim with "H1").
-      iNext. by iApply le_upd_intro.
+      iIntros "H£ H". iApply le_upd_trans.
+      by iApply (lc_le_upd_elim_later with "H£").
     Qed.
 
     Lemma except_0_le_upd P : (◇ |==£> P) ⊢ |==£> ◇ P.
@@ -449,7 +444,7 @@ Module le_upd.
     Lemma le_upd_finally_later P : ▷ (|==£|> P) ⊢ |==£|> ▷ ◇ P.
     Proof.
       iIntros "H". iApply le_upd_finally_lc; iIntros "H£".
-      iApply le_upd_le_upd_finally. iApply (le_upd_later_elim with "H£"); auto.
+      iApply le_upd_le_upd_finally. iApply (lc_le_upd_add_later with "H£"); auto.
     Qed.
   End le_upd_finally.
 

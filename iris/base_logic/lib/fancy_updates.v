@@ -109,7 +109,7 @@ Lemma lc_fupd_elim_later `{!invGS_gen HasLc Σ} E P :
 Proof.
   iIntros "Hf Hupd".
   rewrite uPred_fupd_unseal /uPred_fupd_def.
-  iIntros "[$ $]". iApply (le_upd_later with "Hf").
+  iIntros "[$ $]". iApply (lc_le_upd_elim_later with "Hf").
   iNext. by iModIntro.
 Qed.
 
