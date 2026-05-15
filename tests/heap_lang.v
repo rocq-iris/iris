@@ -575,7 +575,7 @@ Proof. eapply (heap_adequacy heapΣ). iIntros (?) "_". by iApply heap_e_spec. Qe
 
 Lemma heap_e_totally_adequate σ : sn erased_step ([heap_e], σ).
 Proof.
-  eapply (heap_total heapΣ NotStuck _ _ (const True)).
-  iIntros (?) "_". rewrite /heap_e /=.
+  eapply (heap_total HasLc heapΣ NotStuck _ _ (const True) 0).
+  iIntros (?) "_ _". rewrite /heap_e /=.
   wp_alloc l. wp_load. wp_store. wp_load. auto.
 Qed.

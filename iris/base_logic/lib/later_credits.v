@@ -71,7 +71,7 @@ Section later_credit_theory.
   Qed.
 
   Lemma lc_decrease_supply n m :
-    lc_supply (n + m) -∗ £ n -∗ |==> lc_supply m.
+    lc_supply (n + m) -∗ £ n ==∗ lc_supply m.
   Proof.
     rewrite lc_unseal /lc_def.
     rewrite lc_supply_unseal /lc_supply_def.
@@ -79,6 +79,16 @@ Section later_credit_theory.
     iMod (own_update_2 with "H1 H2") as "Hown".
     { eapply auth_update. eapply (nat_local_update _ _ m 0). lia. }
     by iDestruct "Hown" as "[Hm _]".
+  Qed.
+
+  Lemma lc_increase_supply n m :
+    lc_supply m ==∗ lc_supply (n + m) ∗ £ n.
+  Proof.
+    rewrite lc_unseal /lc_def.
+    rewrite lc_supply_unseal /lc_supply_def.
+    iIntros "H"; iMod (own_update with "H") as "Hown".
+    { eapply auth_update_alloc. eapply (nat_local_update m 0 (n + m) n). lia. }
+    iDestruct "Hown" as "[Hm ?]"; by iFrame.
   Qed.
 
   Lemma lc_succ n :
@@ -185,11 +195,6 @@ Module le_upd.
       iMod "Hupd" as "P". iModIntro. iLeft. by iFrame.
     Qed.
 
-    Lemma le_upd_intro P : P ⊢ |==£> P.
-    Proof.
-      iIntros "H"; by iApply bupd_le_upd.
-    Qed.
-
     Lemma le_upd_bind P Q :
       (P -∗ |==£> Q) -∗ (|==£> P) -∗ (|==£> Q).
     Proof.
@@ -207,18 +212,19 @@ Module le_upd.
         iExists _; iFrame. iNext. by iApply ("IH" with "PQ Hupd").
     Qed.
 
-    Lemma le_upd_later_elim P :
-      £ 1 -∗ (▷ |==£> P) -∗ |==£> P.
+    Lemma lc_le_upd_elim_later P : £ 1 -∗ (▷ P) -∗ |==£> P.
     Proof.
-      iIntros "Hc Hl".
-      iEval (rewrite le_upd_unfold). iIntros (n) "Hs".
+      iIntros "Hc Hl". iApply le_upd_unfold. iIntros (n) "Hs". iRight.
       iDestruct (lc_supply_bound with "Hs Hc") as "%".
-      destruct n as [ | n]; first by lia.
-      replace (S n) with (1 + n) by lia.
-      iMod (lc_decrease_supply with "Hs Hc") as "Hs". eauto 10 with iFrame lia.
+      replace n with (1 + (n - 1)) by lia.
+      iMod (lc_decrease_supply with "Hs Hc") as "$"; iModIntro.
+      iSplit; [by eauto with lia|]. iNext. by iApply bupd_le_upd.
     Qed.
 
     (** Derived lemmas *)
+    Lemma le_upd_intro P : P ⊢ |==£> P.
+    Proof. iIntros "H"; by iApply bupd_le_upd. Qed.
+
     Lemma le_upd_mono P Q : (P ⊢ Q) → (|==£> P) ⊢ (|==£> Q).
     Proof.
       intros Hent. iApply le_upd_bind.
@@ -232,7 +238,7 @@ Module le_upd.
     Global Instance le_upd_equiv_proper : Proper ((≡) ==> (≡)) le_upd.
     Proof. apply ne_proper. apply _. Qed.
 
-    Lemma le_upd_trans P :  (|==£> |==£> P) ⊢ |==£> P.
+    Lemma le_upd_trans P : (|==£> |==£> P) ⊢ |==£> P.
     Proof.
       iIntros "HP". iApply le_upd_bind; eauto.
     Qed.
@@ -244,14 +250,13 @@ Module le_upd.
     Lemma le_upd_frame_l P R : R ∗ (|==£> P) ⊢ |==£> R ∗ P.
     Proof. rewrite comm le_upd_frame_r comm //. Qed.
 
-    Lemma le_upd_later P :
-      £ 1 -∗ ▷ P -∗ |==£> P.
+    Lemma lc_le_upd_add_later P : £ 1 -∗ ▷ (|==£> P) -∗ |==£> P.
     Proof.
-      iIntros "H1 H2". iApply (le_upd_later_elim with "H1").
-      iNext. by iApply le_upd_intro.
+      iIntros "H£ H". iApply le_upd_trans.
+      by iApply (lc_le_upd_elim_later with "H£").
     Qed.
 
-    Lemma except_0_le_upd P : ◇ (le_upd P) ⊢ le_upd (◇ P).
+    Lemma except_0_le_upd P : (◇ |==£> P) ⊢ |==£> ◇ P.
     Proof.
       rewrite /bi_except_0. apply or_elim; eauto using le_upd_mono, or_intro_r.
       by rewrite -le_upd_intro -or_intro_l.
@@ -270,52 +275,10 @@ Module le_upd.
       - apply le_upd_frame_r.
     Qed.
 
-    (** unfolding the later elimination update *)
-    Lemma le_upd_elim n P :
-      lc_supply n -∗
-      (|==£> P) -∗
-      Nat.iter n (λ P, |==> ▷ P) (|==> ◇ (∃ m, ⌜m ≤ n⌝ ∗ lc_supply m ∗ P)).
-    Proof.
-      induction (Nat.lt_wf_0 n) as [n _ IH].
-      iIntros "Ha". rewrite (le_upd_unfold P) //=.
-      iIntros "Hupd". iSpecialize ("Hupd" with "Ha").
-      destruct n as [|n]; simpl.
-      - iMod "Hupd" as "[[H● ?]| Hf]".
-        { do 2 iModIntro. iExists 0. iFrame. done. }
-        iDestruct "Hf" as (x' Hlt) "_". lia.
-      - iMod "Hupd" as "[[Hc P]|Hupd]".
-        + iModIntro. iNext. iApply iter_modal_intro; last first.
-          { do 2 iModIntro. iExists (S n); iFrame; done. }
-          iIntros (Q) "Q"; iModIntro; by iNext.
-        + iModIntro. iDestruct "Hupd" as (m Hstep) "[Hown Hupd]". iNext.
-          iPoseProof (IH with "Hown Hupd") as "Hit"; first done.
-          clear IH.
-          assert (m ≤ n) as [k ->]%Nat.le_sum by lia.
-          rewrite Nat.add_comm Nat.iter_add.
-          iApply iter_modal_intro.
-          { by iIntros (Q) "$". }
-          iApply (iter_modal_mono with "[] Hit").
-          { iIntros (R S) "Hent H". by iApply "Hent". }
-          iIntros "H". iMod "H". iModIntro. iMod "H" as (m' Hle) "H".
-          iModIntro. iExists m'. iFrame. iPureIntro. lia.
-    Qed.
-
-    Lemma le_upd_elim_complete n P :
-      lc_supply n -∗
-      (|==£> P) -∗
-      Nat.iter (S n) (λ Q, |==> ▷ Q) P.
-    Proof.
-      iIntros "Hlc Hupd". iPoseProof (le_upd_elim with "Hlc Hupd") as "Hit".
-      rewrite Nat.iter_succ_r. iApply (iter_modal_mono with "[] Hit").
-      { clear. iIntros (P Q) "Hent HP". by iApply "Hent". }
-      iIntros "Hupd". iMod "Hupd". iModIntro. iMod "Hupd".
-      iNext. iDestruct "Hupd" as "[%m (_ & _ & $)]".
-    Qed.
-
     (** Proof mode class instances internally needed for people defining their
     [fupd] with [le_upd]. *)
     Global Instance elim_bupd_le_upd p P Q :
-      ElimModal True p false (bupd P) P (le_upd Q) (le_upd Q)%I.
+      ElimModal True p false (|==> P) P (|==£> Q) (|==£> Q).
     Proof.
       rewrite /ElimModal bi.intuitionistically_if_elim //=.
       rewrite bupd_le_upd. iIntros "_ [HP HPQ]".
@@ -323,34 +286,34 @@ Module le_upd.
     Qed.
 
     Global Instance from_assumption_le_upd p P Q :
-      FromAssumption p P Q → KnownRFromAssumption p P (le_upd Q).
+      FromAssumption p P Q → KnownRFromAssumption p P (|==£> Q).
     Proof.
       rewrite /KnownRFromAssumption /FromAssumption=>->. apply le_upd_intro.
     Qed.
 
     Global Instance from_pure_le_upd a P φ :
-      FromPure a P φ → FromPure a (le_upd P) φ.
+      FromPure a P φ → FromPure a (|==£> P) φ.
     Proof. rewrite /FromPure=> <-. apply le_upd_intro. Qed.
 
-    Global Instance is_except_0_le_upd P : IsExcept0 P → IsExcept0 (le_upd P).
+    Global Instance is_except_0_le_upd P : IsExcept0 P → IsExcept0 (|==£> P).
     Proof.
       rewrite /IsExcept0=> HP.
       by rewrite -{2}HP -(except_0_idemp P) -except_0_le_upd -(except_0_intro P).
     Qed.
 
     Global Instance from_modal_le_upd P :
-      FromModal True modality_id (le_upd P) (le_upd P) P.
+      FromModal True modality_id (|==£> P) (|==£> P) P.
     Proof. by rewrite /FromModal /= -le_upd_intro. Qed.
 
     Global Instance elim_modal_le_upd p P Q :
-      ElimModal True p false (le_upd P) P (le_upd Q) (le_upd Q).
+      ElimModal True p false (|==£> P) P (|==£> Q) (|==£> Q).
     Proof.
       by rewrite /ElimModal
         intuitionistically_if_elim le_upd_frame_r wand_elim_r le_upd_trans.
     Qed.
 
     Global Instance frame_le_upd p R P Q :
-      Frame p R P Q → Frame p R (le_upd P) (le_upd Q).
+      Frame p R P Q → Frame p R (|==£> P) (|==£> Q).
     Proof. rewrite /Frame=><-. by rewrite le_upd_frame_l. Qed.
   End le_upd.
 
@@ -366,18 +329,142 @@ Module le_upd.
     iModIntro. iExists C. iFrame.
   Qed.
 
-  Lemma lc_soundness `{!lcGpreS Σ} m (P : iProp Σ) `{!Plain P} :
-    (∀ {Hc: lcGS Σ}, £ m -∗ |==£> P) → ⊢ P.
+  (** Flexible soundness theorem through "finally" modality. *)
+  (** The later-elimination finally modality [le_upd_finally] is used internally
+  in the finally modality for fancy updates ([fupd_finally]). It should not be
+  used directly by end-users. See the file [fancy_updates] for documentation how
+  to prove soundness/adequacy results using the user-facing finally modality.
+
+  Compared to the later-elimination modality [le_upd] itself, this modality
+  only consumes the supply [lc_supply], but does not give it back. This change
+  allows us to prove the rules [le_upd_finally_later], [le_upd_finally_keep],
+  and [le_upd_finally_forall], which cannot be proven for [le_upd]. For instance,
+  to prove [le_upd_finally_forall] the goal is [▷^m ◇ ■ ∀ x, Φ x] where we can
+  just commute out the [∀]. Such a proof does not work for a corresponding lemma
+  for [le_upd] because we cannot commute out the [∀].
+
+  Due to the plain modality [■], we can perform basic updates around
+  [le_upd_finally] (we have [(|==> ■ P) ⊣⊢ ■ P]). This fact is exposed by the
+  rule [le_upd_le_upd_finally] combined with the rule [bupd_le_upd]. *)
+  Definition le_upd_finally_def `{!lcGS Σ} (P : iProp Σ) : iProp Σ :=
+    ∀ m, lc_supply m -∗ ▷^m ◇ ■ P.
+  Local Definition le_upd_finally_aux : seal (@le_upd_finally_def).
+  Proof. by eexists. Qed.
+  Local Definition le_upd_finally := le_upd_finally_aux.(unseal).
+  Local Definition le_upd_finally_unseal :
+    @le_upd_finally = @le_upd_finally_def := le_upd_finally_aux.(seal_eq).
+  Global Arguments le_upd_finally {Σ _}.
+
+  Notation "|==£|> Q" := (le_upd_finally Q) (at level 20, Q at level 200,
+     format "'[  ' |==£|>  '/' Q ']'") : bi_scope.
+
+  Section le_upd_finally.
+    Context `{!lcGS Σ}.
+
+    Global Instance le_upd_finally_ne : NonExpansive le_upd_finally.
+    Proof. rewrite le_upd_finally_unseal. solve_proper. Qed.
+
+    Lemma le_upd_finally_mono P Q : (P ⊢ Q) → (|==£|> P) ⊢ (|==£|> Q).
+    Proof. rewrite le_upd_finally_unseal. solve_proper. Qed.
+
+    Lemma le_upd_finally_intro P : ■ P ⊢ |==£|> P.
+    Proof. rewrite le_upd_finally_unseal. iIntros "#HP %m _ !> !>". done. Qed.
+
+    Lemma le_upd_le_upd_finally P : (|==£> |==£|> P) ⊢ |==£|> P.
+    Proof.
+      rewrite le_upd_finally_unseal /le_upd_finally_def. iIntros "HP %m Hlc".
+      iLöb as "IH" forall (m).
+      iEval (rewrite later_credits.le_upd.le_upd_unfold) in "HP".
+      iMod ("HP" with "Hlc") as "[[Hlc H]|(%m' & %Hm & Hlc & H)]".
+      { by iApply "H". }
+      replace m with (S ((m - m' - 1) + m')) by lia. rewrite /= laterN_add.
+      do 2 iNext. iApply ("IH" with "H Hlc").
+    Qed.
+
+    Lemma except_0_le_upd_finally P : (◇ |==£|> P) ⊢ |==£|> P.
+    Proof.
+      rewrite le_upd_finally_unseal /le_upd_finally_def. iIntros "HP %m Hlc".
+      iEval (rewrite -except_0_idemp -except_0_laterN).
+      iMod "HP"; iModIntro. by iApply "HP".
+    Qed.
+
+    Lemma le_upd_finally_except_0 P : (|==£|> ◇ P) ⊢ |==£|> P.
+    Proof.
+      rewrite le_upd_finally_unseal /le_upd_finally_def. iIntros "HP %m Hlc".
+      iEval (rewrite -except_0_idemp except_0_plainly). by iApply "HP".
+    Qed.
+
+    (** Add a later credit by removing a later below the modality. This
+    only works if the proposition below the later can be turned into an
+    except-0 [◇]. *)
+    Lemma le_upd_finally_add_lc P : (£ 1 -∗ |==£|> P) ⊢ |==£|> ▷ ◇ P.
+    Proof.
+      rewrite le_upd_finally_unseal. iIntros "H %m Hlc".
+      rewrite -except_0_intro -later_plainly -except_0_plainly -laterN_later.
+      iMod (later_credits.lc_increase_supply 1 with "Hlc") as "[Hlc H£]".
+      iApply ("H" with "H£ Hlc").
+    Qed.
+
+    (* [iApply] this lemma to use your current context for proving a timeless
+    assertion [P] *without* actually using up the context. You can then continue
+    the proof in the second conjunct. *)
+    Lemma le_upd_finally_keep P Q `{!Timeless P} :
+      (|==£|> P) ∧ (P -∗ |==£|> Q) ⊢ |==£|> Q.
+    Proof.
+      rewrite le_upd_finally_unseal. iIntros "H %m Hlc".
+      iAssert (▷^m ◇ ■ P)%I as "#HP".
+      { iDestruct "H" as "[H _]". iApply ("H" with "Hlc"). }
+      iDestruct "H" as "[_ H]".
+      iEval (rewrite except_0_into_later -laterN_later timeless_laterN) in "HP".
+      iDestruct "HP" as "[HFalse|HP']".
+      { iNext. by iMod "HFalse". }
+      iApply ("H" with "HP' Hlc").
+    Qed.
+
+    Lemma le_upd_finally_forall {A} (Φ : A → iProp Σ) :
+      (∀ x, |==£|> Φ x) ⊢ |==£|> ∀ x, Φ x.
+    Proof.
+      rewrite le_upd_finally_unseal.
+      iIntros "H %m Hlc %x". iApply ("H" with "Hlc").
+    Qed.
+
+    (** Derived rules *)
+    (** Since the modality is used only internally in the version for fancy
+    updates, we do not provide instances of the proof mode classes. *)
+    Global Instance le_upd_finally_proper : Proper ((⊣⊢) ==> (⊣⊢)) le_upd_finally.
+    Proof. apply: ne_proper. Qed.
+    Global Instance le_upd_finally_mono' : Proper ((⊢) ==> (⊢)) le_upd_finally.
+    Proof. intros P Q. apply le_upd_finally_mono. Qed.
+    Global Instance le_upd_finally_flip_mono' :
+      Proper (flip (⊢) ==> flip (⊢)) le_upd_finally.
+    Proof. intros P Q. apply le_upd_finally_mono. Qed.
+
+    (** Commute a later out of the modality. This only works if the proposition
+    below the later can be turned into an except-0 [◇]. *)
+    Lemma le_upd_finally_later P : ▷ (|==£|> P) ⊢ |==£|> ▷ ◇ P.
+    Proof.
+      iIntros "H". iApply le_upd_finally_add_lc; iIntros "H£".
+      iApply le_upd_le_upd_finally. iApply (lc_le_upd_add_later with "H£"); auto.
+    Qed.
+  End le_upd_finally.
+
+  Lemma le_upd_finally_soundness `{!lcGpreS Σ} n P :
+    (∀ `{!lcGS Σ}, £ n ⊢ |==£|> P) → ⊢ P.
   Proof.
-    intros H. apply (laterN_soundness _ (S m)).
-    eapply bupd_soundness; first apply _.
-    iStartProof.
-    iMod (lc_alloc m) as (C) "[H● H◯]".
-    iPoseProof (H C) as "Hc". iSpecialize ("Hc" with "H◯").
-    iPoseProof (le_upd_elim_complete m with "H● Hc") as "H".
-    simpl. iMod "H". iModIntro. iNext.
-    clear H. iInduction m as [|m IH]; simpl; [done|].
-    iMod "H". iNext. by iApply "IH".
+    rewrite le_upd_finally_unseal. intros HP. apply (laterN_soundness _ (S n)).
+    rewrite laterN_later -except_0_into_later -(plainly_elim P).
+    iMod (later_credits.le_upd.lc_alloc n) as (Hc) "[Hlc H£]".
+    iApply (HP with "H£ Hlc").
+  Qed.
+
+  #[deprecated(note="Internal result, will be removed in the future. Use
+  `le_upd_finally_soundness` if you build a custom update modality.")]
+  Lemma lc_soundness `{!lcGpreS Σ} m (P : iProp Σ) `{!Plain P} :
+    (∀ `{!lcGS Σ}, £ m -∗ |==£> P) → ⊢ P.
+  Proof.
+    intros H. apply (le_upd_finally_soundness m); iIntros (?) "H£".
+    iApply le_upd_le_upd_finally. iMod (H with "H£") as "HP"; iModIntro.
+    iApply le_upd_finally_intro. by iApply plain_plainly.
   Qed.
 End le_upd.
 
@@ -405,6 +492,9 @@ Module le_upd_if.
     Proof.
       destruct b; [apply le_upd_intro | apply bupd_intro].
     Qed.
+
+    Lemma le_upd_if_into_le_upd b P : le_upd_if b P ⊢ le_upd P.
+    Proof. destruct b; simpl; auto using bupd_le_upd. Qed.
 
     Lemma le_upd_if_bind b P Q :
       (P -∗ le_upd_if b Q) -∗ (le_upd_if b P) -∗ (le_upd_if b Q).

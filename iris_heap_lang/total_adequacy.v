@@ -4,11 +4,12 @@ From iris.heap_lang Require Export adequacy.
 From iris.heap_lang Require Import proofmode notation.
 From iris.prelude Require Import options.
 
-Definition heap_total Σ `{!heapGpreS Σ} s e σ φ :
-  (∀ `{!heapGS_gen HasNoLc Σ}, ⊢ inv_heap_inv -∗ WP e @ s; ⊤ [{ v, ⌜φ v⌝ }]) →
+Definition heap_total hlc Σ `{!heapGpreS Σ} s e σ φ m :
+  (∀ `{!heapGS_gen hlc Σ},
+    ⊢ inv_heap_inv -∗ £ m -∗ WP e @ s; ⊤ [{ v, ⌜φ v⌝ }]) →
   sn erased_step ([e], σ).
 Proof.
-  intros Hwp; eapply (twp_total _ _); iIntros (?) "".
+  intros Hwp; eapply (twp_total _ _ _); iIntros (?) "".
   iMod (gen_heap_init σ.(heap)) as (?) "[Hh _]".
   iMod (inv_heap_init loc (option val)) as (?) ">Hi".
   iMod (proph_map_init [] σ.(used_proph_id)) as (?) "Hp".

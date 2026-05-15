@@ -76,7 +76,7 @@ Proof.
     rewrite Nat.add_0_r right_id_L. iFrame. by iApply fupd_mask_subseteq. }
   iIntros (Hsteps) "Hσ Hcred He". inversion_clear Hsteps as [|?? [t1' σ1']].
   rewrite -(assoc_L (++)) Nat.iter_add -{1}plus_Sn_m plus_n_Sm.
-  rewrite lc_split. iDestruct "Hcred" as "[Hc1 Hc2]".
+  iDestruct "Hcred" as "[Hc1 Hc2]".
   iDestruct (wptp_step with "Hσ Hc1 He") as (nt') ">H"; first eauto; simplify_eq.
   iModIntro. iApply step_fupdN_S_fupd. iApply (step_fupdN_wand with "H").
   iIntros ">(Hσ & He)". iMod (IH with "Hσ Hc2 He") as "IH"; first done. iModIntro.
@@ -86,7 +86,7 @@ Proof.
 Qed.
 
 Local Lemma wp_not_stuck κs nt e σ ns Φ :
-  state_interp σ ns κs nt -∗ WP e {{ Φ }} ={⊤, ∅}=∗ ⌜not_stuck e σ⌝.
+  state_interp σ ns κs nt -∗ WP e {{ Φ }} ={⊤,∅}=∗ ⌜not_stuck e σ⌝.
 Proof.
   rewrite wp_unfold /wp_pre /not_stuck. iIntros "Hσ H".
   destruct (to_val e) as [v|] eqn:?.
@@ -95,106 +95,18 @@ Proof.
   iMod "H" as "%". iModIntro. eauto.
 Qed.
 
-(** The adequacy statement of Iris consists of two parts:
-      (1) the postcondition for all threads that have terminated in values
-      and (2) progress (i.e., after n steps the program is not stuck).
-    For an n-step execution of a thread pool, the two parts are given by
-    [wptp_strong_adequacy] and [wptp_progress] below.
-
-    For the final adequacy theorem of Iris, [wp_strong_adequacy_gen], we would
-    like to instantiate the Iris proof (i.e., instantiate the
-    [∀ {Hinv : !invGS_gen hlc Σ} κs, ...]) and then use both lemmas to get
-    progress and the postconditions. Unfortunately, since the addition of later
-    credits, this is no longer possible, because the original proof relied on an
-    interaction of the update modality and plain propositions. So instead, we
-    employ a trick: we duplicate the instantiation of the Iris proof, such
-    that we can "run the WP proof twice". That is, we instantiate the
-    [∀ {Hinv : !invGS_gen hlc Σ} κs, ...] both in [wp_progress_gen] and
-    [wp_strong_adequacy_gen]. In doing  so, we can avoid the interactions with
-    the plain modality. In [wp_strong_adequacy_gen], we can then make use of
-    [wp_progress_gen] to prove the progress component of the main adequacy theorem.
-*)
-
-Local Lemma wptp_postconditions Φs κs' s n es1 es2 κs σ1 ns σ2 nt:
-  nsteps n (es1, σ1) κs (es2, σ2) →
-  state_interp σ1 ns (κs ++ κs') nt -∗
-  £ (steps_sum num_laters_per_step ns n) -∗
-  wptp s es1 Φs
-  ={⊤,∅}=∗ |={∅}▷=>^(steps_sum num_laters_per_step ns n) |={∅,⊤}=> ∃ nt',
-    state_interp σ2 (n + ns) κs' (nt + nt') ∗
-    [∗ list] e;Φ ∈ es2;Φs ++ replicate nt' fork_post, from_option Φ True (to_val e).
+Local Lemma wptp_postconditions Φs s es :
+  wptp s es Φs ={⊤}=∗ [∗ list] e;Φ ∈ es;Φs, from_option Φ True (to_val e).
 Proof.
-  iIntros (Hstep) "Hσ Hcred He". iMod (wptp_preservation with "Hσ Hcred He") as "Hwp"; first done.
-  iModIntro. iApply (step_fupdN_wand with "Hwp").
-  iMod 1 as (nt') "(Hσ & Ht)"; simplify_eq/=.
-  iExists _. iFrame "Hσ".
-  iApply big_sepL2_fupd.
-  iApply (big_sepL2_impl with "Ht").
+  iIntros "Ht". iApply big_sepL2_fupd. iApply (big_sepL2_impl with "Ht").
   iIntros "!#" (? e Φ ??) "Hwp".
   destruct (to_val e) as [v2|] eqn:He2'; last done.
   apply of_to_val in He2' as <-. simpl. iApply wp_value_fupd'. done.
 Qed.
-
-
-Local Lemma wptp_progress Φs κs' n es1 es2 κs σ1 ns σ2 nt e2 :
-  nsteps n (es1, σ1) κs (es2, σ2) →
-  e2 ∈ es2 →
-  state_interp σ1 ns (κs ++ κs') nt -∗
-  £ (steps_sum num_laters_per_step ns n) -∗
-  wptp NotStuck es1 Φs
-  ={⊤,∅}=∗ |={∅}▷=>^(steps_sum num_laters_per_step ns n) |={∅}=> ⌜not_stuck e2 σ2⌝.
-Proof.
-  iIntros (Hstep Hel) "Hσ Hcred He". iMod (wptp_preservation with "Hσ Hcred He") as "Hwp"; first done.
-  iModIntro. iApply (step_fupdN_wand with "Hwp").
-  iMod 1 as (nt') "(Hσ & Ht)"; simplify_eq/=.
-  eapply list_elem_of_lookup in Hel as [i Hlook].
-  destruct ((Φs ++ replicate nt' fork_post) !! i) as [Φ|] eqn: Hlook2; last first.
-  { rewrite big_sepL2_alt. iDestruct "Ht" as "[%Hlen _]". exfalso.
-    eapply lookup_lt_Some in Hlook. rewrite Hlen in Hlook.
-    eapply lookup_lt_is_Some_2 in Hlook. rewrite Hlook2 in Hlook.
-    destruct Hlook as [? ?]. naive_solver. }
-  iDestruct (big_sepL2_lookup with "Ht") as "Ht"; [done..|].
-  by iApply (wp_not_stuck with "Hσ").
-Qed.
 End adequacy.
 
-Local Lemma wp_progress_gen (hlc : has_lc) Σ Λ `{!invGpreS Σ} es σ1 n κs t2 σ2 e2
-        (num_laters_per_step : nat → nat)  :
-    (∀ `{Hinv : !invGS_gen hlc Σ},
-    ⊢ |={⊤}=> ∃
-         (stateI : state Λ → nat → list (observation Λ) → nat → iProp Σ)
-         (Φs : list (val Λ → iProp Σ))
-         (fork_post : val Λ → iProp Σ)
-         state_interp_mono,
-       let _ : irisGS_gen hlc Λ Σ := IrisG Hinv stateI fork_post num_laters_per_step
-                                  state_interp_mono
-       in
-       stateI σ1 0 κs 0 ∗
-       ([∗ list] e;Φ ∈ es;Φs, WP e @ ⊤ {{ Φ }})) →
-  nsteps n (es, σ1) κs (t2, σ2) →
-  e2 ∈ t2 →
-  not_stuck e2 σ2.
-Proof.
-  intros Hwp ??.
-  apply (pure_soundness (PROP:=iPropI Σ)).
-  eapply (step_fupdN_soundness_gen _ hlc (steps_sum num_laters_per_step 0 n)
-    (steps_sum num_laters_per_step 0 n)).
-  iIntros (Hinv) "Hcred".
-  iMod Hwp as (stateI Φ fork_post state_interp_mono) "(Hσ & Hwp)".
-  iDestruct (big_sepL2_length with "Hwp") as %Hlen1.
-  iMod (@wptp_progress _ _ _
-       (IrisG Hinv stateI fork_post num_laters_per_step state_interp_mono) _ []
-    with "[Hσ] Hcred  Hwp") as "H"; [done| done |by rewrite right_id_L|].
-  iAssert (|={∅}▷=>^(steps_sum num_laters_per_step 0 n) |={∅}=> ⌜not_stuck e2 σ2⌝)%I
-    with "[-]" as "H"; last first.
-  { destruct steps_sum; [done|]. by iApply step_fupdN_S_fupd. }
-  iApply (step_fupdN_wand with "H"). iIntros "$".
-Qed.
-
 (** Iris's generic adequacy result *)
-(** The lemma is parameterized by [use_credits] over whether to make later credits available or not.
-  Below, a concrete instances is provided with later credits (see [wp_strong_adequacy]). *)
-Lemma wp_strong_adequacy_gen (hlc : has_lc) Σ Λ `{!invGpreS Σ} s es σ1 n κs t2 σ2 φ
+Lemma wp_strong_adequacy_gen hlc Σ Λ `{!invGpreS Σ} s es σ1 n κs t2 σ2 φ
         (num_laters_per_step : nat → nat) :
   (* WP *)
   (∀ `{Hinv : !invGS_gen hlc Σ},
@@ -233,42 +145,31 @@ Lemma wp_strong_adequacy_gen (hlc : has_lc) Σ Λ `{!invGpreS Σ} s es σ1 n κs
   (* Then we can conclude [φ] at the meta-level. *)
   φ.
 Proof.
-  intros Hwp ?.
-  apply (pure_soundness (PROP:=iPropI Σ)).
-  eapply (step_fupdN_soundness_gen _ hlc (steps_sum num_laters_per_step 0 n)
-    (steps_sum num_laters_per_step 0 n)).
-  iIntros (Hinv) "Hcred".
-  iMod Hwp as (stateI Φ fork_post state_interp_mono) "(Hσ & Hwp & Hφ)".
+  intros Hwp ?. apply (pure_soundness (PROP:=iPropI Σ)).
+  apply (laterN_soundness _ (steps_sum num_laters_per_step 0 n + 1)).
+  rewrite laterN_add /= -except_0_into_later.
+  apply (fupd_finally_soundness hlc (steps_sum num_laters_per_step 0 n) ⊤).
+  iIntros (?) "H£".
+  iMod Hwp as (stateI Φ fork_post state_interp_mono) "(Hσ & Hwp & Hφ)". clear Hwp.
   iDestruct (big_sepL2_length with "Hwp") as %Hlen1.
-  iMod (@wptp_postconditions _ _ _
-       (IrisG Hinv stateI fork_post num_laters_per_step state_interp_mono) _ []
-    with "[Hσ] Hcred Hwp") as "H"; [done|by rewrite right_id_L|].
-  iAssert (|={∅}▷=>^(steps_sum num_laters_per_step 0 n) |={∅}=> ⌜φ⌝)%I
-    with "[-]" as "H"; last first.
-  { destruct steps_sum; [done|]. by iApply step_fupdN_S_fupd. }
-  iApply (step_fupdN_wand with "H").
-  iMod 1 as (nt') "(Hσ & Hval) /=".
-  iDestruct (big_sepL2_app_inv_r with "Hval") as (es' t2' ->) "[Hes' Ht2']".
+  pose (iG := IrisG _ stateI fork_post num_laters_per_step state_interp_mono).
+  rewrite -(right_id_L [] (++) κs).
+  iMod (@wptp_preservation _ _ _ iG with "Hσ H£ Hwp") as "H /="; first done.
+  rewrite Nat.add_0_r. iApply step_fupdN_fupd_finally.
+  iApply (step_fupdN_wand with "H"); iIntros ">(%nt' & Hσ & Ht)".
+  iApply (fupd_finally_keep
+    ⌜∀ e2, s = NotStuck → e2 ∈ t2 → not_stuck e2 σ2⌝); iSplit.
+  { iIntros (e -> [i He]%list_elem_of_lookup).
+    iDestruct (big_sepL2_lookup_l with "Ht") as (Φ' _) "He"; first done.
+    iMod (@wp_not_stuck _ _ _ iG with "Hσ He") as %?. done. }
+  iIntros (?). iMod (wptp_postconditions with "Ht") as "Ht".
+  iDestruct (big_sepL2_app_inv_r with "Ht") as (es' t2' ->) "[Hes' Ht2']".
+  iDestruct (big_sepL2_length with "Hes'") as %?.
   iDestruct (big_sepL2_length with "Ht2'") as %Hlen2.
   rewrite length_replicate in Hlen2; subst.
-  iDestruct (big_sepL2_length with "Hes'") as %Hlen3.
-  rewrite -plus_n_O.
-  iApply ("Hφ" with "[//] [%] [ ] Hσ Hes'");
-    (* FIXME: Different implicit types for [length] are inferred, so [lia] and
-    [congruence] do not work due to https://github.com/coq/coq/issues/16634 *)
-    [by rewrite Hlen1 Hlen3| |]; last first.
-  { by rewrite big_sepL2_replicate_r // big_sepL_omap. }
-  (* At this point in the adequacy proof, we use a trick: we effectively run the
-    user-provided WP proof again (i.e., instantiate the `invGS_gen` and execute the
-    program) by using the lemma [wp_progress_gen]. In doing so, we can obtain
-    the progress part of the adequacy theorem.
-  *)
-  iPureIntro. intros e2 -> Hel.
-  eapply (wp_progress_gen hlc);
-    [ done | clear stateI Φ fork_post state_interp_mono Hlen1 Hlen3 | done|done].
-  iIntros (?).
-  iMod Hwp as (stateI Φ fork_post state_interp_mono) "(Hσ & Hwp & Hφ)".
-  iModIntro. iExists _, _, _, _. iFrame.
+  rewrite big_sepL2_replicate_r // -big_sepL_omap.
+  iMod ("Hφ" with "[//] [] [//] Hσ Hes' Ht2'") as %?; first by rewrite Hlen1.
+  done.
 Qed.
 
 (** Adequacy when using later credits (the default) *)
@@ -341,7 +242,7 @@ Lemma wp_adequacy_gen (hlc : has_lc) Σ Λ `{!invGpreS Σ} s e σ φ :
   adequate s e σ (λ v _, φ v).
 Proof.
   intros Hwp. apply adequate_alt; intros t2 σ2 [n [κs ?]]%erased_steps_nsteps.
-  eapply (wp_strong_adequacy_gen hlc Σ _); [ | done]=> ?.
+  eapply (wp_strong_adequacy_gen hlc Σ _); [ |done]=> ?.
   iMod Hwp as (stateI fork_post) "[Hσ Hwp]".
   iExists (λ σ _ κs _, stateI σ κs), [(λ v, ⌜φ v⌝%I)], fork_post, _ => /=.
   iIntros "{$Hσ $Hwp} !>" (e2 t2' -> ? ?) "_ H _".

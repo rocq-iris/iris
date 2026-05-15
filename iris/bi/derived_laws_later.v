@@ -416,6 +416,13 @@ Global Instance from_option_timeless {A} P (Ψ : A → PROP) (mx : option A) :
   (∀ x, Timeless (Ψ x)) → Timeless P → Timeless (from_option Ψ P mx).
 Proof. destruct mx; apply _. Qed.
 
+Lemma timeless_laterN P n : Timeless P → ▷^n P ⊢ ▷^n False ∨ P.
+Proof.
+  intros. induction n as [|n IH]; simpl; first by auto.
+  rewrite IH later_or. apply or_elim; first by auto.
+  rewrite timeless. apply or_mono; auto.
+Qed.
+  
 (* Big op stuff *)
 Global Instance bi_later_monoid_and_homomorphism :
   MonoidHomomorphism bi_and bi_and (≡) (@bi_later PROP).

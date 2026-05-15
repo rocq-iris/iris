@@ -17,6 +17,7 @@ lemma.
 * Change the update modality notations to level 20.
 * Add lemmas `monPred_at_equiv`, `monPred_at_entails`, `monPred_at_emp_valid`,
   and `monPred_at_dist`.
+* Add lemma `timeless_laterN`.
 
 **Changes in `base_logic`:**
 
@@ -47,17 +48,33 @@ lemma.
 * Add lemma `cinv_inv` for "persisting" a cancelable invariant.
 * Rename `cmra_morphism_monotone` → `cmra_morphism_mono` and
   `cmra_morphism_monotoneN` → `cmra_morphism_monoN`.
+* Add lemma `lc_fupd_add_step_fupdN`.
+* Add new "final fancy update" modality `|={E|}=> P` to streamline adequacy
+  proofs. This modality makes it possible to prove adequacy of total WP and
+  trace-based logics (Trillium) while supporting later credits. (inspired by
+  ideas from Freja Marott Crawford, Amim Timany, Thomas Somers)
+  + To prove adequacy of a custom logic, use the new soundness theorem
+    `fupd_finally_soundness`.
+  + The legacy soundness theorems for fancy updates still exist, but the number
+    of versions has been reduced. The `_gen` suffix from `fupd_soundness`,
+    `step_fupdN_soundness` and `step_fupdN_soundness'` has been removed. The
+    `_lc` and `_no_lc` versions have been removed and can be obtained by
+    instantiating the first `hlc` argument with `HasLc` or `HasNoLc`.
 
 **Changes in `program_logic`:**
 
 * Change `WP` notations to level 0.
 * Do not re-export `language` from `weakestpre` since many `weakestpre` users do
   not want or need `language` names in scope.
+* Strengthen total WP adequacy to support later credits (`HasLc` mode): a fixed
+  number can be allocated at the beginning, and they can be eliminated by any
+  `fupd`.
 
 **Changes in `heap_lang`:**
 
 * Change level of `resolve_proph:` to 99 so that it binds stronger than `;;`.
 * Reduce and re-organize re-exports to avoid shadowing issues around `val`.
+* Strengthen total WP adequacy to allocate a fixed number of later credits.
 
 The following `sed` script helps adjust your code to the renaming (on macOS,
 replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
@@ -74,6 +91,16 @@ s/\bmono_nat_lb_own_valid\b/mono_nat_auth_lb_own_valid/g
 s/\bmono_Z_lb_own_valid\b/mono_Z_auth_lb_own_valid/g
 # cmra_morphism_monotone
 s/\bcmra_morphism_monotone(N|)\b/cmra_morphism_mono\1/g
+# fancy update soundness
+s/\bfupd_soundness_gen\b/fupd_soundness/g
+s/\bfupd_soundness_lc\b/fupd_soundness HasLc/g
+s/\bfupd_soundness_no_lc\b/fupd_soundness HasNoLc/g
+s/\bstep_fupdN_soundness_gen\b/step_fupdN_soundness/g
+s/\bstep_fupdN_soundness_lc\b/step_fupdN_soundness HasLc/g
+s/\bstep_fupdN_soundness_no_lc\b/step_fupdN_soundness HasNoLc/g
+# There was no "_gen" version for step_fupdN_soundness_lc'
+s/\bstep_fupdN_soundness_lc'\b/step_fupdN_soundness HasLc/g
+s/\bstep_fupdN_soundness_no_lc'\b/step_fupdN_soundness HasNoLc/g
 EOF
 ```
 

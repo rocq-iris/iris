@@ -7,7 +7,7 @@ From iris.prelude Require Import options.
 Import uPred.
 
 Section adequacy.
-Context `{!irisGS_gen HasNoLc Λ Σ}.
+Context `{!irisGS_gen hlc Λ Σ}.
 Implicit Types e : expr Λ.
 
 Definition twptp_pre (twptp : list (expr Λ) → iProp Σ)
@@ -107,19 +107,19 @@ Proof.
 Qed.
 
 Lemma twptp_total σ ns nt t :
-  state_interp σ ns [] nt -∗ twptp t ={⊤}=∗ ⌜sn erased_step (t, σ)⌝.
+  state_interp σ ns [] nt -∗ twptp t ={⊤|}=∗ ⌜sn erased_step (t, σ)⌝.
 Proof.
   iIntros "Hσ Ht". iRevert (σ ns nt) "Hσ". iRevert (t) "Ht".
   iApply twptp_ind; iIntros "!>" (t) "IH"; iIntros (σ ns nt) "Hσ".
-  iApply (pure_mono _ _ (Acc_intro _)). iIntros ([t' σ'] [κ Hstep]).
+  rewrite -(pure_mono _ _ (Acc_intro _)). iIntros ([t' σ'] [κ Hstep]).
   rewrite /twptp_pre.
   iMod ("IH" with "[% //] Hσ") as (n' ->) "[Hσ [H _]]".
   by iApply "H".
 Qed.
 End adequacy.
 
-Theorem twp_total Σ Λ `{!invGpreS Σ} s e σ Φ n :
-  (∀ `{Hinv : !invGS_gen HasNoLc Σ},
+Theorem twp_total hlc Σ Λ `{!invGpreS Σ} s e σ Φ n m :
+  (∀ `{Hinv : !invGS_gen hlc Σ},
      ⊢ |={⊤}=> ∃
          (stateI : state Λ → nat → list (observation Λ) → nat → iProp Σ)
          (** We abstract over any instance of [irisG], and thus any value of
@@ -129,16 +129,15 @@ Theorem twp_total Σ Λ `{!invGpreS Σ} s e σ Φ n :
          (num_laters_per_step : nat → nat)
          (fork_post : val Λ → iProp Σ)
          state_interp_mono,
-       let _ : irisGS_gen HasNoLc Λ Σ :=
+       let _ : irisGS_gen hlc Λ Σ :=
            IrisG Hinv stateI fork_post num_laters_per_step state_interp_mono
        in
-       stateI σ n [] 0 ∗ WP e @ s; ⊤ [{ Φ }]) →
+       stateI σ n [] 0 ∗ (£ m -∗ WP e @ s; ⊤ [{ Φ }])) →
   sn erased_step ([e], σ). (* i.e. ([e], σ) is strongly normalizing *)
 Proof.
   intros Hwp. eapply (pure_soundness (PROP:=iPropI Σ)).
-  apply (fupd_soundness_no_lc ⊤ ⊤ _ 0)=> Hinv. iIntros "_".
+  apply (fupd_finally_soundness hlc m ⊤); iIntros (?) "H£".
   iMod (Hwp) as (stateI num_laters_per_step fork_post stateI_mono) "[Hσ H]".
-  set (iG := IrisG Hinv stateI fork_post num_laters_per_step stateI_mono).
-  iApply (@twptp_total _ _ iG _ n with "Hσ").
-  by iApply (@twp_twptp _ _ (IrisG Hinv _ fork_post _ _)).
+  pose (iG := IrisG _ stateI fork_post num_laters_per_step stateI_mono).
+  iApply (@twptp_total _ _ _ iG _ n with "Hσ"). iApply twp_twptp. by iApply "H".
 Qed.
