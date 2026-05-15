@@ -196,7 +196,7 @@ Qed.
 Program Definition uPred_map {M1 M2 : ucmra} (f : M2 -n> M1)
   `{!CmraMorphism f} (P : uPred M1) :
   uPred M2 := {| uPred_holds n x := P n (f x) |}.
-Next Obligation. naive_solver eauto using uPred_mono, cmra_morphism_monotoneN. Qed.
+Next Obligation. naive_solver eauto using uPred_mono, cmra_morphism_monoN. Qed.
 
 Global Instance uPred_map_ne {M1 M2 : ucmra} (f : M2 -n> M1)
   `{!CmraMorphism f} n : Proper (dist n ==> dist n) (uPred_map f).
