@@ -334,7 +334,23 @@ Module le_upd.
     iModIntro. iExists C. iFrame.
   Qed.
 
-  (** More flexible soundness theorem *)
+  (** Flexible soundness theorem through "finally" modality. *)
+  (** The later-elimination finally modality [le_upd_finally] is used internally
+  in the finally modality for fancy updates ([fupd_finally]). It should not be
+  used directly by end-users. See the file [fancy_updates] for documentation how
+  to prove soundness/adequacy results using the user-facing finally modality.
+
+  Compared to the later-elimination modality [le_upd] itself, this modality
+  only consumes the supply [lc_supply], but does not give it back. This change
+  allows us to prove the rules [le_upd_finally_later], [le_upd_finally_keep],
+  and [le_upd_finally_forall], which cannot be proven for [le_upd]. For instance,
+  to prove [le_upd_finally_forall] the goal is [▷^m ◇ ■ ∀ x, Φ x] where we can
+  just commute out the [∀]. Such a proof does not work for a corresponding lemma
+  for [le_upd] because we cannot commute out the [∀].
+
+  Due to the plain modality [■], we can perform basic updates around
+  [le_upd_finally] (we have [(|==> ■ P) ⊣⊢ ■ P]). This fact is exposed by the
+  rule [le_upd_le_upd_finally] combined with the rule [bupd_le_upd]. *)
   Definition le_upd_finally_def `{!lcGS Σ} (P : iProp Σ) : iProp Σ :=
     ∀ m, lc_supply m -∗ ■ ▷^m ◇ P.
   Local Definition le_upd_finally_aux : seal (@le_upd_finally_def).
@@ -382,7 +398,7 @@ Module le_upd.
     Lemma le_upd_finally_later P : ▷ (|==£|> P) ⊢ |==£|> ▷ ◇ P.
     Proof.
       rewrite le_upd_finally_unseal.
-      iIntros "H %m Hlc". rewrite -except_0_intro -laterN_later /= - later_plainly.
+      iIntros "H %m Hlc". rewrite -except_0_intro -laterN_later /= -later_plainly.
       iNext. iApply ("H" with "Hlc").
     Qed.
 
@@ -394,6 +410,9 @@ Module le_upd.
       iApply ("H" with "H£ Hlc").
     Qed.
 
+    (* [iApply] this lemma to use your current context for proving a timeless
+    assertion [P] *without* actually using up the context. You can then continue
+    the proof in the second conjunct. *)
     Lemma le_upd_finally_keep P Q `{!Timeless P} :
       (|==£|> P) ∧ (P -∗ |==£|> Q) ⊢ |==£|> Q.
     Proof.
@@ -415,7 +434,9 @@ Module le_upd.
       iIntros "H %m Hlc %x". iApply ("H" with "Hlc").
     Qed.
 
-    (* Derived *)
+    (** Derived rules *)
+    (** Since the modality is used only internally in the version for fancy
+    updates, we do not provide instances of the proof mode classes. *)
     Global Instance le_upd_finally_proper : Proper ((⊣⊢) ==> (⊣⊢)) le_upd_finally.
     Proof. apply: ne_proper. Qed.
     Global Instance le_upd_finally_mono' : Proper ((⊢) ==> (⊢)) le_upd_finally.
@@ -434,6 +455,8 @@ Module le_upd.
     iApply (HP with "H£ Hlc").
   Qed.
 
+  #[deprecated(note="Internal result, will be removed in the future. Use
+  `le_upd_finally_soundness` if you build a custom update modality.")]
   Lemma lc_soundness `{!lcGpreS Σ} m (P : iProp Σ) `{!Plain P} :
     (∀ `{!lcGS Σ}, £ m -∗ |==£> P) → ⊢ P.
   Proof.

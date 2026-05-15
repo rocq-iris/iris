@@ -146,7 +146,7 @@ Lemma wp_strong_adequacy_gen hlc Σ Λ `{!invGpreS Σ} s es σ1 n κs t2 σ2 φ
   φ.
 Proof.
   intros Hwp ?. apply (pure_soundness (PROP:=iPropI Σ)).
-  apply (laterN_soundness _  (steps_sum num_laters_per_step 0 n + 1)).
+  apply (laterN_soundness _ (steps_sum num_laters_per_step 0 n + 1)).
   rewrite laterN_add /= -except_0_into_later.
   apply (fupd_finally_soundness hlc (steps_sum num_laters_per_step 0 n) ⊤).
   iIntros (?) "H£".
@@ -157,7 +157,7 @@ Proof.
   iMod (@wptp_preservation _ _ _ iG with "Hσ H£ Hwp") as "H /="; first done.
   rewrite Nat.add_0_r. iApply step_fupdN_fupd_finally.
   iApply (step_fupdN_wand with "H"); iIntros ">(%nt' & Hσ & Ht)".
-  iApply (fupd_finally_keep _
+  iApply (fupd_finally_keep
     ⌜∀ e2, s = NotStuck → e2 ∈ t2 → not_stuck e2 σ2⌝); iSplit.
   { iIntros (e -> [i He]%list_elem_of_lookup).
     iDestruct (big_sepL2_lookup_l with "Ht") as (Φ' _) "He"; first done.

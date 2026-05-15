@@ -169,7 +169,32 @@ Proof.
   by iApply ("HP" with "HwE").
 Qed.
 
-(** More flexible soundness theorem *)
+(** Flexible soundness theorem through "finally" modality *)
+(** The [fupd_finally] modality allows convenient proofs of soundness/adequacy
+of a custom modality/program logic. To use it, perform the following steps:
+- Apply [pure_soundness] to turn your pure goal into an Iris entailment.
+- (Only when *not* using later credits ([HasNoLc]), or proving a theorem generic
+  in [hlc : has_lc])
+  Apply [laterN_soundness] to add a number of laters.
+- Apply [fupd_finally_soundness] to turn the goal into [|={E|}=> ..] and to
+  allocate a number of later credits. In addition to the later credits you want
+  to supply to the user, you also want to allocate enough later credits to
+  eliminate the laters obtained from unfolding a recursive definition (such as
+  WP) sufficiently many times.
+
+Next, you can:
+- Eliminate update modalities around [|={E|}=> ..] through [fupd_fupd_finally].
+  This lemma is used implicitly when using the [iMod] tactic.
+- "Duplicate" the context for proving timeless assertions through
+  [fupd_finally_keep].
+- Introduce foralls below [|={E|}=> ..] through [fupd_finally_forall]. This
+  lemma is used implicitly when using the [iIntros] tactic.
+- Turn laters below [|={E|}=> ..] into later credits through [fupd_finally_lc]
+  or commute them out through [fupd_finally_later].
+- Finally introduce the modality using [fupd_finally_intro].
+
+See the proofs of the derived soundness theorems below for examples on how to
+use the modality. Also see the proofs of adequacy of WP or total WP. *)
 Definition fupd_finally_def `{!invGS_gen hlc Σ}
     (E : coPset) (P : iProp Σ) : iProp Σ :=
   wsat -∗ ownE E -∗ |==£|> P.
@@ -229,7 +254,10 @@ Section fupd_finally.
     iIntros "H£". iApply ("H" with "H£ Hw HE").
   Qed.
 
-  Lemma fupd_finally_keep E P Q `{!Timeless P} :
+  (* [iApply] this lemma to use your current context for proving a timeless
+  assertion [P] *without* actually using up the context. You can then continue
+  the proof in the second conjunct. *)
+  Lemma fupd_finally_keep {E} P Q `{!Timeless P} :
     (|={E|}=> P) ∧ (P -∗ |={E|}=> Q) ⊢ |={E|}=> Q.
   Proof.
     rewrite fupd_finally_unseal. iIntros "H Hw HE".
@@ -320,6 +348,7 @@ Proof.
   rewrite ownE_op; [|set_solver]. iDestruct "HE" as "[$ _]".
 Qed.
 
+(** Derived soundness theorems *)
 (** Note: the [hlc = HasNoLc] versions also allow generating later credits, but
 these cannot be used for anything. They are merely provided to enable making
 the adequacy proof generic in whether later credits are used. *)
@@ -331,7 +360,6 @@ Proof.
   iMod (HP with "H£"). iApply fupd_finally_intro. by iApply plain_plainly.
 Qed.
 
-(** [step_fupdN] soundness lemmas *)
 Lemma step_fupdN_soundness hlc `{!invGpreS Σ} n m (P : iProp Σ) `{!Plain P} :
   (∀ `{!invGS_gen hlc Σ}, £ m ={⊤,∅}=∗ |={∅}▷=>^n P) →
   ⊢ P.
