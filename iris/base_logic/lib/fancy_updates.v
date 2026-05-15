@@ -193,8 +193,9 @@ Next, you can:
   or commute them out through [fupd_finally_later].
 - Finally introduce the modality using [fupd_finally_intro].
 
-See the proofs of the derived soundness theorems below for examples on how to
-use the modality. Also see the proofs of adequacy of WP or total WP. *)
+See the proofs of the derived soundness theorems (e.g. [fupd_finally_soundness])
+below for examples on how to use the modality. Also see the proofs of adequacy of
+WP or total WP. *)
 Definition fupd_finally_def `{!invGS_gen hlc Σ}
     (E : coPset) (P : iProp Σ) : iProp Σ :=
   wsat -∗ ownE E -∗ |==£|> P.
