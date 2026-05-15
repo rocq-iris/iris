@@ -7,20 +7,27 @@ From iris.base_logic Require Export later_credits.
 From iris.prelude Require Import options.
 Export wsatGS.
 Import uPred.
-Import le_upd_if.
+Import le_upd.
 
-(** The definition of fancy updates (and in turn the logic built on top of it) is parameterized
-    by whether it supports elimination of laters via later credits or not.
-    This choice is necessary as the fancy update *with* later credits does *not* support
-    the interaction laws with the plainly modality in [BiFUpdPlainly]. While these laws are
-    seldomly used, support for them is required for backwards compatibility.
+(** The definition of fancy updates (and in turn the logic built on top of it)
+is parameterized by whether it supports elimination of laters via later credits
+or not. This choice is necessary as the fancy update *with* later credits does
+*not* support the interaction laws with the plainly modality in [BiFUpdPlainly].
+While these laws are seldomly used, support for them is required for backwards
+compatibility. More precisely:
 
-    Thus, the [invGS_gen] typeclass ("gen" for "generalized") is parameterized by
-    a parameter of type [has_lc] that determines whether later credits are
-    available or not. [invGS] is provided as a convenient notation for the default [HasLc].
-    We don't use that notation in this file to avoid confusion.
- *)
-Inductive has_lc := HasLc | HasNoLc.
+- If later credits are enabled ([hlc = HasLc]), we obtain the rule
+  [lc_fupd_elim_later : £ 1 -∗ (▷ P) -∗ |={E}=> P], which allows us strip a
+  later by spending a credit.
+- If later credits are disabled ([hlc = HasNoLc]), we obtain the rule
+  [fupd_keep : (|={E1|}=> P) ∧ (P -∗ |={E1,E2}=> Q) ⊢ |={E1,E2}=> Q] without the
+  side-condition that [P] should be timeless. This rule is used to derive the
+  plain interaction rules [BiFUpdSbi].
+
+The [invGS_gen] typeclass ("gen" for "generalized") is parameterized by a
+parameter of type [has_lc] that determines whether later credits are available
+or not. [invGS] is provided as a convenient notation for the default [HasLc].
+We don't use that notation in this file to avoid confusion. *)
 
 Class invGpreS (Σ : gFunctors) : Set := InvGpreS {
   #[local] invGpreS_wsat :: wsatGpreS Σ;
@@ -32,27 +39,29 @@ Class invGpreS (Σ : gFunctors) : Set := InvGpreS {
 global as the lemmas in [invariants.v] require it. *)
 Class invGS_gen (hlc : has_lc) (Σ : gFunctors) : Set := InvG {
   #[global] invGS_wsat :: wsatGS Σ;
-  #[global] invGS_lc :: lcGS Σ;
+  #[global] invGS_lc :: lcGS hlc Σ;
 }.
 Global Hint Mode invGS_gen - - : typeclass_instances.
 Global Hint Mode invGpreS - : typeclass_instances.
 
 Notation invGS := (invGS_gen HasLc).
 
-Definition invΣ : gFunctors :=
-  #[wsatΣ; lcΣ].
+Definition invΣ : gFunctors := #[wsatΣ; lcΣ].
 Global Instance subG_invΣ {Σ} : subG invΣ Σ → invGpreS Σ.
 Proof. solve_inG. Qed.
 
-Local Definition uPred_fupd_def `{!invGS_gen hlc Σ} (E1 E2 : coPset) (P : iProp Σ) : iProp Σ :=
-  wsat ∗ ownE E1 -∗ le_upd_if (if hlc is HasLc then true else false) (wsat ∗ ownE E2 ∗ P).
+Local Definition uPred_fupd_def `{!invGS_gen hlc Σ}
+    (E1 E2 : coPset) (P : iProp Σ) : iProp Σ :=
+  wsat ∗ ownE E1 -∗ |==£> wsat ∗ ownE E2 ∗ P.
 Local Definition uPred_fupd_aux : seal (@uPred_fupd_def). Proof. by eexists. Qed.
 Definition uPred_fupd := uPred_fupd_aux.(unseal).
 Global Arguments uPred_fupd {hlc Σ _}.
-Local Lemma uPred_fupd_unseal `{!invGS_gen hlc Σ} : @fupd _ uPred_fupd = uPred_fupd_def.
+Local Lemma uPred_fupd_unseal `{!invGS_gen hlc Σ} :
+  @fupd _ uPred_fupd = uPred_fupd_def.
 Proof. rewrite -uPred_fupd_aux.(seal_eq) //. Qed.
 
-Lemma uPred_fupd_mixin `{!invGS_gen hlc Σ} : BiFUpdMixin (uPredI (iResUR Σ)) uPred_fupd.
+Lemma uPred_fupd_mixin `{!invGS_gen hlc Σ} :
+  BiFUpdMixin (uPredI (iResUR Σ)) uPred_fupd.
 Proof.
   split.
   - rewrite uPred_fupd_unseal. solve_proper.
@@ -78,44 +87,22 @@ Global Instance uPred_bi_fupd `{!invGS_gen hlc Σ} : BiFUpd (uPredI (iResUR Σ))
 Global Instance uPred_bi_bupd_fupd `{!invGS_gen hlc Σ} : BiBUpdFUpd (uPredI (iResUR Σ)).
 Proof. rewrite /BiBUpdFUpd uPred_fupd_unseal. by iIntros (E P) ">? [$ $] !>". Qed.
 
-(** The interaction laws with the plainly modality are only supported when
-  we opt out of the support for later credits. *)
-Global Instance uPred_bi_fupd_sbi_no_lc `{!invGS_gen HasNoLc Σ} :
-  BiFUpdSbi (uPredI (iResUR Σ)).
+(** If later credits are disabled, this lemma shows that [fupd] is just the
+basic update + except-0 modality, i.e., fancy updates are like Iris 3.0. *)
+Local Lemma fupd_unfold_no_lc `{!invGS_gen HasNoLc Σ} E1 E2 (P : iProp Σ) :
+  (|={E1,E2}=> P) ⊣⊢ (wsat ∗ ownE E1 ==∗ ◇ (wsat ∗ ownE E2 ∗ P)).
 Proof.
-  split; rewrite uPred_fupd_unseal /uPred_fupd_def.
-  - iIntros (E E' Pi Q) "[H HQ] [Hw HE]".
-    iAssert (◇ <si_pure> Pi)%I as "#>HP".
-    { by iMod ("H" with "HQ [$]") as "(_ & _ & HP)". }
-    by iFrame.
-  - iIntros (E Pi) "H [Hw HE]".
-    iAssert (▷ ◇ <si_pure> Pi)%I as "#HP".
-    { iNext. by iMod ("H" with "[$]") as "(_ & _ & HP)". }
-    iFrame. iIntros "!> !>". by iMod "HP".
-  - iIntros (E A Φi) "HΦ [Hw HE]".
-    iAssert (◇ ∀ x : A, <si_pure> Φi x)%I as "#>HP".
-    { iIntros (x). by iMod ("HΦ" with "[$Hw $HE]") as "(_&_&?)". }
-    by iFrame.
+  rewrite uPred_fupd_unseal /uPred_fupd_def.
+  by rewrite later_credits.le_upd.le_upd_unfold_no_le.
 Qed.
 
-(* [iApply] this lemma to use your current context for proving a pure
-proposition [φ] *without* actually using up the context and masks. You can then
-continue the proof in the second conjunct. *)
-Lemma fupd_pure_keep `{!invGS_gen hlc Σ} φ E2' E1 E2 (Q : iProp Σ) :
-  (|={E1,E2'}=> ⌜ φ ⌝) ∧ (⌜ φ ⌝ ={E1,E2}=∗ Q) ⊢ |={E1,E2}=> Q.
-Proof.
-  rewrite uPred_fupd_unseal. iIntros "H HwE".
-  iApply (le_upd_if_pure_keep _ φ); iSplit.
-  - iDestruct "H" as "[H _]". iMod ("H" with "HwE") as "(?&?&?)"; auto.
-  - iIntros (Hφ). iDestruct "H" as "[_ H]". by iApply "H".
-Qed.
-
-(** Later credits: the laws are only available when we opt into later credit support.*)
+(** Later credits: the laws for spending credits are only available when we opt
+into later credit support ([hlc = HasLc]). *)
 
 (** [lc_fupd_elim_later] allows to eliminate a later from a hypothesis at an update.
-  This is typically used as [iMod (lc_fupd_elim_later with "Hcredit HP") as "HP".],
-  where ["Hcredit"] is a credit available in the context and ["HP"] is the
-  assumption from which a later should be stripped. *)
+This is typically used as [iMod (lc_fupd_elim_later with "Hcredit HP") as "HP".],
+where ["Hcredit"] is a credit available in the context and ["HP"] is the
+assumption from which a later should be stripped. *)
 Lemma lc_fupd_elim_later `{!invGS_gen HasLc Σ} E P :
    £ 1 -∗ (▷ P) -∗ |={E}=> P.
 Proof.
@@ -125,9 +112,9 @@ Proof.
 Qed.
 
 (** If the goal is a fancy update, this lemma can be used to make a later appear
-  in front of it in exchange for a later credit.
-  This is typically used as [iApply (lc_fupd_add_later with "Hcredit")],
-  where ["Hcredit"] is a credit available in the context. *)
+in front of it in exchange for a later credit. This is typically used as
+[iApply (lc_fupd_add_later with "Hcredit")], where ["Hcredit"] is a credit
+available in the context. *)
 Lemma lc_fupd_add_later `{!invGS_gen HasLc Σ} E1 E2 P :
   £ 1 -∗ (▷ |={E1, E2}=> P) -∗ |={E1, E2}=> P.
 Proof.
@@ -168,16 +155,16 @@ Lemma fupd_soundness_no_lc_unfold `{!invGpreS Σ} m E :
 Proof.
   iMod wsat_alloc as (Hw) "[Hw HE]".
   (* We don't actually want any credits, but we need the [lcGS]. *)
-  iMod (later_credits.le_upd.lc_alloc m) as (Hc) "[_ Hlc]".
+  iDestruct (later_credits.le_upd.lc_alloc_no_lc m) as (Hc) "[_ Hlc]".
   set (Hi := InvG HasNoLc _ Hw Hc).
   iExists Hi, (λ E, wsat ∗ ownE E)%I.
   rewrite (union_difference_L E ⊤); [|set_solver].
   rewrite ownE_op; [|set_solver].
-  iDestruct "HE" as "[HE _]". iFrame.
+  iDestruct "HE" as "[HE _]". iFrame "Hw HE Hlc".
   iIntros "!>!>" (E1 E2 P) "HP HwE".
   rewrite fancy_updates.uPred_fupd_unseal
           /fancy_updates.uPred_fupd_def -assoc /=.
-  by iApply ("HP" with "HwE").
+  iApply later_credits.le_upd.le_upd_unfold_no_le. by iApply ("HP" with "HwE").
 Qed.
 
 (** Flexible soundness theorem through "finally" modality *)
@@ -247,7 +234,7 @@ Section fupd_finally.
     rewrite fupd_finally_unseal uPred_fupd_unseal.
     iIntros "HP Hw HE1". rewrite /uPred_fupd_def /=.
     iApply le_upd_le_upd_finally.
-    iMod (le_upd_if_into_le_upd with "(HP [$Hw $HE1])") as "HP"; iModIntro.
+    iMod ("HP" with "[$Hw $HE1]") as "HP"; iModIntro.
     iDestruct "HP" as "(Hw & HE2 & HP)". iApply ("HP" with "Hw HE2").
   Qed.
 
@@ -275,16 +262,16 @@ Section fupd_finally.
     iNext. iApply ("H" with "Hw HE").
   Qed.
 
-  (* [iApply] this lemma to use your current context for proving a timeless
+  (* [iApply] this lemma to use your current context for proving a (timeless)
   assertion [P] *without* actually using up the context. You can then continue
   the proof in the second conjunct. *)
-  Lemma fupd_finally_keep {E} P Q `{!Timeless P} :
-    (|={E|}=> P) ∧ (P -∗ |={E|}=> Q) ⊢ |={E|}=> Q.
+  Lemma fupd_keep {E1 E2} P Q `{!TCOr (TCEq hlc HasNoLc) (Timeless P)} :
+    (|={E1|}=> P) ∧ (P -∗ |={E1,E2}=> Q) ⊢ |={E1,E2}=> Q.
   Proof.
-    rewrite fupd_finally_unseal. iIntros "H Hw HE".
-    iApply (le_upd_finally_keep P). iSplit.
+    rewrite fupd_finally_unseal uPred_fupd_unseal. iIntros "H [Hw HE]".
+    iApply (le_upd_keep P). iSplit.
     - iDestruct "H" as "[H _]". iApply ("H" with "Hw HE").
-    - iIntros "HP". iDestruct "H" as "[_ H]". iApply ("H" with "HP Hw HE").
+    - iIntros "HP". iDestruct "H" as "[_ H]". iApply ("H" with "HP [$Hw $HE]").
   Qed.
 
   Lemma fupd_finally_forall {A} E (Φ : A → iProp Σ) :
@@ -302,6 +289,27 @@ Section fupd_finally.
   Global Instance fupd_finally_flip_mono' E :
     Proper (flip (⊢) ==> flip (⊢)) (fupd_finally E).
   Proof. intros P Q. apply fupd_finally_mono. Qed.
+
+  (* [iApply] this lemma to use your current context for proving a timeless
+  assertion [P] *without* actually using up the context. You can then continue
+  the proof in the second conjunct. *)
+  Lemma fupd_finally_keep {E} P Q `{!TCOr (TCEq hlc HasNoLc) (Timeless P)} :
+    (|={E|}=> P) ∧ (P -∗ |={E|}=> Q) ⊢ |={E|}=> Q.
+  Proof.
+    iIntros "H". iApply (fupd_fupd_finally E E). iApply (fupd_keep P).
+    by rewrite -fupd_intro.
+  Qed.
+
+  (* [iApply] this lemma to use your current context for proving a pure
+  proposition [φ] *without* actually using up the context and masks. You can
+  then continue the proof in the second conjunct. *)
+  Lemma fupd_pure_keep {E1 E2} φ E2' (Q : iProp Σ) :
+    (|={E1,E2'}=> ⌜ φ ⌝) ∧ (⌜ φ ⌝ ={E1,E2}=∗ Q) ⊢ |={E1,E2}=> Q.
+  Proof.
+    iIntros "H". iApply (fupd_keep ⌜ φ ⌝).
+    iEval (rewrite -(fupd_fupd_finally E1 E2')).
+    by iEval (rewrite -fupd_finally_intro plain_plainly).
+  Qed.
 
   Lemma fupd_finally_and E P Q : (|={E|}=> P) ∧ (|={E|}=> Q) ⊢ |={E|}=> P ∧ Q.
   Proof. rewrite !and_alt -fupd_finally_forall. by f_equiv=> -[]. Qed.
@@ -358,11 +366,30 @@ Section fupd_finally.
   Qed.
 End fupd_finally.
 
+(** The interaction laws with the plainly modality are only supported when we
+opt out of the support for later credits. These rules are derived from the rules
+of the *finally* modality. *)
+Global Instance uPred_bi_fupd_sbi_no_lc `{!invGS_gen HasNoLc Σ} :
+  BiFUpdSbi (uPredI (iResUR Σ)).
+Proof.
+  split.
+  - iIntros (E E' Pi R) "[H HR]".
+    iApply (fupd_keep (<si_pure> Pi)); iSplit; last by auto.
+    iMod ("H" with "HR") as "#?". iApply fupd_finally_intro. auto.
+  - iIntros (E Pi) "H".
+    iApply (fupd_keep (▷ ◇ <si_pure> Pi)); iSplit; last by auto.
+    iApply fupd_finally_later. iNext. iMod "H" as "#?".
+    iApply fupd_finally_intro. auto.
+  - iIntros (E A Φi) "HΦ".
+    iApply (fupd_keep (∀ x, <si_pure> Φi x)); iSplit; last by auto.
+    iIntros (x). iMod ("HΦ" $! x) as "#?". iApply fupd_finally_intro. auto.
+Qed.
+
 Lemma fupd_finally_soundness hlc `{!invGpreS Σ} n E P :
   (∀ `{!invGS_gen hlc Σ}, £ n ⊢ |={E|}=> P) → ⊢ P.
 Proof.
   rewrite fupd_finally_unseal=> HP.
-  apply (le_upd_finally_soundness n); iIntros (?) "H£".
+  apply (le_upd_finally_soundness hlc n); iIntros (?) "H£".
   iApply le_upd_le_upd_finally. iMod wsat_alloc as (Hw) "[Hw HE]". iModIntro.
   iApply (HP (InvG _ _ _ _) with "H£ Hw").
   rewrite (union_difference_L E ⊤); [|set_solver].
