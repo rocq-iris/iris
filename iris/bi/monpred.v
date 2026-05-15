@@ -651,6 +651,8 @@ Section bi_facts.
   Implicit Types P Q : monPred.
 
   (** monPred_at unfolding laws *)
+  Lemma monPred_at_dist n P Q : (P ≡{n}≡ Q) ↔ (∀ i, P i ≡{n}≡ Q i).
+  Proof. split; [by intros []|by split]. Qed.
   Lemma monPred_at_equiv P Q : (P ⊣⊢ Q) ↔ (∀ i, P i ⊣⊢ Q i).
   Proof. split; [by intros []|by split]. Qed.
   Lemma monPred_at_entails P Q : (P ⊢ Q) ↔ (∀ i, P i ⊢ Q i).

@@ -15,7 +15,8 @@ lemma.
 
 * Change atomic update notations (`AU` and `AACC`) to level 0.
 * Change the update modality notations to level 20.
-* Add lemmas `monPred_at_equiv`, `monPred_at_entails`, `monPred_at_emp_valid`.
+* Add lemmas `monPred_at_equiv`, `monPred_at_entails`, `monPred_at_emp_valid`,
+  and `monPred_at_dist`.
 
 **Changes in `base_logic`:**
 
