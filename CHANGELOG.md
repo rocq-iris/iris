@@ -53,8 +53,9 @@ lemma.
 * Add lemma `lc_fupd_add_step_fupdN`.
 * Add new "final fancy update" modality `|={E|}=> P` to streamline adequacy
   proofs. This modality makes it possible to prove adequacy of total WP and
-  trace-based logics (Trillium) while supporting later credits. (inspired by
-  ideas from Freja Marott Crawford, Amim Timany, Thomas Somers)
+  trace-based logics (Trillium) while supporting later credits, and gives new
+  rules for fancy updates. (inspired by ideas from Freja Marott Crawford, Amim
+  Timany, Thomas Somers, Simcha van Collem)
   + To prove adequacy of a custom logic, use the new soundness theorem
     `fupd_finally_soundness`.
   + The legacy soundness theorems for fancy updates still exist, but the number
@@ -62,6 +63,11 @@ lemma.
     `step_fupdN_soundness` and `step_fupdN_soundness'` has been removed. The
     `_lc` and `_no_lc` versions have been removed and can be obtained by
     instantiating the first `hlc` argument with `HasLc` or `HasNoLc`.
+  + From the the rule `fupd_finally_keep` we can derive:
+    * The new rules `fupd_keep_pure` and `fupd_pure_forall`. The former was
+      previously only provable for decidable Rocq propositions.
+    * The existing `BiFUpdSbi` rules (if later credits are disabled), which were
+      previously proved in the model of `fupd`.
 
 **Changes in `program_logic`:**
 
