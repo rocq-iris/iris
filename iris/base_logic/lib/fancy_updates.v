@@ -311,6 +311,17 @@ Section fupd_finally.
     by iEval (rewrite -fupd_finally_intro plain_plainly).
   Qed.
 
+  Lemma fupd_pure_forall E1 E2 {A} (φ : A → Prop) :
+    E2 ⊆ E1 →
+    (|={E1,E2}=> ∀ x, ⌜ φ x ⌝) ⊣⊢@{iProp Σ} (∀ x, |={E1,E2}=> ⌜ φ x ⌝).
+  Proof.
+    intros. iSplit; first by iIntros ">H %x !> //".
+    iIntros "H". iApply (fupd_keep (∀ x, ⌜ φ x ⌝)). iSplit.
+    - iApply fupd_finally_forall; iIntros (x). iApply fupd_fupd_finally.
+      iMod ("H" $! x) as "#?". iModIntro. iApply fupd_finally_intro. auto.
+    - iIntros "$". by iMod (fupd_mask_subseteq E2).
+  Qed.
+
   Lemma fupd_finally_and E P Q : (|={E|}=> P) ∧ (|={E|}=> Q) ⊢ |={E|}=> P ∧ Q.
   Proof. rewrite !and_alt -fupd_finally_forall. by f_equiv=> -[]. Qed.
   Lemma fupd_finally_wand E P Q : (|={E|}=> P) -∗ ■ (P -∗ Q) -∗ (|={E|}=> Q).
@@ -335,7 +346,7 @@ Section fupd_finally.
 
   Global Instance from_forall_fupd_finally E {A} P (Φ : A → iProp Σ) name :
     FromForall P Φ name →
-    FromForall (|={E|}=> P) (λ a, |={E|}=> (Φ a))%I name.
+    FromForall (|={E|}=> P) (λ a, |={E|}=> Φ a)%I name.
   Proof. rewrite /FromForall=> <-. apply fupd_finally_forall. Qed.
 
   Global Instance is_except_0_fupd_finally E P : IsExcept0 (|={E|}=> P).
@@ -363,6 +374,16 @@ Section fupd_finally.
     { by iEval (rewrite -except_0_intro). }
     iMod "HP". iEval (rewrite -except_0_idemp -except_0_laterN).
     iApply fupd_finally_later; iNext. iMod "HP". by iApply "IH".
+  Qed.
+
+  Global Instance from_forall_fupd_pure E {A} P
+      (Φ : A → iProp Σ) (φ : A → Prop) name :
+    FromForall P Φ name →
+    (∀ x, FromPure false (Φ x) (φ x)) →
+    FromForall (|={E}=> P) (λ a, |={E}=> ⌜ φ a ⌝)%I name.
+  Proof.
+    rewrite /FromForall /FromPure=> <- /= HΦ. setoid_rewrite <-HΦ.
+    rewrite fupd_pure_forall //.
   Qed.
 End fupd_finally.
 
