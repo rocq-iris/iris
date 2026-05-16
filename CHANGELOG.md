@@ -10,6 +10,7 @@ lemma.
 * Change `✓` notation to be explicitly right-associative.
 * Change big-op notations to parse the collection that they iterate over at
   level 200.
+* Add lemma `big_opM_set_to_map`.
 
 **Changes in `bi`:**
 
@@ -18,6 +19,7 @@ lemma.
 * Add lemmas `monPred_at_equiv`, `monPred_at_entails`, `monPred_at_emp_valid`,
   and `monPred_at_dist`.
 * Add lemma `timeless_laterN`.
+* Add lemma `big_sepM_set_to_map`.
 
 **Changes in `base_logic`:**
 
