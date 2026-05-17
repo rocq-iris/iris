@@ -391,13 +391,6 @@ Module le_upd.
       do 2 iNext. iApply ("IH" with "H Hlc").
     Qed.
 
-    Lemma except_0_le_upd_finally P : (◇ |==£|> P) ⊢ |==£|> P.
-    Proof.
-      rewrite le_upd_finally_unseal /le_upd_finally_def. iIntros "HP %m Hlc".
-      iEval (rewrite -except_0_idemp -except_0_laterN).
-      iMod "HP"; iModIntro. by iApply "HP".
-    Qed.
-
     Lemma le_upd_finally_except_0 P : (|==£|> ◇ P) ⊢ |==£|> P.
     Proof.
       rewrite le_upd_finally_unseal /le_upd_finally_def. iIntros "HP %m Hlc".
