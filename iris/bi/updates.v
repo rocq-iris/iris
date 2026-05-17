@@ -117,12 +117,12 @@ Global Hint Mode BiBUpdSbi ! - - : typeclass_instances.
 modality only make sense for affine logics. For general BIs we do not know the
 canonical set of rules and linear models in which they might hold. *)
 Class BiFUpdSbi (PROP : bi) `{!BiFUpd PROP, !Sbi PROP} := {
-  (** Given a mask-changing non-persistent view shift ending in a plain
-  proposition, and given the precondition of the view shift, we can eliminate
-  the view shift without consuming the precondition and without changing the
-  mask. *)
-  fupd_si_pure_keep_l E E' Pi (R : PROP) :
-    (R ={E,E'}=∗ <si_pure> Pi) ∗ R ⊢ |={E}=> <si_pure> Pi ∗ R;
+  (** This rule allows you to use the current context for proving a purely
+  step-indexed proposition [Pi] *without* actually using up the context. You can
+  then continue the proof in the second conjunct. The mask-changing version
+  [fupd_si_pure_keep] can be derived. *)
+  fupd_keep_si_pure' {E} E' Pi (R : PROP) :
+    (|={E,E'}=> <si_pure> Pi) ∧ (<si_pure> Pi ={E}=∗ R) ⊢ |={E}=> R;
   (** Later "almost" commutes with fancy updates over plain propositions. It
   commutes "almost" because of the ◇ modality, which is needed in the definition
   of fancy updates so one can remove laters of timeless propositions. *)
@@ -584,14 +584,25 @@ Section fupd_derived.
   Section fupd_sbi_derived.
     Context `{!Sbi PROP, !BiFUpdSbi PROP, !BiAffine PROP}.
 
-    Lemma fupd_plainly_keep_l E E' (P R : PROP) :
-      (R ={E,E'}=∗ ■ P) ∗ R ⊢ |={E}=> P ∗ R.
-    Proof. by rewrite /plainly fupd_si_pure_keep_l si_pure_si_emp_valid_elim. Qed.
+    Lemma fupd_keep_si_pure {E1 E2} E2' Pi R :
+      (|={E1,E2'}=> <si_pure> Pi) ∧ (<si_pure> Pi ={E1,E2}=∗ R) ⊢ |={E1,E2}=> R.
+    Proof.
+      rewrite -{2}(fupd_trans E1 E1 E2) -(fupd_keep_si_pure' E2' Pi).
+      by rewrite -fupd_intro.
+    Qed.
+
+    Lemma fupd_keep_plainly {E1 E2} E2' P R :
+      (|={E1,E2'}=> ■ P) ∧ (P ={E1,E2}=∗ R) ⊢ |={E1,E2}=> R.
+    Proof.
+      rewrite -{2}(fupd_keep_si_pure E2' (<si_emp_valid> P) R).
+      by rewrite {2}si_pure_si_emp_valid_elim.
+    Qed.
 
     Lemma fupd_plainly_later E P : (▷ |={E}=> ■ P) ⊢ |={E}=> ▷ ◇ P.
     Proof.
       by rewrite /plainly fupd_si_pure_later si_pure_si_emp_valid_elim.
     Qed.
+
     Lemma fupd_plainly_forall_2 E {A} (Φ : A → PROP) :
       (∀ x, |={E}=> ■ Φ x) ⊢ |={E}=> ∀ x, Φ x.
     Proof.
@@ -601,37 +612,35 @@ Section fupd_derived.
 
     Lemma fupd_plainly_mask E E' P : (|={E,E'}=> ■ P) ⊢ |={E}=> P.
     Proof.
-      trans (|={E}=> P ∗ emp)%I; last by rewrite right_id.
-      rewrite -fupd_plainly_keep_l.
-      rewrite right_id left_id. done.
+      etrans; [|apply (fupd_keep_plainly E' P)]. apply and_intro; [done|].
+      apply wand_intro_l. by rewrite sep_elim_l -fupd_intro.
     Qed.
-
-    Lemma fupd_plainly_elim E P : ■ P ⊢ |={E}=> P.
-    Proof. by rewrite (fupd_intro E (■ P)) fupd_plainly_mask. Qed.
-
-    Lemma fupd_plainly_keep_r E E' P R : R ∗ (R ={E,E'}=∗ ■ P) ⊢ |={E}=> R ∗ P.
-    Proof. by rewrite !(comm _ R) fupd_plainly_keep_l. Qed.
 
     Lemma fupd_plainly_laterN E n P : (▷^n |={E}=> ■ P) ⊢ |={E}=> ▷^n ◇ P.
     Proof.
       revert P. induction n as [|n IH]=> P /=.
-      { by rewrite -except_0_intro (fupd_plainly_elim E) fupd_trans. }
+      { by rewrite -except_0_intro plainly_elim. }
       rewrite -!later_laterN !laterN_later.
       rewrite -plainly_idemp fupd_plainly_later.
       by rewrite except_0_plainly_1 later_plainly_1 IH except_0_later.
     Qed.
 
     (** Laws for general plain propositions. *)
+    Lemma fupd_keep_plain {E1 E2} E2' P `{!Plain P} R :
+      (|={E1,E2'}=> P) ∧ (P ={E1,E2}=∗ R) ⊢ |={E1,E2}=> R.
+    Proof. by rewrite -{1}(plain_plainly P) fupd_keep_plainly. Qed.
+
     Lemma fupd_plain_mask E E' P `{!Plain P} : (|={E,E'}=> P) ⊢ |={E}=> P.
     Proof. by rewrite {1}(plain P) fupd_plainly_mask. Qed.
 
-    Lemma fupd_plain_keep_l E E' P R `{!Plain P} : (R ={E,E'}=∗ P) ∗ R ⊢ |={E}=> P ∗ R.
-    Proof. rewrite {1}(plain P) fupd_plainly_keep_l //. Qed.
-    Lemma fupd_plain_keep_r E E' P R `{!Plain P} : R ∗ (R ={E,E'}=∗ P) ⊢ |={E}=> R ∗ P.
-    Proof. by rewrite !(comm _ R) fupd_plain_keep_l. Qed.
-
-    Lemma fupd_plain_keep E E' P R `{!Plain P} : (R ={E,E'}=∗ P) -∗ R -∗ |={E}=> P ∗ R.
-    Proof. apply entails_wand, wand_intro_r, fupd_plain_keep_l. done. Qed.
+    Lemma fupd_keep_plain_sep {E} E' P `{!Plain P} R :
+      (R ={E,E'}=∗ P) -∗ R -∗ |={E}=> P ∗ R.
+    Proof.
+      apply entails_wand, wand_intro_r.
+      etrans; [|apply (fupd_keep_plain E' P)]. apply and_intro.
+      - by rewrite wand_elim_l.
+      - rewrite sep_elim_r -fupd_intro. by apply wand_intro_l.
+    Qed.
 
     Lemma fupd_plain_later E P `{!Plain P} : (▷ |={E}=> P) ⊢ |={E}=> ▷ ◇ P.
     Proof. by rewrite {1}(plain P) fupd_plainly_later. Qed.
@@ -653,7 +662,7 @@ Section fupd_derived.
       { apply forall_mono=> x. by rewrite fupd_plain_mask. }
       rewrite fupd_plain_forall_2. apply fupd_elim.
       rewrite {1}(plain (∀ x, Φ x)) (fupd_mask_intro_discard E1 E2 (■ _)) //.
-      apply fupd_elim. by rewrite fupd_plainly_elim.
+      by rewrite plainly_elim.
     Qed.
     Lemma fupd_plain_forall' E {A} (Φ : A → PROP) `{!∀ x, Plain (Φ x)} :
       (|={E}=> ∀ x, Φ x) ⊣⊢ (∀ x, |={E}=> Φ x).
