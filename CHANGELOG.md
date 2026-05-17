@@ -20,6 +20,13 @@ lemma.
   and `monPred_at_dist`.
 * Add lemma `timeless_laterN`.
 * Add lemma `big_sepM_set_to_map`.
+* Rename `fupd_plain_keep` → `fupd_keep_plain`, and rewrite it into a more
+  useful format with conjunction that can by `iApply`ed without manually picking
+  a frame. The old rule is still available as `fupd_keep_plain_sep`, but
+  alternative versions of the old rule `fupd_si_pure_keep_l`,
+  `fupd_plainly_keep_l`, `fupd_plainly_keep_r`, `fupd_plain_keep_l` and
+  `fupd_plain_keep_r` have been removed.
+* Remove `fupd_plainly_elim`, use `plainly_elim` and `fupd_intro` instead.
 
 **Changes in `base_logic`:**
 
