@@ -21,7 +21,8 @@ compatibility. More precisely:
   later by spending a credit.
 - If later credits are disabled ([hlc = HasNoLc]), we obtain the rule
   [fupd_keep : (|={E1|}=> P) ∧ (P -∗ |={E1,E2}=> Q) ⊢ |={E1,E2}=> Q] without the
-  side-condition that [P] should be timeless. This rule is used to derive the
+  side-condition that [P] should be timeless (the "finally" modality [|={E|}=>]
+  is described further below in this file). This rule is used to derive the
   plain interaction rules [BiFUpdSbi].
 
 The [invGS_gen] typeclass ("gen" for "generalized") is parameterized by a
@@ -50,6 +51,10 @@ Definition invΣ : gFunctors := #[wsatΣ; lcΣ].
 Global Instance subG_invΣ {Σ} : subG invΣ Σ → invGpreS Σ.
 Proof. solve_inG. Qed.
 
+(** Note that compared to the definition of the fancy update modality in Iris
+3.1 ("Iris from the Ground Up") and Iris 4.0 ("Later Credits"), the except-0
+modality [◇] is now hidden in the definition of the later-elimination update
+[|==£>]. *)
 Local Definition uPred_fupd_def `{!invGS_gen hlc Σ}
     (E1 E2 : coPset) (P : iProp Σ) : iProp Σ :=
   wsat ∗ ownE E1 -∗ |==£> wsat ∗ ownE E2 ∗ P.
@@ -193,7 +198,7 @@ Next, you can:
 
 It is important to note that [|={E|}=> P] can only be introduced if [P] is plain
 (i.e., it can be proven without resources) due to the [■] modality in the
-definition of [==£|>]). Therefore, rules that have [|={E|}=> P] as a premise
+definition of [|==£|>]). Therefore, rules that have [|={E|}=> P] as a premise
 (particularly [fupd_keep]) do not need to require that [P] is plain.
 
 See the proofs of the derived soundness theorems (e.g. [fupd_finally_soundness])

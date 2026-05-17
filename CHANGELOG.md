@@ -68,6 +68,10 @@ lemma.
       previously only provable for decidable Rocq propositions.
     * The existing `BiFUpdSbi` rules (if later credits are disabled), which were
       previously proved in the model of `fupd`.
+  + Change the model of the fancy update with regard to the placement of the
+    except-0 modality `◇`. (This is an internal change that only affects users
+    who built a custom fancy update modality on top of the later-elimination
+    update modality.)
 
 **Changes in `program_logic`:**
 

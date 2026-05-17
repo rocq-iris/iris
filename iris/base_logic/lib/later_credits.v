@@ -16,7 +16,8 @@ or not. From a user's point of view there are two differences:
   the fancy update modality.
 - If later credits are disabled ([hlc = HasNoLc]), we obtain the rule
   [le_upd_keep : (|==£|> P) ∧ (P -∗ |==£> Q) ⊢ |==£> Q] without the
-  side-condition that [P] should be timeless. This rule is used to derive the
+  side-condition that [P] should be timeless (the "finally" modality [|==£|>]
+  is described further below in this file). This rule is used to derive the
   plain interaction rules [BiFUpdSbi] of the fancy update modality.
 
 In the model, if later credits are disabled ([hlc = HasNoLc]), we simply define
