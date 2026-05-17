@@ -41,7 +41,8 @@ Definition lcΣ := #[GFunctor (authR (natUR))].
 Global Instance subG_lcΣ {Σ} : subG lcΣ Σ → lcGpreS Σ.
 Proof. solve_inG. Qed.
 
-(** The user-facing credit resource, denoting ownership of [n] credits. *)
+(** The user-facing credit resource, denoting ownership of [n] credits
+(but only if later credits are enabled). *)
 Local Definition lc_def `{!lcGS hlc Σ} (n : nat) : iProp Σ :=
   if hlc is HasLc then own lcGS_name (◯ n) else True.
 Local Definition lc_aux : seal (@lc_def). Proof. by eexists. Qed.
@@ -156,7 +157,17 @@ This should only be imported by the internal development of fancy updates. *)
 Module le_upd.
   Definition le_upd_pre `{!lcGS hlc Σ} (P le_upd : iProp Σ) : iProp Σ :=
     ∀ n, lc_supply n ==∗
-         ▷^(S n) False ∨ (lc_supply n ∗ P) ∨ (∃ m, ⌜m < n⌝ ∗ lc_supply m ∗ ▷ le_upd).
+      (** Case 1: Generalization of except-0 [◇], needed for proving the rule
+      [le_upd_keep]. There we obtain [▷^n ◇ P] for a timeless [P], and need to
+      eliminate [n] laters and one except-0, which can be done by having a
+      disjunct [▷^(S n) False] in the goal. *)
+      ▷^(S n) False ∨
+      (** Case 2: No credits are spent. *)
+      (lc_supply n ∗ P) ∨
+      (** Case 3: Eliminate a later by decreasing the credit supply (which
+      means at least one credit needs to be spent). This case is impossible if
+      later credits are disabled ([HasNoLc]), because [m < 0] is false. *)
+      (∃ m, ⌜m < n⌝ ∗ lc_supply m ∗ ▷ le_upd).
 
   Local Instance le_upd_pre_contractive `{!lcGS hlc Σ} P : Contractive (le_upd_pre P).
   Proof. solve_contractive. Qed.
@@ -329,7 +340,6 @@ Module le_upd.
       first (apply auth_both_valid; split; done).
     iModIntro. iExists (LcGS HasLc _ _ γLC). iFrame.
   Qed.
-
   Local Lemma lc_alloc_no_lc `{!lcGpreS Σ} n :
     ⊢ ∃ _ : lcGS HasNoLc Σ, lc_supply 0 ∗ £ n.
   Proof.

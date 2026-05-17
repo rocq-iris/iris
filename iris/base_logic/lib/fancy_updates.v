@@ -191,6 +191,11 @@ Next, you can:
   or commute them out through [fupd_finally_later].
 - Finally introduce the modality using [fupd_finally_intro].
 
+It is important to note that [|={E|}=> P] can only be introduced if [P] is plain
+(i.e., it can be proven without resources) due to the [■] modality in the
+definition of [==£|>]). Therefore, rules that have [|={E|}=> P] as a premise
+(particularly [fupd_keep]) do not need to require that [P] is plain.
+
 See the proofs of the derived soundness theorems (e.g. [fupd_finally_soundness])
 below for examples on how to use the modality. Also see the proofs of adequacy of
 WP or total WP. *)
@@ -264,7 +269,9 @@ Section fupd_finally.
 
   (* [iApply] this lemma to use your current context for proving a (timeless)
   assertion [P] *without* actually using up the context. You can then continue
-  the proof in the second conjunct. *)
+  the proof in the second conjunct. If later credits are disabled,
+  this works for *all* [P], not just timeless assertions. [P] can
+  be proven under the [fupd_finally] modality; see above for context. *)
   Lemma fupd_keep {E1 E2} P Q `{!TCOr (TCEq hlc HasNoLc) (Timeless P)} :
     (|={E1|}=> P) ∧ (P -∗ |={E1,E2}=> Q) ⊢ |={E1,E2}=> Q.
   Proof.
@@ -303,7 +310,7 @@ Section fupd_finally.
   (* [iApply] this lemma to use your current context for proving a pure
   proposition [φ] *without* actually using up the context and masks. You can
   then continue the proof in the second conjunct. *)
-  Lemma fupd_pure_keep {E1 E2} φ E2' (Q : iProp Σ) :
+  Lemma fupd_keep_pure {E1 E2} φ E2' (Q : iProp Σ) :
     (|={E1,E2'}=> ⌜ φ ⌝) ∧ (⌜ φ ⌝ ={E1,E2}=∗ Q) ⊢ |={E1,E2}=> Q.
   Proof.
     iIntros "H". iApply (fupd_keep ⌜ φ ⌝).
