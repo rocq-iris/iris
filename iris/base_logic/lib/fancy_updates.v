@@ -148,30 +148,6 @@ Qed.
 
 (** * [fupd] soundness lemmas *)
 
-(** "Unfolding" soundness stamement for no-LC fupd:
-This exposes that when initializing the [invGS_gen], we can provide
-a general lemma that lets one unfold a [|={E1, E2}=> P] into a basic update
-while also carrying around some frame [ω E] that tracks the current mask.
-We also provide a bunch of later credits for consistency,
-but there is no way to use them since this is a [HasNoLc] lemma. *)
-Lemma fupd_soundness_no_lc_unfold `{!invGpreS Σ} m E :
-  ⊢ |==> ∃ `(Hws: invGS_gen HasNoLc Σ) (ω : coPset → iProp Σ),
-    £ m ∗ ω E ∗ □ (∀ E1 E2 P, (|={E1, E2}=> P) -∗ ω E1 ==∗ ◇ (ω E2 ∗ P)).
-Proof.
-  iMod wsat_alloc as (Hw) "[Hw HE]".
-  (* We don't actually want any credits, but we need the [lcGS]. *)
-  iDestruct (later_credits.le_upd.lc_alloc_no_lc m) as (Hc) "[_ Hlc]".
-  set (Hi := InvG HasNoLc _ Hw Hc).
-  iExists Hi, (λ E, wsat ∗ ownE E)%I.
-  rewrite (union_difference_L E ⊤); [|set_solver].
-  rewrite ownE_op; [|set_solver].
-  iDestruct "HE" as "[HE _]". iFrame "Hw HE Hlc".
-  iIntros "!>!>" (E1 E2 P) "HP HwE".
-  rewrite fancy_updates.uPred_fupd_unseal
-          /fancy_updates.uPred_fupd_def -assoc /=.
-  iApply later_credits.le_upd.le_upd_unfold_no_le. by iApply ("HP" with "HwE").
-Qed.
-
 (** Flexible soundness theorem through "finally" modality *)
 (** The [fupd_finally] modality allows convenient proofs of soundness/adequacy
 of a custom modality/program logic. To use it, perform the following steps:
@@ -467,6 +443,30 @@ Proof.
   iPoseProof (HP with "Hc") as "HP".
   rewrite laterN_add /= -except_0_into_later. iApply step_fupdN_fupd_finally.
   iApply (step_fupdN_wand with "HP"); iIntros "#HP !> //".
+Qed.
+
+(** "Unfolding" soundness theorem for no-LC fupd *)
+(** This theorem exposes that when initializing the [invGS_gen], we can provide
+a general lemma that lets one unfold a [|={E1, E2}=> P] into a basic update
+while also carrying around some frame [ω E] that tracks the current mask.
+We also provide a bunch of later credits for consistency, but there is no way to
+use them since this is a [HasNoLc] lemma. *)
+Lemma fupd_soundness_no_lc_unfold `{!invGpreS Σ} m E :
+  ⊢ |==> ∃ `(Hws: invGS_gen HasNoLc Σ) (ω : coPset → iProp Σ),
+    £ m ∗ ω E ∗ □ (∀ E1 E2 P, (|={E1, E2}=> P) -∗ ω E1 ==∗ ◇ (ω E2 ∗ P)).
+Proof.
+  iMod wsat_alloc as (Hw) "[Hw HE]".
+  (* We don't actually want any credits, but we need the [lcGS]. *)
+  iDestruct (later_credits.le_upd.lc_alloc_no_lc m) as (Hc) "[_ Hlc]".
+  set (Hi := InvG HasNoLc _ Hw Hc).
+  iExists Hi, (λ E, wsat ∗ ownE E)%I.
+  rewrite (union_difference_L E ⊤); [|set_solver].
+  rewrite ownE_op; [|set_solver].
+  iDestruct "HE" as "[HE _]". iFrame "Hw HE Hlc".
+  iIntros "!>!>" (E1 E2 P) "HP HwE".
+  rewrite fancy_updates.uPred_fupd_unseal
+          /fancy_updates.uPred_fupd_def -assoc /=.
+  iApply later_credits.le_upd.le_upd_unfold_no_le. by iApply ("HP" with "HwE").
 Qed.
 
 (** * Now the Rocq-level tactic [iNext credit:H] *)
