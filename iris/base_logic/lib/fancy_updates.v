@@ -194,7 +194,8 @@ Next, you can:
   lemma is used implicitly when using the [iIntros] tactic.
 - Turn laters below [|={E|}=> ..] into later credits through [fupd_finally_lc]
   or commute them out through [fupd_finally_later].
-- Finally introduce the modality using [fupd_finally_intro].
+- Finally introduce the modality using [fupd_finally_intro]. This lemma is used
+  implicitly by [iModIntro].
 
 It is important to note that [|={E|}=> P] can only be introduced if [P] is plain
 (i.e., it can be proven without resources) due to the [■] modality in the
@@ -349,6 +350,12 @@ Section fupd_finally.
     iIntros (?) "H". iApply fupd_fupd_finally. by iApply fupd_mask_intro_discard.
   Qed.
 
+  (** Introduction of [|={E|}=> P] is the same as introduction of [■]: all
+  non-plain propositions are removed from the context. *)
+  Global Instance from_modal_fupd_finally E P :
+    FromModal True modality_plainly (|={E|}=> P) (|={E|}=> P) P.
+  Proof. intros _. apply fupd_finally_intro. Qed.
+
   Global Instance from_pure_fupd_finally a E P φ :
     FromPure a P φ → FromPure a (|={E|}=> P) φ.
   Proof.
@@ -408,14 +415,13 @@ Proof.
   split.
   - iIntros (E E' Pi R) "[H HR]".
     iApply (fupd_keep (<si_pure> Pi)); iSplit; last by auto.
-    iMod ("H" with "HR") as "#?". iApply fupd_finally_intro. auto.
+    iMod ("H" with "HR") as "#?". by iModIntro.
   - iIntros (E Pi) "H".
     iApply (fupd_keep (▷ ◇ <si_pure> Pi)); iSplit; last by auto.
-    iApply fupd_finally_later. iNext. iMod "H" as "#?".
-    iApply fupd_finally_intro. auto.
+    iApply fupd_finally_later. iNext. iMod "H" as "#?". by iModIntro.
   - iIntros (E A Φi) "HΦ".
     iApply (fupd_keep (∀ x, <si_pure> Φi x)); iSplit; last by auto.
-    iIntros (x). iMod ("HΦ" $! x) as "#?". iApply fupd_finally_intro. auto.
+    iIntros (x). iMod ("HΦ" $! x) as "#?". by iModIntro.
 Qed.
 
 Lemma fupd_finally_soundness hlc `{!invGpreS Σ} n E P :
@@ -438,7 +444,7 @@ Lemma fupd_soundness hlc `{!invGpreS Σ} n E1 E2 (P : iProp Σ) `{!Plain P} :
   ⊢ P.
 Proof.
   intros HP. apply (fupd_finally_soundness hlc n E1); iIntros (?) "H£".
-  iMod (HP with "H£"). iApply fupd_finally_intro. by iApply plain_plainly.
+  iMod (HP with "H£") as "#?". by iModIntro.
 Qed.
 
 Lemma step_fupdN_soundness hlc `{!invGpreS Σ} n m (P : iProp Σ) `{!Plain P} :
@@ -449,8 +455,7 @@ Proof.
   apply (fupd_finally_soundness hlc m ⊤); iIntros (Hinv) "Hc".
   iMod (HP with "Hc") as "HP".
   rewrite laterN_add /= -except_0_into_later. iApply step_fupdN_fupd_finally.
-  iApply (step_fupdN_wand with "HP"); iIntros "HP".
-  iApply fupd_finally_intro. by iApply plain_plainly.
+  iApply (step_fupdN_wand with "HP"); iIntros "#HP !> //".
 Qed.
 
 Lemma step_fupdN_soundness' hlc `{!invGpreS Σ} n m (P : iProp Σ) `{!Plain P} :
@@ -461,8 +466,7 @@ Proof.
   apply (fupd_finally_soundness hlc m ⊤); iIntros (Hinv) "Hc".
   iPoseProof (HP with "Hc") as "HP".
   rewrite laterN_add /= -except_0_into_later. iApply step_fupdN_fupd_finally.
-  iApply (step_fupdN_wand with "HP"); iIntros "HP".
-  iApply fupd_finally_intro. by iApply plain_plainly.
+  iApply (step_fupdN_wand with "HP"); iIntros "#HP !> //".
 Qed.
 
 (** * Now the Rocq-level tactic [iNext credit:H] *)
