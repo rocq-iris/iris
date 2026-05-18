@@ -121,7 +121,7 @@ Section lc_rules.
   Proof. by rewrite /IntoSep (lc_succ n). Qed.
 End lc_rules.
 
-(** The (internal) [lc_supply] are only vald if later credits are enabled. *)
+(** The (internal) [lc_supply] rules are only vald if later credits are enabled. *)
 Section lc_supply_rules.
   Context `{!lcGS HasLc Σ}.
 

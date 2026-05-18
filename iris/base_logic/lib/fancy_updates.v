@@ -198,7 +198,7 @@ Next, you can:
 
 It is important to note that [|={E|}=> P] can only be introduced if [P] is plain
 (i.e., it can be proven without resources) due to the [■] modality in the
-definition of [|==£|>]). Therefore, rules that have [|={E|}=> P] as a premise
+definition of [|==£|>]. Therefore, rules that have [|={E|}=> P] as a premise
 (particularly [fupd_keep]) do not need to require that [P] is plain.
 
 See the proofs of the derived soundness theorems (e.g. [fupd_finally_soundness])
