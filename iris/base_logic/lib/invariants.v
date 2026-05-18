@@ -4,7 +4,6 @@ From iris.proofmode Require Import proofmode.
 From iris.base_logic.lib Require Export fancy_updates.
 From iris.base_logic.lib Require Import wsat.
 From iris.prelude Require Import options.
-Import le_upd_if.
 
 (** Semantic Invariants *)
 Local Definition inv_def `{!invGS_gen hlc Σ} (N : namespace) (P : iProp Σ) : iProp Σ :=
@@ -35,9 +34,9 @@ Section inv.
     iDestruct "Hi" as % ?%elem_of_subseteq_singleton.
     rewrite {1 4}(union_difference_L (↑ N) E) // ownE_op; last set_solver.
     rewrite {1 5}(union_difference_L {[ i ]} (↑ N)) // ownE_op; last set_solver.
-    iIntros "(Hw & [HE $] & $) !> !>".
+    iIntros "(Hw & [HE $] & $) !>".
     iDestruct (ownI_open i with "[$Hw $HE $HiP]") as "($ & $ & HD)".
-    iIntros "HP [Hw $] !> !>". iApply (ownI_close _ P). by iFrame.
+    iIntros "HP [Hw $] !>". iApply (ownI_close _ P). by iFrame.
   Qed.
 
   Lemma fresh_inv_name (E : gset positive) N : ∃ i, i ∉ E ∧ i ∈@{coPset} ↑N.
@@ -54,7 +53,7 @@ Section inv.
     iIntros "HP [Hw $]".
     iMod (ownI_alloc (.∈ (↑N : coPset)) P with "[$HP $Hw]")
       as (i ?) "[$ ?]"; auto using fresh_inv_name.
-    do 2 iModIntro. iExists i. auto.
+    iModIntro. iExists i. auto.
   Qed.
 
   (* This does not imply [own_inv_alloc] due to the extra assumption [↑N ⊆ E]. *)
@@ -69,12 +68,12 @@ Section inv.
       with "[HE]" as "(HEi & HEN\i & HE\N)".
     { rewrite -?ownE_op; [|set_solver..].
       rewrite assoc_L -!union_difference_L //. set_solver. }
-    do 2 iModIntro. iFrame "HE\N". iSplitL "Hw HEi"; first by iApply "Hw".
+    iModIntro. iFrame "HE\N". iSplitL "Hw HEi"; first by iApply "Hw".
     iSplitL "Hi".
     { iExists i. auto. }
     iIntros "HP [Hw HE\N]".
     iDestruct (ownI_close with "[$Hw $Hi $HP $HD]") as "[$ HEi]".
-    do 2 iModIntro. iSplitL; [|done].
+    iModIntro. iSplitL; [|done].
     iCombine "HEi HEN\i HE\N" as "HEN".
     rewrite -?ownE_op; [|set_solver..].
     rewrite assoc_L -!union_difference_L //; set_solver.
