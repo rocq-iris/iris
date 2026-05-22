@@ -202,7 +202,7 @@ The $\HLOp$ subscript indicates that this is the HeapLang operator, not the math
   (\loc, \mapinsert {[\loc,\loc+z)} \val {\pstate:\stateHeap}, \nil)
   &&\text{if $z>0$ and \(\All i<z. \pstate.\stateHeap(\loc+i) = \bot\)} \\
 (\Free(\loc), \pstate) \hstep[\nil]{}&
-  ((), \mapinsert \loc \bot {\pstate:\stateHeap}, \nil) &&\text{if $\pstate.\stateHeap(l) = \val$} \\
+  (\TT, \mapinsert \loc \bot {\pstate:\stateHeap}, \nil) &&\text{if $\pstate.\stateHeap(l) = \val$} \\
 (\deref\loc, \pstate) \hstep[\nil]{}&
   (\val, \pstate, \nil) &&\text{if $\pstate.\stateHeap(l) = \val$} \\
 (\loc\gets\valB, \pstate) \hstep[\nil]{}&
@@ -213,9 +213,9 @@ The $\HLOp$ subscript indicates that this is the HeapLang operator, not the math
 (\CmpXchg(\loc,\valB_1,\valB_2), \pstate) \hstep[\nil]{}&
   ((\val, \False), \pstate, \nil)
   &&\text{if $\pstate.\stateHeap(l) = \val$ and $\val \valne \valB_1$} \\
-(\Xchg(\loc, \valB) \hstep[\nil]{}&
+(\Xchg(\loc, \valB), \pstate) \hstep[\nil]{}&
   (\val, \mapinsert \loc \valB {\pstate:\stateHeap}, \nil) &&\text{if $\pstate.\stateHeap(l) = \val$} \\
-(\FAA(\loc, z_2) \hstep[\nil]{}&
+(\FAA(\loc, z_2), \pstate) \hstep[\nil]{}&
   (z_1, \mapinsert \loc {z_1+z_2} {\pstate:\stateHeap}, \nil) &&\text{if $\pstate.\stateHeap(l) = z_1$} \\
 &\alignheader\textbf{Special reductions} \\
 (\Fork\expr, \pstate) \hstep[\nil]{}&
@@ -226,8 +226,8 @@ The $\HLOp$ subscript indicates that this is the HeapLang operator, not the math
 \end{align*}
 \begin{mathpar}
 \infer
-  {(\expr, \pstate) \hstep[\vec\obs] (\val, \pstate', \vec\expr')}
-  {(\ResolveWith \expr at \prophid to \valB, \pstate) \hstep[\vec\obs \dplus [(\prophid, (\val, \valB))]] (\val, \pstate', \vec\expr')}\text{ if $\prophid \in \pstate.\stateProphs$}
+  {(\expr, \pstate) \hstep[\vec\obs] (\val, \pstate', \vec\expr\,')}
+  {(\ResolveWith \expr at \prophid to \valB, \pstate) \hstep[\vec\obs \dplus {[(\prophid, (\val, \valB))]}] (\val, \pstate', \vec\expr\,')}\qquad\text{ if $\prophid \in \pstate.\stateProphs$}
 \end{mathpar}
 \caption{HeapLang impure reduction rules. \\ \small
 Here, $\pstate:\stateHeap$ denotes $\sigma$ with the $\stateHeap$ field updated as indicated.
