@@ -32,8 +32,8 @@ Section ectx_language_mixin.
     (** Given a base redex [e1_redex] somewhere in a term, and another
         decomposition of the same term into [fill K' e1'] such that [e1'] is not
         a value, then the base redex context is [e1']'s context [K'] filled with
-        another context [K''].  In particular, this implies [e1 = fill K''
-        e1_redex] by [fill_inj], i.e., [e1]' contains the base redex.)
+        another context [K''].  In particular, this implies [e1' = fill K''
+        e1_redex] by [fill_inj], i.e., [e1'] contains the base redex.)
 
         This implies there can be only one base redex, see
         [base_redex_unique]. *)
