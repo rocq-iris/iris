@@ -132,7 +132,7 @@ The \langkw{resolve} evaluation context for the leftmost expression (the nested 
 Hence we define $\Lctx_{>}$ for non-empty evaluation contexts.
 For more details on prophecy variables, see \cite{iris:prophecy}.
 
-This lets us define the primitive reduction relation in terms of a ``head step'' reduction; see \figref{fig:heaplang-reduction-pure} and \figref{fig:heaplang-reduction-impure}.
+This lets us define the primitive reduction relation in terms of a ``primitive step'' reduction; see \figref{fig:heaplang-reduction-pure} and \figref{fig:heaplang-reduction-impure}.
 Comparison (both for $\CmpXchg$ and the binary comparison operator) is a bit tricky and uses a helper judgment (\figref{fig:heaplang-valeq}).
 Basically, two values can only be compared if at least one of them is ``compare-safe''.
 Compare-safe values are basic literals (integers, Booleans, locations, unit) as well as $\Inl$ and $\Inr$ of those literals.
@@ -146,7 +146,7 @@ The intention of this is to forbid directly comparing large values such as pairs
   {\fillctx\lctx[\expr_1], \pstate_1 \step[\vec\obs] \fillctx\lctx[\expr_2], \pstate_2, \vec\expr}
 \end{mathpar}
 
-\judgment[``Head'' reduction (pure)]{\expr_1, \pstate_1 \hstep [\vec\obs] \expr_2, \pstate_2, \vec\expr}
+\judgment[``Primitive'' reduction (pure)]{\expr_1, \pstate_1 \hstep [\vec\obs] \expr_2, \pstate_2, \vec\expr}
 \newcommand\alignheader{\kern-30ex}
 \begin{align*}
 &\alignheader\textbf{``Boxing'' reductions} \\
@@ -194,7 +194,7 @@ The $\HLOp$ subscript indicates that this is the HeapLang operator, not the math
 \end{figure}
 
 \begin{figure}
-\judgment[``Head'' reduction (impure)]{\expr_1, \pstate_1 \hstep [\vec\obs] \expr_2, \pstate_2, \vec\expr}
+\judgment[``Primitive'' reduction (impure)]{\expr_1, \pstate_1 \hstep [\vec\obs] \expr_2, \pstate_2, \vec\expr}
 \newcommand\alignheader{\kern-30ex}
 \begin{align*}
 &\alignheader\textbf{Heap reductions} \\
