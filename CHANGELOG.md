@@ -72,6 +72,9 @@ lemma.
     except-0 modality `◇`. (This is an internal change that only affects users
     who built a custom fancy update modality on top of the later-elimination
     update modality.)
+* Strengthen lemma `proph_map_init` to provide the initial ownership of `ps`.
+  (by Zichen Zhang)
+* Change the statement of lemma `proph_map_agree` to be curried. (by Zichen Zhang)
 
 **Changes in `program_logic`:**
 
