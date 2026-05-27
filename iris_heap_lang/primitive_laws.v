@@ -744,7 +744,7 @@ Proof.
      here, since this breaks the WP abstraction. *)
   iIntros (A He) "Hp WPe". rewrite !wp_unfold /wp_pre /= He. simpl in *.
   iIntros (σ1 ns κ κs nt) "(Hσ & Hκ & Hsteps)".
-  iPoseProof (proph_map_agree with "[$Hκ $Hp]") as "[%Hin #_]".
+  iPoseProof (proph_map_agree with "Hκ Hp") as "[%Hin #_]".
   iSpecialize ("WPe" with "Hp").
   destruct κ as [|[p' [w' v']] κ' _] using rev_ind.
   - iMod ("WPe" $! σ1 ns [] κs nt with "[$Hσ $Hκ $Hsteps]") as "[Hs WPe]".

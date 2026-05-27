@@ -33,7 +33,7 @@ Proof.
   iIntros (Hinv).
   iMod (gen_heap_init σ.(heap)) as (?) "[Hh _]".
   iMod (inv_heap_init loc (option val)) as (?) ">Hi".
-  iMod (proph_map_init κs σ.(used_proph_id)) as (?) "Hp".
+  iMod (proph_map_init κs σ.(used_proph_id)) as (?) "[Hp _]".
   iMod (mono_nat_own_alloc) as (γ) "[Hsteps _]".
   iDestruct (Hwp (HeapGS _ _ _ _ _ _ _ _) with "Hi") as "Hwp".
   iModIntro.

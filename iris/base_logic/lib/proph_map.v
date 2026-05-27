@@ -72,11 +72,15 @@ Section list_resolves.
 End list_resolves.
 
 Lemma proph_map_init `{Countable P, !proph_mapGpreS P V Σ} pvs ps :
-  ⊢ |==> ∃ _ : proph_mapGS P V Σ, proph_map_interp pvs ps.
+  ⊢ |==> ∃ _ : proph_mapGS P V Σ, proph_map_interp pvs ps ∗
+    [∗ set] p ∈ ps, proph p (proph_list_resolves pvs p).
 Proof.
-  iMod (ghost_map_alloc_empty) as (γ) "Hh".
-  iModIntro. iExists (ProphMapGS P V _ _ _ _ γ), ∅. iSplit; last by iFrame.
-  iPureIntro. done.
+  pose (R := set_to_map (proph_list_resolves pvs) ps : gmap P (list V)).
+  iMod (ghost_map_alloc R) as (γ) "[Hh Hps]".
+  iModIntro. iExists (ProphMapGS P V _ _ _ _ γ). iFrame "Hh". repeat iSplit.
+  - by iIntros "!%" (p vs [??]%lookup_set_to_map_Some).
+  - by rewrite /R dom_set_to_map.
+  - by rewrite /R big_sepM_set_to_map proph_unseal.
 Qed.
 
 Section proph_map.
@@ -109,7 +113,7 @@ Section proph_map.
     { apply not_elem_of_dom. set_solver. }
     iFrame. iPureIntro. split.
     - apply resolves_insert; first done. set_solver.
-    - rewrite dom_insert. set_solver.
+    - rewrite dom_insert_L. set_solver.
   Qed.
 
   Lemma proph_map_resolve_proph p v pvs ps vs :
@@ -131,13 +135,13 @@ Section proph_map.
           rewrite (Hres q ws HEq).
           simpl. rewrite decide_False; done.
       + assert (p ∈ dom R) by exact: elem_of_dom_2.
-        rewrite dom_insert. set_solver.
+        rewrite dom_insert_L. set_solver.
   Qed.
 
   Lemma proph_map_agree pvs ps p vs :
-    proph_map_interp pvs ps ∗ proph p vs -∗ ⌜p ∈ ps ∧ vs = proph_list_resolves pvs p⌝.
+    proph_map_interp pvs ps -∗ proph p vs -∗ ⌜p ∈ ps ∧ vs = proph_list_resolves pvs p⌝.
   Proof.
-    iIntros "[(%R & [%Hres %Hdom] & H●) Hp]".
+    iIntros "(%R & [%Hres %Hdom] & H●) Hp".
     rewrite /proph_map_interp proph_unseal /proph_def.
     iCombine "H● Hp" gives %Hlookup.
     iPureIntro. split; last by auto.
