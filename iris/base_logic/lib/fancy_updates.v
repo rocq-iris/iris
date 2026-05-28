@@ -389,9 +389,9 @@ Global Instance uPred_bi_fupd_sbi_no_lc `{!invGS_gen HasNoLc Σ} :
   BiFUpdSbi (uPredI (iResUR Σ)).
 Proof.
   split.
-  - iIntros (E E' Pi R) "[H HR]".
-    iApply (fupd_keep (<si_pure> Pi)); iSplit; last by auto.
-    iMod ("H" with "HR") as "#?". by iModIntro.
+  - iIntros (E E' Pi R) "H".
+    iApply (fupd_keep (<si_pure> Pi)); iSplit; last by iDestruct "H" as "[_ H]".
+    iDestruct "H" as "[>#H _]". by iModIntro.
   - iIntros (E Pi) "H".
     iApply (fupd_keep (▷ ◇ <si_pure> Pi)); iSplit; last by auto.
     iApply fupd_finally_later. iNext. iMod "H" as "#?". by iModIntro.

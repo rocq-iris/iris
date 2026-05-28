@@ -622,7 +622,7 @@ Section instances.
     split; rewrite /bi_except_0; unseal.
     - intros E E' P R. split=>/= i.
       rewrite (bi.forall_elim i) bi.pure_True // bi.True_impl.
-      apply fupd_si_pure_keep_l.
+      apply fupd_keep_si_pure'.
     - intros E P. split=>/= i. apply fupd_si_pure_later.
     - intros E A Φ. split=>/= i. apply fupd_si_pure_forall_2.
   Qed.
