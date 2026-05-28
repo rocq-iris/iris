@@ -633,6 +633,9 @@ Section fupd_derived.
     Lemma fupd_plain_mask E E' P `{!Plain P} : (|={E,E'}=> P) ⊢ |={E}=> P.
     Proof. by rewrite {1}(plain P) fupd_plainly_mask. Qed.
 
+    (** This is an alternative version of [fupd_keep_plain] that might look more
+    intuitive, but is more annoying to use: we can eliminate a [fupd] that
+    "consumes" [R] to produce some plain [P] without actually using up [R]. *)
     Lemma fupd_keep_plain_sep {E} E' P `{!Plain P} R :
       (R ={E,E'}=∗ P) -∗ R -∗ |={E}=> P ∗ R.
     Proof.
