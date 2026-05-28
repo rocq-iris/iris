@@ -1,4 +1,4 @@
-From iris.bi Require Export bi.
+From iris.bi Require Export bi updates.
 From iris.proofmode Require Import proofmode.
 From iris.prelude Require Import options.
 
@@ -423,3 +423,57 @@ Module linear. Section linear.
     iApply "Hclose". done.
   Qed.
 End linear. End linear.
+
+(** This example shows that for standard step indexing (i.e. not transfinite),
+the combination of later credits and the [fupd_keep_si_pure'] law in [BiFUpdSbi]
+is unsound. The [fupd_keep_si_pure'] law is used to derive [fupd_keep_plainly],
+which allows `keeping` resources used to establish plain propositions after
+a (non later-eliminating) fancy update. *)
+Module later_credits_plain. Section later_credits_plain.
+  Context PROP `{!Sbi PROP, !BiFUpd PROP}.
+
+  (** Assumptions. *)
+  (** We have a single later credit and the corresponding soundness and
+  later elimination rules. *)
+  Context (lc : PROP).
+  Hypothesis lc_fupd_elim_later : ∀ E P, lc ∗ ▷ P ⊢ |={E}=> P.
+  Hypothesis lc_soundness : ∀ P `{!Plain P} E, (lc ⊢ |={E}=> P) → ⊢ P.
+
+  (** We have the keep rule for plain propositions taken from [BiFUpdSbi]. *)
+  Hypothesis fupd_keep_si_pure' : ∀ {E} E' Pi (R : PROP),
+    (|={E,E'}=> <si_pure> Pi) ∧ (<si_pure> Pi ={E}=∗ R) ⊢ |={E}=> R.
+
+  (** The [fupd_keep_si_pure'] rule lets you keep later credits around later
+  elimination. *)
+  Lemma lc_fupd_elim_later_keep E P `{!Plain P, !Absorbing P} :
+    lc -∗ ▷ P ={E}=∗ lc ∗ P.
+  Proof.
+    iIntros "Hlc HP".
+    iApply (fupd_keep_si_pure' E (<si_emp_valid> P)). iSplit.
+    - iApply lc_fupd_elim_later. iFrame "Hlc".
+      iNext. by rewrite -{1}(plain_plainly P).
+    - iIntros "HP' !>". iFrame "Hlc".
+      by iApply si_pure_si_emp_valid_elim.
+  Qed.
+
+  Lemma laterN_False : ⊢@{PROP} ∃ n, ▷^n False.
+  Proof.
+    iLöb as "IH".
+    iDestruct "IH" as (n) "Hn".
+    by iExists (S n).
+  Qed.
+
+  (* Now we can just apply [lc_fupd_elim_later_keep] [n] times to the
+  result of [laterN_False] (because [▷^n False] is plain) to get [False]. *)
+  Lemma contradiction : False.
+  Proof using All.
+    apply (pure_soundness (PROP:=PROP)).
+    apply (lc_soundness _ ⊤).
+    iIntros "Hlc".
+    iDestruct laterN_False as (n) "-# Hfalse".
+    iDestruct (bi.affinely_elim with "Hfalse") as "Hfalse".
+    iInduction n as [|n IH]; simpl; first by iFrame.
+    iMod (lc_fupd_elim_later_keep with "Hlc Hfalse") as "[Hlc Hfalse]".
+    iApply ("IH" with "Hlc Hfalse").
+  Qed.
+End later_credits_plain. End later_credits_plain.
