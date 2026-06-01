@@ -612,11 +612,11 @@ Section instances.
     + rewrite si_emp_valid_forall. by apply bi.forall_intro.
   Qed.
 
-  Global Instance monPred_bi_bupd_sbi `{BiBUpdSbi PROP, !@BiIndexBottom I bot} :
+  Global Instance monPred_bi_bupd_sbi `{BiBUpdSbi PROP} :
     BiBUpdSbi monPredI.
   Proof. intros P. split=> /= i. unseal. apply bupd_si_pure. Qed.
 
-  Global Instance monPred_bi_fupd_sbi `{BiFUpdSbi PROP, !@BiIndexBottom I bot} :
+  Global Instance monPred_bi_fupd_sbi `{BiFUpdSbi PROP} :
     BiFUpdSbi monPredI.
   Proof.
     split; rewrite /bi_except_0; unseal.
