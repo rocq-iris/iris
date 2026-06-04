@@ -29,7 +29,7 @@ tags: [
 depends: [
   "rocq-core" { (>= "9.0" & < "9.3~") | (= "dev") }
   "rocq-stdlib" { (>= "9.0") | (= "dev") }
-  "rocq-stdpp" { (= "dev.2026-05-16.0.2301f95c") | (= "dev") }
+  "rocq-stdpp" { (= "dev.2026-06-03.1.dafbf9e8") | (= "dev") }
 ]
 conflicts: [
   "coq-iris"
