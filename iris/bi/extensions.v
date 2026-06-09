@@ -36,6 +36,14 @@ Class BiPersistentlyForall (PROP : bi) :=
   persistently_forall_2 : ∀ {A} (Ψ : A → PROP), (∀ a, <pers> (Ψ a)) ⊢ <pers> (∀ a, Ψ a).
 Global Hint Mode BiPersistentlyForall ! : typeclass_instances.
 
+(** The class [BiPersistentlyExist] states that existential quantification
+commutes with the persistently modality. The reverse direction of the entailment
+described by this type class is derivable, so it is not included. *)
+Class BiPersistentlyExist (PROP : bi) :=
+  persistently_exist_1 : ∀ {A} (Ψ : A → PROP),
+    <pers> (∃ a, Ψ a) ⊢ ∃ a, <pers> Ψ a.
+Global Hint Mode BiPersistentlyExist ! : typeclass_instances.
+
 (** The class [BiPureForall] states that universal quantification commutes with
 the embedding of pure propositions. The reverse direction of the entailment
 described by this type class is derivable, so it is not included.

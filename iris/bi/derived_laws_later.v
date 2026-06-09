@@ -316,15 +316,24 @@ Lemma except_0_laterN n P : ◇ ▷^n P ⊢ ▷^n ◇ P.
 Proof. by destruct n as [|n]; rewrite //= ?except_0_later -except_0_intro. Qed.
 Lemma except_0_into_later P : ◇ P ⊢ ▷ P.
 Proof. by rewrite -except_0_later -later_intro. Qed.
-Lemma except_0_persistently P : ◇ <pers> P ⊣⊢ <pers> ◇ P.
+Lemma except_0_persistently_1 P : ◇ <pers> P ⊢ <pers> ◇ P.
+Proof.
+  by rewrite /bi_except_0 -persistently_or_2 -later_persistently persistently_pure.
+Qed.
+Lemma except_0_persistently `{!BiPersistentlyExist PROP} P :
+  ◇ <pers> P ⊣⊢ <pers> ◇ P.
 Proof.
   by rewrite /bi_except_0 persistently_or -later_persistently persistently_pure.
 Qed.
 Lemma except_0_affinely_2 P : <affine> ◇ P ⊢ ◇ <affine> P.
 Proof. rewrite /bi_affinely except_0_and. auto using except_0_intro. Qed.
-Lemma except_0_intuitionistically_2 P : □ ◇ P ⊢ ◇ □ P.
-Proof. by rewrite /bi_intuitionistically -except_0_persistently except_0_affinely_2. Qed.
-Lemma except_0_intuitionistically_if_2 p P : □?p ◇ P ⊢ ◇ □?p P.
+Lemma except_0_intuitionistically_2 `{!BiPersistentlyExist PROP} P :
+  □ ◇ P ⊢ ◇ □ P.
+Proof.
+  by rewrite /bi_intuitionistically -except_0_persistently except_0_affinely_2.
+Qed.
+Lemma except_0_intuitionistically_if_2 `{!BiPersistentlyExist PROP} p P :
+  □?p ◇ P ⊢ ◇ □?p P.
 Proof. destruct p; simpl; auto using except_0_intuitionistically_2. Qed.
 Lemma except_0_absorbingly P : ◇ <absorb> P ⊣⊢ <absorb> ◇ P.
 Proof. by rewrite /bi_absorbingly except_0_sep except_0_True. Qed.
@@ -408,7 +417,8 @@ Proof.
   - rewrite /bi_except_0; auto.
   - apply exist_elim=> x. rewrite -(exist_intro x); auto.
 Qed.
-Global Instance persistently_timeless P : Timeless P → Timeless (<pers> P).
+Global Instance persistently_timeless `{!BiPersistentlyExist PROP} P :
+  Timeless P → Timeless (<pers> P).
 Proof.
   intros. rewrite /Timeless /bi_except_0 later_persistently_1.
   by rewrite (timeless P) /bi_except_0 persistently_or {1}persistently_elim.
@@ -419,8 +429,7 @@ Global Instance affinely_timeless P :
 Proof. rewrite /bi_affinely; apply _. Qed.
 Global Instance absorbingly_timeless P : Timeless P → Timeless (<absorb> P).
 Proof. rewrite /bi_absorbingly; apply _. Qed.
-
-Global Instance intuitionistically_timeless P :
+Global Instance intuitionistically_timeless `{!BiPersistentlyExist PROP} P :
   Timeless (PROP:=PROP) emp → Timeless P → Timeless (□ P).
 Proof. rewrite /bi_intuitionistically; apply _. Qed.
 

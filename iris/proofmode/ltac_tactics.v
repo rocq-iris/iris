@@ -1245,8 +1245,9 @@ Tactic Notation "iRight" :=
     |(* subgoal *)].
 
 Tactic Notation "iOrDestruct" constr(H) "as" constr(H1) constr(H2) :=
-  notypeclasses refine (tac_or_destruct _ H _ H1 H2 _ _ _ _ _ _ _); (* (i:=H) (j1:=H1) (j2:=H2) *)
-    [pm_reflexivity ||
+  notypeclasses refine (tac_or_destruct _ H _ _ H1 H2 _ _ _ _ _ _ _ _); (* (i:=H) (j1:=H1) (j2:=H2) *)
+    [tc_solve
+    |pm_reflexivity ||
      let H := pretty_ident H in
      fail "iOrDestruct:" H "not found"
     |tc_solve ||
@@ -1378,8 +1379,9 @@ Ltac _iExistDestructFail P := first
 
 Tactic Notation "_iExistDestruct" constr(H)
     "as" simple_intropattern(x) constr(Hx) :=
-  notypeclasses refine (tac_exist_destruct _ H _ Hx _ _ _ _ _ _ _); (* (i:=H) (j:=Hx) *)
-    [pm_reflexivity ||
+  notypeclasses refine (tac_exist_destruct _ H _ _ Hx _ _ _ _ _ _ _ _); (* (i:=H) (j:=Hx) *)
+    [tc_solve
+    |pm_reflexivity ||
      let H := pretty_ident H in
      fail "iExistDestruct:" H "not found"
     |tc_solve ||

@@ -80,8 +80,8 @@ Qed.
 
 Lemma uPred_bi_persistently_mixin (M : ucmra) :
   BiPersistentlyMixin
-    uPred_entails uPred_emp uPred_and
-    (@uPred_exist M) uPred_sep uPred_persistently.
+    (@uPred_entails M) uPred_emp uPred_and
+    uPred_sep uPred_persistently.
 Proof.
   split.
   - exact: persistently_ne.
@@ -102,7 +102,6 @@ Proof.
       apply persistently_mono. apply and_intro.
       * etrans; first apply (forall_elim true). done.
       * etrans; first apply (forall_elim false). done.
-  - exact: @persistently_exist_1.
   - (* <pers> P ∗ Q ⊢ <pers> P (ADMISSIBLE) *)
     intros. etrans; first exact: sep_comm'.
     etrans; last exact: True_sep_2.
@@ -182,6 +181,9 @@ Global Hint Immediate uPred_affine : core.
 
 Global Instance uPred_persistently_forall M : BiPersistentlyForall (uPredI M).
 Proof. exact: @persistently_forall_2. Qed.
+
+Global Instance uPred_persistently_exist M : BiPersistentlyExist (uPredI M).
+Proof. exact: @persistently_exist_1. Qed.
 
 Global Instance uPred_pure_forall M : BiPureForall (uPredI M).
 Proof.

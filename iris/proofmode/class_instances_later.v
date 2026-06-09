@@ -102,7 +102,7 @@ Global Instance maybe_combine_sep_gives_except_0 Q1 Q2 P :
   CombineSepGives Q1 Q2 P →
   CombineSepGives (◇ Q1) (◇ Q2) (◇ P).
 Proof.
-  by rewrite /CombineSepGives -except_0_sep -except_0_persistently => ->.
+  by rewrite /CombineSepGives -except_0_sep -except_0_persistently_1 => ->.
 Qed.
 
 (** IntoAnd *)
@@ -120,7 +120,7 @@ Proof.
   by rewrite laterN_intuitionistically_if_2 HP
              intuitionistically_if_elim laterN_and.
 Qed.
-Global Instance into_and_except_0 p P Q1 Q2 :
+Global Instance into_and_except_0 `{!BiPersistentlyExist PROP} p P Q1 Q2 :
   IntoAnd p P Q1 Q2 → IntoAnd p (◇ P) (◇ Q1) (◇ Q2).
 Proof.
   rewrite /IntoAnd=> HP. apply intuitionistically_if_intro'.
@@ -253,22 +253,27 @@ Proof. rewrite /IntoExcept0. destruct p; auto using except_0_intro. Qed.
 Global Instance into_except_0_affinely P Q :
   IntoExcept0 P Q → IntoExcept0 (<affine> P) (<affine> Q).
 Proof. rewrite /IntoExcept0=> ->. by rewrite except_0_affinely_2. Qed.
-Global Instance into_except_0_intuitionistically P Q :
+Global Instance into_except_0_intuitionistically `{!BiPersistentlyExist PROP} P Q :
   IntoExcept0 P Q → IntoExcept0 (□ P) (□ Q).
 Proof. rewrite /IntoExcept0=> ->. by rewrite except_0_intuitionistically_2. Qed.
 Global Instance into_except_0_absorbingly P Q :
   IntoExcept0 P Q → IntoExcept0 (<absorb> P) (<absorb> Q).
 Proof. rewrite /IntoExcept0=> ->. by rewrite except_0_absorbingly. Qed.
-Global Instance into_except_0_persistently P Q :
+Global Instance into_except_0_persistently `{!BiPersistentlyExist PROP} P Q :
   IntoExcept0 P Q → IntoExcept0 (<pers> P) (<pers> Q).
 Proof. rewrite /IntoExcept0=> ->. by rewrite except_0_persistently. Qed.
 
 (** ElimModal *)
-Global Instance elim_modal_timeless p P P' Q :
-  IntoExcept0 P P' → IsExcept0 Q → ElimModal True p p P P' Q Q.
+Global Instance elim_modal_timeless p p' P P' Q :
+  TCIf (BiPersistentlyExist PROP) (TCEq p p') (TCEq p' false) →
+  IntoExcept0 P P' →
+  IsExcept0 Q →
+  ElimModal True p p' P P' Q Q.
 Proof.
-  intros. rewrite /ElimModal (except_0_intro (_ -∗ _)) (into_except_0 P).
-  by rewrite except_0_intuitionistically_if_2 -except_0_sep wand_elim_r.
+  intros Hp ?? _. rewrite (except_0_intro (_ -∗ _)) (into_except_0 P).
+  destruct Hp as [? ->%TCEq_eq| ->%TCEq_eq]; simpl.
+  - by rewrite except_0_intuitionistically_if_2 -except_0_sep wand_elim_r.
+  - by rewrite intuitionistically_if_elim -except_0_sep wand_elim_r.
 Qed.
 
 (** AddModal *)

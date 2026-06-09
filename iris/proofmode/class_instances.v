@@ -901,14 +901,14 @@ Global Instance from_or_affinely P Q1 Q2 :
 Proof. rewrite /FromOr=> <-. by rewrite affinely_or. Qed.
 Global Instance from_or_intuitionistically P Q1 Q2 :
   FromOr P Q1 Q2 → FromOr (□ P) (□ Q1) (□ Q2).
-Proof. rewrite /FromOr=> <-. by rewrite intuitionistically_or. Qed.
+Proof. rewrite /FromOr=> <-. by rewrite intuitionistically_or_2. Qed.
 Global Instance from_or_absorbingly P Q1 Q2 :
   FromOr P Q1 Q2 → FromOr (<absorb> P) (<absorb> Q1) (<absorb> Q2).
 Proof. rewrite /FromOr=> <-. by rewrite absorbingly_or. Qed.
 Global Instance from_or_persistently P Q1 Q2 :
   FromOr P Q1 Q2 →
   FromOr (<pers> P) (<pers> Q1) (<pers> Q2).
-Proof. rewrite /FromOr=> <-. by rewrite persistently_or. Qed.
+Proof. rewrite /FromOr=> <-. by rewrite persistently_or_2. Qed.
 
 (** IntoOr *)
 Global Instance into_or_or P Q : IntoOr (P ∨ Q) P Q.
@@ -918,13 +918,13 @@ Proof. by rewrite /IntoOr pure_or. Qed.
 Global Instance into_or_affinely P Q1 Q2 :
   IntoOr P Q1 Q2 → IntoOr (<affine> P) (<affine> Q1) (<affine> Q2).
 Proof. rewrite /IntoOr=>->. by rewrite affinely_or. Qed.
-Global Instance into_or_intuitionistically P Q1 Q2 :
+Global Instance into_or_intuitionistically `{!BiPersistentlyExist PROP} P Q1 Q2 :
   IntoOr P Q1 Q2 → IntoOr (□ P) (□ Q1) (□ Q2).
 Proof. rewrite /IntoOr=>->. by rewrite intuitionistically_or. Qed.
 Global Instance into_or_absorbingly P Q1 Q2 :
   IntoOr P Q1 Q2 → IntoOr (<absorb> P) (<absorb> Q1) (<absorb> Q2).
 Proof. rewrite /IntoOr=>->. by rewrite absorbingly_or. Qed.
-Global Instance into_or_persistently P Q1 Q2 :
+Global Instance into_or_persistently `{!BiPersistentlyExist PROP} P Q1 Q2 :
   IntoOr P Q1 Q2 →
   IntoOr (<pers> P) (<pers> Q1) (<pers> Q2).
 Proof. rewrite /IntoOr=>->. by rewrite persistently_or. Qed.
@@ -941,13 +941,13 @@ Global Instance from_exist_affinely {A} P (Φ : A → PROP) :
 Proof. rewrite /FromExist=> <-. by rewrite affinely_exist. Qed.
 Global Instance from_exist_intuitionistically {A} P (Φ : A → PROP) :
   FromExist P Φ → FromExist (□ P) (λ a, □ (Φ a))%I.
-Proof. rewrite /FromExist=> <-. by rewrite intuitionistically_exist. Qed.
+Proof. rewrite /FromExist=> <-. by rewrite intuitionistically_exist_2. Qed.
 Global Instance from_exist_absorbingly {A} P (Φ : A → PROP) :
   FromExist P Φ → FromExist (<absorb> P) (λ a, <absorb> (Φ a))%I.
 Proof. rewrite /FromExist=> <-. by rewrite absorbingly_exist. Qed.
 Global Instance from_exist_persistently {A} P (Φ : A → PROP) :
   FromExist P Φ → FromExist (<pers> P) (λ a, <pers> (Φ a))%I.
-Proof. rewrite /FromExist=> <-. by rewrite persistently_exist. Qed.
+Proof. rewrite /FromExist=> <-. by rewrite persistently_exist_2. Qed.
 
 (** IntoExist *)
 
@@ -968,7 +968,8 @@ Proof. by rewrite /IntoExist bi_texist_exist. Qed.
 Global Instance into_exist_affinely {A} P (Φ : A → PROP) name :
   IntoExist P Φ name → IntoExist (<affine> P) (λ a, <affine> (Φ a))%I name.
 Proof. rewrite /IntoExist=> HP. by rewrite HP affinely_exist. Qed.
-Global Instance into_exist_intuitionistically {A} P (Φ : A → PROP) name :
+Global Instance into_exist_intuitionistically `{!BiPersistentlyExist PROP}
+    {A} P (Φ : A → PROP) name :
   IntoExist P Φ name → IntoExist (□ P) (λ a, □ (Φ a))%I name.
 Proof. rewrite /IntoExist=> HP. by rewrite HP intuitionistically_exist. Qed.
 (* This instance is generalized to let us use [iDestruct as (P) "..."] and
@@ -1003,7 +1004,8 @@ Qed.
 Global Instance into_exist_absorbingly {A} P (Φ : A → PROP) name :
   IntoExist P Φ name → IntoExist (<absorb> P) (λ a, <absorb> (Φ a))%I name.
 Proof. rewrite /IntoExist=> HP. by rewrite HP absorbingly_exist. Qed.
-Global Instance into_exist_persistently {A} P (Φ : A → PROP) name :
+Global Instance into_exist_persistently `{!BiPersistentlyExist PROP}
+    {A} P (Φ : A → PROP) name :
   IntoExist P Φ name → IntoExist (<pers> P) (λ a, <pers> (Φ a))%I name.
 Proof. rewrite /IntoExist=> HP. by rewrite HP persistently_exist. Qed.
 

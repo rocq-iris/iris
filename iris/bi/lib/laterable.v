@@ -1,5 +1,6 @@
 From iris.bi Require Export bi.
 From iris.proofmode Require Import proofmode.
+Set Default Proof Using "Type*".
 
 (** The class of laterable assertions *)
 Class Laterable {PROP : bi} (P : PROP) := laterable :
@@ -24,7 +25,7 @@ Global Arguments into_laterable_result_laterable {_} P%_I Q%_I {_}.
 Global Hint Mode IntoLaterable + ! - : typeclass_instances.
 
 Section instances.
-  Context {PROP : bi}.
+  Context `{!BiPersistentlyExist PROP}.
   Implicit Types P : PROP.
   Implicit Types Ps : list PROP.
 
@@ -40,7 +41,7 @@ Section instances.
   Global Instance timeless_laterable P :
     Timeless P → Laterable P.
   Proof.
-    rewrite /Laterable. iIntros (?) "HP". iExists P%I. iFrame.
+    rewrite /Laterable. iIntros (?) "HP". iExists P. iFrame.
     iSplitR; first by iNext. iIntros "!> >HP !>". done.
   Qed.
 

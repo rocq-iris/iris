@@ -942,15 +942,20 @@ Lemma persistently_forall `{!BiPersistentlyForall PROP} {A} (Ψ : A → PROP) :
 Proof.
   apply (anti_symm _); auto using persistently_forall_1, persistently_forall_2.
 Qed.
-Lemma persistently_exist {A} (Ψ : A → PROP) :
+Lemma persistently_exist_2 {A} (Ψ : A → PROP) :
+  (∃ a, <pers> Ψ a) ⊢ <pers> (∃ a, Ψ a).
+Proof. apply exist_elim=> x. by rewrite (exist_intro x). Qed.
+Lemma persistently_exist `{!BiPersistentlyExist PROP} {A} (Ψ : A → PROP) :
   <pers> (∃ a, Ψ a) ⊣⊢ ∃ a, <pers> (Ψ a).
 Proof.
-  apply (anti_symm _); first by auto using persistently_exist_1.
-  apply exist_elim=> x. by rewrite (exist_intro x).
+  apply (anti_symm _); [apply persistently_exist_1|apply persistently_exist_2].
 Qed.
 Lemma persistently_and P Q : <pers> (P ∧ Q) ⊣⊢ <pers> P ∧ <pers> Q.
 Proof. apply (anti_symm _); by auto using persistently_and_2. Qed.
-Lemma persistently_or P Q : <pers> (P ∨ Q) ⊣⊢ <pers> P ∨ <pers> Q.
+Lemma persistently_or_2 P Q : <pers> P ∨ <pers> Q ⊢ <pers> (P ∨ Q).
+Proof. rewrite !or_alt -persistently_exist_2. by f_equiv=> -[]. Qed.
+Lemma persistently_or `{!BiPersistentlyExist PROP} P Q :
+  <pers> (P ∨ Q) ⊣⊢ <pers> P ∨ <pers> Q.
 Proof. rewrite !or_alt persistently_exist. by apply exist_proper=> -[]. Qed.
 Lemma persistently_impl P Q : <pers> (P → Q) ⊢ <pers> P → <pers> Q.
 Proof.
@@ -1162,7 +1167,7 @@ Global Instance and_persistent P Q :
 Proof. intros. by rewrite /Persistent persistently_and -!persistent. Qed.
 Global Instance or_persistent P Q :
   Persistent P → Persistent Q → Persistent (P ∨ Q).
-Proof. intros. by rewrite /Persistent persistently_or -!persistent. Qed.
+Proof. intros. by rewrite /Persistent -persistently_or_2 -!persistent. Qed.
 Global Instance forall_persistent `{!BiPersistentlyForall PROP} {A} (Ψ : A → PROP) :
   (∀ x, Persistent (Ψ x)) → Persistent (∀ x, Ψ x).
 Proof.
@@ -1172,7 +1177,7 @@ Qed.
 Global Instance exist_persistent {A} (Ψ : A → PROP) :
   (∀ x, Persistent (Ψ x)) → Persistent (∃ x, Ψ x).
 Proof.
-  intros. rewrite /Persistent persistently_exist.
+  intros. rewrite /Persistent -persistently_exist_2.
   apply exist_mono=> x. by rewrite -!persistent.
 Qed.
 
@@ -1237,9 +1242,15 @@ Lemma intuitionistically_forall {A} (Φ : A → PROP) : □ (∀ x, Φ x) ⊢ �
 Proof.
   by rewrite /bi_intuitionistically persistently_forall_1 affinely_forall.
 Qed.
-Lemma intuitionistically_or P Q : □ (P ∨ Q) ⊣⊢ □ P ∨ □ Q.
+Lemma intuitionistically_or_2 P Q : □ P ∨ □ Q ⊢ □ (P ∨ Q).
+Proof. by rewrite /bi_intuitionistically -persistently_or_2 affinely_or. Qed.
+Lemma intuitionistically_or `{!BiPersistentlyExist PROP} P Q :
+  □ (P ∨ Q) ⊣⊢ □ P ∨ □ Q.
 Proof. by rewrite /bi_intuitionistically persistently_or affinely_or. Qed.
-Lemma intuitionistically_exist {A} (Φ : A → PROP) : □ (∃ x, Φ x) ⊣⊢ ∃ x, □ Φ x.
+Lemma intuitionistically_exist_2 {A} (Φ : A → PROP) : (∃ x, □ Φ x) ⊢ □ (∃ x, Φ x).
+Proof. by rewrite /bi_intuitionistically -persistently_exist_2 affinely_exist. Qed.
+Lemma intuitionistically_exist `{!BiPersistentlyExist PROP} {A} (Φ : A → PROP) :
+  □ (∃ x, Φ x) ⊣⊢ ∃ x, □ Φ x.
 Proof. by rewrite /bi_intuitionistically persistently_exist affinely_exist. Qed.
 Lemma intuitionistically_sep_2 P Q : □ P ∗ □ Q ⊢ □ (P ∗ Q).
 Proof. by rewrite /bi_intuitionistically affinely_sep_2 persistently_sep_2. Qed.
@@ -1480,9 +1491,15 @@ Lemma persistently_if_pure p φ : <pers>?p ⌜φ⌝ ⊣⊢ ⌜φ⌝.
 Proof. destruct p; simpl; auto using persistently_pure. Qed.
 Lemma persistently_if_and p P Q : <pers>?p (P ∧ Q) ⊣⊢ <pers>?p P ∧ <pers>?p Q.
 Proof. destruct p; simpl; auto using persistently_and. Qed.
-Lemma persistently_if_or p P Q : <pers>?p (P ∨ Q) ⊣⊢ <pers>?p P ∨ <pers>?p Q.
+Lemma persistently_if_or_2 p P Q : <pers>?p P ∨ <pers>?p Q ⊢ <pers>?p (P ∨ Q).
+Proof. destruct p; simpl; auto using persistently_or_2. Qed.
+Lemma persistently_if_or `{!BiPersistentlyExist PROP} p P Q :
+  <pers>?p (P ∨ Q) ⊣⊢ <pers>?p P ∨ <pers>?p Q.
 Proof. destruct p; simpl; auto using persistently_or. Qed.
-Lemma persistently_if_exist {A} p (Ψ : A → PROP) :
+Lemma persistently_if_exist_2 {A} p (Ψ : A → PROP) :
+  (∃ a, <pers>?p Ψ a) ⊢ <pers>?p ∃ a, Ψ a.
+Proof. destruct p; simpl; auto using persistently_exist_2. Qed.
+Lemma persistently_if_exist `{!BiPersistentlyExist PROP} {A} p (Ψ : A → PROP) :
   (<pers>?p (∃ a, Ψ a)) ⊣⊢ ∃ a, <pers>?p (Ψ a).
 Proof. destruct p; simpl; auto using persistently_exist. Qed.
 Lemma persistently_if_sep_2 p P Q : <pers>?p P ∗ <pers>?p Q ⊢ <pers>?p (P ∗ Q).
@@ -1530,9 +1547,16 @@ Lemma intuitionistically_if_False p : □?p False ⊣⊢ False.
 Proof. destruct p; simpl; auto using intuitionistically_False. Qed.
 Lemma intuitionistically_if_and p P Q : □?p (P ∧ Q) ⊣⊢ □?p P ∧ □?p Q.
 Proof. destruct p; simpl; auto using intuitionistically_and. Qed.
-Lemma intuitionistically_if_or p P Q : □?p (P ∨ Q) ⊣⊢ □?p P ∨ □?p Q.
+Lemma intuitionistically_if_or_2 p P Q : □?p P ∨ □?p Q ⊢ □?p (P ∨ Q).
+Proof. destruct p; simpl; auto using intuitionistically_or_2. Qed.
+Lemma intuitionistically_if_or `{!BiPersistentlyExist PROP} p P Q :
+  □?p (P ∨ Q) ⊣⊢ □?p P ∨ □?p Q.
 Proof. destruct p; simpl; auto using intuitionistically_or. Qed.
-Lemma intuitionistically_if_exist {A} p (Ψ : A → PROP) :
+Lemma intuitionistically_if_exist_2 {A} p (Ψ : A → PROP) :
+  (∃ a, □?p Ψ a) ⊢ □?p ∃ a, Ψ a.
+Proof. destruct p; simpl; auto using intuitionistically_exist_2. Qed.
+Lemma intuitionistically_if_exist `{!BiPersistentlyExist PROP}
+    {A} p (Ψ : A → PROP) :
   (□?p ∃ a, Ψ a) ⊣⊢ ∃ a, □?p Ψ a.
 Proof. destruct p; simpl; auto using intuitionistically_exist. Qed.
 Lemma intuitionistically_if_sep_2 p P Q : □?p P ∗ □?p Q ⊢ □?p (P ∗ Q).
@@ -1691,7 +1715,15 @@ Proof.
   - apply persistently_pure.
 Qed.
 
-Global Instance bi_persistently_or_homomorphism :
+Global Instance bi_persistently_or_homomorphism_2 :
+  MonoidHomomorphism bi_or bi_or (flip (⊢)) (@bi_persistently PROP).
+Proof.
+  split; [split|]; try apply _.
+  - apply persistently_or_2.
+  - by rewrite /= persistently_pure.
+Qed.
+
+Global Instance bi_persistently_or_homomorphism `{!BiPersistentlyExist PROP} :
   MonoidHomomorphism bi_or bi_or (≡) (@bi_persistently PROP).
 Proof.
   split; [split|]; try apply _.

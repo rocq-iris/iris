@@ -98,7 +98,7 @@ Section bi_mixin.
   the persistence modality has a non-trivial definition (involving the [core] of
   the camera). It is not clear whether a trivial definition exists: while
   [<pers> P := False] comes close, it does not satisfy [later_persistently_1].
-  
+
   However, for some simpler discrete BIs the persistence modality
   can be defined as:
 
@@ -109,10 +109,6 @@ Section bi_mixin.
   The nesting of the entailment below the pure embedding ⌜ ⌝ only works for
   discrete BIs: Non-expansiveness of [<pers>] relies on [dist] ignoring the
   step-index.
-
-  To prove the rule [<pers> (∃ a, Ψ a) ⊢ ∃ a, <pers> Ψ a] the BI furthermore
-  needs to satisfy the "existential property": [emp ⊢ ∃ x, Φ x] implies
-  [∃ x, emp ⊢ Φ x].
 
   This construction is formalized by the smart constructor
   [bi_persistently_mixin_discrete] for [BiPersistentlyMixin]. See
@@ -140,8 +136,6 @@ Section bi_mixin.
     other laws. *)
     bi_mixin_persistently_and_2 (P Q : PROP) :
       (<pers> P) ∧ (<pers> Q) ⊢ <pers> (P ∧ Q);
-    bi_mixin_persistently_exist_1 {A} (Ψ : A → PROP) :
-      <pers> (∃ a, Ψ a) ⊢ ∃ a, <pers> (Ψ a);
 
     (* In the ordered RA model: [core x ≼ core (x ⋅ y)]. *)
     bi_mixin_persistently_absorbing P Q : <pers> P ∗ Q ⊢ <pers> P;
@@ -151,12 +145,11 @@ Section bi_mixin.
 
   Lemma bi_persistently_mixin_discrete :
     (∀ n (P Q : PROP), P ≡{n}≡ Q → P ≡ Q) →
-    (∀ {A} (Φ : A → PROP), (emp ⊢ ∃ x, Φ x) → ∃ x, emp ⊢ Φ x) →
     (∀ P : PROP, (<pers> P)%I = ⌜ emp ⊢ P ⌝%I) →
     BiMixin →
     BiPersistentlyMixin.
   Proof.
-    intros Hdiscrete Hex Hpers Hbi. pose proof (bi_mixin_entails_po Hbi).
+    intros Hdiscrete Hpers Hbi. pose proof (bi_mixin_entails_po Hbi).
     split.
     - (* [NonExpansive bi_persistently] *)
       intros n P Q [HPQ HQP]%Hdiscrete%(bi_mixin_equiv_entails Hbi).
@@ -176,10 +169,6 @@ Section bi_mixin.
       etrans; [apply (bi_mixin_and_elim_r Hbi)|].
       apply (bi_mixin_pure_elim' Hbi)=> ?.
       apply (bi_mixin_pure_intro Hbi). by apply (bi_mixin_and_intro Hbi).
-    - (* [<pers> (∃ a, Ψ a) ⊢ ∃ a, <pers> Ψ a] *)
-      intros A Φ. rewrite !Hpers. apply (bi_mixin_pure_elim' Hbi)=> /Hex [x ?].
-      etrans; [|apply (bi_mixin_exist_intro Hbi x)]; simpl.
-      rewrite Hpers. by apply (bi_mixin_pure_intro Hbi).
     - (* [<pers> P ∗ Q ⊢ <pers> P] *)
       intros P Q. rewrite !Hpers.
       apply (bi_mixin_wand_elim_l' Hbi). apply (bi_mixin_pure_elim' Hbi)=> ?.
@@ -289,7 +278,7 @@ Structure bi := Bi {
   bi_bi_mixin : BiMixin bi_entails bi_emp bi_pure bi_and bi_or bi_impl bi_forall
                         bi_exist bi_sep bi_wand;
   bi_bi_persistently_mixin :
-    BiPersistentlyMixin bi_entails bi_emp bi_and bi_exist bi_sep bi_persistently;
+    BiPersistentlyMixin bi_entails bi_emp bi_and bi_sep bi_persistently;
   bi_bi_later_mixin : BiLaterMixin bi_entails bi_pure bi_or bi_impl
                                    bi_forall bi_exist bi_sep bi_persistently bi_later;
 }.
@@ -486,9 +475,6 @@ Proof. eapply bi_mixin_persistently_emp_2, bi_bi_persistently_mixin. Qed.
 Lemma persistently_and_2 (P Q : PROP) :
   ((<pers> P) ∧ (<pers> Q)) ⊢ <pers> (P ∧ Q).
 Proof. eapply bi_mixin_persistently_and_2, bi_bi_persistently_mixin. Qed.
-Lemma persistently_exist_1 {A} (Ψ : A → PROP) :
-  <pers> (∃ a, Ψ a) ⊢ ∃ a, <pers> (Ψ a).
-Proof. eapply bi_mixin_persistently_exist_1, bi_bi_persistently_mixin. Qed.
 
 Lemma persistently_absorbing P Q : <pers> P ∗ Q ⊢ <pers> P.
 Proof.

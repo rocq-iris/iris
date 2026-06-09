@@ -31,9 +31,9 @@ Lemma demo_0 `{!BiPersistentlyForall PROP} P Q :
 Proof.
   iIntros "H #H2". Show. iDestruct "H" as "###H".
   (* should remove the disjunction "H" *)
-  iDestruct "H" as "[#?|#?]"; last by iLeft. Show.
+  iDestruct "H" as "[?|?]"; last by iLeft. Show.
   (* should keep the disjunction "H" because it is instantiated *)
-  iDestruct ("H2" $! 10) as "[%|%]"; done.
+  iDestruct ("H2" $! 10) as %[?|?]; done.
 Qed.
 
 Lemma demo_2 P1 P2 P3 P4 Q (P5 : nat → PROP) `{!Affine P4, !Absorbing P2} :
@@ -225,7 +225,7 @@ Check "test_iDestruct_exists_intuitionistic".
 Lemma test_iDestruct_exists_intuitionistic P (Φ: nat → PROP) :
   □ (∃ y, Φ y ∧ P) -∗ P.
 Proof.
-  iDestruct 1 as (?) "#H". Show.
+  iDestruct 1 as "#[% H]". Show.
   iDestruct "H" as "[_ $]".
 Qed.
 
@@ -1120,7 +1120,7 @@ Lemma test_iDestruct_persistent P (Φ : nat → PROP) `{!∀ x, Persistent (Φ x
   □ (P -∗ ∃ x, Φ x) -∗
   P -∗ ∃ x, Φ x ∗ P.
 Proof.
-  iIntros "#H HP". iDestruct ("H" with "HP") as (x) "#H2". eauto with iFrame.
+  iIntros "#H HP". iDestruct ("H" with "HP") as "#[%x H2]". eauto with iFrame.
 Qed.
 
 Lemma test_iLöb `{!BiLöb PROP} P : ⊢ ∃ n, ▷^n P.
@@ -1827,7 +1827,8 @@ Proof.
   iIntros "[P _]". done.
 Qed.
 
-Lemma test_iModIntro_make_laterable `{!BiAffine PROP} (P Q : PROP) :
+Lemma test_iModIntro_make_laterable
+    `{!BiPersistentlyExist PROP, !BiAffine PROP} (P Q : PROP) :
   Laterable Q →
   P -∗ Q -∗ make_laterable (▷ P ∗ Q).
 Proof.
@@ -2486,7 +2487,7 @@ Qed.
 Lemma test_iDestruct_select4 φ :
   □ (∃ x, φ x) -∗ □ (∃ x, φ x).
 Proof.
-  iIntros "#?".
+  iIntros "#? !>".
   iDestruct select (∃ _, _)%I as (n) "H".
   by iExists n.
 Qed.
