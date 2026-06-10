@@ -265,6 +265,8 @@ Proof. rewrite /IntoExcept0=> ->. by rewrite except_0_persistently. Qed.
 
 (** ElimModal *)
 Global Instance elim_modal_timeless p p' P P' Q :
+  (* We can keep the result in the persistent context only if the persistence
+  modality commutes with [∃]. Otherwise, we move it to the spatial context. *)
   TCIf (BiPersistentlyExist PROP) (TCEq p p') (TCEq p' false) →
   IntoExcept0 P P' →
   IsExcept0 Q →

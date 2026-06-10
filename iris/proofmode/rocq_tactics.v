@@ -858,6 +858,8 @@ Proof.
 Qed.
 
 Lemma tac_or_destruct Δ i p q j1 j2 P P1 P2 Q :
+  (* We can keep the result in the persistent context only if the persistence
+  modality commutes with [∃]. Otherwise, we move it to the spatial context. *)
   TCIf (BiPersistentlyExist PROP) (TCEq q true) (TCEq q false) →
   envs_lookup i Δ = Some (p, P) → IntoOr P P1 P2 →
   match envs_replace i p (q &&& p) (Esnoc Enil j1 P1) Δ,
@@ -917,6 +919,8 @@ Proof.
 Qed.
 
 Lemma tac_exist_destruct {A} Δ i p q j P (Φ : A → PROP) (name: ident_name) Q :
+  (* We can keep the result in the persistent context only if the persistence
+  modality commutes with [∃]. Otherwise, we move it to the spatial context. *)
   TCIf (BiPersistentlyExist PROP) (TCEq q true) (TCEq q false) →
   envs_lookup i Δ = Some (p, P) →
   IntoExist P Φ name →

@@ -250,6 +250,10 @@ Qed.
 
 Global Instance heapProp_persistently_exist : BiPersistentlyExist heapPropI.
 Proof.
+  (* By definition [<pers> P := ⌜ True ⊢ P ⌝], we implicitly prove the
+  "existential property" [(True ⊢ ∃ x, Φ x) → (∃ x, True ⊢ Φ x)]. For an affine
+  BI the proof relies on there being a smallest resource/the unit (here the
+  empty heap [∅]). *)
   intros A Φ. rewrite /bi_exist /bi_persistently /=.
   unseal; split=> σ [] /(_ ∅ I) [x HΦ]. exists x.
   split=> σ' _. by eapply heapProp_closed, map_empty_subseteq.

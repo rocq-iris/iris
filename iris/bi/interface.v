@@ -129,11 +129,12 @@ Section bi_mixin.
     (* In the ordered RA model: [ε ≼ core x]. *)
     bi_mixin_persistently_emp_2 : emp ⊢ <pers> emp;
 
-    (* The laws of a "frame" (https://ncatlab.org/nlab/show/frame, not to be
-    confused with separation logic terminology): commuting with finite
-    conjunction and infinite disjunction.
-    The null-ary case, [persistently_True : True ⊢ <pers> True], is derivable from the
-    other laws. *)
+    (* The modality commutes with finite conjunction. The null-ary case,
+    [persistently_True : True ⊢ <pers> True], is derivable from the other laws.
+    Note that we do not require the modality to commute with disjunctions,
+    because such a law does not hold in temporal logics. The file [extensions]
+    contains classes for commuting with infinite conjunctions (∀) and
+    disjunctions (∃). *)
     bi_mixin_persistently_and_2 (P Q : PROP) :
       (<pers> P) ∧ (<pers> Q) ⊢ <pers> (P ∧ Q);
 
