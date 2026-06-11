@@ -107,7 +107,7 @@ Proof.
 Qed.
 
 Lemma twptp_total σ ns nt t :
-  state_interp σ ns [] nt -∗ twptp t ={⊤|}=∗ ⌜sn erased_step (t, σ)⌝.
+  state_interp σ ns [] nt -∗ twptp t ={⊤|}■=∗ ⌜sn erased_step (t, σ)⌝.
 Proof.
   iIntros "Hσ Ht". iRevert (σ ns nt) "Hσ". iRevert (t) "Ht".
   iApply twptp_ind; iIntros "!>" (t) "IH"; iIntros (σ ns nt) "Hσ".
