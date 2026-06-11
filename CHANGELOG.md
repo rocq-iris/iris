@@ -61,7 +61,7 @@ lemma.
 * Add new "final fancy update" modality `|={E|}=> P` to streamline adequacy
   proofs. This modality makes it possible to prove adequacy of total WP and
   trace-based logics (Trillium) while supporting later credits, and gives new
-  rules for fancy updates. (inspired by ideas from Freja Marott Crawford, Amim
+  rules for fancy updates. (inspired by ideas from Freja Marott Crawford, Amin
   Timany, Thomas Somers, Simcha van Collem)
   + To prove adequacy of a custom logic, use the new soundness theorem
     `fupd_finally_soundness`.
