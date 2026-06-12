@@ -1,4 +1,4 @@
-From iris.algebra Require Export ofe stepindex_finite.
+From iris.algebra Require Export ofe.
 From iris.bi Require Export notation.
 
 (* We enable primitive projections in this file to improve the performance of the Iris proofmode:
@@ -7,7 +7,7 @@ From iris.bi Require Export notation.
 Local Set Primitive Projections.
 
 Section bi_mixin.
-  Context {PROP : Type} `{!Dist PROP, !Equiv PROP}.
+  Context {SI : sidx} {PROP : Type} `{!Dist PROP, !Equiv PROP}.
   Context (bi_entails : PROP → PROP → Prop).
   Context (bi_emp : PROP).
   Context (bi_pure : Prop → PROP).
@@ -258,7 +258,7 @@ Module Import universes.
   Universe Quant.
 End universes.
 
-Structure bi := Bi {
+Structure bi {SI : sidx} := Bi {
   bi_car :> Type@{Logic};
   bi_dist : Dist bi_car;
   bi_equiv : Equiv bi_car;
@@ -285,51 +285,51 @@ Structure bi := Bi {
 }.
 Bind Scope bi_scope with bi_car.
 
-Coercion bi_ofeO (PROP : bi) : ofe := Ofe PROP (bi_ofe_mixin PROP).
+Coercion bi_ofeO {SI : sidx} (PROP : bi) : ofe := Ofe PROP (bi_ofe_mixin PROP).
 Canonical Structure bi_ofeO.
 
 (** The projection [bi_cofe_aux] is not registered as an instance because it has
 the wrong type. Its result type is unfolded, i.e., [Cofe (Ofe PROP ...)], and
 thus should never be used. The instance [bi_cofe] has the proper result type
 [Cofe (bi_ofeO PROP)]. *)
-Global Instance bi_cofe (PROP : bi) : Cofe PROP := bi_cofe_aux PROP.
+Global Instance bi_cofe {SI : sidx} (PROP : bi) : Cofe PROP := bi_cofe_aux PROP.
 
-Global Instance: Params (@bi_entails) 1 := {}.
-Global Instance: Params (@bi_emp) 1 := {}.
-Global Instance: Params (@bi_pure) 1 := {}.
-Global Instance: Params (@bi_and) 1 := {}.
-Global Instance: Params (@bi_or) 1 := {}.
-Global Instance: Params (@bi_impl) 1 := {}.
-Global Instance: Params (@bi_forall) 2 := {}.
-Global Instance: Params (@bi_exist) 2 := {}.
-Global Instance: Params (@bi_sep) 1 := {}.
-Global Instance: Params (@bi_wand) 1 := {}.
-Global Instance: Params (@bi_persistently) 1 := {}.
-Global Instance: Params (@bi_later) 1  := {}.
+Global Instance: Params (@bi_entails) 2 := {}.
+Global Instance: Params (@bi_emp) 2 := {}.
+Global Instance: Params (@bi_pure) 2 := {}.
+Global Instance: Params (@bi_and) 2 := {}.
+Global Instance: Params (@bi_or) 2 := {}.
+Global Instance: Params (@bi_impl) 2 := {}.
+Global Instance: Params (@bi_forall) 3 := {}.
+Global Instance: Params (@bi_exist) 3 := {}.
+Global Instance: Params (@bi_sep) 2 := {}.
+Global Instance: Params (@bi_wand) 2 := {}.
+Global Instance: Params (@bi_persistently) 2 := {}.
+Global Instance: Params (@bi_later) 2  := {}.
 
 Global Arguments bi_car : simpl never.
 Global Arguments bi_dist : simpl never.
 Global Arguments bi_equiv : simpl never.
-Global Arguments bi_entails {PROP} _ _ : simpl never, rename.
-Global Arguments bi_emp {PROP} : simpl never, rename.
-Global Arguments bi_pure {PROP} _%_stdpp : simpl never, rename.
-Global Arguments bi_and {PROP} _ _ : simpl never, rename.
-Global Arguments bi_or {PROP} _ _ : simpl never, rename.
-Global Arguments bi_impl {PROP} _ _ : simpl never, rename.
-Global Arguments bi_forall {PROP _} _%_I : simpl never, rename.
-Global Arguments bi_exist {PROP _} _%_I : simpl never, rename.
-Global Arguments bi_sep {PROP} _ _ : simpl never, rename.
-Global Arguments bi_wand {PROP} _ _ : simpl never, rename.
-Global Arguments bi_persistently {PROP} _ : simpl never, rename.
-Global Arguments bi_later {PROP} _ : simpl never, rename.
+Global Arguments bi_entails {SI PROP} _ _ : simpl never, rename.
+Global Arguments bi_emp {SI PROP} : simpl never, rename.
+Global Arguments bi_pure {SI PROP} _%_stdpp : simpl never, rename.
+Global Arguments bi_and {SI PROP} _ _ : simpl never, rename.
+Global Arguments bi_or {SI PROP} _ _ : simpl never, rename.
+Global Arguments bi_impl {SI PROP} _ _ : simpl never, rename.
+Global Arguments bi_forall {SI PROP _} _%_I : simpl never, rename.
+Global Arguments bi_exist {SI PROP _} _%_I : simpl never, rename.
+Global Arguments bi_sep {SI PROP} _ _ : simpl never, rename.
+Global Arguments bi_wand {SI PROP} _ _ : simpl never, rename.
+Global Arguments bi_persistently {SI PROP} _ : simpl never, rename.
+Global Arguments bi_later {SI PROP} _ : simpl never, rename.
 
 Global Hint Extern 0 (bi_entails _ _) => reflexivity : core.
 (** We set this rewrite relation's cost above the stdlib's
   ([impl], [iff], [eq], ...) and [≡] but below [⊑].
   [eq] (at 100) < [≡] (at 150) < [bi_entails _] (at 170) < [⊑] (at 200)
 *)
-Global Instance bi_rewrite_relation (PROP : bi) : RewriteRelation (@bi_entails PROP) | 170 := {}.
-Global Instance bi_inhabited {PROP : bi} : Inhabited PROP := populate (bi_pure True).
+Global Instance bi_rewrite_relation {SI : sidx} (PROP : bi) : RewriteRelation (@bi_entails SI PROP) | 170 := {}.
+Global Instance bi_inhabited {SI : sidx} {PROP : bi} : Inhabited PROP := populate (bi_pure True).
 
 Notation "'emp'" := (bi_emp) : bi_scope.
 Notation "'⌜' φ '⌝'" := (bi_pure φ%type%stdpp) : bi_scope.
@@ -364,9 +364,9 @@ Notation "'(⊣⊢@{' PROP } )" := (equiv (A:=bi_car PROP)) (only parsing) : std
 Notation "( P ⊣⊢.)" := (equiv (A:=bi_car _) P) (only parsing) : stdpp_scope.
 Notation "(.⊣⊢ Q )" := (λ P, P ≡@{bi_car _} Q) (only parsing) : stdpp_scope.
 
-Definition bi_emp_valid {PROP : bi} (P : PROP) : Prop := emp ⊢ P.
+Definition bi_emp_valid {SI : sidx} {PROP : bi} (P : PROP) : Prop := emp ⊢ P.
 
-Global Arguments bi_emp_valid {_} _%_I : simpl never.
+Global Arguments bi_emp_valid {_ _} _%_I : simpl never.
 Global Typeclasses Opaque bi_emp_valid.
 
 Notation "⊢ Q" := (bi_emp_valid Q%I) : stdpp_scope.
@@ -380,37 +380,37 @@ Notation "P -∗ Q" := (⊢ P -∗ Q) : stdpp_scope.
 
 Module bi.
 Section bi_laws.
-Context {PROP : bi}.
+Context {SI : sidx} {PROP : bi}.
 Implicit Types φ : Prop.
 Implicit Types P Q R : PROP.
 Implicit Types A : Type.
 
 (* About the entailment *)
-Global Instance entails_po : PreOrder (@bi_entails PROP).
+Global Instance entails_po : PreOrder (@bi_entails SI PROP).
 Proof. eapply bi_mixin_entails_po, bi_bi_mixin. Qed.
 Lemma equiv_entails P Q : P ≡ Q ↔ (P ⊢ Q) ∧ (Q ⊢ P).
 Proof. eapply bi_mixin_equiv_entails, bi_bi_mixin. Qed.
 
 (* Non-expansiveness *)
-Global Instance pure_ne n : Proper (iff ==> dist n) (@bi_pure PROP).
+Global Instance pure_ne n : Proper (iff ==> dist n) (@bi_pure SI PROP).
 Proof. eapply bi_mixin_pure_ne, bi_bi_mixin. Qed.
-Global Instance and_ne : NonExpansive2 (@bi_and PROP).
+Global Instance and_ne : NonExpansive2 (@bi_and SI PROP).
 Proof. eapply bi_mixin_and_ne, bi_bi_mixin. Qed.
-Global Instance or_ne : NonExpansive2 (@bi_or PROP).
+Global Instance or_ne : NonExpansive2 (@bi_or SI PROP).
 Proof. eapply bi_mixin_or_ne, bi_bi_mixin. Qed.
-Global Instance impl_ne : NonExpansive2 (@bi_impl PROP).
+Global Instance impl_ne : NonExpansive2 (@bi_impl SI PROP).
 Proof. eapply bi_mixin_impl_ne, bi_bi_mixin. Qed.
 Global Instance forall_ne A n :
-  Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_forall PROP A).
+  Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_forall SI PROP A).
 Proof. eapply bi_mixin_forall_ne, bi_bi_mixin. Qed.
 Global Instance exist_ne A n :
-  Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_exist PROP A).
+  Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_exist SI PROP A).
 Proof. eapply bi_mixin_exist_ne, bi_bi_mixin. Qed.
-Global Instance sep_ne : NonExpansive2 (@bi_sep PROP).
+Global Instance sep_ne : NonExpansive2 (@bi_sep SI PROP).
 Proof. eapply bi_mixin_sep_ne, bi_bi_mixin. Qed.
-Global Instance wand_ne : NonExpansive2 (@bi_wand PROP).
+Global Instance wand_ne : NonExpansive2 (@bi_wand SI PROP).
 Proof. eapply bi_mixin_wand_ne, bi_bi_mixin. Qed.
-Global Instance persistently_ne : NonExpansive (@bi_persistently PROP).
+Global Instance persistently_ne : NonExpansive (@bi_persistently SI PROP).
 Proof. eapply bi_mixin_persistently_ne, bi_bi_persistently_mixin. Qed.
 
 (* Higher-order logic *)
@@ -487,7 +487,7 @@ Proof.
 Qed.
 
 (* Later *)
-Global Instance later_ne : NonExpansive (@bi_later PROP).
+Global Instance later_ne : NonExpansive (@bi_later SI PROP).
 Proof. eapply bi_mixin_later_ne, bi_bi_later_mixin. Qed.
 
 Lemma later_mono P Q : (P ⊢ Q) → ▷ P ⊢ ▷ Q.

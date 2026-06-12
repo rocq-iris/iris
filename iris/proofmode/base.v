@@ -1,5 +1,6 @@
 From Stdlib Require Export Ascii.
 From stdpp Require Export strings.
+From iris.algebra Require Import stepindex_finite.
 From iris.prelude Require Export prelude.
 From Ltac2 Require Ltac2.
 

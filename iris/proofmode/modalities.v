@@ -1,4 +1,5 @@
 From stdpp Require Import namespaces.
+From iris.algebra Require Import stepindex_finite.
 From iris.bi Require Export bi.
 Import bi.
 

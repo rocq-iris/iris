@@ -1,3 +1,4 @@
+From iris.algebra Require Import stepindex_finite.
 From iris.bi Require Export derived_connectives extensions.
 From iris.bi Require Export sbi updates internal_eq plainly cmra.
 From iris.si_logic Require Export bi.
@@ -254,9 +255,9 @@ Section restate.
   Proof. by rewrite -upred.uPred_or_unseal. Qed.
   Local Lemma uPred_impl_unseal : bi_impl = @upred.uPred_impl_def M.
   Proof. by rewrite -upred.uPred_impl_unseal. Qed.
-  Local Lemma uPred_forall_unseal : @bi_forall _ = @upred.uPred_forall_def M.
+  Local Lemma uPred_forall_unseal : @bi_forall _ _ = @upred.uPred_forall_def M.
   Proof. by rewrite -upred.uPred_forall_unseal. Qed.
-  Local Lemma uPred_exist_unseal : @bi_exist _ = @upred.uPred_exist_def M.
+  Local Lemma uPred_exist_unseal : @bi_exist _ _ = @upred.uPred_exist_def M.
   Proof. by rewrite -upred.uPred_exist_unseal. Qed.
   Local Lemma uPred_sep_unseal : bi_sep = @upred.uPred_sep_def M.
   Proof. by rewrite -upred.uPred_sep_unseal. Qed.

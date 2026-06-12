@@ -395,7 +395,7 @@ Section general.
 End general.
 
 Section timeless.
-  Context `{!Sbi PROP, !Timeless (@bi_emp PROP)}.
+  Context `{!Sbi PROP, !Timeless (@bi_emp _ PROP)}.
   Context `{!OfeDiscrete A}.
   Context (R : A → A → PROP) `{!NonExpansive2 R}.
 

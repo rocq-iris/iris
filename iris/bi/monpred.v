@@ -1,4 +1,5 @@
 From stdpp Require Import coPset.
+From iris.algebra Require Import stepindex_finite.
 From iris.bi Require Import bi.
 
 (** Definitions. *)
@@ -250,25 +251,25 @@ Section monPred_defs.
   Local Definition monPred_later_unseal :
     monPred_later = _ := monPred_later_aux.(seal_eq).
 
-  Local Program Definition monPred_bupd_def `{BiBUpd PROP}
+  Local Program Definition monPred_bupd_def `{!BiBUpd PROP}
     (P : monPred) : monPred := MonPred (λ i, |==> P i)%I _.
   Next Obligation. solve_proper. Qed.
   Local Definition monPred_bupd_aux : seal (@monPred_bupd_def).
   Proof. by eexists. Qed.
   Definition monPred_bupd := monPred_bupd_aux.(unseal).
   Global Arguments monPred_bupd {_}.
-  Local Definition monPred_bupd_unseal `{BiBUpd PROP} :
+  Local Definition monPred_bupd_unseal `{!BiBUpd PROP} :
     @bupd _ monPred_bupd = monPred_bupd_def.
   Proof. by rewrite -monPred_bupd_aux.(seal_eq). Qed.
 
-  Local Program Definition monPred_fupd_def `{BiFUpd PROP} (E1 E2 : coPset)
+  Local Program Definition monPred_fupd_def `{!BiFUpd PROP} (E1 E2 : coPset)
     (P : monPred) : monPred := MonPred (λ i, |={E1,E2}=> P i)%I _.
   Next Obligation. solve_proper. Qed.
   Local Definition monPred_fupd_aux : seal (@monPred_fupd_def).
   Proof. by eexists. Qed.
   Definition monPred_fupd := monPred_fupd_aux.(unseal).
   Global Arguments monPred_fupd {_}.
-  Local Definition monPred_fupd_unseal `{BiFUpd PROP} :
+  Local Definition monPred_fupd_unseal `{!BiFUpd PROP} :
     @fupd _ monPred_fupd = monPred_fupd_def.
   Proof. by rewrite -monPred_fupd_aux.(seal_eq). Qed.
 
@@ -416,10 +417,10 @@ Section instances.
     bi_impl = @monPred_defs.monPred_impl_def I PROP.
   Proof. by rewrite -monPred_defs.monPred_impl_unseal. Qed.
   Local Lemma monPred_forall_unseal :
-    @bi_forall _ = @monPred_defs.monPred_forall_def I PROP.
+    @bi_forall _ _ = @monPred_defs.monPred_forall_def I PROP.
   Proof. by rewrite -monPred_defs.monPred_forall_unseal. Qed.
   Local Lemma monPred_exist_unseal :
-    @bi_exist _ = @monPred_defs.monPred_exist_def I PROP.
+    @bi_exist _ _ = @monPred_defs.monPred_exist_def I PROP.
   Proof. by rewrite -monPred_defs.monPred_exist_unseal. Qed.
   Local Lemma monPred_sep_unseal :
     bi_sep = @monPred_defs.monPred_sep_def I PROP.
@@ -503,7 +504,7 @@ Section instances.
     {| sbi_sbi_mixin := monPred_sbi_mixin;
        sbi_sbi_prop_ext_mixin := monPred_sbi_prop_ext_mixin |}.
 
-  Lemma monPred_bupd_mixin `{BiBUpd PROP} : BiBUpdMixin monPredI monPred_bupd.
+  Lemma monPred_bupd_mixin `{!BiBUpd PROP} : BiBUpdMixin monPredI monPred_bupd.
   Proof.
     split; rewrite !(monPred_defs.monPred_bupd_unseal, monPred_unseal_bi).
     - split=>/= i. solve_proper.
@@ -512,10 +513,10 @@ Section instances.
     - intros P. split=>/= i. apply bupd_trans.
     - intros P Q. split=>/= i. apply bupd_frame_r.
   Qed.
-  Global Instance monPred_bi_bupd `{BiBUpd PROP} : BiBUpd monPredI :=
+  Global Instance monPred_bi_bupd `{!BiBUpd PROP} : BiBUpd monPredI :=
     {| bi_bupd_mixin := monPred_bupd_mixin |}.
 
-  Lemma monPred_fupd_mixin `{BiFUpd PROP} : BiFUpdMixin monPredI monPred_fupd.
+  Lemma monPred_fupd_mixin `{!BiFUpd PROP} : BiFUpdMixin monPredI monPred_fupd.
   Proof.
     split; rewrite /bi_emp_valid /bi_except_0
       !(monPred_defs.monPred_fupd_unseal, monPred_unseal_bi).
@@ -528,7 +529,7 @@ Section instances.
       by rewrite (bi.forall_elim i) bi.pure_True // left_id fupd_mask_frame_r'.
     - intros E1 E2 P Q. split=>/= i. apply fupd_frame_r.
   Qed.
-  Global Instance monPred_bi_fupd `{BiFUpd PROP} : BiFUpd monPredI :=
+  Global Instance monPred_bi_fupd `{!BiFUpd PROP} : BiFUpd monPredI :=
     {| bi_fupd_mixin := monPred_fupd_mixin |}.
 
   Local Lemma monPred_embed_unseal :
@@ -587,14 +588,15 @@ Section instances.
   Global Instance monPred_bi_embed_later : BiEmbedLater PROP monPredI.
   Proof. split; by unseal. Qed.
 
-  Global Instance monPred_bi_bupd_fupd `{BiBUpdFUpd PROP} : BiBUpdFUpd monPredI.
+  Global Instance monPred_bi_bupd_fupd
+      `{!BiBUpd PROP, !BiFUpd PROP, !BiBUpdFUpd PROP} : BiBUpdFUpd monPredI.
   Proof. intros E P. split=> i. unseal. apply bupd_fupd. Qed.
 
   Global Instance monPred_bi_embed_bupd `{!BiBUpd PROP} :
     BiEmbedBUpd PROP monPredI.
   Proof. split. by unseal. Qed.
 
-  Global Instance monPred_bi_embed_fupd `{BiFUpd PROP} : BiEmbedFUpd PROP monPredI.
+  Global Instance monPred_bi_embed_fupd `{!BiFUpd PROP} : BiEmbedFUpd PROP monPredI.
   Proof. split. by unseal. Qed.
 
   Global Instance monPred_sbi_emp_valid_exist `{!Sbi PROP, @BiIndexBottom I bot} :

@@ -1,4 +1,5 @@
 From iris.algebra Require Export ofe.
+From iris.algebra Require Import stepindex_finite.
 From iris.bi Require Export weakestpre.
 
 Section language_mixin.

@@ -8,7 +8,7 @@ Local Open Scope string_scope.
    conflict with the ltac notation.
  *)
 Section with_bi.
-  Context {PROP : bi}.
+  Context {SI : sidx} {PROP : bi}.
   Variables P Q R : PROP.
 
   Local Open Scope stdpp_scope.

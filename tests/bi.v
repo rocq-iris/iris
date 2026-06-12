@@ -1,4 +1,5 @@
 From stdpp Require Import strings.
+From iris.algebra Require Import stepindex_finite.
 From iris.bi Require Import bi plainly big_op.
 
 Unset Mangle Names.

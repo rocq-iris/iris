@@ -44,7 +44,7 @@ Proof. by rewrite /MakeEmbed. Qed.
 Global Instance make_sep_emp_l P : KnownLMakeSep emp P P.
 Proof. apply left_id, _. Qed.
 Global Instance make_sep_emp_r P : KnownRMakeSep P emp P.
-Proof. apply right_id, _. Qed.
+Proof. rewrite /KnownRMakeSep /MakeSep. apply right_id, _. Qed.
 Global Instance make_sep_true_l P : QuickAbsorbing P → KnownLMakeSep True P P.
 Proof. rewrite /QuickAbsorbing /KnownLMakeSep /MakeSep=> ?. by apply True_sep. Qed.
 Global Instance make_sep_true_r P : QuickAbsorbing P →  KnownRMakeSep P True P.
