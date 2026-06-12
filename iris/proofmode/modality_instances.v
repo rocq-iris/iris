@@ -1,3 +1,4 @@
+From iris.algebra Require Import stepindex_finite.
 From iris.bi Require Import bi.
 From iris.proofmode Require Export classes.
 Import bi.
@@ -6,7 +7,7 @@ Section modalities.
   Context {PROP : bi}.
 
   Lemma modality_persistently_mixin :
-    modality_mixin (@bi_persistently PROP) MIEnvId MIEnvClear.
+    modality_mixin (@bi_persistently _ PROP) MIEnvId MIEnvClear.
   Proof.
     split; simpl; eauto using equiv_entails_1_2, persistently_intro,
       persistently_mono, persistently_sep_2 with typeclass_instances.
@@ -15,7 +16,7 @@ Section modalities.
     Modality _ modality_persistently_mixin.
 
   Lemma modality_affinely_mixin :
-    modality_mixin (@bi_affinely PROP) MIEnvId (MIEnvForall Affine).
+    modality_mixin (@bi_affinely _ PROP) MIEnvId (MIEnvForall Affine).
   Proof.
     split; simpl; eauto using equiv_entails_1_2, affinely_intro, affinely_mono,
       affinely_sep_2 with typeclass_instances.
@@ -24,7 +25,7 @@ Section modalities.
     Modality _ modality_affinely_mixin.
 
   Lemma modality_intuitionistically_mixin :
-    modality_mixin (@bi_intuitionistically PROP) MIEnvId MIEnvIsEmpty.
+    modality_mixin (@bi_intuitionistically _ PROP) MIEnvId MIEnvIsEmpty.
   Proof.
     split; simpl; eauto using equiv_entails_1_2, intuitionistically_emp,
       affinely_mono, persistently_mono, intuitionistically_idemp,
@@ -55,7 +56,7 @@ Section modalities.
     Modality _ modality_plainly_mixin.
 
   Lemma modality_laterN_mixin n :
-    modality_mixin (@bi_laterN PROP n)
+    modality_mixin (@bi_laterN _ PROP n)
       (MIEnvTransform (MaybeIntoLaterN false n)) (MIEnvTransform (MaybeIntoLaterN false n)).
   Proof.
     split; simpl; split_and?; eauto using equiv_entails_1_2, laterN_intro,

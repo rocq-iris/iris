@@ -20,7 +20,7 @@ Global Hint Mode Embed ! - : typeclass_instances.
 Global Hint Mode Embed - ! : typeclass_instances.
 
 (* Mixins allow us to create instances easily without having to use Program *)
-Record BiEmbedMixin (PROP1 PROP2 : bi) `(Embed PROP1 PROP2) := {
+Record BiEmbedMixin {SI : sidx} (PROP1 PROP2 : bi) `(Embed PROP1 PROP2) := {
   bi_embed_mixin_ne : NonExpansive (embed (A:=PROP1) (B:=PROP2));
   bi_embed_mixin_mono : Proper ((⊢) ==> (⊢)) (embed (A:=PROP1) (B:=PROP2));
   bi_embed_mixin_emp_valid_inj (P : PROP1) :
@@ -40,35 +40,35 @@ Record BiEmbedMixin (PROP1 PROP2 : bi) `(Embed PROP1 PROP2) := {
     ⎡<pers> P⎤ ⊣⊢@{PROP2} <pers> ⎡P⎤
 }.
 
-Class BiEmbed (PROP1 PROP2 : bi) := {
+Class BiEmbed {SI : sidx} (PROP1 PROP2 : bi) := {
   #[global] bi_embed_embed :: Embed PROP1 PROP2;
   bi_embed_mixin : BiEmbedMixin PROP1 PROP2 bi_embed_embed;
 }.
-Global Hint Mode BiEmbed ! - : typeclass_instances.
-Global Hint Mode BiEmbed - ! : typeclass_instances.
+Global Hint Mode BiEmbed - ! - : typeclass_instances.
+Global Hint Mode BiEmbed - - ! : typeclass_instances.
 Global Arguments bi_embed_embed : simpl never.
 
-Class BiEmbedEmp (PROP1 PROP2 : bi) `{!BiEmbed PROP1 PROP2} :=
+Class BiEmbedEmp {SI : sidx} (PROP1 PROP2 : bi) `{!BiEmbed PROP1 PROP2} :=
   embed_emp_1 : ⎡ emp : PROP1 ⎤ ⊢ emp.
-Global Hint Mode BiEmbedEmp ! - - : typeclass_instances.
-Global Hint Mode BiEmbedEmp - ! - : typeclass_instances.
+Global Hint Mode BiEmbedEmp - ! - - : typeclass_instances.
+Global Hint Mode BiEmbedEmp - - ! - : typeclass_instances.
 
-Class BiEmbedLater (PROP1 PROP2 : bi) `{!BiEmbed PROP1 PROP2} :=
+Class BiEmbedLater {SI : sidx} (PROP1 PROP2 : bi) `{!BiEmbed PROP1 PROP2} :=
   embed_later P : ⎡▷ P⎤ ⊣⊢@{PROP2} ▷ ⎡P⎤.
-Global Hint Mode BiEmbedLater ! - - : typeclass_instances.
-Global Hint Mode BiEmbedLater - ! - : typeclass_instances.
+Global Hint Mode BiEmbedLater - ! - - : typeclass_instances.
+Global Hint Mode BiEmbedLater - - ! - : typeclass_instances.
 
-Class BiEmbedBUpd (PROP1 PROP2 : bi)
+Class BiEmbedBUpd {SI : sidx} (PROP1 PROP2 : bi)
     `{!BiEmbed PROP1 PROP2, !BiBUpd PROP1, !BiBUpd PROP2} :=
   embed_bupd P : ⎡|==> P⎤ ⊣⊢@{PROP2} |==> ⎡P⎤.
-Global Hint Mode BiEmbedBUpd - ! - - - : typeclass_instances.
-Global Hint Mode BiEmbedBUpd ! - - - - : typeclass_instances.
+Global Hint Mode BiEmbedBUpd - - ! - - - : typeclass_instances.
+Global Hint Mode BiEmbedBUpd - ! - - - - : typeclass_instances.
 
-Class BiEmbedFUpd (PROP1 PROP2 : bi)
+Class BiEmbedFUpd {SI : sidx} (PROP1 PROP2 : bi)
     `{!BiEmbed PROP1 PROP2, !BiFUpd PROP1, !BiFUpd PROP2} :=
   embed_fupd E1 E2 P : ⎡|={E1,E2}=> P⎤ ⊣⊢@{PROP2} |={E1,E2}=> ⎡P⎤.
-Global Hint Mode BiEmbedFUpd - ! - - - : typeclass_instances.
-Global Hint Mode BiEmbedFUpd ! - - - - : typeclass_instances.
+Global Hint Mode BiEmbedFUpd - - ! - - - : typeclass_instances.
+Global Hint Mode BiEmbedFUpd - ! - - - - : typeclass_instances.
 
 Class BiEmbedSbi (PROP1 PROP2 : bi)
     `{!BiEmbed PROP1 PROP2, !Sbi PROP1, !Sbi PROP2} := {
@@ -80,7 +80,7 @@ Global Hint Mode BiEmbedSbi - ! - - - : typeclass_instances.
 Global Hint Mode BiEmbedSbi ! - - - - : typeclass_instances.
 
 Section embed_laws.
-  Context {PROP1 PROP2 : bi} `{!BiEmbed PROP1 PROP2}.
+  Context {SI : sidx} {PROP1 PROP2 : bi} `{!BiEmbed PROP1 PROP2}.
   Local Notation embed := (embed (A:=bi_car PROP1) (B:=bi_car PROP2)).
   Local Notation "⎡ P ⎤" := (embed P) : bi_scope.
   Implicit Types P : PROP1.
@@ -108,7 +108,7 @@ Section embed_laws.
 End embed_laws.
 
 Section embed.
-  Context {PROP1 PROP2 : bi} `{!BiEmbed PROP1 PROP2}.
+  Context {SI : sidx} {PROP1 PROP2 : bi} `{!BiEmbed PROP1 PROP2}.
   Local Notation embed := (embed (A:=bi_car PROP1) (B:=bi_car PROP2)).
   Local Notation "⎡ P ⎤" := (embed P) : bi_scope.
   Implicit Types P Q R : PROP1.
@@ -164,7 +164,7 @@ Section embed.
   Qed.
   Lemma embed_pure φ : ⎡⌜φ⌝⎤ ⊣⊢ ⌜φ⌝.
   Proof.
-    rewrite (@bi.pure_alt PROP1) (@bi.pure_alt PROP2) embed_exist.
+    rewrite (@bi.pure_alt SI PROP1) (@bi.pure_alt SI PROP2) embed_exist.
     do 2 f_equiv. apply bi.equiv_entails. split; [apply bi.True_intro|].
     rewrite -(_ : (emp → emp : PROP1) ⊢ True) ?embed_impl;
       last apply bi.True_intro.
@@ -278,38 +278,43 @@ Section embed.
       intros ?. by rewrite /Timeless -embed_except_0 -embed_later timeless.
     Qed.
   End later.
-
-  Section sbi.
-    Context `{!Sbi PROP1, !Sbi PROP2, !BiEmbedSbi PROP1 PROP2}.
-
-    Lemma embed_si_pure Pi : ⎡<si_pure> Pi⎤ ⊣⊢ <si_pure> Pi.
-    Proof.
-      apply (anti_symm _); [apply embed_si_pure_1|].
-      rewrite -(si_pure_si_emp_valid_elim ⎡ _ ⎤).
-      by rewrite embed_si_emp_valid si_emp_valid_si_pure.
-    Qed.
-
-    Lemma embed_internal_inj `{!Sbi PROP3} P Q : ⎡P⎤ ≡ ⎡Q⎤ ⊢@{PROP3} P ≡ Q.
-    Proof.
-      intros. rewrite -(si_pure_internal_eq ⎡ _ ⎤%I) -(si_pure_internal_eq P).
-      f_equiv. rewrite !prop_ext_si_emp_valid.
-      rewrite /bi_wand_iff !si_emp_valid_and.
-      by rewrite -!embed_wand !embed_si_emp_valid.
-    Qed.
-
-    Lemma embed_internal_eq (A : ofe) (x y : A) : ⎡x ≡ y⎤ ⊣⊢@{PROP2} x ≡ y.
-    Proof. apply embed_si_pure. Qed.
-
-    Lemma embed_plainly P : ⎡■ P⎤ ⊣⊢ ■ ⎡P⎤.
-    Proof. by rewrite /plainly embed_si_pure embed_si_emp_valid. Qed.
-
-    Lemma embed_plainly_if p P : ⎡■?p P⎤ ⊣⊢ ■?p ⎡P⎤.
-    Proof. destruct p; simpl; auto using embed_plainly. Qed.
-
-    Lemma embed_plain (P : PROP1) : Plain P → Plain (PROP:=PROP2) ⎡P⎤.
-    Proof. intros ?. by rewrite /Plain {1}(plain P) embed_plainly. Qed.
-  End sbi.
 End embed.
+
+Section embed_sbi.
+  (* Sbi embeddings use natSI for the step-index type *)
+  Context {PROP1 PROP2 : bi} `{!BiEmbed PROP1 PROP2}.
+  Context `{!Sbi PROP1, !Sbi PROP2, !BiEmbedSbi PROP1 PROP2}.
+  Local Notation embed := (embed (A:=bi_car PROP1) (B:=bi_car PROP2)).
+  Local Notation "⎡ P ⎤" := (embed P) : bi_scope.
+  Implicit Types P Q R : PROP1.
+
+  Lemma embed_si_pure Pi : ⎡<si_pure> Pi⎤ ⊣⊢ <si_pure> Pi.
+  Proof.
+    apply (anti_symm _); [apply embed_si_pure_1|].
+    rewrite -(si_pure_si_emp_valid_elim ⎡ _ ⎤).
+    by rewrite embed_si_emp_valid si_emp_valid_si_pure.
+  Qed.
+
+  Lemma embed_internal_inj `{!Sbi PROP3} P Q : ⎡P⎤ ≡ ⎡Q⎤ ⊢@{PROP3} P ≡ Q.
+  Proof.
+    intros. rewrite -(si_pure_internal_eq ⎡ _ ⎤%I) -(si_pure_internal_eq P).
+    f_equiv. rewrite !prop_ext_si_emp_valid.
+    rewrite /bi_wand_iff !si_emp_valid_and.
+    by rewrite -!embed_wand !embed_si_emp_valid.
+  Qed.
+
+  Lemma embed_internal_eq (A : ofe) (x y : A) : ⎡x ≡ y⎤ ⊣⊢@{PROP2} x ≡ y.
+  Proof. apply embed_si_pure. Qed.
+
+  Lemma embed_plainly P : ⎡■ P⎤ ⊣⊢ ■ ⎡P⎤.
+  Proof. by rewrite /plainly embed_si_pure embed_si_emp_valid. Qed.
+
+  Lemma embed_plainly_if p P : ⎡■?p P⎤ ⊣⊢ ■?p ⎡P⎤.
+  Proof. destruct p; simpl; auto using embed_plainly. Qed.
+
+  Lemma embed_plain (P : PROP1) : Plain P → Plain (PROP:=PROP2) ⎡P⎤.
+  Proof. intros ?. by rewrite /Plain {1}(plain P) embed_plainly. Qed.
+End embed_sbi.
 
 (* Not defined using an ordinary [Instance] because the default
 [class_apply @bi_embed_plainly] shelves the [BiPlainly] premise, making proof
@@ -324,7 +329,8 @@ Note that declaring these instances globally can make TC search ambiguous or
 diverging. These are only defined so that a user can conveniently use them to
 manually combine embeddings. *)
 Section embed_embed.
-  Context {PROP1 PROP2 PROP3 : bi} `{!BiEmbed PROP1 PROP2, !BiEmbed PROP2 PROP3}.
+  Context {SI : sidx} {PROP1 PROP2 PROP3 : bi}
+    `{!BiEmbed PROP1 PROP2, !BiEmbed PROP2 PROP3}.
 
   Local Instance embed_embed : Embed PROP1 PROP3 := λ P, ⎡ ⎡ P ⎤ ⎤%I.
 
@@ -356,14 +362,6 @@ Section embed_embed.
     BiEmbedLater PROP1 PROP2 → BiEmbedLater PROP2 PROP3 →
     BiEmbedLater PROP1 PROP3.
   Proof. intros ?? P. by rewrite !embed_embed_alt !embed_later. Qed.
-  Lemma embed_embed_sbi `{!Sbi PROP1, !Sbi PROP2, !Sbi PROP3} :
-    BiEmbedSbi PROP1 PROP2 → BiEmbedSbi PROP2 PROP3 →
-    BiEmbedSbi PROP1 PROP3.
-  Proof.
-    intros ??; split.
-    - intros P. by rewrite embed_embed_alt !embed_si_emp_valid.
-    - intros Pi. by rewrite embed_embed_alt !embed_si_pure.
-  Qed.
   Lemma embed_embed_bupd `{!BiBUpd PROP1, !BiBUpd PROP2, !BiBUpd PROP3} :
     BiEmbedBUpd PROP1 PROP2 → BiEmbedBUpd PROP2 PROP3 →
     BiEmbedBUpd PROP1 PROP3.
@@ -373,3 +371,19 @@ Section embed_embed.
     BiEmbedFUpd PROP1 PROP3.
   Proof. intros ?? E1 E2 P. by rewrite !embed_embed_alt !embed_fupd. Qed.
 End embed_embed.
+
+Section embed_embed_sbi.
+  Context {PROP1 PROP2 PROP3 : bi}
+    `{!BiEmbed PROP1 PROP2, !BiEmbed PROP2 PROP3}.
+  Context `{!Sbi PROP1, !Sbi PROP2, !Sbi PROP3}.
+  Local Existing Instances embed_embed embed_bi_embed.
+
+  Lemma embed_embed_sbi :
+    BiEmbedSbi PROP1 PROP2 → BiEmbedSbi PROP2 PROP3 →
+    BiEmbedSbi PROP1 PROP3.
+  Proof.
+    intros ??; split.
+    - intros P. by rewrite embed_embed_alt !embed_si_emp_valid.
+    - intros Pi. by rewrite embed_embed_alt !embed_si_pure.
+  Qed.
+End embed_embed_sbi.

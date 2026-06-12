@@ -5,12 +5,14 @@ Import bi.
 (* This cannot import the proofmode because it is imported by the proofmode! *)
 
 (** Telescopic quantifiers *)
-Definition bi_texist {PROP : bi} {TT : tele@{Quant}} (Ψ : TT → PROP) : PROP :=
-  tele_fold (@bi_exist PROP) (tele_bind Ψ).
-Global Arguments bi_texist {_ !_} _ /.
-Definition bi_tforall {PROP : bi} {TT : tele@{Quant}} (Ψ : TT → PROP) : PROP :=
-  tele_fold (@bi_forall PROP) (tele_bind Ψ).
-Global Arguments bi_tforall {_ !_} _ /.
+Definition bi_texist {SI : sidx} {PROP : bi} {TT : tele@{Quant}}
+    (Ψ : TT → PROP) : PROP :=
+  tele_fold (@bi_exist SI PROP) (tele_bind Ψ).
+Global Arguments bi_texist {SI _ !_} _ /.
+Definition bi_tforall {SI : sidx} {PROP : bi} {TT : tele@{Quant}}
+    (Ψ : TT → PROP) : PROP :=
+  tele_fold (@bi_forall SI PROP) (tele_bind Ψ).
+Global Arguments bi_tforall {SI _ !_} _ /.
 
 Notation "'∃..' x .. y , P" := (bi_texist (λ x, .. (bi_texist (λ y, P)) .. )%I)
   (at level 200, x binder, y binder, right associativity,
@@ -20,7 +22,7 @@ Notation "'∀..' x .. y , P" := (bi_tforall (λ x, .. (bi_tforall (λ y, P)) ..
   format "∀..  x  ..  y ,  P") : bi_scope.
 
 Section telescopes.
-  Context {PROP : bi} {TT : tele@{Quant}}.
+  Context {SI : sidx} {PROP : bi} {TT : tele@{Quant}}.
   Implicit Types Ψ : TT → PROP.
 
   Lemma bi_tforall_forall Ψ : bi_tforall Ψ ⊣⊢ bi_forall Ψ.
@@ -48,17 +50,17 @@ Section telescopes.
   Qed.
 
   Global Instance bi_tforall_ne n :
-    Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_tforall PROP TT).
+    Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_tforall SI PROP TT).
   Proof. intros ?? EQ. rewrite !bi_tforall_forall. rewrite EQ //. Qed.
   Global Instance bi_tforall_proper :
-    Proper (pointwise_relation _ (⊣⊢) ==> (⊣⊢)) (@bi_tforall PROP TT).
+    Proper (pointwise_relation _ (⊣⊢) ==> (⊣⊢)) (@bi_tforall SI PROP TT).
   Proof. intros ?? EQ. rewrite !bi_tforall_forall. rewrite EQ //. Qed.
 
   Global Instance bi_texist_ne n :
-    Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_texist PROP TT).
+    Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_texist SI PROP TT).
   Proof. intros ?? EQ. rewrite !bi_texist_exist. rewrite EQ //. Qed.
   Global Instance bi_texist_proper :
-    Proper (pointwise_relation _ (⊣⊢) ==> (⊣⊢)) (@bi_texist PROP TT).
+    Proper (pointwise_relation _ (⊣⊢) ==> (⊣⊢)) (@bi_texist SI PROP TT).
   Proof. intros ?? EQ. rewrite !bi_texist_exist. rewrite EQ //. Qed.
 
   Global Instance bi_tforall_absorbing Ψ :

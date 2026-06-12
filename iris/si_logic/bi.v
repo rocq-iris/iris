@@ -1,3 +1,4 @@
+From iris.algebra Require Import stepindex_finite.
 From iris.bi Require Export interface extensions.
 From iris.si_logic Require Export siprop.
 Import siProp_primitive.
@@ -167,9 +168,9 @@ Section restate.
   Proof. by rewrite -siprop.siProp_or_unseal. Qed.
   Local Lemma siProp_impl_unseal : bi_impl = @siprop.siProp_impl_def.
   Proof. by rewrite -siprop.siProp_impl_unseal. Qed.
-  Local Lemma siProp_forall_unseal : @bi_forall _ = @siprop.siProp_forall_def.
+  Local Lemma siProp_forall_unseal : @bi_forall _ _ = @siprop.siProp_forall_def.
   Proof. by rewrite -siprop.siProp_forall_unseal. Qed.
-  Local Lemma siProp_exist_unseal : @bi_exist _ = @siprop.siProp_exist_def.
+  Local Lemma siProp_exist_unseal : @bi_exist _ _ = @siprop.siProp_exist_def.
   Proof. by rewrite -siprop.siProp_exist_unseal. Qed.
   Local Lemma siProp_sep_unseal : bi_sep = @siprop.siProp_and_def.
   Proof. by rewrite -siprop.siProp_and_unseal. Qed.

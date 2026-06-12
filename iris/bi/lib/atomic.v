@@ -201,7 +201,7 @@ Notation "'AACC' '<{' α , 'ABORT' P '}>' @ Eo , Ei '<{' β , 'COMM' Φ '}>'" :=
 
 (** Lemmas about AU *)
 Section lemmas.
-  Context `{BiFUpd PROP} {TA TB : tele}.
+  Context `{!BiFUpd PROP} {TA TB : tele}.
   Implicit Types (α : TA → PROP) (β Φ : TA → TB → PROP) (P : PROP).
 
   Local Existing Instance atomic_update_pre_mono.
@@ -417,7 +417,7 @@ End lemmas.
 
 (** ProofMode support for atomic updates. *)
 Section proof_mode.
-  Context `{BiFUpd PROP} {TA TB : tele}.
+  Context `{!BiFUpd PROP} {TA TB : tele}.
   Implicit Types (α : TA → PROP) (β Φ : TA → TB → PROP) (P : PROP).
 
   Lemma tac_aupd_intro Γp Γs n α β Eo Ei Φ P :

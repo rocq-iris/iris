@@ -171,13 +171,13 @@ Tactic failure: wp_pure: cannot find ?y in (Var "x") or
   Σ : gFunctors
   heapGS0 : heapGS_gen HasLc Σ
   ============================
-  @bi_emp_valid (uPredI (iResUR Σ))
-    (@fupd (bi_car (uPredI (iResUR Σ)))
-       (@bi_fupd_fupd _
+  @bi_emp_valid natSI (uPredI (iResUR Σ))
+    (@fupd (@bi_car _ (uPredI (iResUR Σ)))
+       (@bi_fupd_fupd _ _
           (@uPred_bi_fupd HasLc Σ
              (@iris_invGS HasLc heap_lang Σ (@heapGS_irisGS HasLc Σ heapGS0))))
        (@top coPset coPset_top) (@top coPset coPset_top)
-       (@bi_pure (uPredI (iResUR Σ)) True))
+       (@bi_pure _ (uPredI (iResUR Σ)) True))
 "test_wp_pure_credit_succeed"
      : string
 1 goal

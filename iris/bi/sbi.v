@@ -532,7 +532,7 @@ Section sbi_derived.
 
   (** The [BiLöb] condition is redundant, we could get it from [sbi_later_contractive],
   but that only appears later in the dependency chain ([iris.bi.internal_eq]). *)
-  Lemma only_0_intuitionistically `{!BiLöb PROP, !@Timeless PROP emp} P :
+  Lemma only_0_intuitionistically `{!BiLöb PROP, !Timeless (PROP:=PROP) emp} P :
     <only0> □ P ⊣⊢ □ <only0> P.
   Proof.
     by rewrite /bi_intuitionistically bi.only_0_affinely only_0_persistently.

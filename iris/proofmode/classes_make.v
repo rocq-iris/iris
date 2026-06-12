@@ -39,6 +39,7 @@ that would have this behavior.
 
 In practice this means that usually only the default instance should use [MakeX],
 and most specialized instances should use [KnownMakeX]. *)
+From iris.algebra Require Import stepindex_finite.
 From iris.bi Require Export bi.
 
 (** Aliases for [Affine] and [Absorbing], but the instances are severely
@@ -49,11 +50,11 @@ Global Hint Mode QuickAffine + ! : typeclass_instances.
 Class QuickAbsorbing {PROP : bi} (P : PROP) := quick_absorbing : Absorbing P.
 Global Hint Mode QuickAbsorbing + ! : typeclass_instances.
 
-Class MakeEmbed {PROP PROP' : bi} `{BiEmbed PROP PROP'} (P : PROP) (Q : PROP') :=
+Class MakeEmbed {PROP PROP' : bi} `{!BiEmbed PROP PROP'} (P : PROP) (Q : PROP') :=
   make_embed : ⎡P⎤ ⊣⊢ Q.
 Global Arguments MakeEmbed {_ _ _} _%_I _%_I.
 Global Hint Mode MakeEmbed + + + - - : typeclass_instances.
-Class KnownMakeEmbed {PROP PROP' : bi} `{BiEmbed PROP PROP'} (P : PROP) (Q : PROP') :=
+Class KnownMakeEmbed {PROP PROP' : bi} `{!BiEmbed PROP PROP'} (P : PROP) (Q : PROP') :=
   #[global] known_make_embed :: MakeEmbed P Q.
 Global Arguments KnownMakeEmbed {_ _ _} _%_I _%_I.
 Global Hint Mode KnownMakeEmbed + + + ! - : typeclass_instances.

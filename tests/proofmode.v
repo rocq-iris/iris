@@ -1038,7 +1038,7 @@ Qed.
 (** Test that [iFrame] fails if the goal turns into [True]/[emp], but hypotheses
 are given to frame. See https://gitlab.mpi-sws.org/iris/iris/-/issues/582 *)
 Check "test_iFrame_useless".
-Lemma test_iFrame_useless `{BiAffine PROP} P Q : P -∗ Q -∗ P.
+Lemma test_iFrame_useless `{!BiAffine PROP} P Q : P -∗ Q -∗ P.
 Proof.
   iIntros "HP HQ".
   Fail iFrame "HP HQ".
