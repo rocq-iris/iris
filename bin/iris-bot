@@ -97,36 +97,34 @@ def build(args):
             pipeline_url = trigger_build(project['name'], project['branch'], vars)['web_url']
             print("    Pipeline running at {}".format(pipeline_url))
 
-TimeJob = namedtuple("TimeJob", "id base_commit base_pipeline test_commit test_pipeline compare")
+TimeJob = namedtuple("TimeJob", "id iris_base_commit base_pipeline iris_test_commit test_pipeline compare")
 
-def time_project(project, iris_repo, iris_rev, test_rev):
+def time_project(project, iris_repo, iris_test_rev, iris_base_rev=None, project_test_rev=None, project_base_rev=None):
     # Obtain a unique ID for this experiment
     id = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
-    # Determine the branch commit to build
-    subprocess.run(["git", "fetch", "-q", "https://gitlab.mpi-sws.org/{}".format(iris_repo), iris_rev], check=True)
-    test_commit = subprocess.run(["git", "rev-parse", "FETCH_HEAD"], check=True, stdout=subprocess.PIPE).stdout.decode().strip()
-    # Determine the base commit in master
-    subprocess.run(["git", "fetch", "-q", "https://gitlab.mpi-sws.org/iris/iris.git", "master"], check=True)
-    base_commit = subprocess.run(["git", "merge-base", test_commit, "FETCH_HEAD"], check=True, stdout=subprocess.PIPE).stdout.decode().strip()
+    # Determine the Iris test commit to build
+    subprocess.run(["git", "fetch", "-q", "https://gitlab.mpi-sws.org/{}".format(iris_repo), iris_test_rev], check=True)
+    iris_test_commit = subprocess.run(["git", "rev-parse", "FETCH_HEAD"], check=True, stdout=subprocess.PIPE).stdout.decode().strip()
+    # Determine the Iris base commit in master
+    subprocess.run(["git", "fetch", "-q", "https://gitlab.mpi-sws.org/iris/iris.git", iris_base_rev or "master"], check=True)
+    iris_base_commit = subprocess.run(["git", "merge-base", iris_test_commit, "FETCH_HEAD"], check=True, stdout=subprocess.PIPE).stdout.decode().strip()
     # Trigger the builds
+    project_base_rev = project_base_rev or project['branch']
     vars = {
         'IRIS_REPO': iris_repo,
-        'IRIS_REV': base_commit,
+        'IRIS_REV': iris_base_commit,
         'TIMING_AD_HOC_ID': id+"-base",
     }
-    base_pipeline = trigger_build(project['name'], project['branch'], vars)
+    base_pipeline = trigger_build(project['name'], project_base_rev, vars)
     vars = {
         'IRIS_REPO': iris_repo,
-        'IRIS_REV': test_commit,
+        'IRIS_REV': iris_test_commit,
         'TIMING_AD_HOC_ID': id+"-test",
     }
-    if test_rev is None:
-        # We hope that this repository did not change since the job we created just above...
-        test_pipeline = trigger_build(project['name'], project['branch'], vars)
-    else:
-        test_pipeline = trigger_build(project['name'], args.test_rev, vars)
+    # We hope that project_base_rev did not change since the job we created just above...
+    test_pipeline = trigger_build(project['name'], project_test_rev or project_base_rev, vars)
     compare = "https://coq-speed.mpi-sws.org/d/1QE_dqjiz/coq-compare?orgId=1&var-project={}&var-branch1=@hoc&var-commit1={}&var-config1={}&var-branch2=@hoc&var-commit2={}&var-config2={}".format(project['name'], base_pipeline['sha'], id+"-base", test_pipeline['sha'], id+"-test")
-    return TimeJob(id, base_commit, base_pipeline['web_url'], test_commit, test_pipeline['web_url'], compare)
+    return TimeJob(id, iris_base_commit, base_pipeline['web_url'], iris_test_commit, test_pipeline['web_url'], compare)
 
 def time(args):
     # Make sure only 'iris' variables are set.
@@ -141,13 +139,13 @@ def time(args):
     (iris_repo, iris_rev) = BUILD_BRANCHES['iris']
     # Special mode: time everything
     if args.project == 'all':
-        if args.test_rev is not None:
-            print("'time all' does not support '--test-rev'")
+        if args.test_rev is not None or args.base_rev is not None or args.iris_base_rev is not None:
+            print("'time all' does not support '--test-rev' nor '--base-rev' nor '--iris-base-rev'")
             sys.exit(1)
         for (name, project) in PROJECTS.items():
             if not project.get('timing'):
                 continue
-            job = time_project(project, iris_repo, iris_rev, None)
+            job = time_project(project, iris_repo, iris_rev)
             print("- [{}]({})".format(name, job.compare))
         return
     # Get project to test and ensure it supports timing
@@ -160,8 +158,8 @@ def time(args):
         print("ERROR: {} does not support timing".format(project_name))
         sys.exit(1)
     # Run it!
-    job = time_project(project, iris_repo, iris_rev, args.test_rev)
-    print("Triggering timing builds for {} with Iris base commit {} and test commit {} using ad-hoc ID {}...".format(project_name, job.base_commit[:8], job.test_commit[:8], job.id))
+    job = time_project(project, iris_repo, iris_rev, args.iris_base_rev, args.test_rev, args.base_rev)
+    print("Triggering timing builds for {} with Iris base commit {} and test commit {} using ad-hoc ID {}...".format(project_name, job.iris_base_commit[:8], job.iris_test_commit[:8], job.id))
     print("    Base pipeline running at {}".format(job.base_pipeline))
     if args.test_rev is None:
         print("    Test pipeline running at {}".format(job.test_pipeline))
@@ -181,7 +179,9 @@ if __name__ == "__main__":
 
     parser_time = subparsers.add_parser('time', help='Time one reverse dependency against an Iris branch')
     parser_time.add_argument("project", help="the project to measure the time of, or 'all' to measure all of them")
-    parser_time.add_argument("--test-rev", help="use different revision on project for the test build (in case the project requires changes to still build)")
+    parser_time.add_argument("--test-rev", help="use different branch/tag of the project for the test build (in case the project requires changes to still build)")
+    parser_time.add_argument("--base-rev", help="use different branch/tag of the project for the baseline build (for benchmarking against old versions); defaults to the projects main branch")
+    parser_time.add_argument("--iris-base-rev", help="use different revision of Iris for the baseline build (for benchmarking against old versions); defaults to 'master'")
     parser_time.set_defaults(func=time)
 
     # Parse, and dispatch to sub-command
