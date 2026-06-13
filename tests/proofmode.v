@@ -5,7 +5,7 @@ From iris.proofmode Require Import proofmode intro_patterns.
 Unset Mangle Names.
 
 Section tests.
-Context {PROP : bi}.
+Context {SI : sidx} {PROP : bi}.
 Implicit Types P Q R : PROP.
 
 Lemma test_eauto_iSplit_emp_wand_iff P : emp ⊢ P ∗-∗ P.
@@ -2015,7 +2015,7 @@ Proof. Fail iIntros "[%x ?]". Abort.
 End tests.
 
 Section parsing_tests.
-Context {PROP : bi}.
+Context {SI : sidx} {PROP : bi}.
 Implicit Types P : PROP.
 
 (** Test notations for (bi)entailment and internal equality. These tests are
@@ -2063,7 +2063,7 @@ Proof. naive_solver. Qed.
 End parsing_tests.
 
 Section printing_tests.
-Context {PROP : bi} `{!BiFUpd PROP}.
+Context {SI : sidx} {PROP : bi} `{!BiFUpd PROP}.
 Implicit Types P Q R : PROP.
 
 Check "elim_mod_accessor".
@@ -2137,7 +2137,7 @@ End printing_tests.
 
 (** Test error messages *)
 Section error_tests.
-Context {PROP : bi}.
+Context {SI : sidx} {PROP : bi}.
 Implicit Types P Q R : PROP.
 
 Check "iStopProof_not_proofmode".
@@ -2463,7 +2463,7 @@ Abort.
 End error_tests.
 
 Section pure_name_tests.
-Context {PROP : bi}.
+Context {SI : sidx} {PROP : bi}.
 Implicit Types P Q R : PROP.
 
 Check "test_pure_name".
@@ -2499,7 +2499,7 @@ Qed.
 End pure_name_tests.
 
 Section tactic_tests.
-Context {PROP : bi}.
+Context {SI : sidx} {PROP : bi}.
 Implicit Types P Q R : PROP.
 Implicit Types φ : nat → PROP.
 Implicit Types Ψ : nat → nat → PROP.
@@ -2646,7 +2646,7 @@ Proof. iStartProof. iIntros (?%lookup_kmap_Some). Abort.
 End tactic_tests.
 
 Section mutual_induction.
-  Context {PROP : bi}.
+  Context {SI : sidx} {PROP : bi}.
   Implicit Types P Q R : PROP.
   Implicit Types φ : nat → PROP.
   Implicit Types Ψ : nat → nat → PROP.
@@ -2707,7 +2707,7 @@ Section mutual_induction.
 End mutual_induction.
 
 Section FrameDisjUnion.
-  Context {PROP : bi}.
+  Context {SI : sidx} {PROP : bi}.
   Implicit Types P Q R : PROP.
 
   (** Making sure that [iFrame] does not diverge on evars gmultisets by turning

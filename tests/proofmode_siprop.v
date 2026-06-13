@@ -2,6 +2,7 @@ From iris.proofmode Require Import proofmode.
 From iris.si_logic Require Import bi.
 
 Section si_logic_tests.
+  Context {SI : sidx}.
   Implicit Types P Q R : siProp.
 
   Lemma test_everything_persistent P : P -∗ P.

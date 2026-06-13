@@ -7,7 +7,7 @@ Import bi.
 (** All leaf instances below are defined with [Hint Extern] to use evarconv
 ([refine]) instead of legacy unification ([apply]). *)
 
-Lemma from_assumption_exact {PROP : bi} p (P : PROP) : FromAssumption p P P.
+Lemma from_assumption_exact {SI : sidx} {PROP : bi} p (P : PROP) : FromAssumption p P P.
 Proof. by rewrite /FromAssumption /= intuitionistically_if_elim. Qed.
 Global Hint Extern 0 (FromAssumption _ _ _) =>
   (* See [test_iAssumption_evar_refine] for an example where evars are created
@@ -15,7 +15,7 @@ Global Hint Extern 0 (FromAssumption _ _ _) =>
   notypeclasses refine (from_assumption_exact _ _);
     shelve (* evars created during unification *) : typeclass_instances.
 
-Lemma into_wand_wand {PROP : bi} p q (P Q P' : PROP) :
+Lemma into_wand_wand {SI : sidx} {PROP : bi} p q (P Q P' : PROP) :
   FromAssumption q P P' → IntoWand p q (P' -∗ Q) P Q.
 Proof.
   rewrite /FromAssumption /IntoWand=> HP. by rewrite HP intuitionistically_if_elim.
@@ -34,13 +34,13 @@ Global Hint Extern 0 (IntoWand _ _ _ _ _) =>
 
 (* See https://gitlab.mpi-sws.org/iris/iris/issues/288 and [test_iExists_unused]
 for an example where an ordinary [Instance] fails. *)
-Lemma from_exist_exist {PROP : bi} {A} (Φ : A → PROP) : FromExist (∃ a, Φ a) Φ.
+Lemma from_exist_exist {SI : sidx} {PROP : bi} {A} (Φ : A → PROP) : FromExist (∃ a, Φ a) Φ.
 Proof. by rewrite /FromExist. Qed.
 Global Hint Extern 0 (FromExist _ _) =>
   notypeclasses refine (from_exist_exist _) : typeclass_instances.
 
 Section class_instances.
-Context {PROP : bi}.
+Context {SI : sidx} {PROP : bi}.
 Implicit Types P Q R : PROP.
 Implicit Types mP : option PROP.
 
@@ -76,7 +76,7 @@ Global Instance from_affinely_intuitionistically P :
 Proof. by rewrite /FromAffinely. Qed.
 
 (** IntoAbsorbingly *)
-Global Instance into_absorbingly_True : @IntoAbsorbingly PROP True emp | 0.
+Global Instance into_absorbingly_True : @IntoAbsorbingly SI PROP True emp | 0.
 Proof. by rewrite /IntoAbsorbingly -absorbingly_emp_True. Qed.
 Global Instance into_absorbingly_absorbing P : Absorbing P → IntoAbsorbingly P P | 1.
 Proof. intros. by rewrite /IntoAbsorbingly absorbing_absorbingly. Qed.
@@ -159,7 +159,7 @@ Proof.
 Qed.
 
 (** IntoPure *)
-Global Instance into_pure_pure φ : @IntoPure PROP ⌜φ⌝ φ.
+Global Instance into_pure_pure φ : @IntoPure SI PROP ⌜φ⌝ φ.
 Proof. by rewrite /IntoPure. Qed.
 
 Global Instance into_pure_pure_and (φ1 φ2 : Prop) P1 P2 :
@@ -245,9 +245,9 @@ Proof.
 Qed.
 
 (** FromPure *)
-Global Instance from_pure_emp : @FromPure PROP true emp True.
+Global Instance from_pure_emp : @FromPure SI PROP true emp True.
 Proof. rewrite /FromPure /=. apply (affine _). Qed.
-Global Instance from_pure_pure φ : @FromPure PROP false ⌜φ⌝ φ.
+Global Instance from_pure_pure φ : @FromPure SI PROP false ⌜φ⌝ φ.
 Proof. by rewrite /FromPure /=. Qed.
 Global Instance from_pure_pure_and a1 a2 (φ1 φ2 : Prop) P1 P2 :
   FromPure a1 P1 φ1 → FromPure a2 P2 φ2 →
@@ -593,10 +593,10 @@ Proof.
   by rewrite absorbingly_elim_persistently -{2}(intuitionistically_elim P2).
 Qed.
 
-Global Instance from_and_pure φ ψ : @FromAnd PROP ⌜φ ∧ ψ⌝ ⌜φ⌝ ⌜ψ⌝.
+Global Instance from_and_pure φ ψ : @FromAnd SI PROP ⌜φ ∧ ψ⌝ ⌜φ⌝ ⌜ψ⌝.
 Proof. by rewrite /FromAnd pure_and. Qed.
 (* additional instance for ↔ because it is typeclasses opaque *)
-Global Instance from_and_pure_iff φ ψ : @FromAnd PROP ⌜φ ↔ ψ⌝ ⌜φ → ψ⌝ ⌜ψ → φ⌝.
+Global Instance from_and_pure_iff φ ψ : @FromAnd SI PROP ⌜φ ↔ ψ⌝ ⌜φ → ψ⌝ ⌜ψ → φ⌝.
 Proof. rewrite /iff. apply _. Qed.
 
 Global Instance from_and_persistently P Q1 Q2 :
@@ -656,10 +656,10 @@ Global Instance from_sep_and P1 P2 :
   FromSep (P1 ∧ P2) P1 P2 | 101.
 Proof. intros. by rewrite /FromSep sep_and. Qed.
 
-Global Instance from_sep_pure φ ψ : @FromSep PROP ⌜φ ∧ ψ⌝ ⌜φ⌝ ⌜ψ⌝.
+Global Instance from_sep_pure φ ψ : @FromSep SI PROP ⌜φ ∧ ψ⌝ ⌜φ⌝ ⌜ψ⌝.
 Proof. by rewrite /FromSep pure_and sep_and. Qed.
 (* additional instance for ↔ because it is typeclasses opaque *)
-Global Instance from_sep_pure_iff φ ψ : @FromSep PROP ⌜φ ↔ ψ⌝ ⌜φ → ψ⌝ ⌜ψ → φ⌝.
+Global Instance from_sep_pure_iff φ ψ : @FromSep SI PROP ⌜φ ↔ ψ⌝ ⌜φ → ψ⌝ ⌜ψ → φ⌝.
 Proof. rewrite /iff. apply _. Qed.
 
 Global Instance from_sep_affinely P Q1 Q2 :
@@ -777,7 +777,7 @@ Global Instance into_and_sep_affine p P Q :
   IntoAnd p (P ∗ Q) P Q.
 Proof. intros. by rewrite /IntoAnd /= sep_and. Qed.
 
-Global Instance into_and_pure p φ ψ : @IntoAnd PROP p ⌜φ ∧ ψ⌝ ⌜φ⌝ ⌜ψ⌝.
+Global Instance into_and_pure p φ ψ : @IntoAnd SI PROP p ⌜φ ∧ ψ⌝ ⌜φ⌝ ⌜ψ⌝.
 Proof. by rewrite /IntoAnd pure_and intuitionistically_if_and. Qed.
 
 Global Instance into_and_affinely p P Q1 Q2 :
@@ -831,7 +831,7 @@ Proof.
   - by rewrite persistent_and_affinely_sep_r_1.
 Qed.
 
-Global Instance into_sep_pure φ ψ : @IntoSep PROP ⌜φ ∧ ψ⌝ ⌜φ⌝ ⌜ψ⌝.
+Global Instance into_sep_pure φ ψ : @IntoSep SI PROP ⌜φ ∧ ψ⌝ ⌜φ⌝ ⌜ψ⌝.
 Proof. by rewrite /IntoSep pure_and persistent_and_sep_1. Qed.
 
 Global Instance into_sep_affinely `{!BiPositive PROP} P Q1 Q2 :
@@ -894,7 +894,7 @@ Proof. by rewrite /IntoSep big_sepMS_disj_union. Qed.
 (** FromOr *)
 Global Instance from_or_or P1 P2 : FromOr (P1 ∨ P2) P1 P2.
 Proof. by rewrite /FromOr. Qed.
-Global Instance from_or_pure φ ψ : @FromOr PROP ⌜φ ∨ ψ⌝ ⌜φ⌝ ⌜ψ⌝.
+Global Instance from_or_pure φ ψ : @FromOr SI PROP ⌜φ ∨ ψ⌝ ⌜φ⌝ ⌜ψ⌝.
 Proof. by rewrite /FromOr pure_or. Qed.
 Global Instance from_or_affinely P Q1 Q2 :
   FromOr P Q1 Q2 → FromOr (<affine> P) (<affine> Q1) (<affine> Q2).
@@ -913,7 +913,7 @@ Proof. rewrite /FromOr=> <-. by rewrite persistently_or_2. Qed.
 (** IntoOr *)
 Global Instance into_or_or P Q : IntoOr (P ∨ Q) P Q.
 Proof. by rewrite /IntoOr. Qed.
-Global Instance into_or_pure φ ψ : @IntoOr PROP ⌜φ ∨ ψ⌝ ⌜φ⌝ ⌜ψ⌝.
+Global Instance into_or_pure φ ψ : @IntoOr SI PROP ⌜φ ∨ ψ⌝ ⌜φ⌝ ⌜ψ⌝.
 Proof. by rewrite /IntoOr pure_or. Qed.
 Global Instance into_or_affinely P Q1 Q2 :
   IntoOr P Q1 Q2 → IntoOr (<affine> P) (<affine> Q1) (<affine> Q2).
@@ -934,7 +934,7 @@ Global Instance from_exist_texist {TT : tele} (Φ : TT → PROP) :
   FromExist (∃.. a, Φ a) Φ.
 Proof. by rewrite /FromExist bi_texist_exist. Qed.
 Global Instance from_exist_pure {A} (φ : A → Prop) :
-  @FromExist PROP A ⌜∃ x, φ x⌝ (λ a, ⌜φ a⌝)%I.
+  @FromExist SI PROP A ⌜∃ x, φ x⌝ (λ a, ⌜φ a⌝)%I.
 Proof. by rewrite /FromExist pure_exist. Qed.
 Global Instance from_exist_affinely {A} P (Φ : A → PROP) :
   FromExist P Φ → FromExist (<affine> P) (λ a, <affine> (Φ a))%I.
@@ -960,7 +960,7 @@ Global Instance into_exist_exist {A} (Φ : A → PROP) name :
 Proof. by rewrite /IntoExist. Qed.
 Global Instance into_exist_pure {A} (φ : A → Prop) name :
   AsIdentName φ name →
-  @IntoExist PROP A ⌜ex φ⌝ (λ a, ⌜φ a⌝)%I name.
+  @IntoExist SI PROP A ⌜ex φ⌝ (λ a, ⌜φ a⌝)%I name.
 Proof. by rewrite /IntoExist pure_exist. Qed.
 Global Instance into_exist_texist {TT : tele} (Φ : TT → PROP) name :
   AsIdentName Φ name → IntoExist (bi_texist Φ) Φ name | 10.
@@ -1061,16 +1061,16 @@ Global Instance from_forall_tforall {TT : tele} (Φ : TT → PROP) name :
   AsIdentName Φ name → FromForall (bi_tforall Φ) Φ name.
 Proof. by rewrite /FromForall bi_tforall_forall. Qed.
 Global Instance from_forall_pure `{!BiPureForall PROP} {A} (φ : A → Prop) name :
-  AsIdentName φ name → @FromForall PROP A ⌜∀ a : A, φ a⌝ (λ a, ⌜ φ a ⌝)%I name.
+  AsIdentName φ name → @FromForall SI PROP A ⌜∀ a : A, φ a⌝ (λ a, ⌜ φ a ⌝)%I name.
 Proof. by rewrite /FromForall pure_forall_2. Qed.
 Global Instance from_tforall_pure `{!BiPureForall PROP}
     {TT : tele} (φ : TT → Prop) name :
-  AsIdentName φ name → @FromForall PROP TT ⌜tforall φ⌝ (λ x, ⌜ φ x ⌝)%I name.
+  AsIdentName φ name → @FromForall SI PROP TT ⌜tforall φ⌝ (λ x, ⌜ φ x ⌝)%I name.
 Proof. by rewrite /FromForall tforall_forall pure_forall. Qed.
 
 (* [H] is the default name for the [φ] hypothesis, in the following three instances *)
 Global Instance from_forall_pure_not `{!BiPureForall PROP} (φ : Prop) :
-  @FromForall PROP φ ⌜¬ φ⌝ (λ _ : φ, False)%I (to_ident_name H).
+  @FromForall SI PROP φ ⌜¬ φ⌝ (λ _ : φ, False)%I (to_ident_name H).
 Proof. by rewrite /FromForall pure_forall. Qed.
 Global Instance from_forall_impl_pure P Q φ :
   IntoPureT P φ → FromForall (P → Q) (λ _ : φ, Q) (to_ident_name H).

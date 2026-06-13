@@ -8,7 +8,7 @@ Local Tactic Notation "iSplitWith" constr(H) :=
   iApply (bi.and_parallel with H); iSplit; iIntros H.
 
 Section definition.
-  Context {PROP : bi} `{!BiFUpd PROP} {TA TB : tele}.
+  Context {SI : sidx} {PROP : bi} `{!BiFUpd PROP} {TA TB : tele}.
   Implicit Types
     (Eo Ei : coPset) (* outer/inner masks *)
     (α : TA → PROP) (* atomic pre-condition *)
@@ -87,12 +87,12 @@ End definition.
 Local Definition atomic_update_aux : seal (@atomic_update_def).
 Proof. by eexists. Qed.
 Definition atomic_update := atomic_update_aux.(unseal).
-Global Arguments atomic_update {PROP _ TA TB}.
+Global Arguments atomic_update {SI PROP _ TA TB}.
 Local Definition atomic_update_unseal :
   @atomic_update = _ := atomic_update_aux.(seal_eq).
 
-Global Arguments atomic_acc {PROP _ TA TB} Eo Ei _ _ _ _ : simpl never.
-Global Arguments atomic_update {PROP _ TA TB} Eo Ei _ _ _ : simpl never.
+Global Arguments atomic_acc {SI PROP _ TA TB} Eo Ei _ _ _ _ : simpl never.
+Global Arguments atomic_update {SI PROP _ TA TB} Eo Ei _ _ _ : simpl never.
 
 (** Notation: Atomic updates *)
 (** We avoid '<<'/'>>' since those can also reasonably be infix operators
@@ -201,7 +201,7 @@ Notation "'AACC' '<{' α , 'ABORT' P '}>' @ Eo , Ei '<{' β , 'COMM' Φ '}>'" :=
 
 (** Lemmas about AU *)
 Section lemmas.
-  Context `{!BiFUpd PROP} {TA TB : tele}.
+  Context {SI : sidx} `{!BiFUpd PROP} {TA TB : tele}.
   Implicit Types (α : TA → PROP) (β Φ : TA → TB → PROP) (P : PROP).
 
   Local Existing Instance atomic_update_pre_mono.
@@ -417,7 +417,7 @@ End lemmas.
 
 (** ProofMode support for atomic updates. *)
 Section proof_mode.
-  Context `{!BiFUpd PROP} {TA TB : tele}.
+  Context {SI : sidx} `{!BiFUpd PROP} {TA TB : tele}.
   Implicit Types (α : TA → PROP) (β Φ : TA → TB → PROP) (P : PROP).
 
   Lemma tac_aupd_intro Γp Γs n α β Eo Ei Φ P :
@@ -446,8 +446,8 @@ Tactic Notation "iAuIntro" :=
 [rewrite /atomic_acc /=] is an entirely legitimate alternative. *)
 Tactic Notation "iAaccIntro" "with" constr(sel) :=
   iStartProof; lazymatch goal with
-  | |- envs_entails _ (@atomic_acc ?PROP ?H ?TA ?TB ?Eo ?Ei ?α ?P ?β ?Φ) =>
-    iApply (@aacc_intro PROP H TA TB Eo Ei α P β Φ with sel);
+  | |- envs_entails _ (@atomic_acc ?SI ?PROP ?H ?TA ?TB ?Eo ?Ei ?α ?P ?β ?Φ) =>
+    iApply (@aacc_intro SI PROP H TA TB Eo Ei α P β Φ with sel);
     first try solve_ndisj; last iSplit
   | _ => fail "iAAccIntro: Goal is not an atomic accessor"
   end.

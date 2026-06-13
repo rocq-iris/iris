@@ -8,7 +8,7 @@ Local Open Scope lazy_bool_scope.
 
 (* Rocq versions of the tactics *)
 Section tactics.
-Context {PROP : bi}.
+Context {SI : sidx} {PROP : bi}.
 Implicit Types Γ : env PROP.
 Implicit Types Δ : envs PROP.
 Implicit Types P Q : PROP.
@@ -639,16 +639,16 @@ head of the list with every element in the tail, and [∧]-ing that with the
 'gives' clause of the tail. In the example above, this would result in
 [✓ (a ⋅ b) ∧ ✓ (a ⋅ c) ∧ ✓ (b ⋅ c)]. This approach is not strong enough:
 it does not allow us to conclude [✓ (a ⋅ b ⋅ c)]. *)
-Class CombineSepsAsGives {PROP : bi} (Ps : list PROP) (Q R : PROP) := {
+Class CombineSepsAsGives {SI : sidx} {PROP : bi} (Ps : list PROP) (Q R : PROP) := {
   combine_seps_as_gives_as : [∗] Ps ⊢ Q;
   combine_seps_as_gives_gives : [∗] Ps ⊢ <pers> R;
 }.
-Global Hint Mode CombineSepsAsGives + ! - - : typeclass_instances.
-Global Arguments CombineSepsAsGives {_} _%_I _%_I _%_I.
-Global Arguments combine_seps_as_gives_as {_} _%_I _%_I _%_I {_}.
-Global Arguments combine_seps_as_gives_gives {_} _%_I _%_I _%_I {_}.
+Global Hint Mode CombineSepsAsGives - + ! - - : typeclass_instances.
+Global Arguments CombineSepsAsGives {_ _} _%_I _%_I _%_I.
+Global Arguments combine_seps_as_gives_as {_ _} _%_I _%_I _%_I {_}.
+Global Arguments combine_seps_as_gives_gives {_ _} _%_I _%_I _%_I {_}.
 
-Global Instance combine_seps_as_gives_nil : @CombineSepsAsGives PROP [] emp True.
+Global Instance combine_seps_as_gives_nil : @CombineSepsAsGives SI PROP [] emp True.
 Proof.
   split; first done. rewrite persistently_True.
   by apply pure_intro.
@@ -690,11 +690,11 @@ Qed.
 
 (** If just the 'as' clause is needed, we will instead look for instances of
 the following [CombineSepsAs] typeclass. *)
-Class CombineSepsAs {PROP : bi} (Ps : list PROP) (Q : PROP) :=
+Class CombineSepsAs {SI : sidx} {PROP : bi} (Ps : list PROP) (Q : PROP) :=
   combine_seps_as : [∗] Ps ⊢ Q.
-Global Hint Mode CombineSepsAs + ! - : typeclass_instances.
-Global Arguments CombineSepsAs {_} _%_I _%_I.
-Global Arguments combine_seps_as {_} _%_I _%_I {_}.
+Global Hint Mode CombineSepsAs - + ! - : typeclass_instances.
+Global Arguments CombineSepsAs {_ _} _%_I _%_I.
+Global Arguments combine_seps_as {_ _} _%_I _%_I {_}.
 
 (** To ensure consistency of the output [Q] with that of [CombineSepsAsGives],
 the only instance of [CombineSepsAs] is constructed with an instance of
@@ -1061,7 +1061,7 @@ Inputs:
 
 Outputs:
 - [Γout] : the resulting environment. *)
-Class TransformIntuitionisticEnv {PROP1 PROP2} (M : modality PROP1 PROP2)
+Class TransformIntuitionisticEnv {SI : sidx} {PROP1 PROP2} (M : modality PROP1 PROP2)
     (C : PROP2 → PROP1 → Prop) (Γin : env PROP2) (Γout : env PROP1) := {
   transform_intuitionistic_env :
     (∀ P Q, C P Q → □ P ⊢ M (□ Q)) →
@@ -1084,7 +1084,7 @@ Inputs:
 Outputs:
 - [Γout] : the resulting environment.
 - [filtered] : a Boolean indicating if non-affine hypotheses have been cleared. *)
-Class TransformSpatialEnv {PROP1 PROP2} (M : modality PROP1 PROP2)
+Class TransformSpatialEnv {SI : sidx} {PROP1 PROP2} (M : modality PROP1 PROP2)
     (C : PROP2 → PROP1 → Prop) (Γin : env PROP2) (Γout : env PROP1)
     (filtered : bool) := {
   transform_spatial_env :
@@ -1106,7 +1106,7 @@ Inputs:
 
 Outputs:
 - [Γout] : the resulting environment. *)
-Inductive IntoModalIntuitionisticEnv {PROP2} : ∀ {PROP1} (M : modality PROP1 PROP2)
+Inductive IntoModalIntuitionisticEnv {SI : sidx} {PROP2} : ∀ {PROP1} (M : modality PROP1 PROP2)
     (Γin : env PROP2) (Γout : env PROP1), modality_action PROP1 PROP2 → Prop :=
   | MIEnvIsEmpty_intuitionistic {PROP1} (M : modality PROP1 PROP2) :
      IntoModalIntuitionisticEnv M Enil Enil MIEnvIsEmpty
@@ -1138,7 +1138,7 @@ Inputs:
 Outputs:
 - [Γout] : the resulting environment.
 - [filtered] : a Boolean indicating if non-affine hypotheses have been cleared. *)
-Inductive IntoModalSpatialEnv {PROP2} : ∀ {PROP1} (M : modality PROP1 PROP2)
+Inductive IntoModalSpatialEnv {SI : sidx} {PROP2} : ∀ {PROP1} (M : modality PROP1 PROP2)
     (Γin : env PROP2) (Γout : env PROP1), modality_action PROP1 PROP2 → bool → Prop :=
   | MIEnvIsEmpty_spatial {PROP1} (M : modality PROP1 PROP2) :
      IntoModalSpatialEnv M Enil Enil MIEnvIsEmpty false
@@ -1158,7 +1158,7 @@ Global Existing Instances MIEnvIsEmpty_spatial MIEnvForall_spatial
   MIEnvTransform_spatial MIEnvClear_spatial MIEnvId_spatial.
 
 Section tac_modal_intro.
-  Context {PROP1 PROP2 : bi} (M : modality PROP1 PROP2).
+  Context {SI : sidx} {PROP1 PROP2 : bi} (M : modality PROP1 PROP2).
 
   Global Instance transform_intuitionistic_env_nil C : TransformIntuitionisticEnv M C Enil Enil.
   Proof.
@@ -1272,7 +1272,7 @@ End tac_modal_intro.
 
 (** The class [MaybeIntoLaterNEnvs] is used by tactics that need to introduce
 laters, e.g., the symbolic execution tactics. *)
-Class MaybeIntoLaterNEnvs {PROP : bi} (n : nat) (Δ1 Δ2 : envs PROP) := {
+Class MaybeIntoLaterNEnvs {SI : sidx} {PROP : bi} (n : nat) (Δ1 Δ2 : envs PROP) := {
   into_later_intuitionistic :
     TransformIntuitionisticEnv (modality_laterN n) (MaybeIntoLaterN false n)
       (env_intuitionistic Δ1) (env_intuitionistic Δ2);
@@ -1281,13 +1281,13 @@ Class MaybeIntoLaterNEnvs {PROP : bi} (n : nat) (Δ1 Δ2 : envs PROP) := {
       (MaybeIntoLaterN false n) (env_spatial Δ1) (env_spatial Δ2) false
 }.
 
-Global Instance into_laterN_envs {PROP : bi} n (Γp1 Γp2 Γs1 Γs2 : env PROP) m :
+Global Instance into_laterN_envs {SI : sidx} {PROP : bi} n (Γp1 Γp2 Γs1 Γs2 : env PROP) m :
   TransformIntuitionisticEnv (modality_laterN n) (MaybeIntoLaterN false n) Γp1 Γp2 →
   TransformSpatialEnv (modality_laterN n) (MaybeIntoLaterN false n) Γs1 Γs2 false →
   MaybeIntoLaterNEnvs n (Envs Γp1 Γs1 m) (Envs Γp2 Γs2 m).
 Proof. by split. Qed.
 
-Lemma into_laterN_env_sound {PROP : bi} n (Δ1 Δ2 : envs PROP) :
+Lemma into_laterN_env_sound {SI : sidx} {PROP : bi} n (Δ1 Δ2 : envs PROP) :
   MaybeIntoLaterNEnvs n Δ1 Δ2 → of_envs Δ1 ⊢ ▷^n (of_envs Δ2).
 Proof.
   intros [[Hp ??] [Hs ??]]; rewrite !of_envs_eq.

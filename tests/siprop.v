@@ -16,7 +16,7 @@ Definition test {SI : sidx} : siProp := ▷ True.
 Definition testI {SI : sidx} : siPropI := ▷ True.
 
 Check "test_persistently_exist".
-Lemma test_persistently_exist {A} (Φ : A → siProp) :
+Lemma test_persistently_exist {SI : sidx} {A} (Φ : A → siProp) :
   (∃ x, Φ x) -∗ True.
 Proof.
   iIntros "#H".

@@ -1,10 +1,9 @@
-From iris.algebra Require Import stepindex_finite.
 From iris.bi Require Import bi.
 From iris.proofmode Require Export classes.
 Import bi.
 
 Section modalities.
-  Context {PROP : bi}.
+  Context {SI : sidx} {PROP : bi}.
 
   Lemma modality_persistently_mixin :
     modality_mixin (@bi_persistently _ PROP) MIEnvId MIEnvClear.
@@ -13,7 +12,7 @@ Section modalities.
       persistently_mono, persistently_sep_2 with typeclass_instances.
   Qed.
   Definition modality_persistently :=
-    Modality _ modality_persistently_mixin.
+    Modality (@bi_persistently _ PROP) modality_persistently_mixin.
 
   Lemma modality_affinely_mixin :
     modality_mixin (@bi_affinely _ PROP) MIEnvId (MIEnvForall Affine).
@@ -22,7 +21,7 @@ Section modalities.
       affinely_sep_2 with typeclass_instances.
   Qed.
   Definition modality_affinely :=
-    Modality _ modality_affinely_mixin.
+    Modality (@bi_affinely _ PROP) modality_affinely_mixin.
 
   Lemma modality_intuitionistically_mixin :
     modality_mixin (@bi_intuitionistically _ PROP) MIEnvId MIEnvIsEmpty.
@@ -32,7 +31,7 @@ Section modalities.
       intuitionistically_sep_2 with typeclass_instances.
   Qed.
   Definition modality_intuitionistically :=
-    Modality _ modality_intuitionistically_mixin.
+    Modality (@bi_intuitionistically _ PROP) modality_intuitionistically_mixin.
 
   Lemma modality_embed_mixin `{!BiEmbed PROP PROP'} :
     modality_mixin (@embed PROP PROP' _)
@@ -64,5 +63,5 @@ Section modalities.
     rewrite /MaybeIntoLaterN=> P Q ->. by rewrite laterN_intuitionistically_2.
   Qed.
   Definition modality_laterN n :=
-    Modality _ (modality_laterN_mixin n).
+    Modality (@bi_laterN _ PROP n) (modality_laterN_mixin n).
 End modalities.

@@ -2,6 +2,7 @@
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   Q : PROP
   ============================
@@ -12,12 +13,14 @@
   Q
 1 goal
   
+  SI : sidx
   PROP : bi
   Q : PROP
   ============================
   □ emp ∗ Q ⊢ Q
 1 goal
   
+  SI : sidx
   PROP : bi
   Sbi0 : Sbi PROP
   A : ofe
@@ -27,6 +30,7 @@
   l ≡ l
 1 goal
   
+  SI : sidx
   PROP : bi
   Sbi0 : Sbi PROP
   A : ofe
@@ -40,6 +44,7 @@
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P, Q : PROP
   Persistent0 : Persistent P
@@ -53,6 +58,7 @@
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P, Q : PROP
   ============================
@@ -61,6 +67,7 @@
   Q ∨ P
 1 goal
   
+  SI : sidx
   PROP : bi
   P, Q : PROP
   ============================
@@ -71,6 +78,7 @@
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiPersistentlyExist0 : BiPersistentlyExist PROP
   P, Q : PROP
@@ -80,6 +88,7 @@
   □ P ∨ □ Q
 1 goal
   
+  SI : sidx
   PROP : bi
   BiPersistentlyExist0 : BiPersistentlyExist PROP
   P, Q : PROP
@@ -91,6 +100,7 @@
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   Φ : nat → PROP
   H : ∀ x : nat, Affine (Φ x)
@@ -103,6 +113,7 @@
   □ ∀ x : nat, Φ x ∨ Φ (S x)
 1 goal
   
+  SI : sidx
   PROP : bi
   Φ : nat → PROP
   H : ∀ x : nat, Affine (Φ x)
@@ -117,6 +128,7 @@
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiPersistentlyExist0 : BiPersistentlyExist PROP
   Φ : nat → PROP
@@ -128,6 +140,7 @@
   □ ∀ x : nat, Φ x ∨ Φ (S x)
 1 goal
   
+  SI : sidx
   PROP : bi
   BiPersistentlyExist0 : BiPersistentlyExist PROP
   Φ : nat → PROP
@@ -141,6 +154,7 @@
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P, Q : PROP
   ============================
@@ -151,6 +165,7 @@
   (Q ∨ P) ∗ (P ∨ Q)
 1 goal
   
+  SI : sidx
   PROP : bi
   P, Q : PROP
   ============================
@@ -163,6 +178,7 @@
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   A : Type
   Φ : A → PROP
@@ -178,6 +194,7 @@
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   Q : PROP
   ============================
@@ -188,6 +205,7 @@
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   Q : PROP
   Affine0 : Affine Q
@@ -203,6 +221,7 @@ Tactic failure: iExistDestruct: cannot destruct P.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P : PROP
   Φ : nat → PROP
@@ -215,6 +234,7 @@ Tactic failure: iExistDestruct: cannot destruct P.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P : PROP
   Φ : nat → PROP
@@ -227,6 +247,7 @@ Tactic failure: iExistDestruct: cannot destruct P.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   Φ : nat → PROP
   __unknown : nat
@@ -238,6 +259,7 @@ Tactic failure: iExistDestruct: cannot destruct P.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   Φ : nat → PROP
   __unknown : nat
@@ -249,6 +271,7 @@ Tactic failure: iExistDestruct: cannot destruct P.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiPureForall0 : BiPureForall PROP
   φ : nat → Prop
@@ -261,6 +284,7 @@ Tactic failure: iExistDestruct: cannot destruct P.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   Ψ : nat → PROP
   x : nat
@@ -271,6 +295,7 @@ Tactic failure: iExistDestruct: cannot destruct P.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   H : True
   P : PROP
@@ -311,6 +336,7 @@ Tactic failure: iSpecialize: Q not persistent.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   φ : Prop
   P, Q : PROP
@@ -320,6 +346,7 @@ Tactic failure: iSpecialize: Q not persistent.
   <affine> ⌜φ⌝
 1 goal
   
+  SI : sidx
   PROP : bi
   φ : Prop
   P, Q : PROP
@@ -332,6 +359,7 @@ Tactic failure: iSpecialize: Q not persistent.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiAffine0 : BiAffine PROP
   φ : Prop
@@ -342,6 +370,7 @@ Tactic failure: iSpecialize: Q not persistent.
   ⌜φ⌝
 1 goal
   
+  SI : sidx
   PROP : bi
   BiAffine0 : BiAffine PROP
   φ : Prop
@@ -355,6 +384,7 @@ Tactic failure: iSpecialize: Q not persistent.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   φ : Prop
   P, Q : PROP
@@ -364,6 +394,7 @@ Tactic failure: iSpecialize: Q not persistent.
   <affine> ⌜φ⌝
 1 goal
   
+  SI : sidx
   PROP : bi
   φ : Prop
   P, Q : PROP
@@ -376,6 +407,7 @@ Tactic failure: iSpecialize: Q not persistent.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiAffine0 : BiAffine PROP
   φ : Prop
@@ -386,6 +418,7 @@ Tactic failure: iSpecialize: Q not persistent.
   ⌜φ⌝
 1 goal
   
+  SI : sidx
   PROP : bi
   BiAffine0 : BiAffine PROP
   φ : Prop
@@ -407,6 +440,7 @@ Tactic failure: iFrame: cannot frame (Φ 0 1).
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P, Q : PROP
   Absorbing0 : Absorbing Q
@@ -418,6 +452,7 @@ Tactic failure: iFrame: cannot frame (Φ 0 1).
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   Φ, Ψ : nat → PROP
   P, Q : PROP
@@ -429,6 +464,7 @@ Tactic failure: iFrame: cannot frame (Φ 0 1).
   ∃ x : nat, Φ x ∗ P ∗ Q
 1 goal
   
+  SI : sidx
   PROP : bi
   Φ, Ψ : nat → PROP
   P, Q : PROP
@@ -439,6 +475,7 @@ Tactic failure: iFrame: cannot frame (Φ 0 1).
   ∃ x : nat, Φ x ∗ Q
 1 goal
   
+  SI : sidx
   PROP : bi
   Φ, Ψ : nat → PROP
   P, Q : PROP
@@ -450,6 +487,7 @@ Tactic failure: iFrame: cannot frame (Φ 0 1).
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   Φ : nat → PROP
   ============================
@@ -459,6 +497,7 @@ Tactic failure: iFrame: cannot frame (Φ 0 1).
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P : nat → PROP
   ============================
@@ -469,6 +508,7 @@ Tactic failure: iFrame: cannot frame (Φ 0 1).
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P : nat → PROP
   ============================
@@ -479,6 +519,7 @@ Tactic failure: iFrame: cannot frame (Φ 0 1).
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P : nat → PROP
   ============================
@@ -489,6 +530,7 @@ Tactic failure: iFrame: cannot frame (Φ 0 1).
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P : PROP
   ============================
@@ -499,6 +541,7 @@ Tactic failure: iFrame: cannot frame (Φ 0 1).
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiAffine0 : BiAffine PROP
   P : PROP
@@ -510,6 +553,7 @@ Tactic failure: iFrame: cannot frame (Φ 0 1).
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P1, P2, P3 : PROP
   ============================
@@ -519,6 +563,7 @@ Tactic failure: iFrame: cannot frame (Φ 0 1).
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P1, P2, P3 : PROP
   ============================
@@ -528,6 +573,7 @@ Tactic failure: iFrame: cannot frame (Φ 0 1).
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P1, P2, P3 : PROP
   ============================
@@ -537,6 +583,7 @@ Tactic failure: iFrame: cannot frame (Φ 0 1).
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiAffine0 : BiAffine PROP
   P1, P2, P3 : PROP
@@ -547,6 +594,7 @@ Tactic failure: iFrame: cannot frame (Φ 0 1).
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiAffine0 : BiAffine PROP
   P1, P2, P3 : PROP
@@ -575,6 +623,7 @@ Tactic failure: iCombine: cannot find 'gives' clause for hypotheses
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   l, r : tree
   Φ : tree → PROP
@@ -589,6 +638,7 @@ Tactic failure: iCombine: cannot find 'gives' clause for hypotheses
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   l, r : tree
   Φ : tree → PROP
@@ -608,6 +658,7 @@ Tactic failure: iSpecialize: cannot instantiate (⌜φ⌝ → P -∗ False)%I wi
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P, Q : PROP
   n, m, k : nat
@@ -618,6 +669,7 @@ Tactic failure: iSpecialize: cannot instantiate (⌜φ⌝ → P -∗ False)%I wi
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   φ : Prop
   P, P2, Q, R1, R2 : PROP
@@ -633,6 +685,7 @@ Tactic failure: iSpecialize: cannot instantiate (⌜φ⌝ → P -∗ False)%I wi
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   x, y : nat
   ============================
@@ -641,6 +694,7 @@ Tactic failure: iSpecialize: cannot instantiate (⌜φ⌝ → P -∗ False)%I wi
   ⌜S (S (S x)) = y⌝
 1 goal
   
+  SI : sidx
   PROP : bi
   x, y, z : nat
   ============================
@@ -650,6 +704,7 @@ Tactic failure: iSpecialize: cannot instantiate (⌜φ⌝ → P -∗ False)%I wi
   ⌜S (S (S x)) = y⌝
 1 goal
   
+  SI : sidx
   PROP : bi
   x, y, z : nat
   ============================
@@ -666,6 +721,7 @@ Tactic failure: iEval: %: unsupported selection pattern.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   Hdef : def2 = 10
   ============================
@@ -675,6 +731,7 @@ Tactic failure: iEval: %: unsupported selection pattern.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   Hdef : def2 = 10
   ============================
@@ -685,6 +742,7 @@ Tactic failure: iEval: %: unsupported selection pattern.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P : PROP
   ============================
@@ -695,6 +753,7 @@ Tactic failure: iEval: %: unsupported selection pattern.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P, Q : PROP
   ============================
@@ -704,6 +763,7 @@ Tactic failure: iEval: %: unsupported selection pattern.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P, Q : PROP
   ============================
@@ -731,6 +791,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiAffine0 : BiAffine PROP
   P, Q : PROP
@@ -743,6 +804,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   x : nat
   l : list nat
@@ -755,6 +817,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
   P
 1 goal
   
+  SI : sidx
   PROP : bi
   x : nat
   l : list nat
@@ -769,6 +832,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   x1, x2 : nat
   l1, l2 : list nat
@@ -781,6 +845,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
   P ∨ ([∗ list] _;_ ∈ x1 :: l1;x2 :: l2, True)
 1 goal
   
+  SI : sidx
   PROP : bi
   x1, x2 : nat
   l1, l2 : list nat
@@ -795,6 +860,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   Φ : nat → nat → PROP
   x1, x2 : nat
@@ -808,6 +874,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   ============================
   "H" : □ True
@@ -817,6 +884,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   ============================
   "H" : emp
@@ -826,6 +894,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   ============================
   "H" : emp
@@ -835,6 +904,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   mP : option PROP
   Q, R : PROP
@@ -846,6 +916,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
   R
 1 goal
   
+  SI : sidx
   PROP : bi
   mP : option PROP
   Q, R : PROP
@@ -857,6 +928,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   Ψ, Φ : nat → PROP
   HP :
@@ -867,6 +939,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
   Ψ (1 + 10)
 1 goal
   
+  SI : sidx
   PROP : bi
   BiPersistentlyExist0 : BiPersistentlyExist PROP
   BiAffine0 : BiAffine PROP
@@ -881,6 +954,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   φ : Prop
   P : PROP
@@ -892,6 +966,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   ============================
   --------------------------------------∗
@@ -900,6 +975,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiAffine0 : BiAffine PROP
   φ : Prop
@@ -912,6 +988,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   n : nat
   P : nat → PROP
@@ -922,6 +999,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
   P (S n)
 1 goal
   
+  SI : sidx
   PROP : bi
   n : nat
   Hn : 0 < S n
@@ -934,6 +1012,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiAffine0 : BiAffine PROP
   n : nat
@@ -945,6 +1024,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
   P (S n)
 1 goal
   
+  SI : sidx
   PROP : bi
   BiAffine0 : BiAffine PROP
   n : nat
@@ -958,6 +1038,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiAffine0 : BiAffine PROP
   P : PROP
@@ -1000,6 +1081,7 @@ Tactic failure: iExistDestruct: cannot destruct (□ ▷ ∃ x : A, Φ x)%I.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiFUpd0 : BiFUpd PROP
   X : Type
@@ -1014,6 +1096,7 @@ Tactic failure: iExistDestruct: cannot destruct (□ ▷ ∃ x : A, Φ x)%I.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiFUpd0 : BiFUpd PROP
   P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P : PROP
@@ -1024,6 +1107,7 @@ Tactic failure: iExistDestruct: cannot destruct (□ ▷ ∃ x : A, Φ x)%I.
   True
 1 goal
   
+  SI : sidx
   PROP : bi
   BiFUpd0 : BiFUpd PROP
   P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P : PROP
@@ -1036,6 +1120,7 @@ Tactic failure: iExistDestruct: cannot destruct (□ ▷ ∃ x : A, Φ x)%I.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiFUpd0 : BiFUpd PROP
   P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P : PROP
@@ -1046,6 +1131,7 @@ Tactic failure: iExistDestruct: cannot destruct (□ ▷ ∃ x : A, Φ x)%I.
   True
 1 goal
   
+  SI : sidx
   PROP : bi
   BiFUpd0 : BiFUpd PROP
   P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P_P : PROP
@@ -1058,6 +1144,7 @@ Tactic failure: iExistDestruct: cannot destruct (□ ▷ ∃ x : A, Φ x)%I.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiFUpd0 : BiFUpd PROP
   PPPPPPPPPPPPPPPPP, QQQQQQQQQQQQQQQQQQ : PROP
@@ -1069,6 +1156,7 @@ Tactic failure: iExistDestruct: cannot destruct (□ ▷ ∃ x : A, Φ x)%I.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiFUpd0 : BiFUpd PROP
   PPPPPPPPPPPPPPPPP, QQQQQQQQQQQQQQQQQQ : PROP
@@ -1081,6 +1169,7 @@ Tactic failure: iExistDestruct: cannot destruct (□ ▷ ∃ x : A, Φ x)%I.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiFUpd0 : BiFUpd PROP
   PPPPPPPPPPPPPPPPP, QQQQQQQQQQQQQQQQQQ : PROP
@@ -1092,6 +1181,7 @@ Tactic failure: iExistDestruct: cannot destruct (□ ▷ ∃ x : A, Φ x)%I.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiFUpd0 : BiFUpd PROP
   PPPPPPPPPPPPPPPPP, QQQQQQQQQQQQQQQQQQ : PROP
@@ -1104,6 +1194,7 @@ Tactic failure: iExistDestruct: cannot destruct (□ ▷ ∃ x : A, Φ x)%I.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiFUpd0 : BiFUpd PROP
   E : coPset.coPset
@@ -1116,6 +1207,7 @@ Tactic failure: iExistDestruct: cannot destruct (□ ▷ ∃ x : A, Φ x)%I.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   BiFUpd0 : BiFUpd PROP
   E1, E2 : coPset.coPset
@@ -1209,6 +1301,7 @@ Tactic failure: iClear: "HP" : P not affine and the goal not absorbing.
      : string
 The command has indeed failed with message:
 In environment
+SI : sidx
 PROP : bi
 P : PROP
 The term "true" has type "bool" while it is expected to have type "nat".
@@ -1391,6 +1484,7 @@ Tactic failure: iPoseProof: (⊢ P1) not a PROP2 assertion.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P : PROP
   φ1, φ2 : Prop
@@ -1428,6 +1522,7 @@ Tactic failure: iSpatial: "H" not fresh.
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   P : ntree → PROP
   l : list ntree

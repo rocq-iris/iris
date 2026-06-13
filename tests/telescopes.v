@@ -4,7 +4,7 @@ From iris.proofmode Require Import proofmode.
 Unset Mangle Names.
 
 Section basic_tests.
-  Context {PROP : bi}.
+  Context {SI : sidx} {PROP : bi}.
   Implicit Types P Q R : PROP.
 
   Lemma test_iIntros_tforall {TT : tele} (Φ : TT → PROP) :
@@ -58,6 +58,7 @@ Section basic_tests.
 End basic_tests.
 
 Section accessor.
+Context {SI : sidx} {PROP : bi}.
 (* Just playing around a bit with a telescope version
    of accessors with just one binder list. *)
 Definition accessor `{!BiFUpd PROP} {X : tele} (E1 E2 : coPset)
@@ -100,7 +101,7 @@ Qed.
 End tests.
 
 Section printing_tests.
-Context {PROP : bi} `{!BiFUpd PROP}.
+Context `{!BiFUpd PROP}.
 
 (* Working with concrete telescopes: Testing the reduction into normal quantifiers. *)
 Lemma acc_elim_test_1 E1 E2 :
@@ -116,6 +117,7 @@ End accessor.
 
 (* Robbert's tests *)
 Section telescopes_and_tactics.
+Context {SI : sidx}.
 
 Definition test1 {PROP : bi} {X : tele} (α : X → PROP) : PROP :=
   (∃.. x, α x)%I.
@@ -176,6 +178,6 @@ Abort.
 
 End telescopes_and_tactics.
 
-Lemma tele_universe {PROP : bi} (TT : tele@{bi.Quant}) (P : TT → PROP) :
+Lemma tele_universe {SI : sidx} {PROP : bi} (TT : tele@{bi.Quant}) (P : TT → PROP) :
   bi_texist P ⊣⊢ bi_exist P.
 Proof. apply bi_texist_exist. Qed.

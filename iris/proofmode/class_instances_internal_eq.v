@@ -3,7 +3,7 @@ From iris.proofmode Require Import modality_instances classes.
 Import bi.
 
 Section class_instances_internal_eq.
-Context `{!Sbi PROP}.
+Context {SI : sidx} `{!Sbi PROP}.
 Implicit Types P Q R : PROP.
 
 (* When a user calls [iPureIntro] on [⊢ a ≡ b], the following instance turns
@@ -12,7 +12,7 @@ Implicit Types P Q R : PROP.
   this does not lead to information loss, [=] is harder to prove than [≡]. We thus
   leave such simplifications to the user (e.g. they can call [fold_leibniz]). *)
 Global Instance from_pure_internal_eq {A : ofe} (a b : A) :
-  @FromPure PROP false (a ≡ b) (a ≡ b).
+  @FromPure _ PROP false (a ≡ b) (a ≡ b).
 Proof. by rewrite /FromPure pure_internal_eq. Qed.
 
 (* On the other hand, when a user calls [iIntros "%H"] on [⊢ (a ≡ b) -∗ P],
@@ -27,7 +27,7 @@ Global Instance into_pure_eq {A : ofe} (a b : A) (P : Prop) :
   TCOr (Discrete a) (Discrete b) →
   TCOr (TCAnd (LeibnizEquiv A) (TCEq P (a = b)))
        (TCEq P (a ≡ b)) →
-  @IntoPure PROP (a ≡ b) P.
+  @IntoPure _ PROP (a ≡ b) P.
 Proof.
   move=> ? [[? ->]|->]; rewrite /IntoPure discrete_eq; last done.
   by rewrite leibniz_equiv_iff.
@@ -47,7 +47,7 @@ Proof.
 Qed.
 
 Global Instance into_internal_eq_internal_eq {A : ofe} (x y : A) :
-  @IntoInternalEq PROP _ A (x ≡ y) x y.
+  IntoInternalEq (PROP:=PROP) (x ≡ y) x y.
 Proof. by rewrite /IntoInternalEq. Qed.
 Global Instance into_internal_eq_affinely {A : ofe} (x y : A) P :
   IntoInternalEq P x y → IntoInternalEq (<affine> P) x y.

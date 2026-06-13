@@ -11,7 +11,7 @@ proposition is affine we additionally get [P ∧ Q -∗ P ∗ Q].
 Our proof essentially follows the structure of the proof of Theorem 3 in
 https://www.cs.princeton.edu/~appel/papers/bringing-order.pdf *)
 Module affine_em. Section affine_em.
-  Context `{!BiPersistentlyExist PROP}.
+  Context {SI : sidx} `{!BiPersistentlyExist PROP}.
   Context (em : ∀ P : PROP, ⊢ P ∨ ¬P).
   Implicit Types P Q : PROP.
 
@@ -37,7 +37,7 @@ it gives [▷ P] for any [P], or equivalently [▷ P ≡ True]. In an SBI, the
 excluded-middle axiom results in inconsistency (proof of [False]) due to
 [later_soundness : (⊢ ▷ P) → ⊢ P]. *)
 Module löb_em. Section löb_em.
-  Context `{!BiPersistentlyExist PROP}.
+  Context {SI : sidx} `{!BiPersistentlyExist PROP}.
   Context (em : ∀ P : PROP, ⊢ P ∨ ¬P).
   Implicit Types P : PROP.
 
@@ -48,14 +48,15 @@ Module löb_em. Section löb_em.
     - iExFalso. iLöb as "IH". iSpecialize ("HnotP" with "IH"). done.
   Qed.
 
-  Lemma later_inconsistent `{!Sbi PROP} : ⊢@{PROP} False.
+  (** TODO: Remove [SIdxFinite] once [siProp] has been ported to [sidx]. *)
+  Lemma later_inconsistent `{!SIdxFinite SI, !Sbi PROP} : ⊢@{PROP} False.
   Proof. apply later_soundness, later_anything. Qed.
 End löb_em. End löb_em.
 
 (** This proves that we need the ▷ in a "Saved Proposition" construction with
 name-dependent allocation. *)
 Module savedprop. Section savedprop.
-  Context `{!BiPersistentlyExist PROP, !BiAffine PROP}.
+  Context {SI : sidx} `{!BiPersistentlyExist PROP, !BiAffine PROP}.
   Implicit Types P : PROP.
 
   Context (bupd : PROP → PROP).
@@ -118,7 +119,7 @@ End savedprop. End savedprop.
 paradoxes in this section, but they share the general axiomatization of
 invariants. *)
 Module inv. Section inv.
-  Context {PROP : bi} `{!BiAffine PROP}.
+  Context {SI : sidx} {PROP : bi} `{!BiAffine PROP}.
   Implicit Types P : PROP.
 
   (** Assumptions *)
@@ -374,7 +375,7 @@ There, the stronger variant of the "unlock" rule (see Aquinas Hobor's PhD thesis
 entirely into that lock.
 *)
 Module linear. Section linear.
-  Context {PROP: bi}.
+  Context {SI : sidx} {PROP : bi}.
   Implicit Types P : PROP.
 
   (** Assumptions. *)
@@ -429,7 +430,7 @@ is unsound. The [fupd_keep_si_pure'] law is used to derive [fupd_keep_plainly],
 which allows `keeping` resources used to establish plain propositions after
 a (non later-eliminating) fancy update. *)
 Module later_credits_plain. Section later_credits_plain.
-  Context PROP `{!BiPersistentlyExist PROP, !Sbi PROP, !BiFUpd PROP}.
+  Context `{!SIdxFinite SI, !BiPersistentlyExist PROP, !Sbi PROP, !BiFUpd PROP}.
 
   (** Assumptions. *)
   (** We have a single later credit and the corresponding soundness and

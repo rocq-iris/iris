@@ -8,21 +8,21 @@ Import bi.
 goal. Otherwise we leave [emp] via [frame_here].
 Only if all those options fail, we start decomposing [R], via instances like
 [frame_exist]. To ensure that, all other instances must have cost > 1. *)
-Lemma frame_here_absorbing {PROP : bi} p (R : PROP) :
+Lemma frame_here_absorbing {SI : sidx} {PROP : bi} p (R : PROP) :
   QuickAbsorbing R → Frame p R R True.
 Proof.
   rewrite /QuickAbsorbing /Frame. intros.
   by rewrite intuitionistically_if_elim sep_elim_l.
 Qed.
-Lemma frame_here {PROP : bi} p (R : PROP) : Frame p R R emp.
+Lemma frame_here {SI : sidx} {PROP : bi} p (R : PROP) : Frame p R R emp.
 Proof. intros. by rewrite /Frame intuitionistically_if_elim sep_elim_l. Qed.
-Lemma frame_affinely_here_absorbing {PROP : bi} p (R : PROP) :
+Lemma frame_affinely_here_absorbing {SI : sidx} {PROP : bi} p (R : PROP) :
   QuickAbsorbing R → Frame p (<affine> R) R True.
 Proof.
   rewrite /QuickAbsorbing /Frame. intros.
   rewrite intuitionistically_if_elim affinely_elim. apply sep_elim_l, _.
 Qed.
-Lemma frame_affinely_here {PROP : bi} p (R : PROP) : Frame p (<affine> R) R emp.
+Lemma frame_affinely_here {SI : sidx} {PROP : bi} p (R : PROP) : Frame p (<affine> R) R emp.
 Proof.
   intros. rewrite /Frame intuitionistically_if_elim affinely_elim.
   apply sep_elim_l, _.
@@ -41,7 +41,7 @@ Global Hint Extern 1 (Frame _ (<affine> _) _ _) =>
   notypeclasses refine (frame_affinely_here _ _); shelve : typeclass_instances.
 
 Section class_instances_frame.
-Context {PROP : bi}.
+Context {SI : sidx} {PROP : bi}.
 Implicit Types P Q R : PROP.
 
 Global Instance frame_here_pure_persistent a φ Q :

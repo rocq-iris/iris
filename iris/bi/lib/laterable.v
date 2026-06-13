@@ -3,33 +3,33 @@ From iris.proofmode Require Import proofmode.
 Set Default Proof Using "Type*".
 
 (** The class of laterable assertions *)
-Class Laterable {PROP : bi} (P : PROP) := laterable :
+Class Laterable {SI : sidx} {PROP : bi} (P : PROP) := laterable :
   P ⊢ ∃ Q, ▷ Q ∗ □ (▷ Q -∗ ◇ P).
-Global Arguments Laterable {_} _%_I : simpl never.
-Global Arguments laterable {_} _%_I {_}.
-Global Hint Mode Laterable + ! : typeclass_instances.
+Global Arguments Laterable {_ _} _%_I : simpl never.
+Global Arguments laterable {_ _} _%_I {_}.
+Global Hint Mode Laterable - + ! : typeclass_instances.
 
 (** Proofmode class for turning [P] into a laterable [Q].
     Will be the identity if [P] already is laterable, and add
     [▷] otherwise. *)
-Class IntoLaterable {PROP : bi} (P Q : PROP) : Prop := {
+Class IntoLaterable {SI : sidx} {PROP : bi} (P Q : PROP) : Prop := {
   (** This is non-standard; usually we would just demand
       [P ⊢ make_laterable Q]. However, we need these stronger properties for
       the [make_laterable_id] hack in [atomic.v]. *)
   into_laterable : P ⊢ Q;
   into_laterable_result_laterable : Laterable Q;
 }.
-Global Arguments IntoLaterable {_} P%_I Q%_I.
-Global Arguments into_laterable {_} P%_I Q%_I {_}.
-Global Arguments into_laterable_result_laterable {_} P%_I Q%_I {_}.
-Global Hint Mode IntoLaterable + ! - : typeclass_instances.
+Global Arguments IntoLaterable {_ _} P%_I Q%_I.
+Global Arguments into_laterable {_ _} P%_I Q%_I {_}.
+Global Arguments into_laterable_result_laterable {_ _} P%_I Q%_I {_}.
+Global Hint Mode IntoLaterable - + ! - : typeclass_instances.
 
 Section instances.
-  Context `{!BiPersistentlyExist PROP}.
+  Context {SI : sidx} `{!BiPersistentlyExist PROP}.
   Implicit Types P : PROP.
   Implicit Types Ps : list PROP.
 
-  Global Instance laterable_proper : Proper ((⊣⊢) ==> (↔)) (@Laterable PROP).
+  Global Instance laterable_proper : Proper ((⊣⊢) ==> (↔)) (@Laterable SI PROP).
   Proof. solve_proper. Qed.
 
   Global Instance later_laterable P : Laterable (▷ P).

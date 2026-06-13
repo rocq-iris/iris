@@ -81,14 +81,16 @@ Inductive env_Forall2 {A B} (P : A → B → Prop) : env A → env B → Prop :=
 a [simpl]. *)
 Notation env_and_persistently Γ := ([∧ list] P ∈ env_to_list Γ, <pers> P)%I.
 
-Fixpoint env_to_prop_go {PROP : bi} (acc : PROP) (Γ : env PROP) : PROP :=
+Fixpoint env_to_prop_go {SI : sidx} {PROP : bi}
+    (acc : PROP) (Γ : env PROP) : PROP :=
   match Γ with Enil => acc | Esnoc Γ _ P => env_to_prop_go (P ∗ acc) Γ end.
-Definition env_to_prop {PROP : bi} (Γ : env PROP) : PROP :=
+Definition env_to_prop {SI : sidx} {PROP : bi} (Γ : env PROP) : PROP :=
   match Γ with Enil => emp | Esnoc Γ _ P => env_to_prop_go P Γ end.
 
-Fixpoint env_to_prop_and_go {PROP : bi} (acc : PROP) (Γ : env PROP) : PROP :=
+Fixpoint env_to_prop_and_go {SI : sidx} {PROP : bi}
+    (acc : PROP) (Γ : env PROP) : PROP :=
   match Γ with Enil => acc | Esnoc Γ _ P => env_to_prop_and_go (P ∧ acc) Γ end.
-Definition env_to_prop_and {PROP : bi} (Γ : env PROP) : PROP :=
+Definition env_to_prop_and {SI : sidx} {PROP : bi} (Γ : env PROP) : PROP :=
   match Γ with Enil => True | Esnoc Γ _ P => env_to_prop_and_go P Γ end.
 
 Section env.
@@ -209,7 +211,7 @@ Section env.
 End env.
 
 Section env_bi.
-  Context {PROP : bi}.
+  Context {SI : sidx} {PROP : bi}.
   Implicit Types Γ : env PROP.
 
   Lemma env_to_prop_sound Γ : env_to_prop Γ ⊣⊢ [∗] Γ.
@@ -233,16 +235,16 @@ Section env_bi.
   Qed.
 End env_bi.
 
-Record envs (PROP : bi) := Envs {
+Record envs {SI : sidx} (PROP : bi) := Envs {
   env_intuitionistic : env PROP;
   env_spatial : env PROP;
   env_counter : positive (** A counter to generate fresh hypothesis names *)
 }.
 Add Printing Constructor envs.
-Global Arguments Envs {_} _ _ _.
-Global Arguments env_intuitionistic {_} _.
-Global Arguments env_spatial {_} _.
-Global Arguments env_counter {_} _.
+Global Arguments Envs {_ _} _ _ _.
+Global Arguments env_intuitionistic {_ _} _.
+Global Arguments env_spatial {_ _} _.
+Global Arguments env_counter {_ _} _.
 
 (** We now define the judgment [envs_entails Δ Q] for proof mode entailments.
 This judgment expresses that [Q] can be proved under the proof mode environment
@@ -263,23 +265,24 @@ We first define a version [pre_envs_entails] that takes the two contexts
 [env_intuitionistic] and [env_spatial] as its arguments. We seal this definition
 and then lift it to take the whole proof mode context [Δ : envs PROP]. This is
 crucial to make sure that the counter [env_counter] is not part of the seal. *)
-Record envs_wf' {PROP : bi} (Γp Γs : env PROP) := {
+Record envs_wf' {SI : sidx} {PROP : bi} (Γp Γs : env PROP) := {
   env_intuitionistic_valid : env_wf Γp;
   env_spatial_valid : env_wf Γs;
   envs_disjoint i : Γp !! i = None ∨ Γs !! i = None
 }.
-Definition envs_wf {PROP : bi} (Δ : envs PROP) :=
-  envs_wf' (env_intuitionistic Δ) (env_spatial Δ).
+Definition envs_wf {SI : sidx} {PROP : bi} (Δ : envs PROP) :=
+  @envs_wf' _ PROP (env_intuitionistic Δ) (env_spatial Δ).
 
-Definition of_envs' {PROP : bi} (Γp Γs : env PROP) : PROP :=
+Definition of_envs' {SI : sidx} {PROP : bi} (Γp Γs : env PROP) : PROP :=
   ⌜envs_wf' Γp Γs⌝ ∧ env_and_persistently Γp ∧ [∗] Γs.
-Global Instance: Params (@of_envs') 1 := {}.
-Definition of_envs {PROP : bi} (Δ : envs PROP) : PROP :=
+Global Instance: Params (@of_envs') 2 := {}.
+Definition of_envs {SI : sidx} {PROP : bi} (Δ : envs PROP) : PROP :=
   of_envs' (env_intuitionistic Δ) (env_spatial Δ).
-Global Instance: Params (@of_envs) 1 := {}.
+Global Instance: Params (@of_envs) 2 := {}.
 Global Arguments of_envs : simpl never.
 
-Local Definition pre_envs_entails_def {PROP : bi} (Γp Γs : env PROP) (Q : PROP) :=
+Local Definition pre_envs_entails_def {SI : sidx} {PROP : bi}
+    (Γp Γs : env PROP) (Q : PROP) :=
   of_envs' Γp Γs ⊢ Q.
 Local Definition pre_envs_entails_aux : seal (@pre_envs_entails_def).
 Proof. by eexists. Qed.
@@ -287,30 +290,32 @@ Local Definition pre_envs_entails := pre_envs_entails_aux.(unseal).
 Local Definition pre_envs_entails_unseal :
   @pre_envs_entails = @pre_envs_entails_def := pre_envs_entails_aux.(seal_eq).
 
-Definition envs_entails {PROP : bi} (Δ : envs PROP) (Q : PROP) : Prop :=
-  pre_envs_entails  PROP (env_intuitionistic Δ) (env_spatial Δ) Q.
+Definition envs_entails {SI : sidx} {PROP : bi} (Δ : envs PROP) (Q : PROP) : Prop :=
+  @pre_envs_entails _ PROP (env_intuitionistic Δ) (env_spatial Δ) Q.
 Definition envs_entails_unseal :
-  @envs_entails = λ PROP (Δ : envs PROP) Q, (of_envs Δ ⊢ Q).
+  @envs_entails = λ _ PROP (Δ : envs PROP) Q, (@of_envs _ PROP Δ ⊢ Q).
 Proof. by rewrite /envs_entails pre_envs_entails_unseal. Qed.
-Global Arguments envs_entails {PROP} Δ Q%_I.
-Global Instance: Params (@envs_entails) 1 := {}.
+Global Arguments envs_entails {_ PROP} Δ Q%_I.
+Global Instance: Params (@envs_entails) 2 := {}.
 
-Record envs_Forall2 {PROP : bi} (R : relation PROP) (Δ1 Δ2 : envs PROP) := {
+Record envs_Forall2 {SI : sidx} {PROP : bi}
+    (R : relation PROP) (Δ1 Δ2 : envs PROP) := {
   env_intuitionistic_Forall2 : env_Forall2 R (env_intuitionistic Δ1) (env_intuitionistic Δ2);
   env_spatial_Forall2 : env_Forall2 R (env_spatial Δ1) (env_spatial Δ2)
 }.
 
-Definition envs_dom {PROP} (Δ : envs PROP) : list ident :=
+Definition envs_dom {SI : sidx} {PROP} (Δ : envs PROP) : list ident :=
   env_dom (env_intuitionistic Δ) ++ env_dom (env_spatial Δ).
 
-Definition envs_lookup {PROP} (i : ident) (Δ : envs PROP) : option (bool * PROP) :=
+Definition envs_lookup {SI : sidx} {PROP}
+    (i : ident) (Δ : envs PROP) : option (bool * PROP) :=
   let (Γp,Γs,n) := Δ in
   match env_lookup i Γp with
   | Some P => Some (true, P)
   | None => P ← env_lookup i Γs; Some (false, P)
   end.
 
-Definition envs_delete {PROP} (remove_intuitionistic : bool)
+Definition envs_delete {SI : sidx} {PROP} (remove_intuitionistic : bool)
     (i : ident) (p : bool) (Δ : envs PROP) : envs PROP :=
   let (Γp,Γs,n) := Δ in
   match p with
@@ -318,7 +323,7 @@ Definition envs_delete {PROP} (remove_intuitionistic : bool)
   | false => Envs Γp (env_delete i Γs) n
   end.
 
-Definition envs_lookup_delete {PROP} (remove_intuitionistic : bool)
+Definition envs_lookup_delete {SI : sidx} {PROP} (remove_intuitionistic : bool)
     (i : ident) (Δ : envs PROP) : option (bool * PROP * envs PROP) :=
   let (Γp,Γs,n) := Δ in
   match env_lookup_delete i Γp with
@@ -326,7 +331,7 @@ Definition envs_lookup_delete {PROP} (remove_intuitionistic : bool)
   | None => '(P,Γs') ← env_lookup_delete i Γs; Some (false, P, Envs Γp Γs' n)
   end.
 
-Fixpoint envs_lookup_delete_list {PROP} (remove_intuitionistic : bool)
+Fixpoint envs_lookup_delete_list {SI : sidx} {PROP} (remove_intuitionistic : bool)
     (js : list ident) (Δ : envs PROP) : option (bool * list PROP * envs PROP) :=
   match js with
   | [] => Some (true, [], Δ)
@@ -336,12 +341,12 @@ Fixpoint envs_lookup_delete_list {PROP} (remove_intuitionistic : bool)
      Some ((p:bool) &&& q, P :: Ps, Δ'')
   end.
 
-Definition envs_snoc {PROP} (Δ : envs PROP)
+Definition envs_snoc {SI : sidx} {PROP} (Δ : envs PROP)
     (p : bool) (j : ident) (P : PROP) : envs PROP :=
   let (Γp,Γs,n) := Δ in
   if p then Envs (Esnoc Γp j P) Γs n else Envs Γp (Esnoc Γs j P) n.
 
-Definition envs_app {PROP : bi} (p : bool)
+Definition envs_app {SI : sidx} {PROP : bi} (p : bool)
     (Γ : env PROP) (Δ : envs PROP) : option (envs PROP) :=
   let (Γp,Γs,n) := Δ in
   match p with
@@ -349,7 +354,7 @@ Definition envs_app {PROP : bi} (p : bool)
   | false => _ ← env_app Γ Γp; Γs' ← env_app Γ Γs; Some (Envs Γp Γs' n)
   end.
 
-Definition envs_simple_replace {PROP : bi} (i : ident) (p : bool)
+Definition envs_simple_replace {SI : sidx} {PROP : bi} (i : ident) (p : bool)
     (Γ : env PROP) (Δ : envs PROP) : option (envs PROP) :=
   let (Γp,Γs,n) := Δ in
   match p with
@@ -357,24 +362,25 @@ Definition envs_simple_replace {PROP : bi} (i : ident) (p : bool)
   | false => _ ← env_app Γ Γp; Γs' ← env_replace i Γ Γs; Some (Envs Γp Γs' n)
   end.
 
-Definition envs_replace {PROP : bi} (i : ident) (p q : bool)
+Definition envs_replace {SI : sidx} {PROP : bi} (i : ident) (p q : bool)
     (Γ : env PROP) (Δ : envs PROP) : option (envs PROP) :=
   if beq p q then envs_simple_replace i p Γ Δ
   else envs_app q Γ (envs_delete true i p Δ).
 
-Definition env_spatial_is_nil {PROP} (Δ : envs PROP) : bool :=
+Definition env_spatial_is_nil {SI : sidx} {PROP} (Δ : envs PROP) : bool :=
   if env_spatial Δ is Enil then true else false.
 
-Definition envs_clear_spatial {PROP} (Δ : envs PROP) : envs PROP :=
+Definition envs_clear_spatial {SI : sidx} {PROP} (Δ : envs PROP) : envs PROP :=
   Envs (env_intuitionistic Δ) Enil (env_counter Δ).
 
-Definition envs_clear_intuitionistic {PROP} (Δ : envs PROP) : envs PROP :=
+Definition envs_clear_intuitionistic {SI : sidx} {PROP}
+    (Δ : envs PROP) : envs PROP :=
   Envs Enil (env_spatial Δ) (env_counter Δ).
 
-Definition envs_incr_counter {PROP} (Δ : envs PROP) : envs PROP :=
+Definition envs_incr_counter {SI : sidx} {PROP} (Δ : envs PROP) : envs PROP :=
   Envs (env_intuitionistic Δ) (env_spatial Δ) (Pos_succ (env_counter Δ)).
 
-Fixpoint envs_split_go {PROP}
+Fixpoint envs_split_go {SI : sidx} {PROP}
     (js : list ident) (Δ1 Δ2 : envs PROP) : option (envs PROP * envs PROP) :=
   match js with
   | [] => Some (Δ1, Δ2)
@@ -385,12 +391,12 @@ Fixpoint envs_split_go {PROP}
   end.
 (* if [d = Right] then [result = (remaining hyps, hyps named js)] and
    if [d = Left] then [result = (hyps named js, remaining hyps)] *)
-Definition envs_split {PROP} (d : direction)
+Definition envs_split {SI : sidx} {PROP} (d : direction)
     (js : list ident) (Δ : envs PROP) : option (envs PROP * envs PROP) :=
   '(Δ1,Δ2) ← envs_split_go js Δ (envs_clear_spatial Δ);
   if d is Right then Some (Δ1,Δ2) else Some (Δ2,Δ1).
 
-Definition envs_to_prop {PROP} (Δ : envs PROP) : PROP :=
+Definition envs_to_prop {SI : sidx} {PROP} (Δ : envs PROP) : PROP :=
   match env_intuitionistic Δ, env_spatial Δ with
   | Enil, Γs => env_to_prop Γs
   | Γp, Enil => □ env_to_prop_and Γp
@@ -398,7 +404,7 @@ Definition envs_to_prop {PROP} (Δ : envs PROP) : PROP :=
   end.
 
 Section envs.
-  Context {PROP : bi}.
+  Context {SI : sidx} {PROP : bi}.
   Implicit Types Γ Γp Γs : env PROP.
   Implicit Types Δ : envs PROP.
   Implicit Types P Q : PROP.
@@ -441,27 +447,28 @@ Section envs.
   Proof. intros [??] ?; constructor; eauto using env_Forall2_impl. Qed.
 
   Global Instance env_intuitionistic_mono :
-    Proper (envs_Forall2 (⊢) ==> env_Forall2 (⊢)) (@env_intuitionistic PROP).
+    Proper (envs_Forall2 (⊢) ==> env_Forall2 (⊢)) (@env_intuitionistic _ PROP).
   Proof. solve_proper. Qed.
   Global Instance env_intuitionistic_flip_mono :
-    Proper (flip (envs_Forall2 (⊢)) ==> flip (env_Forall2 (⊢))) (@env_intuitionistic PROP).
+    Proper (flip (envs_Forall2 (⊢)) ==> flip (env_Forall2 (⊢)))
+           (@env_intuitionistic _ PROP).
   Proof. solve_proper. Qed.
   Global Instance env_intuitionistic_proper :
-    Proper (envs_Forall2 (⊣⊢) ==> env_Forall2 (⊣⊢)) (@env_intuitionistic PROP).
+    Proper (envs_Forall2 (⊣⊢) ==> env_Forall2 (⊣⊢)) (@env_intuitionistic _ PROP).
   Proof. solve_proper. Qed.
 
   Global Instance env_spatial_mono :
-    Proper (envs_Forall2 (⊢) ==> env_Forall2 (⊢)) (@env_spatial PROP).
+    Proper (envs_Forall2 (⊢) ==> env_Forall2 (⊢)) (@env_spatial _ PROP).
   Proof. solve_proper. Qed.
   Global Instance env_spatial_flip_mono :
-    Proper (flip (envs_Forall2 (⊢)) ==> flip (env_Forall2 (⊢))) (@env_spatial PROP).
+    Proper (flip (envs_Forall2 (⊢)) ==> flip (env_Forall2 (⊢))) (@env_spatial _ PROP).
   Proof. solve_proper. Qed.
   Global Instance env_spatial_proper :
-    Proper (envs_Forall2 (⊣⊢) ==> env_Forall2 (⊣⊢)) (@env_spatial PROP).
+    Proper (envs_Forall2 (⊣⊢) ==> env_Forall2 (⊣⊢)) (@env_spatial _ PROP).
   Proof. solve_proper. Qed.
 
   Global Instance of_envs_mono' :
-    Proper (env_Forall2 (⊢) ==> env_Forall2 (⊢) ==> (⊢)) (@of_envs' PROP).
+    Proper (env_Forall2 (⊢) ==> env_Forall2 (⊢) ==> (⊢)) (@of_envs' _ PROP).
   Proof.
     intros Γp1 Γp2 Hp Γs1 Γs2 Hs; apply and_mono; simpl in *.
     - apply pure_mono=> -[???]. constructor;
@@ -470,29 +477,32 @@ Section envs.
       induction Hp; simpl; repeat (done || f_equiv).
   Qed.
   Global Instance of_envs_proper' :
-    Proper (env_Forall2 (⊣⊢) ==> env_Forall2 (⊣⊢) ==> (⊣⊢)) (@of_envs' PROP).
+    Proper (env_Forall2 (⊣⊢) ==> env_Forall2 (⊣⊢) ==> (⊣⊢)) (@of_envs' _ PROP ).
   Proof.
     intros Γp1 Γp2 Hp Γs1 Γs2 Hs; apply (anti_symm (⊢)); apply of_envs_mono';
       eapply (env_Forall2_impl (⊣⊢)); by eauto using equiv_entails_1_1.
   Qed.
 
-  Global Instance of_envs_mono : Proper (envs_Forall2 (⊢) ==> (⊢)) (@of_envs PROP).
+  Global Instance of_envs_mono :
+    Proper (envs_Forall2 (⊢) ==> (⊢)) (@of_envs _ PROP).
   Proof. solve_proper. Qed.
-  Global Instance of_envs_proper : Proper (envs_Forall2 (⊣⊢) ==> (⊣⊢)) (@of_envs PROP).
+  Global Instance of_envs_proper :
+    Proper (envs_Forall2 (⊣⊢) ==> (⊣⊢)) (@of_envs _ PROP).
   Proof. solve_proper. Qed.
 
   Global Instance Envs_proper (R : relation PROP) :
-    Proper (env_Forall2 R ==> env_Forall2 R ==> eq ==> envs_Forall2 R) (@Envs PROP).
+    Proper (env_Forall2 R ==> env_Forall2 R ==> eq ==> envs_Forall2 R)
+           (@Envs _ PROP).
   Proof. by constructor. Qed.
 
   Global Instance envs_entails_proper :
-    Proper (envs_Forall2 (⊣⊢) ==> (⊣⊢) ==> iff) (@envs_entails PROP).
+    Proper (envs_Forall2 (⊣⊢) ==> (⊣⊢) ==> iff) (@envs_entails _ PROP).
   Proof. rewrite envs_entails_unseal. solve_proper. Qed.
   Global Instance envs_entails_mono :
-    Proper (flip (envs_Forall2 (⊢)) ==> (⊢) ==> impl) (@envs_entails PROP).
+    Proper (flip (envs_Forall2 (⊢)) ==> (⊢) ==> impl) (@envs_entails _ PROP).
   Proof. rewrite envs_entails_unseal=> Δ1 Δ2 ? P1 P2 <- <-. by f_equiv. Qed.
   Global Instance envs_entails_flip_mono :
-    Proper (envs_Forall2 (⊢) ==> flip (⊢) ==> flip impl) (@envs_entails PROP).
+    Proper (envs_Forall2 (⊢) ==> flip (⊢) ==> flip impl) (@envs_entails _ PROP).
   Proof. rewrite envs_entails_unseal=> Δ1 Δ2 ? P1 P2 <- <-. by f_equiv. Qed.
 
   Lemma envs_delete_intuitionistic Δ i : envs_delete false i true Δ = Δ.
