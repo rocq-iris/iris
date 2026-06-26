@@ -33,8 +33,13 @@ Proof. intros P Q; apply later_mono. Qed.
 
 Lemma later_True : ▷ True ⊣⊢ True.
 Proof. apply (anti_symm (⊢)); auto using later_intro. Qed.
+Lemma later_emp_2 : emp ⊢ ▷ emp.
+Proof. apply bi.later_intro. Qed.
 Lemma later_emp `{!BiAffine PROP} : ▷ emp ⊣⊢ emp.
-Proof. by rewrite -True_emp later_True. Qed.
+Proof.
+  apply (anti_symm (⊢)); [|apply later_emp_2].
+  by rewrite -True_emp later_True.
+Qed.
 Lemma later_forall {A} (Φ : A → PROP) : (▷ ∀ a, Φ a) ⊣⊢ (∀ a, ▷ Φ a).
 Proof.
   apply (anti_symm _); auto using later_forall_2.

@@ -27,6 +27,7 @@ lemma.
   `fupd_plainly_keep_l`, `fupd_plainly_keep_r`, `fupd_plain_keep_l` and
   `fupd_plain_keep_r` have been removed.
 * Remove `fupd_plainly_elim`, use `plainly_elim` and `fupd_intro` instead.
+* Add lemma `bi.later_emp_2` (by Paolo G. Giarrusso, SkyLabs AI).
 
 **Changes in `base_logic`:**
 
