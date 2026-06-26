@@ -178,6 +178,14 @@ See [lib/counterexamples.v] for a fully worked-out proof of that fact. *)
 Lemma not_not_later_False `{!BiLöb PROP} : ⊢@{PROP} ¬ ¬ ▷ False.
 Proof. apply entails_impl, löb. Qed.
 
+(* The left-to-right of [later_emp] is equivalent to the BI being affine. *)
+Lemma bi_affine_alt_later_emp `{!BiLöb PROP} : BiAffine PROP ↔ (▷ emp ⊢ emp).
+Proof.
+  split; [intros; by rewrite later_emp|].
+  intros Hemp Q. rewrite /Affine -(löb emp). apply impl_intro_l.
+  by rewrite Hemp and_elim_l.
+Qed.
+
 (* Iterated later modality *)
 Global Instance laterN_ne m : NonExpansive (@bi_laterN PROP m).
 Proof. induction m; simpl; [by intros ???|]. solve_proper. Qed.
