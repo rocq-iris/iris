@@ -28,6 +28,8 @@ lemma.
   `fupd_plain_keep_r` have been removed.
 * Remove `fupd_plainly_elim`, use `plainly_elim` and `fupd_intro` instead.
 * Add lemma `bi.later_emp_2` (by Paolo G. Giarrusso, SkyLabs AI).
+* Add lemma `bi_affine_alt_later_emp` to give an alternative characterization
+  of affine BIs in terms of `▷ emp ⊢ emp`.
 
 **Changes in `base_logic`:**
 
