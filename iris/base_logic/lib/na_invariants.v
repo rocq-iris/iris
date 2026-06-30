@@ -1,7 +1,6 @@
 From iris.algebra Require Import gset coPset.
 From iris.proofmode Require Import proofmode.
 From iris.base_logic.lib Require Export invariants.
-From iris.prelude Require Import options.
 Import uPred.
 
 (* Non-atomic ("thread-local") invariants. *)

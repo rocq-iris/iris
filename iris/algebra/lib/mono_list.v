@@ -3,7 +3,6 @@
   appending. *)
 From iris.algebra Require Export auth dfrac max_prefix_list.
 From iris.algebra Require Import updates local_updates proofmode_classes.
-From iris.prelude Require Import options.
 
 Definition mono_listR {SI : sidx} (A : ofe) : cmra := authR (max_prefix_listUR A).
 Definition mono_listUR {SI : sidx} (A : ofe) : ucmra := authUR (max_prefix_listUR A).

@@ -1,6 +1,5 @@
 From stdpp Require Export functions gmap gmultiset.
 From iris.algebra Require Export monoid.
-From iris.prelude Require Import options.
 Local Existing Instances monoid_ne monoid_assoc monoid_comm
   monoid_left_id monoid_right_id monoid_proper
   monoid_homomorphism_rel_po monoid_homomorphism_rel_proper

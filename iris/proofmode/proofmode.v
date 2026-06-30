@@ -9,4 +9,3 @@ From iris.proofmode Require Import class_instances class_instances_later
   class_instances_plainly class_instances_internal_eq class_instances_cmra.
 From iris.proofmode Require Import class_instances_frame class_instances_make.
 From iris.proofmode Require Import modality_instances.
-From iris.prelude Require Import options.

@@ -1,6 +1,5 @@
 From stdpp Require Import fin_maps.
 From iris.heap_lang Require Export lang.
-From iris.prelude Require Import options.
 Import heap_lang.
 
 (** The tactic [reshape_expr e tac] decomposes the expression [e] into an

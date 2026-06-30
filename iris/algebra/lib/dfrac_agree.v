@@ -1,6 +1,5 @@
 From iris.algebra Require Export dfrac agree updates local_updates.
 From iris.algebra Require Import proofmode_classes.
-From iris.prelude Require Import options.
 
 Definition dfrac_agreeR {SI : sidx} (A : ofe) : cmra := prodR dfracR (agreeR A).
 

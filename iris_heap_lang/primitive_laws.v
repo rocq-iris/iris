@@ -9,7 +9,6 @@ From iris.program_logic Require Import ectx_lifting total_ectx_lifting.
 From iris.heap_lang Require Export lang.
 From iris.heap_lang Require Import class_instances.
 From iris.heap_lang Require Import tactics notation.
-From iris.prelude Require Import options.
 
 Class heapGS_gen hlc Σ := HeapGS {
   heapGS_invGS : invGS_gen hlc Σ;

@@ -2,7 +2,6 @@ From stdpp Require Import countable fin_sets functions.
 From iris.algebra Require Export big_op.
 From iris.algebra Require Import list gmap.
 From iris.bi Require Import derived_laws_later.
-From iris.prelude Require Import options.
 Import interface.bi derived_laws.bi derived_laws_later.bi.
 
 (** Notations for unary variants *)

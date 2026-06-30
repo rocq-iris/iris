@@ -4,7 +4,6 @@ n-ary function, it is probably easier to copy these proofs than to try and apply
 these lemmas via (un)currying. *)
 From iris.bi Require Export bi.
 From iris.proofmode Require Import proofmode.
-From iris.prelude Require Import options.
 Import bi.
 
 Section fixpoint_laws.

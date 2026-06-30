@@ -1,6 +1,5 @@
 From iris.proofmode Require Import proofmode.
 From iris.si_logic Require Import bi.
-From iris.prelude Require Import options.
 
 Section si_logic_tests.
   Implicit Types P Q R : siProp.

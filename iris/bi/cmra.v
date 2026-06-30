@@ -1,7 +1,6 @@
 From iris.algebra Require Export cmra.
 From iris.bi Require Export sbi plainly.
 From iris.bi Require Import derived_laws_later.
-From iris.prelude Require Import options.
 
 Definition internal_cmra_valid `{!Sbi PROP} {A : cmra} (a : A) : PROP :=
   <si_pure> siProp_cmra_valid a.

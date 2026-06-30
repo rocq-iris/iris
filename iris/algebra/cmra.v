@@ -1,6 +1,5 @@
 From stdpp Require Import finite.
 From iris.algebra Require Export ofe monoid.
-From iris.prelude Require Import options.
 Local Set Primitive Projections.
 
 Local Open Scope sidx_scope.

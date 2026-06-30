@@ -1,5 +1,4 @@
 From iris.algebra Require Import stepindex ofe cmra.
-From iris.prelude Require Import options.
 
 (** * [sidx] instance for [nat] *)
 (** This file provides an instantiation of the [sidx] stepindex type for [nat],

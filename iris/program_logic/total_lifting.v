@@ -2,7 +2,6 @@ From iris.bi Require Export big_op.
 From iris.proofmode Require Import proofmode.
 From iris.program_logic Require Export total_weakestpre.
 From iris.program_logic Require Import language.
-From iris.prelude Require Import options.
 
 Section lifting.
 Context `{!irisGS_gen hlc Λ Σ}.

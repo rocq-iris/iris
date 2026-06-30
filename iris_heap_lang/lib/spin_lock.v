@@ -4,7 +4,6 @@ From iris.base_logic Require Import lib.token.
 From iris.heap_lang Require Export lang.
 From iris.heap_lang Require Import proofmode notation.
 From iris.heap_lang.lib Require Export lock.
-From iris.prelude Require Import options.
 
 Local Definition newlock : val := λ: <>, ref #false.
 Local Definition try_acquire : val := λ: "l", CAS "l" #false #true.

@@ -4,7 +4,6 @@ and the key lemma [token_exclusive] proves only one token exists. *)
 From iris.algebra Require Import excl.
 From iris.proofmode Require Import proofmode.
 From iris.base_logic.lib Require Export own.
-From iris.prelude Require Import options.
 
 (** The CMRA we need. *)
 Class tokenG Σ := TokenG {

@@ -1,6 +1,5 @@
 From iris.bi Require Import telescopes.
 From iris.proofmode Require Import classes classes_make.
-From iris.prelude Require Import options.
 Import bi.
 
 (** This file defines the instances that make up the framing machinery. *)

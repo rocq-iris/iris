@@ -13,7 +13,6 @@ From iris.bi Require Import lib.fractional.
 From iris.proofmode Require Import proofmode.
 From iris.heap_lang Require Export primitive_laws.
 From iris.heap_lang Require Import tactics notation.
-From iris.prelude Require Import options.
 
 (** The [array] connective is a version of [pointsto] that works
 with lists of values. *)

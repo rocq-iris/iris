@@ -1,5 +1,4 @@
 From iris.bi Require Export cmra internal_eq.
-From iris.prelude Require Import options.
 Local Set Default Proof Using "Type*".
 
 (** The tactic takes a (bi-)entailment of plain propositions and turns it into a

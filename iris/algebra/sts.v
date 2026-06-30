@@ -27,7 +27,6 @@ validity check from composition to RA validity.
 
 From stdpp Require Export propset.
 From iris.algebra Require Export cmra updates.
-From iris.prelude Require Import options.
 Local Arguments valid _ _ !_ /.
 Local Arguments op _ _ !_ !_ /.
 Local Arguments core _ _ !_ /.

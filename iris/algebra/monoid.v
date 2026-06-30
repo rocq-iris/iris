@@ -1,5 +1,4 @@
 From iris.algebra Require Export ofe.
-From iris.prelude Require Import options.
 
 (** Important: If you define your own monoid, only declare a [Monoid] instance,
 not a [MonoidOps] instance. *)

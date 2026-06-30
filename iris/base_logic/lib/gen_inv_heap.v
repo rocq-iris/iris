@@ -1,7 +1,6 @@
 From iris.algebra Require Import auth excl gmap.
 From iris.base_logic.lib Require Import own invariants gen_heap.
 From iris.proofmode Require Import proofmode.
-From iris.prelude Require Import options.
 
 (** An "invariant" location is a location that has some invariant about its
 value attached to it, and that can never be deallocated explicitly by the

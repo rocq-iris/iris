@@ -1,6 +1,5 @@
 From stdpp Require Import nat_cancel.
 From iris.proofmode Require Import classes classes_make modality_instances.
-From iris.prelude Require Import options.
 Import bi.
 
 Section class_instances_later.

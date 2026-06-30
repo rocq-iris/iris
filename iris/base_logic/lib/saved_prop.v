@@ -3,7 +3,6 @@ From iris.algebra Require Import dfrac_agree.
 From iris.proofmode Require Import proofmode.
 From iris.base_logic Require Export own.
 From iris.bi Require Import fractional.
-From iris.prelude Require Import options.
 Import uPred.
 
 (* "Saved anything" -- this can give you saved propositions, saved predicates,

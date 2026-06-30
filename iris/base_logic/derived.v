@@ -1,7 +1,6 @@
 From iris.algebra Require Import frac.
 From iris.bi Require Export bi.
 From iris.base_logic Require Export bi.
-From iris.prelude Require Import options.
 Import bi.bi base_logic.bi.uPred.
 
 (** Derived laws for Iris-specific primitive connectives (own, valid).

@@ -1,7 +1,6 @@
 From iris.prelude Require Export prelude.
 From iris.bi Require Export bi.
 From iris.proofmode Require Import base.
-From iris.prelude Require Import options.
 Import bi.
 
 Inductive env (A : Type) : Type :=

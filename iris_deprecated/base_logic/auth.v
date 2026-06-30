@@ -6,7 +6,6 @@ From iris.algebra Require Export auth.
 From iris.algebra Require Import gmap.
 From iris.proofmode Require Import proofmode.
 From iris.base_logic.lib Require Export invariants.
-From iris.prelude Require Import options.
 Import uPred.
 
 (* The CMRA we need. *)

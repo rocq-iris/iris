@@ -1,7 +1,6 @@
 (** This file implements later credits, in particular the later-elimination update.
 That update is used internally to define the Iris [fupd]; it should not
 usually be directly used unless you are defining your own [fupd]. *)
-From iris.prelude Require Import options.
 From iris.proofmode Require Import proofmode.
 From iris.algebra Require Export auth numbers.
 From iris.base_logic.lib Require Import iprop own.

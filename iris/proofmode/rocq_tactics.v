@@ -1,7 +1,6 @@
 From iris.bi Require Export bi telescopes.
 From iris.proofmode Require Export base environments classes classes_make
                                    modality_instances.
-From iris.prelude Require Import options.
 Import bi.
 Import env_notations.
 

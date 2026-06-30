@@ -1,6 +1,5 @@
 From iris.bi Require Export bi.
 From iris.proofmode Require Import proofmode.
-From iris.prelude Require Import options.
 Import bi.
 
 (** Least and greatest fixpoint of a monotone function, defined entirely inside

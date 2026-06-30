@@ -1,6 +1,5 @@
 From stdpp Require Export telescopes.
 From iris.bi Require Export bi.
-From iris.prelude Require Import options.
 Import bi.
 
 (* This cannot import the proofmode because it is imported by the proofmode! *)

@@ -3,7 +3,6 @@ a prefix of the other. The result is the longer list.
 In particular, the core is the identity function for all elements. *)
 From iris.algebra Require Export agree list gmap updates.
 From iris.algebra Require Import local_updates proofmode_classes.
-From iris.prelude Require Import options.
 
 Definition max_prefix_list (A : Type) := gmap nat (agree A).
 Definition max_prefix_listR {SI : sidx} (A : ofe) := gmapUR nat (agreeR A).

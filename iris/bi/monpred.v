@@ -1,6 +1,5 @@
 From stdpp Require Import coPset.
 From iris.bi Require Import bi.
-From iris.prelude Require Import options.
 
 (** Definitions. *)
 Structure biIndex :=

@@ -2,7 +2,6 @@ From stdpp Require Import coPset namespaces.
 From iris.bi Require Export bi updates.
 From iris.bi.lib Require Import fixpoint_mono.
 From iris.proofmode Require Import rocq_tactics proofmode reduction.
-From iris.prelude Require Import options.
 
 (** Conveniently split a conjunction on both assumption and conclusion. *)
 Local Tactic Notation "iSplitWith" constr(H) :=

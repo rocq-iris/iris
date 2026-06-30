@@ -1,7 +1,6 @@
 From iris.algebra Require Import excl csum.
 From iris.bi Require Export sbi.
 From iris.bi Require Import derived_laws_later.
-From iris.prelude Require Import options.
 
 Definition internal_eq `{!Sbi PROP} {A : ofe} (a b : A) : PROP :=
   <si_pure> siProp_internal_eq a b.

@@ -3,7 +3,6 @@ From iris.program_logic Require Export weakestpre total_weakestpre.
 From iris.heap_lang Require Import lang adequacy proofmode notation.
 (* Import lang *again*. This used to break notation. *)
 From iris.heap_lang Require Import lang.
-From iris.prelude Require Import options.
 
 Unset Mangle Names.
 

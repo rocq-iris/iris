@@ -2,7 +2,6 @@
     that this gives rise to a "language" in the Iris sense. *)
 From iris.prelude Require Export prelude.
 From iris.program_logic Require Import language.
-From iris.prelude Require Import options.
 
 (** TAKE CARE: When you define an [ectxLanguage] canonical structure for your
 language, you need to also define a corresponding [language] canonical

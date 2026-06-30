@@ -3,7 +3,6 @@ From iris.proofmode Require Import proofmode monpred.
 From iris.base_logic Require Import base_logic.
 From iris.base_logic.lib Require Import invariants cancelable_invariants na_invariants ghost_var.
 From iris.program_logic Require Import total_weakestpre language.
-From iris.prelude Require Import options.
 
 Unset Mangle Names.
 Set Default Proof Using "Type*".

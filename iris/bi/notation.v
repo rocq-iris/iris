@@ -1,4 +1,3 @@
-From iris.prelude Require Import options.
 (** Just reserve the notation. *)
 
 (** * Turnstiles *)

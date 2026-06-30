@@ -1,6 +1,5 @@
 From stdpp Require Export strings.
 From iris.proofmode Require Import base tokens.
-From iris.prelude Require Import options.
 
 Inductive sel_pat :=
   | SelPure

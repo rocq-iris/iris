@@ -1,5 +1,4 @@
 From iris.heap_lang Require Export lang.
-From iris.prelude Require Import options.
 
 (** Coercions to make programs easier to type. *)
 Coercion LitInt : Z >-> base_lit.

@@ -1,6 +1,5 @@
 From iris.bi Require Export bi.
 From iris.base_logic Require Export derived proofmode.
-From iris.prelude Require Import options.
 
 (* The trick of having multiple [uPred] modules, which are all exported in
 another [uPred] module is by Jason Gross and described in:

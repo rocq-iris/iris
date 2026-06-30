@@ -4,7 +4,6 @@ From iris.algebra Require Import dfrac_agree proofmode_classes frac.
 From iris.bi.lib Require Import fractional.
 From iris.proofmode Require Import proofmode.
 From iris.base_logic.lib Require Export own.
-From iris.prelude Require Import options.
 
 (** The CMRA we need. *)
 Class ghost_varG Σ (A : Type) := GhostVarG {

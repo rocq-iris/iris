@@ -1,7 +1,6 @@
 From Ltac2 Require Ltac2.
 From Stdlib Require Import Strings.String.
 From Stdlib Require Import Init.Byte Ascii.
-From iris.prelude Require Import options.
 
 Import List.ListNotations.
 Local Open Scope list.

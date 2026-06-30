@@ -3,7 +3,6 @@ From iris.bi Require Import big_op fixpoint_mono.
 From iris.proofmode Require Import proofmode.
 From iris.program_logic Require Export total_weakestpre adequacy.
 From iris.program_logic Require Import language.
-From iris.prelude Require Import options.
 Import uPred.
 
 Section adequacy.

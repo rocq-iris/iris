@@ -1,6 +1,5 @@
 From stdpp Require Import coPset.
 From iris.bi Require Import interface derived_laws_later big_op plainly.
-From iris.prelude Require Import options.
 Import interface.bi derived_laws.bi derived_laws_later.bi.
 
 (* We enable primitive projections in this file to improve the performance of the Iris proofmode:

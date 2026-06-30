@@ -4,7 +4,6 @@ From iris.proofmode Require Import rocq_tactics proofmode reduction.
 From iris.base_logic.lib Require Export own.
 From iris.base_logic.lib Require Import wsat.
 From iris.base_logic Require Export later_credits.
-From iris.prelude Require Import options.
 Export wsatGS.
 Import uPred.
 Import le_upd.

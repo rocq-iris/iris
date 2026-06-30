@@ -1,7 +1,6 @@
 From iris.algebra Require Import gmap.
 From iris.algebra Require cofe_solver.
 From iris.base_logic Require Export base_logic.
-From iris.prelude Require Import options.
 
 (** In this file we construct the type [iProp] of propositions of the Iris
 logic. This is done by solving the following recursive domain equation:

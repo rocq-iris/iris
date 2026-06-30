@@ -1,5 +1,4 @@
 From iris.algebra Require Export cmra.
-From iris.prelude Require Import options.
 
 Local Arguments validN _ _ _ _ !_ /.
 Local Arguments valid _ _  !_ /.

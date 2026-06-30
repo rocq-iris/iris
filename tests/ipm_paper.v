@@ -7,7 +7,6 @@ From iris.proofmode Require Import proofmode.
 From iris.base_logic Require Import base_logic.
 From iris.deprecated.program_logic Require Import hoare.
 From iris.heap_lang Require Import proofmode notation.
-From iris.prelude Require Import options.
 
 Unset Mangle Names.
 

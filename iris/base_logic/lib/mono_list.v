@@ -19,7 +19,6 @@ From iris.proofmode Require Import proofmode.
 From iris.algebra.lib Require Import mono_list.
 From iris.bi.lib Require Import fractional.
 From iris.base_logic.lib Require Export own.
-From iris.prelude Require Import options.
 
 Class mono_listG (A : Type) Σ :=
   MonoListG { #[local] mono_list_inG :: inG Σ (mono_listR (leibnizO A)) }.

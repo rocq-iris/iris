@@ -2,7 +2,6 @@
 a PROP-level binary relation to various closures. *)
 From iris.bi.lib Require Export fixpoint_mono.
 From iris.proofmode Require Import proofmode.
-From iris.prelude Require Import options.
 
 (* The sections add extra BI assumptions, which is only picked up with "Type"*. *)
 Set Default Proof Using "Type*".

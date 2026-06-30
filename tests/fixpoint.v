@@ -1,6 +1,5 @@
 From iris.bi Require Import lib.fixpoint_mono.
 From iris.proofmode Require Import proofmode.
-From iris.prelude Require Import options.
 
 Section fixpoint.
   Context `{!Sbi PROP} {A : ofe} (F : (A → PROP) → (A → PROP)) `{!BiMonoPred F}.

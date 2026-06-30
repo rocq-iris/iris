@@ -21,7 +21,6 @@
 From stdpp Require Import countable.
 From iris.algebra Require Export cmra.
 From iris.algebra Require Import proofmode_classes updates frac.
-From iris.prelude Require Import options.
 
 (** An element of dfrac denotes ownership of a fraction, knowledge that a
     fraction has been discarded, or both. Note that [DfracBoth] can be written
