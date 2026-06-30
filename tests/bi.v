@@ -2,6 +2,7 @@ From stdpp Require Import strings.
 From iris.bi Require Import bi plainly big_op.
 
 Unset Mangle Names.
+Set Default Proof Using "Type*".
 
 (** See https://gitlab.mpi-sws.org/iris/iris/-/merge_requests/610 *)
 Lemma test_impl_persistent_1 `{!Sbi PROP, !BiPersistentlyImplSiPure PROP} :
