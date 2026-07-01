@@ -25,18 +25,7 @@ Proof.
   by iDestruct (test_fixpoint with "[//]") as %->.
 Qed.
 
-Check "demo_0".
-Lemma demo_0 `{!BiPersistentlyForall PROP} P Q :
-  □ (P ∨ Q) -∗ (∀ x, ⌜x = 0⌝ ∨ ⌜x = 1⌝) → (Q ∨ P).
-Proof.
-  iIntros "H #H2". Show. iDestruct "H" as "###H".
-  (* should remove the disjunction "H" *)
-  iDestruct "H" as "[?|?]"; last by iLeft. Show.
-  (* should keep the disjunction "H" because it is instantiated *)
-  iDestruct ("H2" $! 10) as %[?|?]; done.
-Qed.
-
-Lemma demo_2 P1 P2 P3 P4 Q (P5 : nat → PROP) `{!Affine P4, !Absorbing P2} :
+Lemma demo P1 P2 P3 P4 Q (P5 : nat → PROP) `{!Affine P4, !Absorbing P2} :
   P2 ∗ (P3 ∗ Q) ∗ True ∗ P1 ∗ P2 ∗ (P4 ∗ (∃ x:nat, P5 x ∨ P3)) ∗ emp -∗
     P1 -∗ (True ∗ True) -∗
   (((P2 ∧ False ∨ P2 ∧ ⌜0 = 0⌝) ∗ P3) ∗ Q ∗ P1 ∗ True) ∧
@@ -129,22 +118,85 @@ Proof.
   iDestruct ("H" $! 1) as "$".
 Qed.
 
+Check "test_iDestruct_or".
 Lemma test_iDestruct_or P Q : □ (P ∨ Q) -∗ Q ∨ P.
 Proof.
   iIntros "#H".
-  (* [iDestruct] consumes "H" because no quantifiers/wands are instantiated *)
+  (* [iDestruct] consumes "H" because no quantifiers/wands are instantiated.
+  Since we don't have [BiPersistentlyExist], the hypothesis "H" is moved to
+  the spatial context. *)
   iDestruct "H" as "[H|H]".
-  - by iRight.
-  - by iLeft.
+  - Show. by iRight.
+  - Show. by iLeft.
 Qed.
+
+Check "test_iDestruct_or_persistently_exist".
+Lemma test_iDestruct_or_persistently_exist `{!BiPersistentlyExist PROP} P Q :
+  □ (P ∨ Q) -∗ □ P ∨ □ Q.
+Proof.
+  iIntros "#H".
+  (* [iDestruct] consumes "H" (similar to [destruct H], this keeps the context
+  clean), but "H1" ends up in the intuitionistic context due to
+  [BiPersistentlyExist]. *)
+  iDestruct "H" as "[H1|H1]".
+  - Show. auto.
+  - Show. auto.
+Qed.
+
+Check "test_iDestruct_forall".
+Lemma test_iDestruct_forall (Φ : nat → PROP) `{!∀ x, Affine (Φ x)} Q :
+  □ (∀ x, Φ x ∨ Φ (S x)) -∗ □ (∀ x, Φ x ∨ Φ (S x)).
+Proof.
+  iIntros "#H".
+  (* Should not clear "H", and move "H1" to the spacial context due to the lack
+  of [BiPersistentlyExist]. *)
+  iDestruct ("H" $! 1) as "[H1|H1]".
+  - Show. auto.
+  - Show. auto.
+Qed.
+
+Check "test_iDestruct_forall_persistently_exist".
+Lemma test_iDestruct_forall_persistently_exist `{!BiPersistentlyExist PROP}
+    (Φ : nat → PROP) Q :
+  □ (∀ x, Φ x ∨ Φ (S x)) -∗ □ (∀ x, Φ x ∨ Φ (S x)).
+Proof.
+  iIntros "#H".
+  (* Should not clear "H", and put "H1" in the intuitionistic context. *)
+  iDestruct ("H" $! 1) as "[H1|H1]".
+  - Show. auto.
+  - Show. auto.
+Qed.
+
+Check "test_iPoseProof_or".
 Lemma test_iPoseProof_or P Q : □ (P ∨ Q) -∗ (Q ∨ P) ∗ (P ∨ Q).
 Proof.
   iIntros "#H".
-  (* [iPoseProof] does not consume "H" despite that no quantifiers/wands are
-  instantiated. This makes it different from [iDestruct]. *)
+  (* [iPoseProof] does not consume the hypothesis "H" from the intuitionistic
+  context. This is useful if one does *not* have [BiPersistentlyExist] because
+  the resulting hypothesis "Hx" is not persistent. *)
   iPoseProof "H" as "[HP|HQ]".
-  - iFrame "H". by iRight.
-  - iFrame "H". by iLeft.
+  - Show. iFrame "H". by iRight.
+  - Show. iFrame "H". by iLeft.
+Qed.
+
+Check "test_iPoseProof_destruct_exist".
+Lemma test_iPoseProof_destruct_exist {A} (Φ : A → PROP) Q :
+  □ (∃ x, Φ x) -∗ (∃ x, Φ x) ∗ (∃ x, Φ x).
+Proof.
+  iIntros "#H".
+  (* [iPoseProof] does not consume the hypothesis "H" from the intuitionistic
+  context. This is useful if one does *not* have [BiPersistentlyExist] because
+  the resulting hypothesis "Hx" is not persistent. *)
+  iPoseProof "H" as (x) "Hx".
+  Show.
+  iFrame "Hx H".
+Qed.
+
+Lemma test_persistently_forall `{!BiPersistentlyForall PROP} P (Φ : nat → PROP) :
+  P -∗ (∀ x, □ Φ x) -∗ Φ 10 ∗ P.
+Proof.
+  (* [BiPersistentlyForall] allows us to move [HΦ] to the intuitionistic context *)
+  iIntros "HP #HΦ". iFrame "HP". iApply "HΦ".
 Qed.
 
 Lemma test_iDestruct_intuitionistic_affine_bi `{!BiAffine PROP} P Q `{!Persistent P}:

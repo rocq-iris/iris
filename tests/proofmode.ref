@@ -1,27 +1,3 @@
-"demo_0"
-     : string
-1 goal
-  
-  PROP : bi
-  BiPersistentlyForall0 : BiPersistentlyForall PROP
-  P, Q : PROP
-  ============================
-  "H2" : ∀ x : nat, ⌜x = 0⌝ ∨ ⌜x = 1⌝
-  --------------------------------------□
-  "H" : □ (P ∨ Q)
-  --------------------------------------∗
-  Q ∨ P
-1 goal
-  
-  PROP : bi
-  BiPersistentlyForall0 : BiPersistentlyForall PROP
-  P, Q : PROP
-  ============================
-  "H2" : ∀ x : nat, ⌜x = 0⌝ ∨ ⌜x = 1⌝
-  --------------------------------------□
-  _ : P
-  --------------------------------------∗
-  Q ∨ P
 "test_iStopProof"
      : string
 1 goal
@@ -53,6 +29,131 @@
   _ : Q
   --------------------------------------□
   <affine> (P ∗ Q)
+"test_iDestruct_or"
+     : string
+1 goal
+  
+  PROP : bi
+  P, Q : PROP
+  ============================
+  "H" : P
+  --------------------------------------∗
+  Q ∨ P
+1 goal
+  
+  PROP : bi
+  P, Q : PROP
+  ============================
+  "H" : Q
+  --------------------------------------∗
+  Q ∨ P
+"test_iDestruct_or_persistently_exist"
+     : string
+1 goal
+  
+  PROP : bi
+  BiPersistentlyExist0 : BiPersistentlyExist PROP
+  P, Q : PROP
+  ============================
+  "H1" : P
+  --------------------------------------□
+  □ P ∨ □ Q
+1 goal
+  
+  PROP : bi
+  BiPersistentlyExist0 : BiPersistentlyExist PROP
+  P, Q : PROP
+  ============================
+  "H1" : Q
+  --------------------------------------□
+  □ P ∨ □ Q
+"test_iDestruct_forall"
+     : string
+1 goal
+  
+  PROP : bi
+  Φ : nat → PROP
+  H : ∀ x : nat, Affine (Φ x)
+  Q : PROP
+  ============================
+  "H" : ∀ x : nat, Φ x ∨ Φ (S x)
+  --------------------------------------□
+  "H1" : Φ 1
+  --------------------------------------∗
+  □ ∀ x : nat, Φ x ∨ Φ (S x)
+1 goal
+  
+  PROP : bi
+  Φ : nat → PROP
+  H : ∀ x : nat, Affine (Φ x)
+  Q : PROP
+  ============================
+  "H" : ∀ x : nat, Φ x ∨ Φ (S x)
+  --------------------------------------□
+  "H1" : Φ 2
+  --------------------------------------∗
+  □ ∀ x : nat, Φ x ∨ Φ (S x)
+"test_iDestruct_forall_persistently_exist"
+     : string
+1 goal
+  
+  PROP : bi
+  BiPersistentlyExist0 : BiPersistentlyExist PROP
+  Φ : nat → PROP
+  Q : PROP
+  ============================
+  "H" : ∀ x : nat, Φ x ∨ Φ (S x)
+  "H1" : Φ 1
+  --------------------------------------□
+  □ ∀ x : nat, Φ x ∨ Φ (S x)
+1 goal
+  
+  PROP : bi
+  BiPersistentlyExist0 : BiPersistentlyExist PROP
+  Φ : nat → PROP
+  Q : PROP
+  ============================
+  "H" : ∀ x : nat, Φ x ∨ Φ (S x)
+  "H1" : Φ 2
+  --------------------------------------□
+  □ ∀ x : nat, Φ x ∨ Φ (S x)
+"test_iPoseProof_or"
+     : string
+1 goal
+  
+  PROP : bi
+  P, Q : PROP
+  ============================
+  "H" : P ∨ Q
+  --------------------------------------□
+  "HP" : P
+  --------------------------------------∗
+  (Q ∨ P) ∗ (P ∨ Q)
+1 goal
+  
+  PROP : bi
+  P, Q : PROP
+  ============================
+  "H" : P ∨ Q
+  --------------------------------------□
+  "HQ" : Q
+  --------------------------------------∗
+  (Q ∨ P) ∗ (P ∨ Q)
+"test_iPoseProof_destruct_exist"
+     : string
+1 goal
+  
+  PROP : bi
+  A : Type
+  Φ : A → PROP
+  Q : PROP
+  x : A
+  ============================
+  "H" : ∃ x0 : A, Φ x0
+  --------------------------------------□
+  "Hx" : Φ x
+  --------------------------------------∗
+  (∃ x0 : A, Φ x0) ∗ ∃ x0 : A, Φ x0
 "test_iDestruct_spatial"
      : string
 1 goal
