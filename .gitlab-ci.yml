@@ -8,6 +8,8 @@ variables:
   OCAML: "ocaml-variants.4.14.0+options ocaml-option-flambda"
   # Avoid needlessly increasing our TCB with native_compute
   COQEXTRAFLAGS: "-native-compiler no"
+  # Debugging.
+  GIT_CURL_VERBOSE: "1"
 
 .only_branches: &only_branches
   rules:
