@@ -31,6 +31,10 @@ lemma.
 * Add lemma `bi_affine_alt_later_emp` to give an alternative characterization
   of affine BIs in terms of `▷ emp ⊢ emp`.
 
+**Changes in `proofmode`:**
+
+* Rename (internal) file `coq_tactics` → `rocq_tactics`.
+
 **Changes in `base_logic`:**
 
 * Generalize `ghost_var`, `ghost_map_auth`, `mono_nat_auth` and `mono_Z_auth` to
@@ -128,11 +132,6 @@ s/\bstep_fupdN_soundness_lc'\b/step_fupdN_soundness HasLc/g
 s/\bstep_fupdN_soundness_no_lc'\b/step_fupdN_soundness HasNoLc/g
 # Coq/Rocq rename
 s/\bcoq_tactics\b/rocq_tactics/g
-s/\bcoq_byte_(list_blit_list|to_int|to_char)\b/rocq_byte_\1/g
-s/\bcoq_string_(length|to_list_byte|to_string|to_ident)\b/rocq_string_\1/g
-s/\bstring_to_coq_string\b/string_to_rocq_string/g
-s/\bget_bit_coq_bool\b/get_bit_rocq_bool/g
-s/\bchar_to_coq_ascii\b/char_to_rocq_ascii/g
 EOF
 ```
 
