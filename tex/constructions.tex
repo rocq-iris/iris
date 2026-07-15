@@ -12,7 +12,7 @@ Given an OFE $\cofe$, we define $\latert\cofe$ as follows (using a datatype-like
   \latert\cofe \eqdef{}& \latertinj(x:\cofe) \\
   \latertinj(x) \dist{n} \latertinj(y) \eqdef{}& n = 0 \lor x \dist{n-1} y
 \end{align*}
-Note that in the definition of the carrier $\latert\cofe$, $\latertinj$ is a constructor (like the constructors in Coq), \ie this is short for $\setComp{\latertinj(x)}{x \in \cofe}$.
+Note that in the definition of the carrier $\latert\cofe$, $\latertinj$ is a constructor (like the constructors in Rocq), \ie this is short for $\setComp{\latertinj(x)}{x \in \cofe}$.
 
 $\latert(-)$ is a locally \emph{contractive} functor from $\OFEs$ to $\OFEs$.
 
@@ -30,7 +30,7 @@ Given a camera $\monoid$, we define the COFE $\UPred(\monoid)$ of \emph{uniform 
 You can think of uniform predicates as monotone, step-indexed predicates over a camera that ``ignore'' invalid elements (as defined by the quotient).
 Note that we will not explicitly deal with equivalence classes below but instead just pick an arbitrary element of the class.
 There is an implicit proof obligation for every operation acting on $\UPred$ to show that the concrete representative does not matter.
-This is all explicit in Coq (where we use a setoid to represent the quotient); we do not spell it out on paper.
+This is all explicit in Rocq (where we use a setoid to represent the quotient); we do not spell it out on paper.
 
 $\UPred(-)$ is a locally non-expansive functor from $\CMRAs$ to $\COFEs$.
 
@@ -219,7 +219,7 @@ This is useful in combination with \ruleref{sum-swap}, and also when used with p
   {(1, a) \mupd (1, b)}
 \end{mathpar}
 
-%TODO: These need syncing with Coq
+%TODO: These need syncing with Rocq
 % \subsection{Finite Powerset Monoid}
 
 % Given an infinite set $X$, we define a monoid $\textdom{PowFin}$ with carrier $\mathcal{P}^{\textrm{fin}}(X)$ as follows:
