@@ -181,7 +181,7 @@ This is not what we want; the second line should be indented by 2 spaces.
 
 On Linux with old versions of RocqIDE you can use the Intelligent
 Input Bus (IBus) framework to input Unicode symbols. First, install `ibus-m17n`
-via your system's package manager. Next, create a file `~/.m17n.d/coq.mim` to
+via your system's package manager. Next, create a file `~/.m17n.d/rocq.mim` to
 configure an input method based on the math symbol list, and with some custom
 aliases for symbols used a lot in Iris as defined [here](ibus).
 
@@ -197,7 +197,7 @@ To use this input method, you should:
 ## RocqIDE/CoqIDE 8.10+ Unicode input
 
 Instead of configuring the input system-wide, you can use RocqIDE's support for
-inputting Unicode symbols (introduced in Coq v8.10). To input a symbol, type a
+inputting Unicode symbols (introduced in Coq 8.10). To input a symbol, type a
 LaTeX-like escape sequence, for example `\alpha` and then type
 `<Shift>-<Space>`, which will expand it into `α`. Expansion will work on a
 prefix of the command as well. You can also customize the expansion keyboard
@@ -206,7 +206,7 @@ shortcut, which is under Tools/LaTeX-to-unicode.
 This system is configurable by adding a Unicode bindings file with additional
 expansion sequences. On Linux this file should go in
 `~/.config/coq/coqide.bindings` while on macOS it should go in
-`~/Library/Application Support/Rocq/coqide.bindings` (or under `$XDG_CONFIG_HOME`
+`~/Library/Application Support/Coq/coqide.bindings` (or under `$XDG_CONFIG_HOME`
 if you have that set).
 
 Here is a `coqide.bindings` file for a variety of symbols used in Iris:
@@ -288,9 +288,8 @@ Here is a `coqide.bindings` file for a variety of symbols used in Iris:
 
 ### VSRocq setup
 
-The recommended extension as of December 2019 is [Maxime Dénès's
-VSRocq](https://marketplace.visualstudio.com/items?itemName=maximedenes.vscoq).
-Press `Ctrl Shift P` or `Cmd Shift P` and then type "coq" to see the list of Rocq
+The recommended extension is [VSRocq](https://github.com/rocq-prover/vsrocq).
+Press `Ctrl Shift P` or `Cmd Shift P` and then type "rocq" to see the list of Rocq
 commands and keyboard shortcuts.
 
 ### Font setup

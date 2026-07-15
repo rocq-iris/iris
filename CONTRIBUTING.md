@@ -9,7 +9,7 @@ To work on Iris itself, you need to install its build-dependencies.  Again we
 recommend you do that with opam (2.0.0 or newer).  This requires the following
 two repositories:
 
-    opam repo add coq-released https://coq.inria.fr/opam/released
+    opam repo add rocq-released https://coq.inria.fr/opam/released
     opam repo add iris-dev https://gitlab.mpi-sws.org/iris/opam.git
 
 Once you got opam set up, run `make builddep` to install the right versions
@@ -60,8 +60,8 @@ guide](docs/style_guide.md).
 ## How to write/update test cases
 
 The files in `tests/` are test cases.  Each of the `.v` files comes with a
-matching `.ref` file containing the expected output of `coqc`.  Adding `Show.`
-in selected places in the proofs makes `coqc` print the current goal state.
+matching `.ref` file containing the expected output of `rocq`.  Adding `Show.`
+in selected places in the proofs makes `rocq` print the current goal state.
 This is used to make sure the proof mode prints goals and reduces terms the way
 we expect it to.  You can run `make MAKE_REF=1` to re-generate all the `.ref` files;
 this is useful after adding or removing `Show.` from a test.  If you do this,

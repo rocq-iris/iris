@@ -114,7 +114,7 @@ If you only want to *import* a certain module in some specific place (for instan
   end
   ```
 
-- **Use coqdoc syntax in comments for Rocq identifiers and inline code, e.g. `[cmraT]`.**
+- **Use rocqdoc syntax in comments for Rocq identifiers and inline code, e.g. `[cmraT]`.**
 
 - **Put proofs either all on one line (`Proof. reflexivity. Qed.`) or split up the usual way with indentation.**
 
