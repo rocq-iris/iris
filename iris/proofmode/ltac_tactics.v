@@ -1,7 +1,7 @@
 From stdpp Require Import namespaces hlist pretty.
 From iris.bi Require Export bi telescopes.
 From iris.proofmode Require Import base intro_patterns spec_patterns
-                                   sel_patterns coq_tactics reduction
+                                   sel_patterns rocq_tactics reduction
                                    string_ident.
 From iris.proofmode Require Export classes notation.
 From iris.prelude Require Import options.

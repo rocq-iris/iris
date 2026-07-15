@@ -126,6 +126,13 @@ s/\bstep_fupdN_soundness_no_lc\b/step_fupdN_soundness HasNoLc/g
 # There was no "_gen" version for step_fupdN_soundness_lc'
 s/\bstep_fupdN_soundness_lc'\b/step_fupdN_soundness HasLc/g
 s/\bstep_fupdN_soundness_no_lc'\b/step_fupdN_soundness HasNoLc/g
+# Coq/Rocq rename
+s/\bcoq_tactics\b/rocq_tactics/g
+s/\bcoq_byte_(list_blit_list|to_int|to_char)\b/rocq_byte_\1/g
+s/\bcoq_string_(length|to_list_byte|to_string|to_ident)\b/rocq_string_\1/g
+s/\bstring_to_coq_string\b/string_to_rocq_string/g
+s/\bget_bit_coq_bool\b/get_bit_rocq_bool/g
+s/\bchar_to_coq_ascii\b/char_to_rocq_ascii/g
 EOF
 ```
 

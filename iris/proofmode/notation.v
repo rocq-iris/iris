@@ -1,5 +1,5 @@
 From stdpp Require Export strings.
-From iris.proofmode Require Import coq_tactics environments.
+From iris.proofmode Require Import rocq_tactics environments.
 From iris.prelude Require Import options.
 
 Declare Scope proof_scope.
