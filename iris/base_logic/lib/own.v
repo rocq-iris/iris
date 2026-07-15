@@ -7,7 +7,7 @@ Import uPred.
 (** The class [inG Σ A] expresses that the CMRA [A] is in the list of functors
 [Σ]. This class is similar to the [subG] class, but written down in terms of
 individual CMRAs instead of (lists of) CMRA *functors*. This additional class is
-needed because Coq is otherwise unable to solve type class constraints due to
+needed because Rocq is otherwise unable to solve type class constraints due to
 higher-order unification problems. *)
 Class inG (Σ : gFunctors) (A : cmra) := InG {
   inG_id : gid Σ;
@@ -19,7 +19,7 @@ Global Arguments inG_apply {_ _} _ _ {_}.
 
 (** We use the mode [-] for [Σ] since there is always a unique [Σ]. We use the
 mode [!] for [A] since we can have multiple [inG]s for different [A]s, so we do
-not want Coq to pick one arbitrarily. *)
+not want Rocq to pick one arbitrarily. *)
 Global Hint Mode inG - ! : typeclass_instances.
 
 Lemma subG_inG Σ (F : gFunctor) : subG F Σ → inG Σ (rFunctor_apply F (iPropO Σ)).

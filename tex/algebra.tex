@@ -99,7 +99,7 @@ Moreover, this theorem also holds if $f$ is just non-expansive, and $f^k$ is con
 \label{thm:america_rutten}
 Let $1$ be the discrete COFE on the unit type: $1 \eqdef \Delta \{ () \}$.
 Given a locally contractive bifunctor $G : \COFEs^{\textrm{op}} \times \COFEs \to \COFEs$, and provided that \(G(1, 1)\) is inhabited,
-then there exists a unique\footnote{Uniqueness is not proven in Coq.} COFE $\ofe$ such that $G(\ofe^{\textrm{op}}, \ofe) \cong \ofe$ (\ie the two are isomorphic in $\COFEs$).
+then there exists a unique\footnote{Uniqueness is not proven in Rocq.} COFE $\ofe$ such that $G(\ofe^{\textrm{op}}, \ofe) \cong \ofe$ (\ie the two are isomorphic in $\COFEs$).
 \end{thm}
 
 \subsection{RA}
@@ -121,7 +121,7 @@ then there exists a unique\footnote{Uniqueness is not proven in Coq.} COFE $\ofe
   \end{align*}
 \end{defn}
 Here, $\mProp$ is the set of (meta-level) propositions.
-Think of \texttt{Prop} in Coq or $\mathbb{B}$ in classical mathematics.
+Think of \texttt{Prop} in Rocq or $\mathbb{B}$ in classical mathematics.
 
 RAs are closely related to \emph{Partial Commutative Monoids} (PCMs), with two key differences:
 \begin{enumerate}
@@ -185,7 +185,7 @@ We define the plain $\mvalFull$ as the ``limit'' of the step-indexed approximati
 \[ \mvalFull(\melt) \eqdef \All n. n \in \mval(\melt) \]
 
 \paragraph{The extension axiom (\ruleref{camera-extend}).}
-Notice that the existential quantification in this axiom is \emph{constructive}, \ie it is a sigma type in Coq.
+Notice that the existential quantification in this axiom is \emph{constructive}, \ie it is a sigma type in Rocq.
 The purpose of this axiom is to compute $\melt_1$, $\melt_2$ completing the following square:
 
 % RJ FIXME: Needs some magic to fix the baseline of the $\dist{n}$, or so

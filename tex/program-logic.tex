@@ -145,7 +145,7 @@ This influences which rules fancy updates satisfy: either fancy updates can be u
   \]
 Here, $\mask_1$ and $\mask_2$ are the \emph{masks} of the view update, defining which invariants have to be (at least!) available before and after the update.
 Masks are sets of natural numbers, \ie they are subsets of $\mathbb{N}$.%
-\footnote{Actually, in the Coq development masks are restricted to a class of sets of natural numbers that contains all finite sets and is closed under union, intersection, difference and complement.
+\footnote{Actually, in the Rocq development masks are restricted to a class of sets of natural numbers that contains all finite sets and is closed under union, intersection, difference and complement.
 The restriction is necessary for engineering reasons to still obtain representation independence: two masks should be \emph{propositionally} equal iff they contain the same invariant names.}
 We use $\top$ as symbol for the largest possible mask, $\nat$, and $\bot$ for the smallest possible mask $\emptyset$.
 We will write $\pvs[\mask] \prop$ for $\pvs[\mask][\mask]\prop$.
@@ -425,7 +425,7 @@ Then we have to show:
 \]
 
 \paragraph{Hoare triples.}
-It turns out that weakest precondition is actually quite convenient to work with, in particular when performing these proofs in Coq.
+It turns out that weakest precondition is actually quite convenient to work with, in particular when performing these proofs in Rocq.
 Still, for a more traditional presentation, we can easily derive the notion of a Hoare triple:
 \[
 \hoare{\prop}{\expr}{\Ret\val.\propB}[\mask] \eqdef \always{(\prop \wand \wpre{\expr}[\mask]{\Ret\val.\propB})}
@@ -507,7 +507,7 @@ As a result, there is often no need to track disjointness of namespaces, we just
 
 Formally speaking, let $\namesp \in \textlog{InvNamesp} \eqdef \List(\nat)$ be the type of \emph{invariant namespaces}.
 We use the notation $\namesp.\iname$ for the namespace $[\iname] \dplus \namesp$.
-(In other words, the list is ``backwards''. This is because cons-ing to the list, like the dot does above, is easier to deal with in Coq than appending at the end.)
+(In other words, the list is ``backwards''. This is because cons-ing to the list, like the dot does above, is easier to deal with in Rocq than appending at the end.)
 
 The elements of a namespaces are \emph{structured invariant names} (think: Java fully qualified class name).
 They, too, are lists of $\nat$, the same type as namespaces.

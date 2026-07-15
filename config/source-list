@@ -116,7 +116,7 @@ iris/proofmode/base.v
 iris/proofmode/ident_name.v
 iris/proofmode/string_ident.v
 iris/proofmode/tokens.v
-iris/proofmode/coq_tactics.v
+iris/proofmode/rocq_tactics.v
 iris/proofmode/ltac_tactics.v
 iris/proofmode/environments.v
 iris/proofmode/reduction.v

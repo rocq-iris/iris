@@ -600,7 +600,7 @@ Section plainly.
 End plainly.
 
 (* When declared as an actual instance, [plain_persistent] will cause
-failing proof searches to take exponential time, as Coq will try to
+failing proof searches to take exponential time, as Rocq will try to
 apply it the instance at any node in the proof search tree.
 
 To avoid that, we declare it using a [Hint Immediate], so that it will

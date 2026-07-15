@@ -129,18 +129,18 @@ constructed. Such instances should make progress on at least one, but
 possibly _both_ sides of the connective---unlike [∗], where we want to make
 progress on exactly one side.
 
-Naive implementations of this idea can cause Coq to do multiple searches
+Naive implementations of this idea can cause Rocq to do multiple searches
 for [Frame] instances of the subterms. For terms with nested [∧]s or [∨]s,
-this can cause an exponential blowup in the time it takes for Coq to
+this can cause an exponential blowup in the time it takes for Rocq to
 _fail_ to construct a [Frame] instance. This happens especially when the
-resource we are framing in contains evars, since Coq's typeclass search
+resource we are framing in contains evars, since Rocq's typeclass search
 does more backtracking in this case.
 
 To combat this, the [∧] and [∨] instances use [MaybeFrame] classes---
 a notation for [MaybeFrame'] guarded by a [TCNoBackTrack]. The [MaybeFrame]
 clauses for the subterms output a boolean [progress] indicator, on which some
 condition is posed. The [TCNoBackTrack] ensures that when this condition is not
-met, Coq will not backtrack on the [MaybeFrame] clauses to consider different
+met, Rocq will not backtrack on the [MaybeFrame] clauses to consider different
 [progress]es. *)
 
 (* For framing below [∧], we can frame [R] away in *both* conjuncts
@@ -150,7 +150,7 @@ Global Instance frame_and p progress1 progress2 R P1 P2 Q1 Q2 Q' :
   MaybeFrame p R P1 Q1 progress1 →
   MaybeFrame p R P2 Q2 progress2 →
   (** If below [TCEq] fails, the [frame_and] instance is immediately abandoned:
-    the [TCNoBackTrack]s above prevent Coq from considering other ways to
+    the [TCNoBackTrack]s above prevent Rocq from considering other ways to
     construct [MaybeFrame] instances. *)
   TCEq (progress1 || progress2) true →
   MakeAnd Q1 Q2 Q' →
@@ -167,11 +167,11 @@ instances (omitting the parameter [p = false]):
   Frame R P1 True → Frame R (P1 ∨ P2) P2
   Frame R P2 True → Frame R (P1 ∨ P2) P1
 
-The problem here is that Coq will try to infer [Frame R P1 ?] and [Frame R P2 ?]
+The problem here is that Rocq will try to infer [Frame R P1 ?] and [Frame R P2 ?]
 multiple times, whereas the current solution makes sure that said inference
 appears at most once.
 
-If Coq would memorize the results of type class resolution, the solution with
+If Rocq would memorize the results of type class resolution, the solution with
 multiple instances would be preferred (and more Prolog-like). *)
 
 (** Framing a spatial resource [R] under [∨] is done only when:
@@ -185,7 +185,7 @@ Global Instance frame_or_spatial progress1 progress2 R P1 P2 Q1 Q2 Q :
   (** Below [TCOr] encodes the condition described above. If this condition
     cannot be satisfied, the [frame_or_spatial] instance is immediately
     abandoned: the [TCNoBackTrack]s present in the [MaybeFrame] notation
-    prevent Coq from considering other ways to construct [MaybeFrame']
+    prevent Rocq from considering other ways to construct [MaybeFrame']
     instances. *)
   TCOr (TCEq (progress1 && progress2) true) (TCOr
     (TCAnd (TCEq progress1 true) (TCEq Q1 True%I))
@@ -202,7 +202,7 @@ Global Instance frame_or_persistent progress1 progress2 R P1 P2 Q1 Q2 Q :
   MaybeFrame true R P2 Q2 progress2 →
   (** If below [TCEq] fails, the [frame_or_persistent] instance is immediately
     abandoned: the [TCNoBackTrack]s present in the [MaybeFrame] notation
-    prevent Coq from considering other ways to construct [MaybeFrame']
+    prevent Rocq from considering other ways to construct [MaybeFrame']
     instances. *)
   TCEq (progress1 || progress2) true →
   MakeOr Q1 Q2 Q → Frame true R (P1 ∨ P2) Q | 9.

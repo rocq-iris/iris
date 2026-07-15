@@ -35,13 +35,13 @@ Global Arguments into_pure {_} _%_I _%_type_scope {_}.
 Global Hint Mode IntoPure + ! - : typeclass_instances.
 
 (* [IntoPureT] is a variant of [IntoPure] with the argument in [Type] to avoid
-some shortcoming of unification in Coq's type class search. An example where we
+some shortcoming of unification in Rocq's type class search. An example where we
 use this workaround is to repair the following instance:
 
   Global Instance into_exist_and_pure P Q (φ : Prop) :
     IntoPure P φ → IntoExist (P ∧ Q) (λ _ : φ, Q).
 
-Coq is unable to use this instance: [class_apply] -- which is used by type class
+Rocq is unable to use this instance: [class_apply] -- which is used by type class
 search -- fails with the error that it cannot unify [Prop] and [Type]. This is
 probably caused because [class_apply] uses an ancient unification algorith. The
 [refine] tactic -- which uses a better unification algorithm -- succeeds to
@@ -52,7 +52,7 @@ any instance like [into_exist_and_pure], we factor this out in the class
 [IntoPureT]. This way, we only have to declare a [Hint Extern] using [refine]
 once, and use [IntoPureT] in any instance like [into_exist_and_pure].
 
-TODO: Report this as a Coq bug, or wait for https://github.com/coq/coq/pull/991
+TODO: Report this as a Rocq bug, or wait for https://github.com/rocq-prover/rocq/pull/991
 to be finished and merged someday. *)
 Class IntoPureT {PROP : bi} (P : PROP) (φ : Type) :=
   into_pureT : ∃ ψ : Prop, φ = ψ ∧ IntoPure P ψ.
@@ -513,7 +513,7 @@ Global Hint Mode IntoEmbed + + + ! -  : typeclass_instances.
    instance is never used when the BI is unknown.
 
    No Hint Modes are declared here. The appropriate one would be
-   [Hint Mode - + ! -], but the fact that Coq ignores primitive
+   [Hint Mode - + ! -], but the fact that Rocq ignores primitive
    projections for hints modes would make this fail.
 
    The direction [d] specifies whether [φ] can be converted to resp. from [⊢ P].
@@ -583,7 +583,7 @@ Global Hint Mode ElimAcc + ! - ! ! ! ! ! ! - : typeclass_instances.
    - [Pacc]: the assertion to be turned into an accessor (e.g. an invariant)
    Outputs:
    - [Pin]: additional logic assertion needed for starting the accessor.
-   - [φ]: additional Coq assertion needed for starting the accessor.
+   - [φ]: additional Rocq assertion needed for starting the accessor.
    - [X] [α], [β], [γ]: the accessor parameters.
    - [M1], [M2]: the two accessor modalities (they will typically still have
      some evars though, e.g. for the masks)
@@ -600,7 +600,7 @@ Global Hint Mode IntoAcc + - ! - - - - - - - : typeclass_instances.
    Other Arguments:
    - [Pinv] is an invariant assertion
    - [Pin] is an additional logic assertion needed for opening an invariant
-   - [φ] is an additional Coq assertion needed for opening an invariant
+   - [φ] is an additional Rocq assertion needed for opening an invariant
    - [Pout] is the assertion obtained by opening the invariant
    - [Pclose] is the closing view shift.  It must be (Some _) or None
      when doing typeclass search as instances are allowed to make a

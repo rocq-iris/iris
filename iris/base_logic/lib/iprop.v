@@ -120,7 +120,7 @@ Qed.
 (** * Solution of the recursive domain equation *)
 (** We first declare a module type and then an instance of it so as to seal all of
 the construction, this way we are sure we do not use any properties of the
-construction, and also avoid Coq from blindly unfolding it. *)
+construction, and also avoid Rocq from blindly unfolding it. *)
 Module Type iProp_solution_sig.
   Parameter iPrePropO : gFunctors → ofe.
   Global Declare Instance iPreProp_cofe {Σ} : Cofe (iPrePropO Σ).

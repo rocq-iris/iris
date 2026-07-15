@@ -2,9 +2,9 @@
 This file formalizes the STS construction from the original Iris paper (POPL15).
 
 DISCLAIMER: The definition of STSs is included in the Iris development for
-historical purposes. If you plan to mechanize an Iris proof in Coq, it is
+historical purposes. If you plan to mechanize an Iris proof in Rocq, it is
 usually better to use a more direct encoding of the ghost state you need as a
-resource algebra (camera). STSs are very painful to use in Coq, and they are
+resource algebra (camera). STSs are very painful to use in Rocq, and they are
 therefore barely used in practice.
 
 The type [stsT] describes state-transition systems: a type of states, a type of
@@ -199,7 +199,7 @@ Notation steps := (rtc step).
 Notation frame_steps T := (rtc (frame_step T)).
 
 (* The type of bounds we can give to the state of an STS. On paper, this is the
-   type that we equip with an RA structure. In Coq we have to do some work to
+   type that we equip with an RA structure. In Rocq we have to do some work to
    model composition only being defined under some non-computable conditions. *)
 Inductive car (sts : stsT) :=
   | auth : state sts → propset (token sts) → car sts

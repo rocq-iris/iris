@@ -10,7 +10,7 @@ not part of the dependencies of the project.
 
 Useful links:
 - [dune documentation](https://dune.readthedocs.io)
-- [coq zulip channel](https://rocq-prover.zulipchat.com/#narrow/channel/240550-Dune-devs-.26-users)
+- [Rocq zulip channel](https://rocq-prover.zulipchat.com/#narrow/channel/240550-Dune-devs-.26-users)
 
 
 Editor support

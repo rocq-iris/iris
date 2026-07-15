@@ -16,7 +16,7 @@ proofmode:
 
 The reduction [pm_eval] avoids reducing anything user-visible to make sure
 we do not reduce e.g., before unification happens in [iApply]. This needs to
-contain all definitions used in the user-visible statements in [coq_tactics],
+contain all definitions used in the user-visible statements in [rocq_tactics],
 and their dependencies.
 
 Examples:

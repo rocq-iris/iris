@@ -1,5 +1,5 @@
 (** The binary (implicitly persistent) view shift connective is rarely ever
-useful in Coq.  This module only exists to verify that the proof rules we give
+useful in Rocq.  This module only exists to verify that the proof rules we give
 on paper hold true.  Use the non-persistent connective [={E}=∗] wrapped in a [□]
 modality if needed.
 This file will be removed when we find a good way to have a [Definition] with

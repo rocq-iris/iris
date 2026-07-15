@@ -469,7 +469,7 @@ Lemma test_iSpecialize_done_error P Q :
   (P -∗ Q) ⊢ Q.
 Proof. iIntros "HQ". Fail iSpecialize ("HQ" with "[//]"). Abort.
 
-Lemma test_iSpecialize_Coq_entailment P Q R :
+Lemma test_iSpecialize_Rocq_entailment P Q R :
   (⊢ P) → (P -∗ Q) → (⊢ Q).
 Proof. iIntros (HP HPQ). iDestruct (HPQ $! HP) as "?". done. Qed.
 
@@ -1016,10 +1016,10 @@ Proof. iIntros "H". iMod "H". done. Qed.
 Lemma test_iAssumption_False P : False -∗ P.
 Proof. iIntros "H". done. Qed.
 
-Lemma test_iAssumption_coq_1 P Q : (⊢ Q) → <affine> P -∗ Q.
+Lemma test_iAssumption_rocq_1 P Q : (⊢ Q) → <affine> P -∗ Q.
 Proof. iIntros (HQ) "_". iAssumption. Qed.
 
-Lemma test_iAssumption_coq_2 P Q : (⊢ □ Q) → <affine> P -∗ ▷ Q.
+Lemma test_iAssumption_rocq_2 P Q : (⊢ □ Q) → <affine> P -∗ ▷ Q.
 Proof. iIntros (HQ) "_". iAssumption. Qed.
 
 (* Check instantiation and dependent types *)
@@ -2304,8 +2304,8 @@ Check "iRevert_dup_var".
 Lemma iRevert_dup_var (k : nat) (Φ : nat → PROP) : ⊢ Φ (S k).
 Proof. Fail iRevert (k k). Abort.
 
-Check "iRevert_dep_var_coq".
-Lemma iRevert_dep_var_coq (k : nat) (Φ : nat → PROP) : k = 0 → ⊢ Φ (S k).
+Check "iRevert_dep_var_rocq".
+Lemma iRevert_dep_var_rocq (k : nat) (Φ : nat → PROP) : k = 0 → ⊢ Φ (S k).
 Proof. intros Hk. Fail iRevert (k). Abort.
 
 Check "iRevert_dep_var".
@@ -2355,12 +2355,12 @@ Proof.
   Fail iInduction n as [|n] "IH".
 Abort.
 
-Check "iInduction_non_fresh_Coq_IH".
-Lemma iInduction_non_fresh_Coq_IH φ (P : nat → PROP) n :
+Check "iInduction_non_fresh_Rocq_IH".
+Lemma iInduction_non_fresh_Rocq_IH φ (P : nat → PROP) n :
   □ ⌜ φ ⌝ -∗ P n.
 Proof.
   iIntros (IH).
-  (* Names for IHs should also be fresh in Coq context *)
+  (* Names for IHs should also be fresh in Rocq context *)
   Fail iInduction n as [|n IH].
   (* But for the legacy syntax this is no problem. *)
   iInduction n as [|n] "IH".
@@ -2588,7 +2588,7 @@ Section mutual_induction.
   Inductive ntree := Tree : list ntree → ntree.
 
   (** The common induction principle for finitely branching trees. By default,
-  Coq generates a too weak induction principle, so we have to prove it by hand. *)
+  Rocq generates a too weak induction principle, so we have to prove it by hand. *)
   Lemma ntree_ind (φ : ntree → Prop) :
     (∀ l, Forall φ l → φ (Tree l)) →
     ∀ t, φ t.

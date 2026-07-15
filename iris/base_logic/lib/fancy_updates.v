@@ -1,6 +1,6 @@
 From stdpp Require Export coPset nat_cancel.
 From iris.algebra Require Import gmap auth agree gset coPset.
-From iris.proofmode Require Import coq_tactics proofmode reduction.
+From iris.proofmode Require Import rocq_tactics proofmode reduction.
 From iris.base_logic.lib Require Export own.
 From iris.base_logic.lib Require Import wsat.
 From iris.base_logic Require Export later_credits.

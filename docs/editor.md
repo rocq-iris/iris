@@ -32,7 +32,7 @@ on the math symbol list, and with some custom aliases for symbols used a lot in 
 ```
 ;; Input of unicode symbols
 (require 'math-symbol-lists)
-; Automatically use math input method for Coq files
+; Automatically use math input method for Rocq files
 (add-hook 'coq-mode-hook (lambda () (set-input-method "math")))
 ; Input method for the minibuffer
 (defun my-inherit-input-method ()
@@ -156,7 +156,7 @@ initialisation file:
    ))
 ```
 This will let the indentation strategy treat the Iris symbols (e.g. `-∗`) similar to the
-closely related Coq symbols (e.g. `->`).
+closely related Rocq symbols (e.g. `->`).
 Note that `->` is used in many places, as its indentation behaviour is:
 ```
   P ->
@@ -179,25 +179,25 @@ This is not what we want; the second line should be indented by 2 spaces.
 
 ## CoqIDE 8.9 and earlier on Linux (ibus-m17n)
 
-On Linux with old versions of CoqIDE you can use the Intelligent
+On Linux with old versions of RocqIDE you can use the Intelligent
 Input Bus (IBus) framework to input Unicode symbols. First, install `ibus-m17n`
-via your system's package manager. Next, create a file `~/.m17n.d/coq.mim` to
+via your system's package manager. Next, create a file `~/.m17n.d/rocq.mim` to
 configure an input method based on the math symbol list, and with some custom
 aliases for symbols used a lot in Iris as defined [here](ibus).
 
 To use this input method, you should:
 
-1. Enable the "Coq" input using your system settings or using the IBus
-   configuration tool. The Coq input method typically appears in the category
+1. Enable the "Rocq" input using your system settings or using the IBus
+   configuration tool. The Rocq input method typically appears in the category
    "other".
-2. On some systems: In CoqIDE, you have to enable the input method by performing
+2. On some systems: In RocqIDE, you have to enable the input method by performing
    a right click on the text area, and selecting "System (IBus)" under "input
    method".
 
-## CoqIDE 8.10+ Unicode input
+## RocqIDE/CoqIDE 8.10+ Unicode input
 
-Instead of configuring the input system-wide, you can use CoqIDE's support for
-inputting Unicode symbols (introduced in Coq v8.10). To input a symbol, type a
+Instead of configuring the input system-wide, you can use RocqIDE's support for
+inputting Unicode symbols (introduced in Coq 8.10). To input a symbol, type a
 LaTeX-like escape sequence, for example `\alpha` and then type
 `<Shift>-<Space>`, which will expand it into `α`. Expansion will work on a
 prefix of the command as well. You can also customize the expansion keyboard
@@ -286,11 +286,10 @@ Here is a `coqide.bindings` file for a variety of symbols used in Iris:
 
 ## Visual Studio Code
 
-### VSCoq setup
+### VSRocq setup
 
-The recommended extension as of December 2019 is [Maxime Dénès's
-VSCoq](https://marketplace.visualstudio.com/items?itemName=maximedenes.vscoq).
-Press `Ctrl Shift P` or `Cmd Shift P` and then type "coq" to see the list of Coq
+The recommended extension is [VSRocq](https://github.com/rocq-prover/vsrocq).
+Press `Ctrl Shift P` or `Cmd Shift P` and then type "rocq" to see the list of Rocq
 commands and keyboard shortcuts.
 
 ### Font setup
@@ -312,7 +311,7 @@ click on "Edit in settings.json" and add the contents of [this file](vscode).
 
 ## Vim
 
-The [Coqtail](https://github.com/whonore/coqtail) plugin can be used to develop Coq code in `vim` (install it with your favorite plugin manager).
+The [Coqtail](https://github.com/whonore/coqtail) plugin can be used to develop Rocq code in `vim` (install it with your favorite plugin manager).
 Follow the installation instructions in Coqtail's README to setup your keybinds and find out about its usage.
 
 ### Unicode support

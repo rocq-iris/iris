@@ -1,4 +1,4 @@
-(** Hoare triples are rarely ever useful in Coq.  This module only exists to
+(** Hoare triples are rarely ever useful in Rocq.  This module only exists to
 verify that the proof rules we give on paper hold true.  Use Texan triples or
 [WP] instead.
 This file will be removed when we find a good way to have a [Definition] with

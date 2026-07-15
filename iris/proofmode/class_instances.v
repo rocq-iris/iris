@@ -4,7 +4,7 @@ From iris.proofmode Require Import ltac_tactics.
 From iris.prelude Require Import options.
 Import bi.
 
-(* FIXME(Coq #6294): needs new unification *)
+(* FIXME(Rocq #6294): needs new unification *)
 (** All leaf instances below are defined with [Hint Extern] to use evarconv
 ([refine]) instead of legacy unification ([apply]). *)
 

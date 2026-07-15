@@ -1,4 +1,4 @@
-(** Coq configuration for Iris (not meant to leak to clients).
+(** Rocq configuration for Iris (not meant to leak to clients).
 If you are a user of Iris, note that importing this file means
 you are implicitly opting-in to every new option we will add here
 in the future. We are *not* guaranteeing any kind of stability here.

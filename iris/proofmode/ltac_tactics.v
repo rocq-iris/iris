@@ -1,7 +1,7 @@
 From stdpp Require Import namespaces hlist pretty.
 From iris.bi Require Export bi telescopes.
 From iris.proofmode Require Import base intro_patterns spec_patterns
-                                   sel_patterns coq_tactics reduction
+                                   sel_patterns rocq_tactics reduction
                                    string_ident.
 From iris.proofmode Require Export classes notation.
 From iris.prelude Require Import options.
@@ -301,12 +301,12 @@ Tactic Notation "iAssumptionCore" :=
      is_evar i; first [find Γp i P | find Γs i P]; pm_reflexivity
   end.
 
-Tactic Notation "iAssumptionCoq" :=
+Tactic Notation "iAssumptionRocq" :=
   let Hass := fresh in
   match goal with
   | H : ⊢ ?P |- envs_entails _ ?Q =>
      assert (FromAssumption false P Q) as Hass by tc_solve;
-     notypeclasses refine (tac_assumption_coq _ P _ H _ _);
+     notypeclasses refine (tac_assumption_rocq _ P _ H _ _);
        [notypeclasses refine Hass
        |pm_reduce; tc_solve ||
         fail 2 "iAssumption: remaining hypotheses not affine and the goal not absorbing"]
@@ -334,7 +334,7 @@ Tactic Notation "iAssumption" :=
   | |- envs_entails (Envs ?Γp ?Γs _) ?Q =>
      first [find true Γp Q
            |find false Γs Q
-           |iAssumptionCoq
+           |iAssumptionRocq
            |fail "iAssumption:" Q "not found"]
   end.
 
@@ -750,7 +750,7 @@ Tactic Notation "iPoseProofCoreHyp" constr(H) "as" constr(Hnew) :=
     | _ => idtac
     end.
 
-(* The tactic [iIntoEmpValid] tactic "imports a Coq lemma into the proofmode",
+(* The tactic [iIntoEmpValid] tactic "imports a Rocq lemma into the proofmode",
 i.e., it solves a goal [IntoEmpValid ψ ?Q]. The argument [ψ] must be of the
 following shape:
 
@@ -1768,8 +1768,8 @@ subtle differences:
    calling [iPoseProof "H" as ...] on ["H" : P ∨ Q] will keep ["H"] if it
    resides in the intuitionistic context.
 
-These differences are also present in Coq's [destruct] and [pose proof] tactics.
-However, Coq's [destruct lem as ...] is more eager on removing the original
+These differences are also present in Rocq's [destruct] and [pose proof] tactics.
+However, Rocq's [destruct lem as ...] is more eager on removing the original
 hypothesis, it might also remove the original hypothesis if [lem] is not an
 identifier, but an applied term. For example, calling [destruct (H HP) as ...]
 on [H : P → Q] and [HP : P] will remove [H]. The [iDestruct] does not do this
@@ -1841,7 +1841,7 @@ result in the following actions:
 
 The argument [IH] in the tactics below is either [Some "IH"], in which case
 the induction hypotheses are named "IH", "IH1", "IH2" (used for the legacy
-syntax), or [None], in which case the names from the Coq introduction pattern
+syntax), or [None], in which case the names from the Rocq introduction pattern
 are used (they are converted from idents into strings). *)
 Tactic Notation "iInductionCore" tactic3(tac) "as" constr(IH) :=
   let rec fix_ihs rev_tac :=
@@ -1916,7 +1916,7 @@ Tactic Notation "iInduction" constr(x) "as" simple_intropattern(pat) constr(IH)
     "forall" "(" ne_ident_list(xs) ")" constr(Hs) :=
   _iInduction x xs Hs ltac:(fun _ => induction x as pat) (Some IH).
 
-(* new syntax that uses IH names from Coq intro pattern *)
+(* new syntax that uses IH names from Rocq intro pattern *)
 Tactic Notation "iInduction" constr(x) "as" simple_intropattern(pat) :=
   _iInduction0 x "" ltac:(fun _ => induction x as pat) (@None string).
 Tactic Notation "iInduction" constr(x) "as" simple_intropattern(pat)
@@ -1944,7 +1944,7 @@ Tactic Notation "iInduction" constr(x) "as" simple_intropattern(pat) constr(IH)
     "using" uconstr(u) "forall" "(" ne_ident_list(xs) ")" constr(Hs) :=
   _iInduction x xs Hs ltac:(fun _ => induction x as pat using u) (Some IH).
 
-(* new syntax that uses IH names from Coq intro pattern *)
+(* new syntax that uses IH names from Rocq intro pattern *)
 Tactic Notation "iInduction" constr(x) "as" simple_intropattern(pat)
     "using" uconstr(u) :=
   _iInduction0 x "" ltac:(fun _ => induction x as pat using u) (@None string).

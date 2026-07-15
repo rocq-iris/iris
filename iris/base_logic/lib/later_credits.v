@@ -98,7 +98,7 @@ Section lc_rules.
   Global Instance lc_0_persistent : Persistent (£ 0).
   Proof. rewrite lc_unseal /lc_def. apply _. Qed.
 
-  (** Make sure that the rule for [+] is used before [S], otherwise Coq's
+  (** Make sure that the rule for [+] is used before [S], otherwise Rocq's
   unification applies the [S] hint too eagerly. See Iris issue #470. *)
   Global Instance from_sep_lc_add n m : FromSep (£ (n + m)) (£ n) (£ m) | 0.
   Proof. by rewrite /FromSep lc_split. Qed.

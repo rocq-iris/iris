@@ -5,7 +5,7 @@ Import bi.
 
 (** We add a useless hypothesis [BiEmbed PROP PROP'] in order to make sure this
 instance is not used when there is no embedding between [PROP] and [PROP']. The
-first [`{BiEmbed PROP PROP'}] is not considered as a premise by Coq TC search
+first [`{BiEmbed PROP PROP'}] is not considered as a premise by Rocq TC search
 mechanism because the rest of the hypothesis is dependent on it. *)
 Global Instance as_emp_valid_embed `{!BiEmbed PROP PROP'} d (φ : Prop) (P : PROP) :
   BiEmbed PROP PROP' →

@@ -1,8 +1,8 @@
-;; Usage: copy to ~/.m17n.d/coq.mim
+;; Usage: copy to ~/.m17n.d/rocq.mim
 
-(input-method t coq)
-(description "Input method for Coq")
-(title "Coq")
+(input-method t rocq)
+(description "Input method for Rocq")
+(title "Rocq")
 
 (map (trans
 

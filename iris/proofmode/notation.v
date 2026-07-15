@@ -1,5 +1,5 @@
 From stdpp Require Export strings.
-From iris.proofmode Require Import coq_tactics environments.
+From iris.proofmode Require Import rocq_tactics environments.
 From iris.prelude Require Import options.
 
 Declare Scope proof_scope.
@@ -18,7 +18,7 @@ Notation "Γ '_' : P" := (Esnoc Γ (IAnon _) P%I)
 
 Notation "Γ '--------------------------------------' □ Δ '--------------------------------------' ∗ Q" :=
   (envs_entails (Envs Γ Δ _) Q%I)
-  (* The level of Δ is picked to silence warnings about incompatible prefixes. See https://github.com/coq/coq/issues/19631. *)
+  (* The level of Δ is picked to silence warnings about incompatible prefixes. See https://github.com/rocq-prover/rocq/issues/19631. *)
   (at level 1, Δ at level 200, Q at level 200, left associativity,
   format "'[' Γ '--------------------------------------' □ '//' Δ '--------------------------------------' ∗ '//' Q ']'", only printing) :
   stdpp_scope.

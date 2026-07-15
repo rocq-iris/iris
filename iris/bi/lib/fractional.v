@@ -51,7 +51,7 @@ Section fractional.
 
   Ideally, this instance would mean that a user never has to define a manual
   [AsFractional] instance for a [Fractional] predicate (even if it's of the
-  form [λ q, Φ a1 ‥ q ‥ an] for some n-ary predicate [Φ].) However, Coq's
+  form [λ q, Φ a1 ‥ q ‥ an] for some n-ary predicate [Φ].) However, Rocq's
   lack of guarantees for higher-order unification mean this instance wouldn't
   guarantee to apply for every [AsFractional] goal.
 
@@ -183,9 +183,9 @@ Section fractional.
   willing to pay the cost. We have concrete instances for certain fractional
   assertions such as ↦.
 
-  Coq is sometimes unable to infer the [Φ], hence it might be useful to write
+  Rocq is sometimes unable to infer the [Φ], hence it might be useful to write
   [apply: (frame_fractional (λ q, ...))] when using the lemma to prove your
-  custom instance. See also https://github.com/coq/coq/issues/17688 *)
+  custom instance. See also https://github.com/rocq-prover/rocq/issues/17688 *)
   Lemma frame_fractional Φ p R P qR qP r :
     AsFractional R Φ qR →
     AsFractional P Φ qP →

@@ -66,12 +66,12 @@ Record SIdxMixin {I} (ilt ile : relation I) (zero : I) (succ : I → I) := {
 
 (** [sidx] is both a canonical structure and a typeclass.
 When working with a concrete index type, we usually fix it globally. Declaring
-an appropriate instance and structure enables Coq to infer the globally fixed
+an appropriate instance and structure enables Rocq to infer the globally fixed
 index type automatically in almost all places. For an example of how to
 instantiate [sidx], see [stepindex_finite.v].
 
 Using both a canonical structure and a type class is not very common. In this
-case, it maximizes the inference that is done by Coq when we use the index type.
+case, it maximizes the inference that is done by Rocq when we use the index type.
 The fact that the step-index is a type class makes sure in, for example, lemma
 statements that it will be inferred from the context automatically. It also
 means that if we work with finite step-indices then the finite step-index

@@ -79,7 +79,7 @@ If you only want to *import* a certain module in some specific place (for instan
 
 - **Prefer `first [ t1 | fail 1 "..." ]` to `t1 || fail "..."`.** This is better because the latter will fail if `t1` doesn't make progress. See https://gitlab.mpi-sws.org/iris/iris/-/issues/216. Note that `first [ t1 | fail "..."]` is simply incorrect; the failure message will never show up and will be replaced with a generic failure.
 
-### Coqdoc comments
+### Rocqdoc comments
 
 - **Module-level comments (covering the entire file) go at the top of the file, before the `Require`.**
 
@@ -114,7 +114,7 @@ If you only want to *import* a certain module in some specific place (for instan
   end
   ```
 
-- **Use coqdoc syntax in comments for Coq identifiers and inline code, e.g. `[cmraT]`.**
+- **Use rocqdoc syntax in comments for Rocq identifiers and inline code, e.g. `[cmraT]`.**
 
 - **Put proofs either all on one line (`Proof. reflexivity. Qed.`) or split up the usual way with indentation.**
 
@@ -258,7 +258,7 @@ theories/base_logic/lib is for constructions in the base logic (using own)
   * `(|==£> |==£> P) ⊢ |==£> P`
   * `▷ own γ a ⊢ ◇ ∃ b, own γ b ∧ ▷ (a ≡ b)`
   * `(P -∗ Q) i ⊢ (P i -∗ Q i)`
-* If a lemma is a Coq implication of Iris entailments (where the entailments are visible, not hidden behind e.g. `Persistent`), then use `⊢`
+* If a lemma is a Rocq implication of Iris entailments (where the entailments are visible, not hidden behind e.g. `Persistent`), then use `⊢`
   * `(P1 ⊢ P2) → recv l P1 ⊢ recv l P2`
 * Else use -∗
   * `a1 ⋅ a2 ~~> a' → own γ a1 -∗ own γ a2 ==∗ own γ a'` (curried and hence not rewrite-friendly)

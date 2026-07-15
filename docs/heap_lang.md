@@ -26,7 +26,7 @@ definition of substitution which just skips over `Val` terms, because values
 should be closed and hence not affected by substitution.  As a consequence, we
 can entirely avoid even talking about "closed terms", that notion just does not
 have to come up anywhere.  We also exploit this when writing specifications,
-because we can just write lemmas involving terms of the form `Val ?v` and Coq
+because we can just write lemmas involving terms of the form `Val ?v` and Rocq
 can determine `?v` by unification (because all values start with the `Val`
 constructor).
 
@@ -44,7 +44,7 @@ binders in both branches.
 
 The widely used `#` is a short-hand to turn a basic literal (an integer, a
 location, a boolean literal or a unit value) into a value.  Since values coerce
-to expressions, `#` is widely used whenever a Coq value needs to be placed into
+to expressions, `#` is widely used whenever a Rocq value needs to be placed into
 a HeapLang term.
 
 ## Tactics
@@ -81,7 +81,7 @@ Tactics to take one or more pure program steps:
 Tactics for the heap:
 
 - `wp_alloc l as "H"`: Reduce an allocation instruction and call the new
-  location `l` (in the Coq context) and the points-to assertion `H` (in the
+  location `l` (in the Rocq context) and the points-to assertion `H` (in the
   spatial context).  You can leave out the `as "H"` to introduce it as an
   anonymous assertion, which is equivalent to `as "?"`.
 - `wp_load`: Reduce a load operation.  This automatically finds the points-to

@@ -63,7 +63,7 @@ Recursive abstractions, pairs, and the injections exist both as a value form and
 The expression forms will reduce to the value form once all their arguments are values.
 Conceptually, one can think of that as corresponding to ``boxing'' that most functional language implementations do.
 We will leave away the disambiguating subscript when it is clear from the context or does not matter.
-All of this lets us define $\ofval$ as simply applying the value injection (the very first syntactic form of $\Expr$), which makes a lot of things in Coq much simpler.
+All of this lets us define $\ofval$ as simply applying the value injection (the very first syntactic form of $\Expr$), which makes a lot of things in Rocq much simpler.
 $\toval$ is defined recursively in the obvious way.
 
 \langkw{AllocN} takes as first argument the number of heap cells to allocate (must be strictly positive), and as second argument the default value to use for these heap cells.
