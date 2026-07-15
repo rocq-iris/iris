@@ -94,7 +94,7 @@ Proof.
   - rewrite from_assumption. destruct H; by rewrite sep_elim_l.
 Qed.
 
-Lemma tac_assumption_coq Δ P Q :
+Lemma tac_assumption_rocq Δ P Q :
   (⊢ P) →
   FromAssumption false P Q →
   (if env_spatial_is_nil Δ then TCTrue

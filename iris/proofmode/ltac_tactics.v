@@ -306,7 +306,7 @@ Tactic Notation "iAssumptionRocq" :=
   match goal with
   | H : ⊢ ?P |- envs_entails _ ?Q =>
      assert (FromAssumption false P Q) as Hass by tc_solve;
-     notypeclasses refine (tac_assumption_coq _ P _ H _ _);
+     notypeclasses refine (tac_assumption_rocq _ P _ H _ _);
        [notypeclasses refine Hass
        |pm_reduce; tc_solve ||
         fail 2 "iAssumption: remaining hypotheses not affine and the goal not absorbing"]
