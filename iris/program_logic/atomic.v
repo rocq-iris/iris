@@ -29,7 +29,7 @@ If you don't need a private postcondition, you can leave it away, e.g.:
     code @ E
   <<{ ∃∃ y, atomic_postcondition | RET return_value }>>
 
-Note that due to combinatorial explosion and because Coq does not have a
+Note that due to combinatorial explosion and because Rocq does not have a
 facility to declare such notation in a compositional way, not *all* variants of
 this notation exist: if you have binders before the [RET] (which is very
 uncommon), you must have a private postcondition (it can be [True]), and you
@@ -270,7 +270,7 @@ Section lemmas.
     iIntros "Hwp" (Φ x) "Hα HΦ".
     iApply (wp_frame_wand with "HΦ"). iApply "Hwp".
     iAuIntro. iAaccIntro with "Hα"; first by eauto. iIntros (y) "Hβ !>".
-    (* FIXME: Using ssreflect rewrite does not work, see Coq bug #7773. *)
+    (* FIXME: Using ssreflect rewrite does not work, see Rocq bug #7773. *)
     rewrite ->!tele_app_bind. iIntros (z) "Hpost HΦ". iApply ("HΦ" with "Hβ Hpost").
   Qed.
 
@@ -311,7 +311,7 @@ Section lemmas.
     iMod ("HΦ") as "[#Hα [Hclose _]]". iMod ("Hclose" with "Hα") as "HΦ".
     iApply wp_fupd. iApply ("Hwp" with "Hα"). iIntros "!> %y Hβ %z Hpost".
     iMod ("HΦ") as "[_ [_ Hclose]]". iMod ("Hclose" with "Hβ") as "HΦ".
-    (* FIXME: Using ssreflect rewrite does not work, see Coq bug #7773. *)
+    (* FIXME: Using ssreflect rewrite does not work, see Rocq bug #7773. *)
     rewrite ->!tele_app_bind. iApply "HΦ". done.
   Qed.
 

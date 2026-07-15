@@ -188,7 +188,7 @@ Section list.
     ([^o list] k ↦ y ∈ l1, f k y) ≡ ([^o list] k ↦ y ∈ l2, g k y).
   Proof.
     intros Hl Hf. apply big_opL_gen_proper_2; try (apply _ || done).
-    (* FIXME (Coq #14441) unnecessary type annotation *)
+    (* FIXME (Rocq #14441) unnecessary type annotation *)
     intros k. assert (l1 !! k ≡@{option A} l2 !! k) as Hlk by (by f_equiv).
     destruct (l1 !! k) eqn:?, (l2 !! k) eqn:?; inversion Hlk; naive_solver.
   Qed.
@@ -376,7 +376,7 @@ Section gmap.
     ([^o map] k ↦ y ∈ m1, f k y) ≡ ([^o map] k ↦ y ∈ m2, g k y).
   Proof.
     intros Hl Hf. apply big_opM_gen_proper_2; try (apply _ || done).
-    (* FIXME (Coq #14441) unnecessary type annotation *)
+    (* FIXME (Rocq #14441) unnecessary type annotation *)
     intros k. assert (m1 !! k ≡@{option A} m2 !! k) as Hlk by (by f_equiv).
     destruct (m1 !! k) eqn:?, (m2 !! k) eqn:?; inversion Hlk; naive_solver.
   Qed.
@@ -391,7 +391,7 @@ Section gmap.
   Proof. intros f g Hf m ? <-. apply big_opM_proper; intros; apply Hf. Qed.
 
   (* FIXME: This lemma could be generalized from [≡] to [=], but that breaks
-  [setoid_rewrite] in the proof of [big_sepS_sepS]. See Coq issue #14349. *)
+  [setoid_rewrite] in the proof of [big_sepS_sepS]. See Rocq issue #14349. *)
   Lemma big_opM_map_to_list f m :
     ([^o map] k↦x ∈ m, f k x) ≡ [^o list] xk ∈ map_to_list m, f (xk.1) (xk.2).
   Proof. rewrite big_opM_unseal. apply big_opL_proper'; [|done]. by intros ? [??]. Qed.
@@ -598,7 +598,7 @@ Section gset.
   Proof. intros f g Hf m ? <-. apply big_opS_proper; intros; apply Hf. Qed.
 
   (* FIXME: This lemma could be generalized from [≡] to [=], but that breaks
-  [setoid_rewrite] in the proof of [big_sepS_sepS]. See Coq issue #14349. *)
+  [setoid_rewrite] in the proof of [big_sepS_sepS]. See Rocq issue #14349. *)
   Lemma big_opS_elements f X :
     ([^o set] x ∈ X, f x) ≡ [^o list] x ∈ elements X, f x.
   Proof. by rewrite big_opS_unseal. Qed.
@@ -766,7 +766,7 @@ Section gmultiset.
   Proof. intros f g Hf m ? <-. apply big_opMS_proper; intros; apply Hf. Qed.
 
   (* FIXME: This lemma could be generalized from [≡] to [=], but that breaks
-  [setoid_rewrite] in the proof of [big_sepS_sepS]. See Coq issue #14349. *)
+  [setoid_rewrite] in the proof of [big_sepS_sepS]. See Rocq issue #14349. *)
   Lemma big_opMS_elements f X :
     ([^o mset] x ∈ X, f x) ≡ [^o list] x ∈ elements X, f x.
   Proof. by rewrite big_opMS_unseal. Qed.

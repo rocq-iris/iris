@@ -667,7 +667,7 @@ Next Obligation.
 Qed.
 Next Obligation.
   intros ? K ?? F A1 ? A2 ? B1 ? B2 ? fg; simpl.
-  (* [apply] does not work, probably the usual unification probem (Coq #6294) *)
+  (* [apply] does not work, probably the usual unification probem (Rocq #6294) *)
   eapply @view_map_cmra_morphism; [apply _..|]=> n m f.
   intros Hrel k [df va] Hf. move: Hf.
   rewrite !lookup_fmap.

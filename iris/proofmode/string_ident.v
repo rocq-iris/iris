@@ -26,7 +26,7 @@ Module StringToIdent.
     | String c s => Ascii.byte_of_ascii c :: coq_string_to_list_byte s
     end.
 
-  (** copy a list of Coq byte constrs into a string (already of the right length) *)
+  (** copy a list of Rocq byte constrs into a string (already of the right length) *)
   Ltac2 rec coq_byte_list_blit_list (pos : int) (ls : constr) (str : string) : unit :=
     match! ls with
     | nil => ()

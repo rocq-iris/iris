@@ -8,7 +8,7 @@ pervasively. These are defined in dedicated sections in this manual.
   _destruct_ a hypothesis (sometimes called _eliminating_ a hypothesis). This is
   directly used by `iDestruct` and `iIntros`, but many tactics also integrate
   support for `ipat`s to combine some other work with destructing, such as
-  `iMod`. The name "introduction pattern" comes from a similar term in Coq which
+  `iMod`. The name "introduction pattern" comes from a similar term in Rocq which
   is used in tactics like `destruct` and `intros`.
 - A "[selection pattern][selpat]" `selpat` like `"H1 H2"` or `"#"` names a collection of
   hypotheses. Most commonly used in `iFrame`.
@@ -34,13 +34,13 @@ weakest precondition.
 Starting and stopping the proof mode
 ------------------------------------
 
-- `iStartProof` : start the proof mode by turning a Coq goal into a proof
+- `iStartProof` : start the proof mode by turning a Rocq goal into a proof
   mode entailment. This tactic is performed implicitly by all proof mode tactics
   described in this file, and thus should generally not be used by hand.
   + `iStartProof PROP` : explicitly specify which BI logic `PROP : bi` should be
     used. This is useful to drop down in a layered logic, e.g. to drop down from
     `monPred PROP` to `PROP`.
-- `iStopProof` : turn the proof-mode entailment into an ordinary Coq goal
+- `iStopProof` : turn the proof-mode entailment into an ordinary Rocq goal
   `big star of context ⊢ proof mode goal`.
 
 Applying hypotheses and lemmas
@@ -48,7 +48,7 @@ Applying hypotheses and lemmas
 
 - `iExact "H"`  : finish the goal if the conclusion matches the hypothesis `H`
 - `iAssumption` : finish the goal if the conclusion matches any hypothesis in
-  either the proofmode or the Coq context. Only hypotheses in the Coq context
+  either the proofmode or the Rocq context. Only hypotheses in the Rocq context
   that are _syntactically_ of the shape `⊢ P` are recognized by this tactic
   (this means that assumptions of the shape `P ⊢ Q` are not recognized).
 - `iApply pm_trm` : match the conclusion of the current goal against the
@@ -62,14 +62,14 @@ Context management
 ------------------
 
 - `iIntros (x1 ... xn) "ipat1 ... ipatn"` : introduce universal quantifiers
-  using Coq introduction patterns `x1 ... xn` and implications/wands using proof
+  using Rocq introduction patterns `x1 ... xn` and implications/wands using proof
   mode [introduction patterns][ipat] `ipat1 ... ipatn`.
 - `iClear (x1 ... xn) "selpat"` : clear the hypotheses given by the [selection
-  pattern][selpat] `selpat` and the Coq level hypotheses/variables `x1 ... xn`.
+  pattern][selpat] `selpat` and the Rocq level hypotheses/variables `x1 ... xn`.
 - `iClear select (pat)%I` : clear the last hypothesis of the intuitionistic
   or spatial context that matches pattern `pat`.
 - `iRevert (x1 ... xn) "selpat"` : revert the hypotheses given by the [selection
-  pattern][selpat] `selpat` into wands, and the Coq level hypotheses/variables
+  pattern][selpat] `selpat` into wands, and the Rocq level hypotheses/variables
   `x1 ... xn` into universal quantifiers. Intuitionistic hypotheses are wrapped
   into the intuitionistic modality.
 - `iRevert select (pat)%I` : revert the last hypothesis of the intuitionistic
@@ -97,8 +97,8 @@ Context management
     hypotheses are available in both the subgoal for `P` as well as the current
     goal. An `ipat` is considered intuitionistic if all branches start with a
     `#` (which causes `P` to be moved to the intuitionistic context) or with a
-    `%` (which causes `P` to be moved to the pure Coq context).
-  + `iAssert (P)%I as %cpat` : assert `P` and destruct it using the Coq introduction
+    `%` (which causes `P` to be moved to the pure Rocq context).
+  + `iAssert (P)%I as %cpat` : assert `P` and destruct it using the Rocq introduction
     pattern `cpat`. All hypotheses can be used for proving `P` as well as for
     proving the current goal.
 - `iSelect (pat)%I tac` : run the tactic `tac H`, where `H` is the name of the
@@ -109,7 +109,7 @@ Context management
 Introduction of logical connectives
 -----------------------------------
 
-- `iPureIntro` : turn a pure goal, typically of the form `⌜φ⌝`, into a Coq
+- `iPureIntro` : turn a pure goal, typically of the form `⌜φ⌝`, into a Rocq
   goal. This tactic also works for goals of the shape `a ≡ b` on discrete
   OFEs, and `✓ a` on discrete cameras.
 - `iLeft` : prove a disjunction `P ∨ Q` by proving the left side `P`.
@@ -137,11 +137,11 @@ Elimination of logical connectives
 - `iExFalso` : change the goal to proving `False`.
 - `iDestruct` is an important enough tactic to describe several special cases:
   + `iDestruct "H1" as (x1 ... xn) "H2"` : eliminate a series of existential
-    quantifiers in hypothesis `H1` using Coq introduction patterns `x1 ... xn`
-    and name the resulting hypothesis `H2`. The Coq introduction patterns can
+    quantifiers in hypothesis `H1` using Rocq introduction patterns `x1 ... xn`
+    and name the resulting hypothesis `H2`. The Rocq introduction patterns can
     also be used for pure conjunctions; for example we can destruct
     `∃ x, ⌜v = x⌝ ∗ l ↦ x` using `iDestruct "H" as (x Heq) "H"` to immediately
-    put `Heq: v = x` in the Coq context. This variant of the tactic will always
+    put `Heq: v = x` in the Rocq context. This variant of the tactic will always
     throw away the original hypothesis `H1`.
   + `iDestruct pm_trm as "ipat"` : specialize the [proof-mode term][pm-trm] (see
     below) and destruct it using the [introduction pattern][ipat] `ipat`. If
@@ -152,7 +152,7 @@ Elimination of logical connectives
     conjuncts) with `x1 ... xn`, and finally destructing the resulting term
     using the [introduction pattern][ipat] `ipat`.
   + `iDestruct pm_trm as %cpat` : destruct the pure conclusion of a term
-    `pr_trm` using the Coq introduction pattern `cpat`. When using this tactic,
+    `pr_trm` using the Rocq introduction pattern `cpat`. When using this tactic,
     all hypotheses can be used for proving the premises of `pm_trm`, as well as
     for proving the resulting goal.
   + `iDestruct num as (x1 ... xn) "ipat"` / `iDestruct num as %cpat` :
@@ -163,7 +163,7 @@ Elimination of logical connectives
 
   In case all branches of `ipat` start with a `#` (which causes the hypothesis
   to be moved to the intuitionistic context), with an `%` (which causes the
-  hypothesis to be moved to the pure Coq context), or with an `->`/`<-` (which
+  hypothesis to be moved to the pure Rocq context), or with an `->`/`<-` (which
   performs a rewrite), then one can use all hypotheses for proving the premises
   of `pm_trm`, as well as for proving the resulting goal. Note that in this case
   the hypotheses still need to be subdivided among the spatial premises.
@@ -171,14 +171,14 @@ Elimination of logical connectives
 Separation logic-specific tactics
 ---------------------------------
 
-- `iFrame (t1 .. tn) "selpat"` : cancel the Coq terms (or Coq hypotheses)
+- `iFrame (t1 .. tn) "selpat"` : cancel the Rocq terms (or Rocq hypotheses)
   `t1 ... tn` and Iris hypotheses given by [`selpat`][selpat] in the goal. The constructs
   of the selection pattern have the following meaning:
-  + `%` : repeatedly frame hypotheses from the Coq context.
+  + `%` : repeatedly frame hypotheses from the Rocq context.
   + `#` : repeatedly frame hypotheses from the intuitionistic context.
   + `∗` : frame as much of the spatial context as possible. (N.B: this
           is the unicode symbol `∗`, not the regular asterisk `*`.)
-  Notice that framing spatial hypotheses makes them disappear, but framing Coq
+  Notice that framing spatial hypotheses makes them disappear, but framing Rocq
   or intuitionistic hypotheses does not make them disappear.
   This tactic solves the goal if everything in the conclusion has been framed,
   i.e., the conclusion turned into `True`/`emp`. If multiple selection patterns
@@ -245,18 +245,18 @@ Induction
 - `iLöb as "IH"` : perform Löb induction by
   generating a hypothesis `IH : ▷ goal`.
   + `iLöb as "IH" forall (x1 ... xn) "selpat"` : perform Löb induction,
-  generalizing over the Coq level variables `x1 ... xn`, the hypotheses given by
+  generalizing over the Rocq level variables `x1 ... xn`, the hypotheses given by
   the selection pattern `selpat`, and the spatial context as usual.
-- `iInduction x as cpat` : perform induction on the Coq term `x`. The
-  Coq introduction pattern `cpat` is used to name the introduced variables,
+- `iInduction x as cpat` : perform induction on the Rocq term `x`. The
+  Rocq introduction pattern `cpat` is used to name the introduced variables,
   including the induction hypotheses which are introduced into the proof mode
   context. Note that induction hypotheses should not be put into string
   quotation marks `".."`, e.g., use `iInduction n as [|n IH]` to perform
   induction on a natural number `n`. An implementation caveat is that the names
-  of the induction hypotheses should be fresh in both the Coq context and the
+  of the induction hypotheses should be fresh in both the Rocq context and the
   proof mode context.
   + `iInduction x as cpat forall (x1 ... xn) "selpat"` : perform induction,
-    generalizing over the Coq level variables `x1 ... xn`, the hypotheses given by
+    generalizing over the Rocq level variables `x1 ... xn`, the hypotheses given by
     the selection pattern `selpat`, and the spatial context.
   + `iInduction x as cpat using t` : perform induction using the induction
     scheme `t`. Common examples of induction schemes are `map_ind`, `set_ind_L`,
@@ -290,14 +290,14 @@ Rewriting / simplification
   shorthand for `iEval (simpl)`.
 - `iUnfold xs` / `iUnfold xs in "selpat"` : perform `unfold xs` on the proof
   mode goal / hypotheses given by the selection pattern `selpat`. This is a
-  shorthand for `iEval (unfold xs)`. Similar to Coq's `unfold`, the argument
+  shorthand for `iEval (unfold xs)`. Similar to Rocq's `unfold`, the argument
   `xs` should be a comma-separated non-empty list.
 
 Iris
 ----
 
 - `iInv H as (x1 ... xn) "ipat"` : open an invariant in hypothesis H. The result
-  is destructed using the Coq intro patterns `x1 ... xn` (for existential
+  is destructed using the Rocq intro patterns `x1 ... xn` (for existential
   quantifiers) and then the proof mode [introduction pattern][ipat] `ipat`.
   + `iInv H with "selpat" as (x1 ... xn) "ipat" "Hclose"` : generate an update
   for closing the invariant and put it in a hypothesis named `Hclose`.
@@ -337,7 +337,7 @@ Selection patterns are used to select hypotheses in the tactics `iRevert`,
 following _selection patterns_:
 
 - `H` : select the hypothesis named `H`.
-- `%` : select the entire pure/Coq context.
+- `%` : select the entire pure/Rocq context.
 - `#` : select the entire intuitionistic context.
 - `∗` : select the entire spatial context. (N.B: this
         is the unicode symbol `∗`, not the regular asterisk `*`.)
@@ -367,11 +367,11 @@ _introduction patterns_:
   to destruct nested (separating) conjunctions.
 - `[ipat1|ipat2]` : disjunction elimination.
 - `[]` : false elimination.
-- `%H` : move the hypothesis to the pure Coq context, and name it `H`.
-- `%` : move the hypothesis to the pure Coq context (anonymously). Note that if
+- `%H` : move the hypothesis to the pure Rocq context, and name it `H`.
+- `%` : move the hypothesis to the pure Rocq context (anonymously). Note that if
   `%` is followed by an identifier, and not another token, a space is needed
   to disambiguate from `%H` above.
-- `->` and `<-` : rewrite using a pure Coq equality
+- `->` and `<-` : rewrite using a pure Rocq equality
 - `# ipat` : move the hypothesis into the intuitionistic context. The tactic
   will fail if the hypothesis is not intuitionistic. On success, the tactic will
   strip any number of intuitionistic and persistence modalities. If the
@@ -460,7 +460,7 @@ _specialization patterns_ to express splitting of hypotheses:
   well in the subsequent goal. The hypotheses `$H1 ... $Hn` will be framed in
   the goal for the premise. These patterns can be terminated with a `//`, which
   causes `done` to be called to close the goal (after framing).
-- `[%]` and `[% //]` : generate a Coq goal for a pure premise. This pattern
+- `[%]` and `[% //]` : generate a Rocq goal for a pure premise. This pattern
   does not consume any hypotheses. The pattern can be terminated with a `//`
   which causes `done` to be called to close the goal.
 - `[$]` : solve the premise by framing. It will first repeatedly frame and
@@ -494,8 +494,8 @@ The syntax for the arguments of these tactics, called _proof mode terms_, is:
 
         (H $! t1 ... tn with "spat1 .. spatn")
 
-Here, `H` can be either a hypothesis or a Coq lemma whose conclusion is
-of the shape `P ⊢ Q`. In the above, `t1 ... tn` are arbitrary Coq terms used
+Here, `H` can be either a hypothesis or a Rocq lemma whose conclusion is
+of the shape `P ⊢ Q`. In the above, `t1 ... tn` are arbitrary Rocq terms used
 for instantiation of universal quantifiers, and `spat1 .. spatn` are
 [specialization patterns][spat] to eliminate implications and wands.
 

@@ -69,7 +69,7 @@ about `Σ`, it also contains some ghost names to refer to particular ghost state
 
 The backtick (`` ` ``) is used to make anonymous assumptions and to automatically
 generalize the `Σ`.  When adding assumptions with backtick, you should most of
-the time also add a `!` in front of every assumption.  If you do not then Coq
+the time also add a `!` in front of every assumption.  If you do not then Rocq
 will also automatically generalize all indices of type-classes that you are
 assuming.  This can easily lead to making more assumptions than you are aware
 of, and often it leads to duplicate assumptions which breaks type class
@@ -86,9 +86,9 @@ resource algebras. For example, `one_shotR` is defined as follows:
 Definition one_shotR := csumR (exclR unitO) (agreeR ZO).
 ```
 
-The suffixes `R` and `O` indicate that we are not working on the level of Coq
+The suffixes `R` and `O` indicate that we are not working on the level of Rocq
 types here, but on the level of `R`esource algebras and `O`FEs,
-respectively. Unfortunately this means we cannot use Coq's usual type notation
+respectively. Unfortunately this means we cannot use Rocq's usual type notation
 (such as `*` for products and `()` for the unit type); we have to spell out the
 underlying OFE or resource algebra names instead.
 
@@ -213,7 +213,7 @@ F_global (X,X⁻) := Π_{F ∈ Σ} gmap nat (F (X,X⁻))
 To make this equation well-defined, the bifunctors `F ∈ Σ` need to be "contractive".
 For further details, see §7.4 of
 [The Iris Documentation](http://plv.mpi-sws.org/iris/appendix-3.3.pdf); here we
-describe the user-side Coq aspects of this approach.
+describe the user-side Rocq aspects of this approach.
 
 Below, when we say "functor", we implicitly mean "bifunctor".
 

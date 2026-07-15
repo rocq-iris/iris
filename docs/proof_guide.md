@@ -1,20 +1,20 @@
 # Iris Proof Guide
 
 This work-in-progress document serves to explain how Iris proofs are typically
-carried out in Coq: what are the common patterns and conventions, what are the
+carried out in Rocq: what are the common patterns and conventions, what are the
 common pitfalls.  This complements the tactic documentation for the
 [proof mode](./proof_mode.md) and [HeapLang](./heap_lang.md).
 
 ## Order of `Requires`
 
-In Coq, declarations in modules imported later may override the
+In Rocq, declarations in modules imported later may override the
 previous definition. Therefore, in order to make sure the most
 relevant declarations and notations always take priority, we recommend
 importing dependencies from the furthest to the closest.
 
-In particular, when importing Iris, Stdpp and Coq stdlib modules, we
+In particular, when importing Iris, Stdpp and Rocq stdlib modules, we
 recommend importing in the following order:
-- Coq
+- Stdlib
 - stdpp
 - iris.algebra
 - iris.bi
@@ -30,7 +30,7 @@ There are two situations to distinguish here.
 
 #### Eliminating a [fupd] with a mask smaller than the current one
 
-When your goal is `|={E,_}=> _` and you want to do `iMod` on an `|={E',_}=> _`, Coq will complain even if `E' ⊆ E`.
+When your goal is `|={E,_}=> _` and you want to do `iMod` on an `|={E',_}=> _`, Rocq will complain even if `E' ⊆ E`.
 To resolve this, you first need to explicitly weaken your mask from `E` to `E'` by doing:
 ```coq
 iMod (fupd_mask_subseteq E') as "Hclose".
@@ -44,7 +44,7 @@ In that case, you will have to experiment with rules like `fupd_mask_frame`, but
 
 #### Introducing a [fupd] when the masks are not yet the same
 
-When your goal is `|={E,E'}=> _` and you want to do `iModIntro`, Coq will complain even if `E' ⊆ E`.
+When your goal is `|={E,E'}=> _` and you want to do `iModIntro`, Rocq will complain even if `E' ⊆ E`.
 This arises, for example, in clients of TaDA-style logically atomic specifications.
 To resolve this, do:
 ```coq
@@ -61,11 +61,11 @@ tweaking is necessary to make the two work together properly.  The details of
 this still need to be written up properly, but here is some background material:
 
 * [Type Classes for Mathematics in Type Theory](http://www.eelis.net/research/math-classes/mscs.pdf)
-* [Canonical Structures for the working Coq user](https://hal.inria.fr/hal-00816703v1/document)
+* [Canonical Structures for the working Rocq user](https://hal.inria.fr/hal-00816703v1/document)
 
 ## Implicit generalization
 
-We often use the implicit generalization feature of Coq, triggered by a backtick:
+We often use the implicit generalization feature of Rocq, triggered by a backtick:
 `` `{!term A B}`` means that an implicit argument of type `term A B` is added,
 and if any of the identifiers that are used here is not yet bound, it gets added
 as well.  Usually, `term` will be some existing type class or similar, and we
@@ -122,17 +122,17 @@ Notations starting with `(` or `{` should be left at their default level (`0`),
 and inner subexpressions that are bracketed by delimiters should be left at
 their default level (`200`).
 
-Moreover, correct parsing of notations sometimes relies on Coq's automatic
+Moreover, correct parsing of notations sometimes relies on Rocq's automatic
 left-factoring, which can require coordinating levels of certain "conflicting"
 notations and their subexpressions.  For instance, to disambiguate `(⊢@{ PROP
-})` and `(⊢@{ PROP } P)`, Coq must factor out a nonterminal for `⊢@{ PROP }`,
+})` and `(⊢@{ PROP } P)`, Rocq must factor out a nonterminal for `⊢@{ PROP }`,
 but it can only do so if all occurrences of `⊢@{ PROP }` agree on the
 precedences for all subexpressions. This also requires using the same
 tokenization in all cases, i.e., the notation has to consistently be declared as
 `(⊢@{` or `('⊢@{'`, but not a mixture of the two. The latter form of using
-explicit tokenization with `'` is preferred to avoid relying on Coq's default.
+explicit tokenization with `'` is preferred to avoid relying on Rocq's default.
 
-For details, consult [the Coq manual](https://coq.inria.fr/refman/user-extensions/syntax-extensions.html#simple-factorization-rules).
+For details, consult [the Rocq manual](https://rocq-prover.org/doc/master/refman/user-extensions/syntax-extensions.html#simple-factorization-rules).
 
 ## Naming conventions for variables/arguments/hypotheses
 

@@ -7,7 +7,7 @@ Import env_notations.
 
 Local Open Scope lazy_bool_scope.
 
-(* Coq versions of the tactics *)
+(* Rocq versions of the tactics *)
 Section tactics.
 Context {PROP : bi}.
 Implicit Types Γ : env PROP.

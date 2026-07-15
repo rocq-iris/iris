@@ -16,7 +16,7 @@ Section demo.
   Context {M : ucmra}.
   Notation iProp := (uPred M).
 
-  (* The version in Coq *)
+  (* The version in Rocq *)
   Lemma and_exist A (P R: Prop) (Ψ: A → Prop) :
     P ∧ (∃ a, Ψ a) ∧ R → ∃ a, P ∧ Ψ a.
   Proof.

@@ -90,8 +90,8 @@ Section language.
      invariants when WP ensures safety, i.e., programs never can get stuck.  We
      have an example in lambdaRust of an expression that is atomic in this
      sense, but not in the stronger sense defined below, and we have to be able
-     to open invariants around that expression.  See `CasStuckS` in
-     [lambdaRust](https://gitlab.mpi-sws.org/FP/LambdaRust-coq/blob/master/theories/lang/lang.v).
+     to open invariants around that expression.  See [CasStuckS] in
+     [lambdaRust](https://gitlab.mpi-sws.org/iris/lambda-rust/-/blob/master/lambda-rust/lang/lang.v).
 
      [Atomic StronglyAtomic]: To open invariants with a WP that does not ensure
      safety, we need a stronger form of atomicity.  With the above definition,

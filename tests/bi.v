@@ -58,12 +58,12 @@ Definition big_sepM_pattern_both
 Definition big_sepM2_pattern {PROP : bi} (m1 m2 : gmap nat (nat * nat)) : PROP :=
   [∗ map] '(x,_);'(_,y) ∈ m1;m2, ⌜ x = y ⌝.
 
-(** This fails, Coq will infer [x] to have type [Z] due to the equality, and
+(** This fails, Rocq will infer [x] to have type [Z] due to the equality, and
 then sees a type mismatch with [m : gmap nat nat]. *)
 Fail Definition big_sepM_implicit_type {PROP : bi} (m : gmap nat nat) : PROP :=
   [∗ map] x ∈ m, ⌜ 10%Z = x ⌝.
 
-(** With a cast, we can force Coq to type check the body with [x : nat] and
+(** With a cast, we can force Rocq to type check the body with [x : nat] and
 thereby insert the [nat] to [Z] coercion in the body. *)
 Definition big_sepM_cast {PROP : bi} (m : gmap nat nat) : PROP :=
   [∗ map] (x:nat) ∈ m, ⌜ 10%Z = x ⌝.
@@ -86,7 +86,7 @@ Proof.
 Abort.
 
 (** This tests that [bupd] is [Typeclasses Opaque]. If [bupd] were transparent,
-Coq would unify [bupd_instance] with [persistently]. *)
+Rocq would unify [bupd_instance] with [persistently]. *)
 Goal ∀ {PROP : bi} (P : PROP),
   ∃ bupd_instance, Persistent (@bupd PROP bupd_instance P).
 Proof. intros. eexists _. Fail apply _. Abort.

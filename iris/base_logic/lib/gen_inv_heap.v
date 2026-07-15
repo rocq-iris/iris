@@ -160,9 +160,9 @@ Section inv_heap.
 
   (** * Typeclass instances *)
 
-  (* FIXME(Coq #6294): needs new unification
+  (* FIXME(Rocq #6294): needs new unification
   The uses of [apply:] and [move: ..; rewrite ..] (by lack of [apply: .. in ..])
-  in this file are needed because Coq's default unification algorithm fails. *)
+  in this file are needed because Rocq's default unification algorithm fails. *)
   Global Instance inv_pointsto_own_proper l v :
     Proper (pointwise_relation _ iff ==> (≡)) (inv_pointsto_own l v).
   Proof.

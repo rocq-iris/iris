@@ -108,7 +108,7 @@ Global Arguments cmra_validN : simpl never.
 Global Arguments cmra_ofe_mixin : simpl never.
 Global Arguments cmra_mixin : simpl never.
 Add Printing Constructor cmra.
-(* FIXME(Coq #6294) : we need the new unification algorithm here. *)
+(* FIXME(Rocq #6294) : we need the new unification algorithm here. *)
 Global Hint Extern 0 (PCore _) => refine (cmra_pcore _); shelve : typeclass_instances.
 Global Hint Extern 0 (Op _) => refine (cmra_op _); shelve : typeclass_instances.
 Global Hint Extern 0 (Valid _) => refine (cmra_valid _); shelve : typeclass_instances.
@@ -116,14 +116,14 @@ Global Hint Extern 0 (ValidN _) => refine (cmra_validN _); shelve : typeclass_in
 Coercion cmra_ofeO {SI : sidx} (A : cmra) : ofe := Ofe A (cmra_ofe_mixin A).
 Canonical Structure cmra_ofeO.
 
-(** As explained more thoroughly in iris#539, Coq can run into trouble when
+(** As explained more thoroughly in iris#539, Rocq can run into trouble when
   [cmra] combinators (such as [optionUR]) are stacked and combined with
-  coercions like [cmra_ofeO]. To partially address this, we give Coq's
+  coercions like [cmra_ofeO]. To partially address this, we give Rocq's
   type-checker some directions for unfolding, with the Strategy command.
 
-  For these structures, we instruct Coq to eagerly _expand_ all projections,
+  For these structures, we instruct Rocq to eagerly _expand_ all projections,
   except for the coercion to type (in this case, [cmra_car]), since that causes
-  problem with canonical structure inference. Additionally, we make Coq
+  problem with canonical structure inference. Additionally, we make Rocq
   eagerly expand the coercions that go from one structure to another, like
   [cmra_ofeO] in this case. *)
 Global Strategy expand [cmra_ofeO cmra_equiv cmra_dist cmra_pcore cmra_op
@@ -247,7 +247,7 @@ Global Arguments ucmra_ofe_mixin : simpl never.
 Global Arguments ucmra_cmra_mixin : simpl never.
 Global Arguments ucmra_mixin : simpl never.
 Add Printing Constructor ucmra.
-(* FIXME(Coq #6294) : we need the new unification algorithm here. *)
+(* FIXME(Rocq #6294) : we need the new unification algorithm here. *)
 Global Hint Extern 0 (Unit _) => refine (ucmra_unit _); shelve : typeclass_instances.
 Coercion ucmra_ofeO {SI : sidx} (A : ucmra) : ofe := Ofe A (ucmra_ofe_mixin A).
 Canonical Structure ucmra_ofeO.
@@ -255,9 +255,9 @@ Coercion ucmra_cmraR {SI : sidx} (A : ucmra) : cmra :=
   Cmra' A (ucmra_ofe_mixin A) (ucmra_cmra_mixin A).
 Canonical Structure ucmra_cmraR.
 
-(** As for CMRAs above, we instruct Coq to eagerly _expand_ all projections,
+(** As for CMRAs above, we instruct Rocq to eagerly _expand_ all projections,
   except for the coercion to type (in this case, [ucmra_car]), since that causes
-  problem with canonical structure inference.  Additionally, we make Coq 
+  problem with canonical structure inference.  Additionally, we make Rocq
   eagerly expand the coercions that go from one structure to another, like
   [ucmra_cmraR] and [ucmra_ofeO] in this case. *)
 Global Strategy expand [ucmra_cmraR ucmra_ofeO ucmra_equiv ucmra_dist ucmra_pcore
@@ -278,7 +278,7 @@ End ucmra_mixin.
 
 (** * Discrete CMRAs *)
 #[projections(primitive=no)] (* FIXME: making this primitive means we cannot use
-the projections with eauto any more (see https://github.com/coq/coq/issues/17561) *)
+the projections with eauto any more (see https://github.com/rocq-prover/rocq/issues/17561) *)
 Class CmraDiscrete {SI : sidx} (A : cmra) := {
   #[global] cmra_discrete_ofe_discrete :: OfeDiscrete A;
   cmra_discrete_valid (x : A) : ✓{0ᵢ} x → ✓ x
@@ -1272,7 +1272,7 @@ Section prod.
     CmraDiscrete A → CmraDiscrete B → CmraDiscrete prodR.
   Proof. split; [apply _|]. by intros ? []; split; apply cmra_discrete_valid. Qed.
 
-  (* FIXME(Coq #6294): This is not an instance because we need it to use the new
+  (* FIXME(Rocq #6294): This is not an instance because we need it to use the new
   unification. *)
   Lemma pair_core_id x y :
     CoreId x → CoreId y → CoreId (x,y).

@@ -1,4 +1,4 @@
-# Contributing to the Iris Coq Development
+# Contributing to the Iris Rocq Development
 
 Here you can find some how-tos for various thing sthat might come up when doing
 Iris development.  This is for contributing to Iris itself; see
@@ -54,7 +54,7 @@ guide](docs/style_guide.md).
   (In case you do not use opam yourself, you can see recently published versions
   [in this repository](https://gitlab.mpi-sws.org/iris/opam/commits/master).)
 * Run `make builddep` (in Iris) to install the new version of std++.
-  You may have to do `make clean` as Coq will likely complain about .vo file
+  You may have to do `make clean` as Rocq will likely complain about .vo file
   mismatches.
 
 ## How to write/update test cases
@@ -67,8 +67,8 @@ we expect it to.  You can run `make MAKE_REF=1` to re-generate all the `.ref` fi
 this is useful after adding or removing `Show.` from a test.  If you do this,
 make sure to check the diff for any unexpected changes in the output!
 
-Some test cases have per-Coq-version `.ref` files (e.g., `atomic.8.8.ref` is a
-Coq-8.8-specific `.ref` file).  If you change one of these, remember to update
+Some test cases have per-Rocq-version `.ref` files (e.g., `atomic.8.8.ref` is a
+Rocq-8.8-specific `.ref` file).  If you change one of these, remember to update
 *all* the `.ref` files.
 
 If you want to compile without tests run `make NO_TEST=1`.
@@ -82,7 +82,7 @@ the usual `-jN`, `install`, ...).  This should only rarely be necessary. For
 example, if you are not using opam and you want to install only the `iris`
 package (without HeapLang, to avoid waiting on that part of the build), you can
 do `./make-package iris install`.  (If you are using opam, you can achieve the
-same by pinning `coq-iris` to your Iris checkout.)
+same by pinning `rocq-iris` to your Iris checkout.)
 
 Note that `./make-package` will never run the test suite, so please always do a
 regular `make -jN` before submitting an MR.

@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-## A simple shell script checking for some common Coq issues.
+## A simple shell script checking for some common Rocq issues.
 
 FILE="$1"
 

@@ -62,7 +62,7 @@ Section mono_proof.
       { iNext. iExists (S c). rewrite Nat2Z.inj_succ Z.add_1_l. by iFrame. }
       wp_pures. iApply "HΦ". iModIntro. iExists γ; repeat iSplit; eauto.
       iApply (own_mono with "Hγf").
-      (* FIXME: FIXME(Coq #6294): needs new unification *)
+      (* FIXME: FIXME(Rocq #6294): needs new unification *)
       apply: auth_frag_mono. by apply max_nat_included, le_n_S.
     - wp_cmpxchg_fail; first (by intros [= ?%Nat2Z.inj]). iModIntro.
       iSplitL "Hl Hγ"; [iNext; iExists c'; by iFrame|].

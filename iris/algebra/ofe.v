@@ -8,7 +8,7 @@ Local Open Scope sidx_scope.
 (** This files defines (a shallow embedding of) the category of OFEs: Complete
 ordered families of equivalences. This is a cartesian closed category, and
 mathematically speaking, the entire development lives in this category. However,
-we will generally prefer to work with raw Coq functions plus some registered
+we will generally prefer to work with raw Rocq functions plus some registered
 [Proper] instances for non-expansiveness. This makes writing such functions much
 easier. It turns out that in many cases, we do not even need non-expansiveness. *)
 
@@ -64,7 +64,7 @@ Structure ofe {SI : sidx} := Ofe {
 }.
 Global Arguments Ofe {_} _ {_ _} _.
 Add Printing Constructor ofe.
-(* FIXME(Coq #6294) : we need the new unification algorithm here. *)
+(* FIXME(Rocq #6294) : we need the new unification algorithm here. *)
 Global Hint Extern 0 (Equiv _) => refine (ofe_equiv _); shelve : typeclass_instances.
 Global Hint Extern 0 (Dist _) => refine (ofe_dist _); shelve : typeclass_instances.
 Global Arguments ofe_car : simpl never.
@@ -73,14 +73,14 @@ Global Arguments ofe_dist : simpl never.
 Global Arguments ofe_mixin : simpl never.
 
 (** When declaring instances of subclasses of OFE (like CMRAs and unital CMRAs)
-we need Coq to *infer* the canonical OFE instance of a given type and take the
+we need Rocq to *infer* the canonical OFE instance of a given type and take the
 mixin out of it. This makes sure we do not use two different OFE instances in
 different places (see for example the constructors [Cmra] and [Ucmra] in the
 file [cmra.v].)
 
 In order to infer the OFE instance, we use the definition [ofe_mixin_of'] which
 is inspired by the [clone] trick in ssreflect. It works as follows, when type
-checking [@ofe_mixin_of' A ?Ac id] Coq faces a unification problem:
+checking [@ofe_mixin_of' A ?Ac id] Rocq faces a unification problem:
 
   ofe_car ?Ac  ~  A
 
@@ -644,7 +644,7 @@ defined above. *)
 Section fixpoint.
   Context {SI : sidx} `{!Cofe A, !Inhabited A} (f : A → A) `{!Contractive f}.
 
-  (** Getting Coq to agree with the above description of the construction of the
+  (** Getting Rocq to agree with the above description of the construction of the
   fixpoint takes a little work. To apply the completion operations (i.e.,
   [compl] and [bcompl]), we need to know that the fixed point approximations
   (i.e., ([x_n] for any [n]) and ([x_m] for any [n < m])) form a "chain".
@@ -664,7 +664,7 @@ Section fixpoint.
   [bfchain_car] with the property that applying [bcompl] to [bfchain_car] gives
   the fixpoint up to index [n]. *)
 
-  (** Note that [bfchain] is a private implementation detail, but Coq does not
+  (** Note that [bfchain] is a private implementation detail, but Rocq does not
   allow us to make records [Local]. *)
   Record bfchain n := {
     bfchain_car :> bchain A n;
@@ -1452,7 +1452,7 @@ are two ways in which they can be used:
    [Canonical Structure tyO := discreteO ty], so not using [Definition]. See
    [natO] below for an example. Make sure to avoid overlapping instances, so
    always check if no instance has already been defined. For most of the types
-   from Coq, std++, and Iris, instances are present in Iris. The convention is
+   from Rocq, std++, and Iris, instances are present in Iris. The convention is
    to use the name [tyO] for the OFE instance of a type [ty].
 2. As part of abstractions that are parametrized with a [Type], but where an
    [ofe] is needed to use (camera) combinators. See [ghost_var] as an example.
@@ -1476,7 +1476,7 @@ Notation discreteO A := (Ofe A (discrete_ofe_mixin _)).
 
 (** The combinator [leibnizO A] lifts Leibniz equality [=] into a discrete OFE.
 The implementation forces the [Equivalence] proof to be [eq_equivalence] so that
-Coq does not accidentally use another one, like [ofe_equivalence], in the case of
+Rocq does not accidentally use another one, like [ofe_equivalence], in the case of
 aliases. See also https://gitlab.mpi-sws.org/iris/iris/issues/299 *)
 Notation leibnizO A := (Ofe A (@discrete_ofe_mixin _ _ equivL eq_equivalence)).
 
@@ -1496,7 +1496,7 @@ Notation discrete_ofe_equivalence_of A := ltac:(
 Global Instance leibnizO_leibniz {SI : sidx} A  : LeibnizEquiv (leibnizO A).
 Proof. by intros x y. Qed.
 
-(** * Basic Coq types *)
+(** * Basic Rocq types *)
 Canonical Structure boolO {SI : sidx} : ofe := leibnizO bool.
 Canonical Structure natO {SI : sidx} : ofe := leibnizO nat.
 Canonical Structure positiveO {SI : sidx} : ofe := leibnizO positive.
@@ -2059,7 +2059,7 @@ Section sigT.
     ∀ n, x1 ≡{n}≡ x2.
 
   (** Unfolding lemmas.
-      Written with [↔] not [=] to avoid https://github.com/coq/coq/issues/3814. *)
+      Written with [↔] not [=] to avoid https://github.com/rocq-prover/rocq/issues/3814. *)
   Definition sigT_equiv_eq x1 x2 : (x1 ≡ x2) ↔ ∀ n, x1 ≡{n}≡ x2 :=
       reflexivity _.
 

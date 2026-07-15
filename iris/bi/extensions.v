@@ -42,7 +42,7 @@ the embedding of pure propositions. The reverse direction of the entailment
 described by this type class is derivable, so it is not included.
 
 An instance of [BiPureForall] itself is derivable if we assume excluded middle
-in Coq, see the lemma [bi_pure_forall_em] in [derived_laws]. *)
+in Rocq, see the lemma [bi_pure_forall_em] in [derived_laws]. *)
 Class BiPureForall (PROP : bi) :=
   pure_forall_2 : ∀ {A} (φ : A → Prop), (∀ a, ⌜ φ a ⌝) ⊢@{PROP} ⌜ ∀ a, φ a ⌝.
 Global Hint Mode BiPureForall ! : typeclass_instances.

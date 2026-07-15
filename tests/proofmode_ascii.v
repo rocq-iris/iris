@@ -7,7 +7,7 @@ From iris.bi Require Import ascii.
 
 Unset Mangle Names.
 
-(* Remove this and the [Set Printing Raw Literals.] below once we require Coq
+(* Remove this and the [Set Printing Raw Literals.] below once we require Rocq
 8.14. *)
 Set Warnings "-unknown-option".
 

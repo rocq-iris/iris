@@ -92,7 +92,7 @@ Section cofe.
 
   (* We generalize over the relation R which is morally the equivalence
      relation over B. That way, the BI index can use equality as an
-     equivalence relation (and Coq is able to infer the Proper and
+     equivalence relation (and Rocq is able to infer the Proper and
      Reflexive instances properly), or any other equivalence relation,
      provided it is compatible with (⊑). *)
   Global Instance monPred_at_ne (R : relation I) :

@@ -1,5 +1,5 @@
 In this changelog, we document "large-ish" changes to Iris that affect even the
-way the logic is used on paper.  We also document changes in the Coq
+way the logic is used on paper.  We also document changes in the Rocq
 development; every API-breaking change should be listed, but not every new
 lemma.
 

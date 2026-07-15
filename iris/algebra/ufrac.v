@@ -5,7 +5,7 @@ From iris.algebra Require Import proofmode_classes.
 From iris.prelude Require Import options.
 
 (** Since the standard (0,1] fractional camera [frac] is used more often, we
-define [ufrac] through a [Definition] instead of a [Notation]. That way, Coq
+define [ufrac] through a [Definition] instead of a [Notation]. That way, Rocq
 infers the [frac] camera by default when using the [Qp] type. *)
 Definition ufrac := Qp.
 

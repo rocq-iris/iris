@@ -288,7 +288,7 @@ Global Hint Extern 0 (SbiUnfold _ (match ?x with _ => _ end) ?Pi) =>
      intros ?; destruct x; shelve
     |(* Create an [SbiUnfold] goal for each constructor *)
      destruct x;
-     (* These goals are of the form [SbiUnfold ?P (λ n, ?Pi_j)]. Since Coq's HO
+     (* These goals are of the form [SbiUnfold ?P (λ n, ?Pi_j)]. Since Rocq's HO
      unification cannot handle the lambda reliably, we turn these goals into
      [SbiUnfold ?P ?Pi_j'] and generate equality goals [TCEq (λ n, ?Pi_j) ?Pi_j']
      that are solved later. *)

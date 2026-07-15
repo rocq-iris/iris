@@ -1196,7 +1196,7 @@ Tactic failure: iRevert: k1 not in scope.
      : string
 The command has indeed failed with message:
 Tactic failure: iRevert: k not in scope.
-"iRevert_dep_var_coq"
+"iRevert_dep_var_rocq"
      : string
 The command has indeed failed with message:
 k is used in hypothesis Hk.
@@ -1246,7 +1246,7 @@ The command has indeed failed with message:
 Tactic failure: iIntro: "IH" not fresh.
 The command has indeed failed with message:
 Tactic failure: iIntro: "IH" not fresh.
-"iInduction_non_fresh_Coq_IH"
+"iInduction_non_fresh_Rocq_IH"
      : string
 The command has indeed failed with message:
 IH is already used.

@@ -18,7 +18,7 @@ Section printing_tests.
 
   (* These terms aren't even closed, but that's not what this is about.  The
   length of the variable names etc. has been carefully chosen to trigger
-  particular behavior of the Coq pretty printer. *)
+  particular behavior of the Rocq pretty printer. *)
 
   Lemma wp_print_long_expr (fun1 fun2 fun3 : expr) :
     True -∗ WP let: "val1" := fun1 #() in
