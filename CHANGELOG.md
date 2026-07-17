@@ -11,6 +11,8 @@ lemma.
 * Change big-op notations to parse the collection that they iterate over at
   level 200.
 * Add lemma `big_opM_set_to_map`.
+* Add non-expansiveness instances for `intersection_with`, `difference_with`,
+  `intersection`, and `difference` on `gmap`s. (by Simcha van Collem)
 
 **Changes in `bi`:**
 
