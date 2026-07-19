@@ -65,7 +65,7 @@ lemma.
 * Rename `cmra_morphism_monotone` → `cmra_morphism_mono` and
   `cmra_morphism_monotoneN` → `cmra_morphism_monoN`.
 * Add lemma `lc_fupd_add_step_fupdN`.
-* Add new "final fancy update" modality `|={E|}=> P` to streamline adequacy
+* Add new "final fancy update" modality `|={E|}■=> P` to streamline adequacy
   proofs. This modality makes it possible to prove adequacy of total WP and
   trace-based logics (Trillium) while supporting later credits, and gives new
   rules for fancy updates. (inspired by ideas from Freja Marott Crawford, Amin

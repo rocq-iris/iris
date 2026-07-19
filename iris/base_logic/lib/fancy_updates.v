@@ -20,8 +20,8 @@ compatibility. More precisely:
   [lc_fupd_elim_later : £ 1 -∗ (▷ P) -∗ |={E}=> P], which allows us strip a
   later by spending a credit.
 - If later credits are disabled ([hlc = HasNoLc]), we obtain the rule
-  [fupd_keep : (|={E1|}=> P) ∧ (P -∗ |={E1,E2}=> Q) ⊢ |={E1,E2}=> Q] without the
-  side-condition that [P] should be timeless (the "finally" modality [|={E|}=>]
+  [fupd_keep : (|={E1|}■=> P) ∧ (P -∗ |={E1,E2}=> Q) ⊢ |={E1,E2}=> Q] without the
+  side-condition that [P] should be timeless (the "finally" modality [|={E|}■=>]
   is described further below in this file). This rule is used to derive the
   plain interaction rules [BiFUpdSbi].
 
@@ -155,27 +155,27 @@ of a custom modality/program logic. To use it, perform the following steps:
 - (Only when *not* using later credits ([HasNoLc]), or proving a theorem generic
   in [hlc : has_lc])
   Apply [laterN_soundness] to add a number of laters.
-- Apply [fupd_finally_soundness] to turn the goal into [|={E|}=> ..] and to
+- Apply [fupd_finally_soundness] to turn the goal into [|={E|}■=> ..] and to
   allocate a number of later credits. In addition to the later credits you want
   to supply to the user, you also want to allocate enough later credits to
   eliminate the laters obtained from unfolding a recursive definition (such as
   WP) sufficiently many times.
 
 Next, you can:
-- Eliminate update modalities around [|={E|}=> ..] through [fupd_fupd_finally].
+- Eliminate update modalities around [|={E|}■=> ..] through [fupd_fupd_finally].
   This lemma is used implicitly when using the [iMod] tactic.
 - "Duplicate" the context for proving timeless assertions through
   [fupd_finally_keep].
-- Introduce foralls below [|={E|}=> ..] through [fupd_finally_forall]. This
+- Introduce foralls below [|={E|}■=> ..] through [fupd_finally_forall]. This
   lemma is used implicitly when using the [iIntros] tactic.
-- Turn laters below [|={E|}=> ..] into later credits through [fupd_finally_lc]
+- Turn laters below [|={E|}■=> ..] into later credits through [fupd_finally_lc]
   or commute them out through [fupd_finally_later].
 - Finally introduce the modality using [fupd_finally_intro]. This lemma is used
   implicitly by [iModIntro].
 
-It is important to note that [|={E|}=> P] can only be introduced if [P] is plain
+It is important to note that [|={E|}■=> P] can only be introduced if [P] is plain
 (i.e., it can be proven without resources) due to the [■] modality in the
-definition of [|==£|>]. Therefore, rules that have [|={E|}=> P] as a premise
+definition of [|==£|>]. Therefore, rules that have [|={E|}■=> P] as a premise
 (particularly [fupd_keep]) do not need to require that [P] is plain.
 
 See the proofs of the derived soundness theorems (e.g. [fupd_finally_soundness])
@@ -183,7 +183,7 @@ below for examples on how to use the modality. Also see the proofs of adequacy o
 WP or total WP. *)
 Definition fupd_finally_def `{!invGS_gen hlc Σ}
     (E : coPset) (P : iProp Σ) : iProp Σ :=
-  wsat -∗ ownE E -∗ |==£|> P.
+  wsat -∗ ownE E -∗ |==£|■> P.
 Local Definition fupd_finally_aux : seal (@fupd_finally_def).
 Proof. by eexists. Qed.
 Local Definition fupd_finally := fupd_finally_aux.(unseal).
@@ -191,15 +191,15 @@ Local Definition fupd_finally_unseal :
   @fupd_finally = @fupd_finally_def := fupd_finally_aux.(seal_eq).
 Global Arguments fupd_finally {hlc Σ _}.
 
-Notation "|={ E |}=> Q" := (fupd_finally E Q)
+Notation "|={ E |}■=> Q" := (fupd_finally E Q)
   (at level 20, E at level 50, Q at level 200,
-   format "'[  ' |={ E |}=>  '/' Q ']'") : bi_scope.
-Notation "P ={ E |}=∗ Q" := (P -∗ fupd_finally E Q)%I
+   format "'[  ' |={ E |}■=>  '/' Q ']'") : bi_scope.
+Notation "P ={ E |}■=∗ Q" := (P -∗ fupd_finally E Q)%I
   (at level 99, E at level 50, Q at level 200,
-   format "'[' P  ={ E |}=∗  '/' '[' Q ']' ']'") : bi_scope.
-Notation "P ={ E |}=∗ Q" := (P -∗ fupd_finally E Q)
+   format "'[' P  ={ E |}■=∗  '/' '[' Q ']' ']'") : bi_scope.
+Notation "P ={ E |}■=∗ Q" := (P -∗ fupd_finally E Q)
   (at level 99, E at level 50, Q at level 200,
-   format "'[' P  ={ E |}=∗  '/' '[' Q ']' ']'") : stdpp_scope.
+   format "'[' P  ={ E |}■=∗  '/' '[' Q ']' ']'") : stdpp_scope.
 
 Section fupd_finally.
   Context `{!invGS_gen hlc Σ}.
@@ -207,16 +207,16 @@ Section fupd_finally.
   Global Instance fupd_finally_ne E : NonExpansive (fupd_finally E).
   Proof. rewrite fupd_finally_unseal. solve_proper. Qed.
 
-  Lemma fupd_finally_mono E P Q : (P ⊢ Q) → (|={E|}=> P) ⊢ (|={E|}=> Q).
+  Lemma fupd_finally_mono E P Q : (P ⊢ Q) → (|={E|}■=> P) ⊢ (|={E|}■=> Q).
   Proof. rewrite fupd_finally_unseal. solve_proper. Qed.
 
-  Lemma fupd_finally_intro E P : ■ P ⊢ |={E|}=> P.
+  Lemma fupd_finally_intro E P : ■ P ⊢ |={E|}■=> P.
   Proof.
     rewrite fupd_finally_unseal.
     iIntros "#HP _ _". by iApply le_upd_finally_intro.
   Qed.
 
-  Lemma fupd_fupd_finally E1 E2 P : (|={E1,E2}=> |={E2|}=> P) ⊢ |={E1|}=> P.
+  Lemma fupd_fupd_finally E1 E2 P : (|={E1,E2}=> |={E2|}■=> P) ⊢ |={E1|}■=> P.
   Proof.
     rewrite fupd_finally_unseal uPred_fupd_unseal.
     iIntros "HP Hw HE1". rewrite /uPred_fupd_def /=.
@@ -227,13 +227,13 @@ Section fupd_finally.
 
   (** Generate a later credit by removing a later below the modality. This only
   works if the proposition below the later can be turned into an except-0 [◇]. *)
-  Lemma fupd_finally_add_lc E P : (£ 1 -∗ |={E|}=> P) ⊢ |={E|}=> ▷ ◇ P.
+  Lemma fupd_finally_add_lc E P : (£ 1 -∗ |={E|}■=> P) ⊢ |={E|}■=> ▷ ◇ P.
   Proof.
     rewrite fupd_finally_unseal. iIntros "H Hw HE".
     iApply le_upd_finally_add_lc. iIntros "H£". iApply ("H" with "H£ Hw HE").
   Qed.
 
-  Lemma fupd_finally_except_0 E P : (|={E|}=> ◇ P) ⊢ |={E|}=> P.
+  Lemma fupd_finally_except_0 E P : (|={E|}■=> ◇ P) ⊢ |={E|}■=> P.
   Proof.
     rewrite fupd_finally_unseal. iIntros "H Hw HE".
     iApply le_upd_finally_except_0. iApply ("H" with "Hw HE").
@@ -243,7 +243,7 @@ Section fupd_finally.
   below the later can be turned into an except-0 [◇].
   This lemma is derivable from [fupd_finally_lc] with [hlc:=HasLc], but
   not with [hlc:=HasNoLc]. *)
-  Lemma fupd_finally_later E P : ▷ (|={E|}=> P) ⊢ |={E|}=> ▷ ◇ P.
+  Lemma fupd_finally_later E P : ▷ (|={E|}■=> P) ⊢ |={E|}■=> ▷ ◇ P.
   Proof.
     rewrite fupd_finally_unseal. iIntros "H Hw HE". iApply le_upd_finally_later.
     iNext. iApply ("H" with "Hw HE").
@@ -255,7 +255,7 @@ Section fupd_finally.
   this works for *all* [P], not just timeless assertions. [P] can
   be proven under the [fupd_finally] modality; see above for context. *)
   Lemma fupd_keep {E1 E2} P Q `{!TCOr (TCEq hlc HasNoLc) (Timeless P)} :
-    (|={E1|}=> P) ∧ (P -∗ |={E1,E2}=> Q) ⊢ |={E1,E2}=> Q.
+    (|={E1|}■=> P) ∧ (P -∗ |={E1,E2}=> Q) ⊢ |={E1,E2}=> Q.
   Proof.
     rewrite fupd_finally_unseal uPred_fupd_unseal. iIntros "H [Hw HE]".
     iApply (le_upd_keep P). iSplit.
@@ -264,7 +264,7 @@ Section fupd_finally.
   Qed.
 
   Lemma fupd_finally_forall {A} E (Φ : A → iProp Σ) :
-    (∀ x, |={E|}=> Φ x) ⊢ |={E|}=> ∀ x, Φ x.
+    (∀ x, |={E|}■=> Φ x) ⊢ |={E|}■=> ∀ x, Φ x.
   Proof.
     rewrite fupd_finally_unseal. iIntros "H Hw HE".
     iApply le_upd_finally_forall; iIntros (x). iApply ("H" with "Hw HE").
@@ -283,7 +283,7 @@ Section fupd_finally.
   assertion [P] *without* actually using up the context. You can then continue
   the proof in the second conjunct. *)
   Lemma fupd_finally_keep {E} P Q `{!TCOr (TCEq hlc HasNoLc) (Timeless P)} :
-    (|={E|}=> P) ∧ (P -∗ |={E|}=> Q) ⊢ |={E|}=> Q.
+    (|={E|}■=> P) ∧ (P -∗ |={E|}■=> Q) ⊢ |={E|}■=> Q.
   Proof.
     iIntros "H". iApply (fupd_fupd_finally E E). iApply (fupd_keep P).
     by rewrite -fupd_intro.
@@ -311,9 +311,9 @@ Section fupd_finally.
     - iIntros "$". by iMod (fupd_mask_subseteq E2).
   Qed.
 
-  Lemma fupd_finally_and E P Q : (|={E|}=> P) ∧ (|={E|}=> Q) ⊢ |={E|}=> P ∧ Q.
+  Lemma fupd_finally_and E P Q : (|={E|}■=> P) ∧ (|={E|}■=> Q) ⊢ |={E|}■=> P ∧ Q.
   Proof. rewrite !and_alt -fupd_finally_forall. by f_equiv=> -[]. Qed.
-  Lemma fupd_finally_wand E P Q : (|={E|}=> P) -∗ ■ (P -∗ Q) -∗ (|={E|}=> Q).
+  Lemma fupd_finally_wand E P Q : (|={E|}■=> P) -∗ ■ (P -∗ Q) -∗ (|={E|}■=> Q).
   Proof.
     apply entails_wand, wand_intro_r.
     rewrite -plainly_and_sep_r -plainly_idemp.
@@ -321,19 +321,19 @@ Section fupd_finally.
     by rewrite plainly_and_sep_r plainly_elim wand_elim_r.
   Qed.
 
-  Lemma fupd_finally_mask_mono E1 E2 P : E1 ⊆ E2 → (|={E1|}=> P) ⊢ |={E2|}=> P.
+  Lemma fupd_finally_mask_mono E1 E2 P : E1 ⊆ E2 → (|={E1|}■=> P) ⊢ |={E2|}■=> P.
   Proof.
     iIntros (?) "H". iApply fupd_fupd_finally. by iApply fupd_mask_intro_discard.
   Qed.
 
-  (** Introduction of [|={E|}=> P] is the same as introduction of [■]: all
+  (** Introduction of [|={E|}■=> P] is the same as introduction of [■]: all
   non-plain propositions are removed from the context. *)
   Global Instance from_modal_fupd_finally E P :
-    FromModal True modality_plainly (|={E|}=> P) (|={E|}=> P) P.
+    FromModal True modality_plainly (|={E|}■=> P) (|={E|}■=> P) P.
   Proof. intros _. apply fupd_finally_intro. Qed.
 
   Global Instance from_pure_fupd_finally a E P φ :
-    FromPure a P φ → FromPure a (|={E|}=> P) φ.
+    FromPure a P φ → FromPure a (|={E|}■=> P) φ.
   Proof.
     rewrite /FromPure=> <-. rewrite -fupd_finally_intro.
     by apply plainly_intro; [destruct a; simpl; apply _|].
@@ -341,29 +341,29 @@ Section fupd_finally.
 
   Global Instance from_forall_fupd_finally E {A} P (Φ : A → iProp Σ) name :
     FromForall P Φ name →
-    FromForall (|={E|}=> P) (λ a, |={E|}=> Φ a)%I name.
+    FromForall (|={E|}■=> P) (λ a, |={E|}■=> Φ a)%I name.
   Proof. rewrite /FromForall=> <-. apply fupd_finally_forall. Qed.
 
-  Global Instance is_except_0_fupd_finally E P : IsExcept0 (|={E|}=> P).
+  Global Instance is_except_0_fupd_finally E P : IsExcept0 (|={E|}■=> P).
   Proof.
     by rewrite /IsExcept0 -{2}(fupd_fupd_finally E E) -except_0_fupd -fupd_intro.
   Qed.
 
   Global Instance elim_modal_bupd_fupd_finally p E P Q :
-    ElimModal True p false (|==> P) P (|={E|}=> Q) (|={E|}=> Q).
+    ElimModal True p false (|==> P) P (|={E|}■=> Q) (|={E|}■=> Q).
   Proof.
     rewrite /ElimModal intuitionistically_if_elim /= bupd_frame_r wand_elim_r.
     by rewrite (bupd_fupd E) fupd_fupd_finally.
   Qed.
   Global Instance elim_modal_fupd_fupd_finally p E1 E2 P Q :
-    ElimModal True p false (|={E1,E2}=> P) P (|={E1|}=> Q) (|={E2|}=> Q).
+    ElimModal True p false (|={E1,E2}=> P) P (|={E1|}■=> Q) (|={E2|}■=> Q).
   Proof.
     rewrite /ElimModal intuitionistically_if_elim /= fupd_frame_r wand_elim_r.
     by rewrite fupd_fupd_finally.
   Qed.
 
   Lemma step_fupdN_fupd_finally E1 E2 n P :
-    (|={E1}[E2]▷=>^n |={E1|}=> P) ⊢ |={E1|}=> ▷^n ◇ P.
+    (|={E1}[E2]▷=>^n |={E1|}■=> P) ⊢ |={E1|}■=> ▷^n ◇ P.
   Proof.
     iIntros "HP". iInduction n as [|n] "IH"; simpl.
     { by iEval (rewrite -except_0_intro). }
@@ -401,7 +401,7 @@ Proof.
 Qed.
 
 Lemma fupd_finally_soundness hlc `{!invGpreS Σ} n E P :
-  (∀ `{!invGS_gen hlc Σ}, £ n ⊢ |={E|}=> P) → ⊢ P.
+  (∀ `{!invGS_gen hlc Σ}, £ n ⊢ |={E|}■=> P) → ⊢ P.
 Proof.
   rewrite fupd_finally_unseal=> HP.
   apply (le_upd_finally_soundness hlc n); iIntros (?) "H£".

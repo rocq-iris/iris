@@ -15,8 +15,8 @@ or not. From a user's point of view there are two differences:
   later by spending a credit. This rule is used to prove the similar rule for
   the fancy update modality.
 - If later credits are disabled ([hlc = HasNoLc]), we obtain the rule
-  [le_upd_keep : (|==£|> P) ∧ (P -∗ |==£> Q) ⊢ |==£> Q] without the
-  side-condition that [P] should be timeless (the "finally" modality [|==£|>]
+  [le_upd_keep : (|==£|■> P) ∧ (P -∗ |==£> Q) ⊢ |==£> Q] without the
+  side-condition that [P] should be timeless (the "finally" modality [|==£|■>]
   is described further below in this file). This rule is used to derive the
   plain interaction rules [BiFUpdSbi] of the fancy update modality.
 
@@ -375,8 +375,8 @@ Module le_upd.
     @le_upd_finally = @le_upd_finally_def := le_upd_finally_aux.(seal_eq).
   Global Arguments le_upd_finally {hlc Σ _}.
 
-  Notation "|==£|> Q" := (le_upd_finally Q) (at level 20, Q at level 200,
-     format "'[  ' |==£|>  '/' Q ']'") : bi_scope.
+  Notation "|==£|■> Q" := (le_upd_finally Q) (at level 20, Q at level 200,
+     format "'[  ' |==£|■>  '/' Q ']'") : bi_scope.
 
   Section le_upd_finally.
     Context `{!lcGS hlc Σ}.
@@ -384,13 +384,13 @@ Module le_upd.
     Global Instance le_upd_finally_ne : NonExpansive le_upd_finally.
     Proof. rewrite le_upd_finally_unseal. solve_proper. Qed.
 
-    Lemma le_upd_finally_mono P Q : (P ⊢ Q) → (|==£|> P) ⊢ (|==£|> Q).
+    Lemma le_upd_finally_mono P Q : (P ⊢ Q) → (|==£|■> P) ⊢ (|==£|■> Q).
     Proof. rewrite le_upd_finally_unseal. solve_proper. Qed.
 
-    Lemma le_upd_finally_intro P : ■ P ⊢ |==£|> P.
+    Lemma le_upd_finally_intro P : ■ P ⊢ |==£|■> P.
     Proof. rewrite le_upd_finally_unseal. iIntros "#HP %m _ !> !>". done. Qed.
 
-    Lemma le_upd_le_upd_finally P : (|==£> |==£|> P) ⊢ |==£|> P.
+    Lemma le_upd_le_upd_finally P : (|==£> |==£|■> P) ⊢ |==£|■> P.
     Proof.
       rewrite le_upd_finally_unseal /le_upd_finally_def. iIntros "HP %m Hlc".
       iLöb as "IH" forall (m).
@@ -402,7 +402,7 @@ Module le_upd.
       do 2 iNext. iApply ("IH" with "H Hlc").
     Qed.
 
-    Lemma le_upd_finally_except_0 P : (|==£|> ◇ P) ⊢ |==£|> P.
+    Lemma le_upd_finally_except_0 P : (|==£|■> ◇ P) ⊢ |==£|■> P.
     Proof.
       rewrite le_upd_finally_unseal /le_upd_finally_def. iIntros "HP %m Hlc".
       iEval (rewrite -except_0_idemp except_0_plainly). by iApply "HP".
@@ -410,7 +410,7 @@ Module le_upd.
 
     (** Commute a later out of the modality. This only works if the proposition
     below the later can be turned into an except-0 [◇]. *)
-    Lemma le_upd_finally_later P : ▷ (|==£|> P) ⊢ |==£|> ▷ ◇ P.
+    Lemma le_upd_finally_later P : ▷ (|==£|■> P) ⊢ |==£|■> ▷ ◇ P.
     Proof.
       rewrite le_upd_finally_unseal /le_upd_finally_def. iIntros "H %m Hlc".
       iEval (rewrite -later_plainly -except_0_plainly
@@ -421,7 +421,7 @@ Module le_upd.
     (** Add a later credit by removing a later below the modality. This
     only works if the proposition below the later can be turned into an
     except-0 [◇]. *)
-    Lemma le_upd_finally_add_lc P : (£ 1 -∗ |==£|> P) ⊢ |==£|> ▷ ◇ P.
+    Lemma le_upd_finally_add_lc P : (£ 1 -∗ |==£|■> P) ⊢ |==£|■> ▷ ◇ P.
     Proof.
       rewrite le_upd_finally_unseal. iIntros "H %m Hlc".
       rewrite -except_0_intro -later_plainly -except_0_plainly -laterN_later.
@@ -432,7 +432,7 @@ Module le_upd.
     Qed.
 
     Lemma le_upd_finally_forall {A} (Φ : A → iProp Σ) :
-      (∀ x, |==£|> Φ x) ⊢ |==£|> ∀ x, Φ x.
+      (∀ x, |==£|■> Φ x) ⊢ |==£|■> ∀ x, Φ x.
     Proof.
       rewrite le_upd_finally_unseal.
       iIntros "H %m Hlc %x". iApply ("H" with "Hlc").
@@ -442,7 +442,7 @@ Module le_upd.
     assertion [P] *without* actually using up the context. You can then continue
     the proof in the second conjunct. *)
     Lemma le_upd_keep P `{!TCOr (TCEq hlc HasNoLc) (Timeless P)} Q :
-      (|==£|> P) ∧ (P -∗ |==£> Q) ⊢ |==£> Q.
+      (|==£|■> P) ∧ (P -∗ |==£> Q) ⊢ |==£> Q.
     Proof.
       iIntros "H". iApply le_upd_unfold; iIntros (n) "Hc".
       iAssert (▷^(S n) False ∨ ■ P)%I as "#[Hfalse|HP]"; [|by auto|].
@@ -468,7 +468,7 @@ Module le_upd.
   End le_upd_finally.
 
   Lemma le_upd_finally_soundness hlc `{!lcGpreS Σ} n P :
-    (∀ `{!lcGS hlc Σ}, £ n ⊢ |==£|> P) → ⊢ P.
+    (∀ `{!lcGS hlc Σ}, £ n ⊢ |==£|■> P) → ⊢ P.
   Proof.
     rewrite le_upd_finally_unseal. intros HP. destruct hlc.
     - apply (laterN_soundness _ (S n)).
