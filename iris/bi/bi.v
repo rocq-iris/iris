@@ -1,7 +1,6 @@
 From iris.bi Require Export derived_laws derived_laws_later big_op.
 From iris.bi Require Export updates embedding.
 From iris.bi Require Export sbi sbi_unfold internal_eq plainly cmra algebra.
-From iris.prelude Require Import options.
 
 Module Import bi.
   (** Get universes into the desired scope *)

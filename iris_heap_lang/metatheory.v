@@ -1,6 +1,5 @@
 From stdpp Require Import gmap stringmap.
 From iris.heap_lang Require Export lang.
-From iris.prelude Require Import options.
 
 (* This file contains some metatheory about the heap_lang language,
   which is not needed for verifying programs. *)

@@ -1,6 +1,5 @@
 From stdpp Require Import coPset namespaces.
 From iris.proofmode Require Import proofmode.
-From iris.prelude Require Import options.
 
 Unset Mangle Names.
 

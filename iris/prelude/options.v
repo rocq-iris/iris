@@ -1,18 +1,14 @@
-(** Rocq configuration for Iris (not meant to leak to clients).
-If you are a user of Iris, note that importing this file means
-you are implicitly opting-in to every new option we will add here
-in the future. We are *not* guaranteeing any kind of stability here.
-Instead our advice is for you to have your own options file; then
-you can re-export the Iris file there but if we ever add an option
-you disagree with you can easily overwrite it in one central location. *)
+(** Iris sets some Rocq flags for itself that we do not want to impose on
+downstream clients by default. Those flags are configured in [config/flags] so
+they are set as command-line parameters in our Rocq invocations. This file
+exists as an old deprecated way to achieve the same effect: [Import]ing this
+file sets these flags without leaking them to downstream clients.
+Please do not import this file into new projects; instead, copy-paste the
+[-set] flags from [config/flags] into your [_RocqProject] (with [-arg]). *)
+
 (* Everything here should be [Export Set], which means when this
 file is *imported*, the option will only apply on the import site
 but not transitively. *)
 From stdpp Require Export options.
 
 #[export] Set Suggest Proof Using. (* also warns about forgotten [Proof.] *)
-
-(* "Fake" import to whitelist this file for the check that ensures we import
-this file everywhere.
-From iris.prelude Require Import options.
-*)

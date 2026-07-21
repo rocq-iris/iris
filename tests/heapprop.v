@@ -1,7 +1,6 @@
 From stdpp Require Import gmap.
 From iris.bi Require Import interface.
 From iris.proofmode Require Import proofmode.
-From iris.prelude Require Import options.
 
 (** This file constructs a simple non step-indexed linear separation logic as
 predicates over heaps (modeled as maps from integer locations to integer values).

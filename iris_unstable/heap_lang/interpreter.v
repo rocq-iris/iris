@@ -53,7 +53,6 @@ issues before stabilization. *)
 From stdpp Require Import gmap.
 From iris.heap_lang Require Export lang.
 From iris.heap_lang Require Import tactics pretty.
-From iris.prelude Require Import options.
 
 Local Ltac invc H := inversion H; subst; clear H.
 

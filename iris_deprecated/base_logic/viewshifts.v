@@ -7,7 +7,6 @@ telescopes for Texan triples. *)
 
 From iris.proofmode Require Import proofmode.
 From iris.base_logic.lib Require Export invariants.
-From iris.prelude Require Import options.
 
 Definition vs `{!invGS Σ} (E1 E2 : coPset) (P Q : iProp Σ) : iProp Σ :=
   □ (P -∗ |={E1,E2}=> Q).

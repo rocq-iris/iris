@@ -1,5 +1,4 @@
 From iris.proofmode Require Import base.
-From iris.prelude Require Import options.
 
 Inductive token :=
   | TName : string → token

@@ -2,7 +2,6 @@ From iris.bi.lib Require Import fractional.
 From iris.program_logic Require Export atomic.
 From iris.heap_lang Require Export derived_laws.
 From iris.heap_lang Require Import notation proofmode.
-From iris.prelude Require Import options.
 
 (** A general logically atomic interface for a heap. All parameters are
 implicit, since it is expected that there is only one [heapGS_gen] in scope that

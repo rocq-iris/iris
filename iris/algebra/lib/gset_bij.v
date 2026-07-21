@@ -13,7 +13,6 @@ only grow (in that it can only map more pairs [(a,b)]). *)
 (* [algebra.view] needs to be exported for the canonical instances *)
 From iris.algebra Require Export view gset.
 From iris.algebra Require Import updates.
-From iris.prelude Require Import options.
 
 Section gset_bijective.
   Context {SI : sidx} `{Countable A, Countable B}.

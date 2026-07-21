@@ -4,7 +4,6 @@ From iris.program_logic Require Import language.
 (* FIXME: If we import iris.bi.weakestpre earlier texan triples do not
    get pretty-printed correctly. *)
 From iris.bi Require Export weakestpre.
-From iris.prelude Require Import options.
 Import uPred.
 
 Class irisGS_gen (hlc : has_lc) (Λ : language) (Σ : gFunctors) := IrisG {

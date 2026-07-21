@@ -1,7 +1,6 @@
 From iris.algebra Require Import gmap.
 From iris.bi Require Import laterable.
 From iris.proofmode Require Import proofmode intro_patterns.
-From iris.prelude Require Import options.
 
 Unset Mangle Names.
 

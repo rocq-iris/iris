@@ -1,6 +1,5 @@
 From iris.algebra Require Export ofe.
 From iris.bi Require Export weakestpre.
-From iris.prelude Require Import options.
 
 Section language_mixin.
   Context {expr val state observation : Type}.

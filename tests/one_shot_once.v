@@ -4,7 +4,6 @@ From iris.program_logic Require Export weakestpre.
 From iris.heap_lang Require Export lang.
 From iris.heap_lang Require Import assert proofmode notation adequacy.
 From iris.heap_lang.lib Require Import par.
-From iris.prelude Require Import options.
 
 (** This is the introductory example from Ralf's PhD thesis.
 The difference to [one_shot] is that [set] asserts to be called only once. *)

@@ -3,7 +3,6 @@ both should be stabilized together. *)
 From iris.algebra Require Import cmra.
 From iris.unstable.algebra Require Import list.
 From iris.bi Require Import algebra.
-From iris.prelude Require Import options.
 
 Section algebra.
   Context `{!Sbi PROP}.

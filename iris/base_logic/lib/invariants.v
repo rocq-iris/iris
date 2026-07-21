@@ -3,7 +3,6 @@ From iris.algebra Require Import gmap.
 From iris.proofmode Require Import proofmode.
 From iris.base_logic.lib Require Export fancy_updates.
 From iris.base_logic.lib Require Import wsat.
-From iris.prelude Require Import options.
 
 (** Semantic Invariants *)
 Local Definition inv_def `{!invGS_gen hlc Σ} (N : namespace) (P : iProp Σ) : iProp Σ :=

@@ -2,7 +2,6 @@ From iris.base_logic.lib Require Import mono_nat.
 From iris.program_logic Require Import total_adequacy.
 From iris.heap_lang Require Export adequacy.
 From iris.heap_lang Require Import proofmode notation.
-From iris.prelude Require Import options.
 
 Definition heap_total hlc Σ `{!heapGpreS Σ} s e σ φ m :
   (∀ `{!heapGS_gen hlc Σ},

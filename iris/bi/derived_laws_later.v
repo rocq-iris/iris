@@ -1,6 +1,5 @@
 From iris.algebra Require Import monoid.
 From iris.bi Require Export derived_laws.
-From iris.prelude Require Import options.
 
 Module bi.
 Import interface.bi.

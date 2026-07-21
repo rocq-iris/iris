@@ -2,7 +2,6 @@ From iris.algebra Require Export frac excl.
 From iris.bi.lib Require Import fractional.
 From iris.proofmode Require Import proofmode.
 From iris.base_logic.lib Require Export invariants.
-From iris.prelude Require Import options.
 
 (* This is using a pair of options to represent two pieces of ghost state (the
  * fractional invariant token and an internal exclusive token) using one ghost

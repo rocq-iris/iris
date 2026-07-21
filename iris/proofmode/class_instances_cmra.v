@@ -1,5 +1,4 @@
 From iris.proofmode Require Import modality_instances classes.
-From iris.prelude Require Import options.
 Import bi.
 
 Section class_instances_cmra_valid.

@@ -1,7 +1,6 @@
 From iris.base_logic.lib Require Import invariants.
 From iris.heap_lang Require Export lang.
 From iris.heap_lang Require Import proofmode notation.
-From iris.prelude Require Import options.
 
 (** A general interface for a lock.
 

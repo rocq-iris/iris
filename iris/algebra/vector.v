@@ -1,7 +1,6 @@
 From stdpp Require Export vector.
 From iris.algebra Require Export ofe.
 From iris.algebra Require Import list.
-From iris.prelude Require Import options.
 
 Section ofe.
   Context {SI : sidx} {A : ofe}.

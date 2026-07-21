@@ -2,7 +2,6 @@
 typeclasses that BIs can optionally implement. *)
 
 From iris.bi Require Export derived_connectives.
-From iris.prelude Require Import options.
 
 Class BiAffine (PROP : bi) := absorbing_bi (Q : PROP) : Affine Q.
 Global Hint Mode BiAffine ! : typeclass_instances.

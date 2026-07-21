@@ -1,6 +1,5 @@
 From stdpp Require Import gmap gmultiset.
 From iris.algebra Require Export big_op cmra.
-From iris.prelude Require Import options.
 
 (** Option *)
 Lemma big_opL_None {SI : sidx} {M : cmra} {A} (f : nat → A → option M) l :

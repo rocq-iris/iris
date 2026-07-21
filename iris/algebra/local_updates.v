@@ -1,5 +1,4 @@
 From iris.algebra Require Export cmra.
-From iris.prelude Require Import options.
 
 (** * Local updates *)
 Definition local_update {SI : sidx} {A : cmra} (x y : A * A) := ∀ n mz,

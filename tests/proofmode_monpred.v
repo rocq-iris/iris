@@ -1,7 +1,6 @@
 From iris.bi.lib Require Import fractional.
 From iris.proofmode Require Import proofmode monpred.
 From iris.base_logic.lib Require Import invariants ghost_var.
-From iris.prelude Require Import options.
 
 Unset Mangle Names.
 

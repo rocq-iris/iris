@@ -40,7 +40,6 @@ that would have this behavior.
 In practice this means that usually only the default instance should use [MakeX],
 and most specialized instances should use [KnownMakeX]. *)
 From iris.bi Require Export bi.
-From iris.prelude Require Import options.
 
 (** Aliases for [Affine] and [Absorbing], but the instances are severely
 restricted. They only inspect the top-level symbol or check if the whole BI

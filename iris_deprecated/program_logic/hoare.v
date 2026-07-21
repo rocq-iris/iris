@@ -8,7 +8,6 @@ From iris.proofmode Require Import proofmode.
 From iris.deprecated.base_logic Require Export viewshifts.
 From iris.program_logic Require Export weakestpre.
 From iris.program_logic Require Import language.
-From iris.prelude Require Import options.
 
 (* This warning is misleading for Hoare triple style notation where the first
 terminal can also occur in the middle of a notation. *)

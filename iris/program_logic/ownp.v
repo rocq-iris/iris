@@ -3,7 +3,6 @@ From iris.proofmode Require Import proofmode classes.
 From iris.program_logic Require Export weakestpre.
 From iris.program_logic Require Import lifting language adequacy.
 From iris.program_logic Require ectx_language.
-From iris.prelude Require Import options.
 
 (**
 This module provides an interface to handling ownership of the global state that

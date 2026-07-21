@@ -18,7 +18,6 @@ difference:
 *)
 From iris.algebra Require Export auth frac updates local_updates.
 From iris.algebra Require Import ufrac proofmode_classes.
-From iris.prelude Require Import options.
 
 Definition ufrac_authR {SI : sidx} (A : cmra) : cmra :=
   authR (optionUR (prodR ufracR A)).

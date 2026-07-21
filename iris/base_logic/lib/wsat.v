@@ -2,7 +2,6 @@ From stdpp Require Export coPset.
 From iris.algebra Require Import gmap_view gset coPset.
 From iris.proofmode Require Import proofmode.
 From iris.base_logic.lib Require Export own.
-From iris.prelude Require Import options.
 
 (** All definitions in this file are internal to [fancy_updates] with the
 exception of what's in the [wsatGS] module. The module [wsatGS] is thus exported in

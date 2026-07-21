@@ -1,6 +1,5 @@
 From iris.bi Require Export bi updates.
 From iris.proofmode Require Import proofmode.
-From iris.prelude Require Import options.
 
 (* The sections add extra BI assumptions, which is only picked up with "Type"*. *)
 Set Default Proof Using "Type*".

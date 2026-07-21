@@ -1,5 +1,4 @@
 From iris.heap_lang Require Import proofmode notation adequacy lib.spin_lock.
-From iris.prelude Require Import options.
 
 (* For printing tests we want stable names. *)
 Unset Mangle Names.

@@ -1,6 +1,5 @@
 From iris.algebra Require Export ofe.
 From iris.algebra Require Export stepindex_finite.
-From iris.prelude Require Import options.
 
 (** * Solver for recursive domain equations over Cofes for FINITE step-indices *)
 (** This file implements a solver for recursive equations of the form [F X ≃ X],

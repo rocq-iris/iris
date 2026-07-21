@@ -4,7 +4,6 @@ From iris.proofmode Require Import base intro_patterns spec_patterns
                                    sel_patterns rocq_tactics reduction
                                    string_ident.
 From iris.proofmode Require Export classes notation.
-From iris.prelude Require Import options.
 Export ident.
 
 (** About unification and type class search:

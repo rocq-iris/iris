@@ -1,7 +1,6 @@
 From stdpp Require Import finite.
 From iris.algebra Require Export cmra.
 From iris.algebra Require Import updates.
-From iris.prelude Require Import options.
 
 Definition discrete_fun_insert {SI : sidx} `{!EqDecision A} {B : A → ofe}
     (x : A) (y : B x) (f : discrete_fun B) : discrete_fun B := λ x',

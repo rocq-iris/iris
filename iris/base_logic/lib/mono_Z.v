@@ -20,7 +20,6 @@ From iris.algebra.lib Require Import mono_nat.
 From iris.bi.lib Require Import fractional.
 From iris.base_logic.lib Require Export own.
 From iris.base_logic.lib Require Import mono_nat.
-From iris.prelude Require Import options.
 
 Local Open Scope Z_scope.
 

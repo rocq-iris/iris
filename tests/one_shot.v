@@ -5,7 +5,6 @@ From iris.deprecated.program_logic Require Import hoare.
 From iris.heap_lang Require Export lang.
 From iris.heap_lang Require Import assert proofmode notation adequacy.
 From iris.heap_lang.lib Require Import par.
-From iris.prelude Require Import options.
 
 (** This is the introductory example from the "Iris from the Ground Up" journal
 paper. *)

@@ -1,6 +1,5 @@
 From iris.bi Require Import bi.
 From iris.proofmode Require Import modality_instances classes.
-From iris.prelude Require Import options.
 Import bi.
 
 (** We add a useless hypothesis [BiEmbed PROP PROP'] in order to make sure this

@@ -31,3 +31,11 @@
 # (https://github.com/rocq-prover/rocq/issues/21916).
 -w
 -postfix-notation-not-level-1
+
+# Overwrite some default Rocq options
+-set
+'Default Goal Selector=!'
+-set
+'Default Proof Using=Type'
+-set
+'Suggest Proof Using'

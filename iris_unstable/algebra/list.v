@@ -4,7 +4,6 @@ issues before stabilization. *)
 From stdpp Require Export list.
 From iris.algebra Require Export cmra list.
 From iris.algebra Require Import updates local_updates big_op.
-From iris.prelude Require Import options.
 
 (* CMRA. Only works if [A] has a unit! *)
 Section cmra.

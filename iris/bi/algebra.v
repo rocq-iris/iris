@@ -1,7 +1,6 @@
 From iris.algebra Require Import cmra view auth agree csum list excl gmap.
 From iris.algebra.lib Require Import excl_auth gmap_view dfrac_agree.
 From iris.bi Require Export sbi_unfold derived_laws.
-From iris.prelude Require Import options.
 Local Set Default Proof Using "Type*".
 
 Section algebra.

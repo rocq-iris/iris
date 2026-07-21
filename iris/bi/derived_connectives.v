@@ -1,6 +1,5 @@
 From iris.algebra Require Import monoid.
 From iris.bi Require Export interface.
-From iris.prelude Require Import options.
 
 Definition bi_iff {PROP : bi} (P Q : PROP) : PROP := (P → Q) ∧ (Q → P).
 Global Arguments bi_iff {_} _%_I _%_I : simpl never.

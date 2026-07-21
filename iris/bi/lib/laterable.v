@@ -1,6 +1,5 @@
 From iris.bi Require Export bi.
 From iris.proofmode Require Import proofmode.
-From iris.prelude Require Import options.
 
 (** The class of laterable assertions *)
 Class Laterable {PROP : bi} (P : PROP) := laterable :

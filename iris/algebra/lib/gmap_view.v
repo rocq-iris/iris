@@ -1,7 +1,6 @@
 From Stdlib.QArith Require Import Qcanon.
 From iris.algebra Require Export view gmap frac dfrac.
 From iris.algebra Require Import local_updates proofmode_classes big_op.
-From iris.prelude Require Import options.
 
 (** * CMRA for a "view of a gmap".
 

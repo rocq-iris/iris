@@ -1,6 +1,5 @@
 From iris.bi Require Export interface extensions.
 From iris.si_logic Require Export siprop.
-From iris.prelude Require Import options.
 Import siProp_primitive.
 
 (** BI instances for [siProp], and re-stating the remaining primitive laws in

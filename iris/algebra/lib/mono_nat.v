@@ -1,6 +1,5 @@
 From iris.algebra Require Export auth.
 From iris.algebra Require Import numbers updates.
-From iris.prelude Require Import options.
 
 (** Authoritative CMRA over [max_nat]. The authoritative element is a
 monotonically increasing [nat], while a fragment is a lower bound. *)

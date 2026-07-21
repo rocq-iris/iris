@@ -1,7 +1,6 @@
 From iris.proofmode Require Import proofmode.
 From iris.base_logic.lib Require Export own.
 From iris.base_logic.lib Require Import ghost_map.
-From iris.prelude Require Import options.
 Import uPred.
 
 Local Notation proph_map P V := (gmap P (list V)).

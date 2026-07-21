@@ -1,6 +1,5 @@
 From iris.algebra Require Export view frac.
 From iris.algebra Require Import proofmode_classes big_op.
-From iris.prelude Require Import options.
 
 (** The authoritative camera with fractional authoritative elements *)
 (** The authoritative camera has 2 types of elements: the authoritative element

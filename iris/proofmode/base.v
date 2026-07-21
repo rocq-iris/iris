@@ -1,7 +1,6 @@
 From Stdlib Require Export Ascii.
 From stdpp Require Export strings.
 From iris.prelude Require Export prelude.
-From iris.prelude Require Import options.
 From Ltac2 Require Ltac2.
 
 (** * Utility definitions used by the proofmode *)

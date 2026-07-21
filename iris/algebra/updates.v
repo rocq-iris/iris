@@ -1,5 +1,4 @@
 From iris.algebra Require Export cmra.
-From iris.prelude Require Import options.
 
 (** * Frame preserving updates *)
 (* This quantifies over [option A] for the frame.  That is necessary to

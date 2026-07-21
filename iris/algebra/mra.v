@@ -1,6 +1,5 @@
 From iris.algebra Require Export cmra.
 From iris.algebra Require Import updates local_updates.
-From iris.prelude Require Import options.
 
 (** Given a preorder [R] on a type [A] we construct the "monotone" resource
 algebra [mra R] and an injection [to_mra : A → mra R] such that:

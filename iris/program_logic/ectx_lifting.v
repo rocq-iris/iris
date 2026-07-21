@@ -2,7 +2,6 @@
 From iris.proofmode Require Import proofmode.
 From iris.program_logic Require Export weakestpre.
 From iris.program_logic Require Import ectx_language language lifting.
-From iris.prelude Require Import options.
 
 Section wp.
 Context {Λ : ectxLanguage} `{!irisGS_gen hlc Λ Σ} {Hinh : Inhabited (state Λ)}.

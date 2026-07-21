@@ -1,6 +1,5 @@
 From iris.algebra Require Export gmap coPset local_updates.
 From iris.algebra Require Import reservation_map updates proofmode_classes.
-From iris.prelude Require Import options.
 
 (** The camera [dyn_reservation_map A] over a camera [A] extends [gmap positive
 A] with a notion of "reservation tokens" for a (potentially infinite) set [E :

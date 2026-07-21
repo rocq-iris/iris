@@ -2,7 +2,6 @@ From iris.bi Require Import atomic.
 From iris.proofmode Require Import proofmode.
 From iris.program_logic Require Export atomic.
 From iris.heap_lang Require Import proofmode notation atomic_heap.
-From iris.prelude Require Import options.
 
 Unset Mangle Names.
 

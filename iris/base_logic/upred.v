@@ -2,7 +2,6 @@ From iris.algebra Require Export cmra updates.
 From iris.algebra Require Export stepindex_finite.
 From iris.bi Require Import notation.
 From iris.si_logic Require Import siprop.
-From iris.prelude Require Import options.
 
 Local Hint Extern 1 (_ ≼ _) => etrans; [eassumption|] : core.
 Local Hint Extern 1 (_ ≼ _) => etrans; [|eassumption] : core.

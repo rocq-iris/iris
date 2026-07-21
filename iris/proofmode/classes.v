@@ -2,7 +2,6 @@ From stdpp Require Import namespaces.
 From iris.bi Require Export bi.
 From iris.proofmode Require Import base.
 From iris.proofmode Require Export ident_name modalities.
-From iris.prelude Require Import options.
 Import bi.
 
 (** Use this as precondition on "failing" instances of typeclasses that have

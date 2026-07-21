@@ -1,6 +1,5 @@
 From stdpp Require Export strings.
 From iris.proofmode Require Import base tokens sel_patterns.
-From iris.prelude Require Import options.
 
 Inductive gallina_ident :=
   | IGallinaNamed : string → gallina_ident

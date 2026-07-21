@@ -3,7 +3,6 @@ From iris.bi Require Export sbi updates internal_eq plainly cmra.
 From iris.si_logic Require Export bi.
 From iris.bi Require Import derived_laws derived_laws_later.
 From iris.base_logic Require Export upred.
-From iris.prelude Require Import options.
 Import uPred_primitive.
 
 Local Existing Instance entails_po.

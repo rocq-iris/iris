@@ -1,5 +1,4 @@
 From iris.algebra Require Export cmra.
-From iris.prelude Require Import options.
 
 (* The [IsOp a b1 b2] class is used in two directions: to "split" input [a] into
 outputs [b1] and [b2], and to "merge" inputs [b1] and [b2] into output [a],

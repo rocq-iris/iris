@@ -1,7 +1,6 @@
 (** Some derived lemmas for ectx-based languages *)
 From iris.proofmode Require Import proofmode.
 From iris.program_logic Require Export ectx_language total_weakestpre total_lifting.
-From iris.prelude Require Import options.
 
 Section wp.
 Context {Λ : ectxLanguage} `{!irisGS_gen hlc Λ Σ} {Hinh : Inhabited (state Λ)}.

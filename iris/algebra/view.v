@@ -1,6 +1,5 @@
 From iris.algebra Require Export updates local_updates frac dfrac agree.
 From iris.algebra Require Import proofmode_classes big_op.
-From iris.prelude Require Import options.
 
 (** The view camera with fractional authoritative elements *)
 (** The view camera, which is reminiscent of the views framework, is used to

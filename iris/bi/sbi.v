@@ -1,6 +1,5 @@
 From iris.si_logic Require Export bi.
 From iris.bi Require Import derived_laws derived_laws_later.
-From iris.prelude Require Import options.
 Set Default Proof Using "Type*".
 
 (** The Step-indexed BI (SBI) interface describes BIs with a step-indexed

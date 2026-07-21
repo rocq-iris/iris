@@ -6,7 +6,6 @@ From iris.proofmode Require Import proofmode.
 From iris.algebra Require Import gmap_view.
 From iris.algebra Require Export dfrac.
 From iris.base_logic.lib Require Export own.
-From iris.prelude Require Import options.
 
 (** The CMRA we need.
 FIXME: This is intentionally discrete-only, but

@@ -1,6 +1,5 @@
 From iris.program_logic Require Export weakestpre total_weakestpre.
 From iris.heap_lang Require Import lang adequacy proofmode notation.
-From iris.prelude Require Import options.
 
 Section tests.
   Context `{!heapGS Σ}.

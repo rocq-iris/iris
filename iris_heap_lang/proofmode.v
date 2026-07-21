@@ -3,7 +3,6 @@ From iris.proofmode Require Export proofmode.
 From iris.program_logic Require Import atomic.
 From iris.heap_lang Require Export tactics derived_laws.
 From iris.heap_lang Require Import class_instances notation.
-From iris.prelude Require Import options.
 Import uPred.
 
 Lemma tac_wp_expr_eval `{!heapGS_gen hlc Σ} Δ s E Φ e e' :

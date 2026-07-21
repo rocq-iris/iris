@@ -1,6 +1,5 @@
 From iris.algebra Require Export cmra.
 From iris.algebra Require Import updates local_updates.
-From iris.prelude Require Import options.
 
 Local Arguments pcore _ _ !_ /.
 Local Arguments cmra_pcore _ !_ /.

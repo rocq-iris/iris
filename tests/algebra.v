@@ -1,6 +1,5 @@
 From iris.algebra Require Import frac ufrac auth excl lib.gmap_view.
 From iris.base_logic.lib Require Import invariants.
-From iris.prelude Require Import options.
 
 (* Should follow from [forall_inhabited] in std++, test that the the OFE
 abstractions are actually unfolded by type class search. *)
