@@ -5,6 +5,8 @@ lemma.
 
 ## Iris master
 
+Iris now depends on rocq-elpi (version 3).
+
 **Changes in `algebra`:**
 
 * Change `✓` notation to be explicitly right-associative.
