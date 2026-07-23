@@ -144,6 +144,21 @@ Proof.
   intros ?? Hf ?? Hm1 ?? Hm2 i; apply (merge_ne _ _); auto.
   by do 2 destruct 1; first [apply Hf | constructor].
 Qed.
+Global Instance intersection_with_ne {SI : sidx} `{Countable K} {A : ofe} n :
+  Proper ((dist n ==> dist n ==> dist n) ==>
+          dist n ==> dist n ==> dist n) (intersection_with (M:=gmap K A)).
+Proof.
+  intros ?? Hf ?? Hm1 ?? Hm2 i; apply (merge_ne _ _); auto.
+  by do 2 destruct 1; first [apply Hf | constructor].
+Qed.
+Global Instance difference_with_ne {SI : sidx} `{Countable K} {A : ofe} n :
+  Proper ((dist n ==> dist n ==> dist n) ==>
+          dist n ==> dist n ==> dist n) (difference_with (M:=gmap K A)).
+Proof.
+  intros ?? Hf ?? Hm1 ?? Hm2 i; apply (merge_ne _ _); auto.
+  by do 2 destruct 1; first [apply Hf | constructor].
+Qed.
+
 Global Instance map_fmap_ne {SI : sidx} `{Countable K} {A B : ofe} (f : A → B) n :
   Proper (dist n ==> dist n) f →
   Proper (dist n ==> (≡{n}@{gmap K B}≡)) (fmap f).
@@ -160,6 +175,12 @@ Qed.
 Global Instance gmap_union_ne {SI : sidx} `{Countable K} {A : ofe} :
   NonExpansive2 (union (A:=gmap K A)).
 Proof. intros n. apply union_with_ne. by constructor. Qed.
+Global Instance gmap_intersection_ne {SI : sidx} `{Countable K} {A : ofe} :
+  NonExpansive2 (intersection (A:=gmap K A)).
+Proof. intros n. apply intersection_with_ne. by constructor. Qed.
+Global Instance gmap_difference_ne {SI : sidx} `{Countable K} {A : ofe} :
+  NonExpansive2 (difference (A:=gmap K A)).
+Proof. intros n. apply difference_with_ne. by constructor. Qed.
 Global Instance gmap_disjoint_ne {SI : sidx} `{Countable K} {A : ofe} n :
   Proper (dist n ==> dist n ==> iff) (map_disjoint (M:=gmap K) (A:=A)).
 Proof.
