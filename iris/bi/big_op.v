@@ -128,14 +128,14 @@ Section sep_list.
   get both from the generic [big_opL] instances. *)
   Global Instance big_sepL_mono' :
     Proper (pointwise_relation _ (pointwise_relation _ (⊢)) ==> (=) ==> (⊢))
-           (big_opL (@bi_sep SI PROP) (A:=A)).
+           (big_opL (@bi_sep _ PROP) (A:=A)).
   Proof. intros f g Hf m ? <-. apply big_sepL_mono; intros; apply Hf. Qed.
   Global Instance big_sepL_flip_mono' :
     Proper (pointwise_relation _ (pointwise_relation _ (flip (⊢))) ==> (=) ==> flip (⊢))
-           (big_opL (@bi_sep SI PROP) (A:=A)).
+           (big_opL (@bi_sep _ PROP) (A:=A)).
   Proof. solve_proper. Qed.
   Global Instance big_sepL_id_mono' :
-    Proper (Forall2 (⊢) ==> (⊢)) (big_opL (@bi_sep SI PROP) (λ _ P, P)).
+    Proper (Forall2 (⊢) ==> (⊢)) (big_opL (@bi_sep _ PROP) (λ _ P, P)).
   Proof. by induction 1 as [|P Q Ps Qs HPQ ? IH]; rewrite /= ?HPQ ?IH. Qed.
 
   Global Instance big_sepL_nil_persistent Φ :
@@ -1106,10 +1106,10 @@ Section and_list.
   get both from the generic [big_opL] instances. *)
   Global Instance big_andL_mono' :
     Proper (pointwise_relation _ (pointwise_relation _ (⊢)) ==> (=) ==> (⊢))
-           (big_opL (@bi_and SI PROP) (A:=A)).
+           (big_opL (@bi_and _ PROP) (A:=A)).
   Proof. intros f g Hf m ? <-. apply big_andL_mono; intros; apply Hf. Qed.
   Global Instance big_andL_id_mono' :
-    Proper (Forall2 (⊢) ==> (⊢)) (big_opL (@bi_and SI PROP) (λ _ P, P)).
+    Proper (Forall2 (⊢) ==> (⊢)) (big_opL (@bi_and _ PROP) (λ _ P, P)).
   Proof. by induction 1 as [|P Q Ps Qs HPQ ? IH]; rewrite /= ?HPQ ?IH. Qed.
 
   Global Instance big_andL_nil_absorbing Φ :
@@ -1287,10 +1287,10 @@ Section or_list.
   get both from the generic [big_opL] instances. *)
   Global Instance big_orL_mono' :
     Proper (pointwise_relation _ (pointwise_relation _ (⊢)) ==> (=) ==> (⊢))
-           (big_opL (@bi_or SI PROP) (A:=A)).
+           (big_opL (@bi_or _ PROP) (A:=A)).
   Proof. intros f g Hf m ? <-. apply big_orL_mono; intros; apply Hf. Qed.
   Global Instance big_orL_id_mono' :
-    Proper (Forall2 (⊢) ==> (⊢)) (big_opL (@bi_or SI PROP) (λ _ P, P)).
+    Proper (Forall2 (⊢) ==> (⊢)) (big_opL (@bi_or _ PROP) (λ _ P, P)).
   Proof. by induction 1 as [|P Q Ps Qs HPQ ? IH]; rewrite /= ?HPQ ?IH. Qed.
 
   Global Instance big_orL_nil_persistent Φ :
@@ -1425,11 +1425,11 @@ Section sep_map.
   get both from the generic [big_opM] instances. *)
   Global Instance big_sepM_mono' :
     Proper (pointwise_relation _ (pointwise_relation _ (⊢)) ==> (=) ==> (⊢))
-           (big_opM (@bi_sep SI PROP) (K:=K) (A:=A)).
+           (big_opM (@bi_sep _ PROP) (K:=K) (A:=A)).
   Proof. intros f g Hf m ? <-. apply big_sepM_mono; intros; apply Hf. Qed.
   Global Instance big_sepM_flip_mono' :
     Proper (pointwise_relation _ (pointwise_relation _ (flip (⊢))) ==> (=) ==> flip (⊢))
-           (big_opM (@bi_sep SI PROP) (K:=K) (A:=A)).
+           (big_opM (@bi_sep _ PROP) (K:=K) (A:=A)).
   Proof. solve_proper. Qed.
 
   Global Instance big_sepM_empty_persistent Φ :
@@ -1873,7 +1873,7 @@ Section and_map.
   get both from the generic [big_opM] instances. *)
   Global Instance big_andM_mono' :
     Proper (pointwise_relation _ (pointwise_relation _ (⊢)) ==> (=) ==> (⊢))
-           (big_opM (@bi_and SI PROP) (K:=K) (A:=A)).
+           (big_opM (@bi_and _ PROP) (K:=K) (A:=A)).
   Proof. intros f g Hf m ? <-. apply big_andM_mono; intros; apply Hf. Qed.
 
   Global Instance big_andM_empty_persistent Φ :
@@ -2703,11 +2703,11 @@ Section gset.
   (** No need to declare instances for non-expansiveness and properness, we
   get both from the generic [big_opS] instances. *)
   Global Instance big_sepS_mono' :
-    Proper (pointwise_relation _ (⊢) ==> (=) ==> (⊢)) (big_opS (@bi_sep SI PROP) (A:=A)).
+    Proper (pointwise_relation _ (⊢) ==> (=) ==> (⊢)) (big_opS (@bi_sep _ PROP) (A:=A)).
   Proof. intros f g Hf m ? <-. by apply big_sepS_mono. Qed.
   Global Instance big_sepS_flip_mono' :
     Proper (pointwise_relation _ (flip (⊢)) ==> (=) ==> flip (⊢))
-           (big_opS (@bi_sep SI PROP) (A:=A)).
+           (big_opS (@bi_sep _ PROP) (A:=A)).
   Proof. solve_proper. Qed.
 
   Global Instance big_sepS_empty_persistent Φ :
@@ -3065,11 +3065,11 @@ Section gmultiset.
   (** No need to declare instances for non-expansiveness and properness, we
   get both from the generic [big_opMS] instances. *)
   Global Instance big_sepMS_mono' :
-     Proper (pointwise_relation _ (⊢) ==> (=) ==> (⊢)) (big_opMS (@bi_sep SI PROP) (A:=A)).
+     Proper (pointwise_relation _ (⊢) ==> (=) ==> (⊢)) (big_opMS (@bi_sep _ PROP) (A:=A)).
   Proof. intros f g Hf m ? <-. by apply big_sepMS_mono. Qed.
   Global Instance big_sepMS_flip_mono' :
      Proper (pointwise_relation _ (flip (⊢)) ==> (=) ==> flip (⊢))
-            (big_opMS (@bi_sep SI PROP) (A:=A)).
+            (big_opMS (@bi_sep _ PROP) (A:=A)).
   Proof. solve_proper. Qed.
 
   Global Instance big_sepMS_empty_persistent Φ :

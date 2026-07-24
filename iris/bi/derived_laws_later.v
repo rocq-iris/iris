@@ -20,14 +20,14 @@ Local Hint Resolve or_elim or_intro_l' or_intro_r' True_intro False_elim : core.
 Local Hint Resolve and_elim_l' and_elim_r' and_intro forall_intro : core.
 
 Global Instance later_proper :
-  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_later SI PROP) := ne_proper _.
+  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_later _ PROP) := ne_proper _.
 
 (* Later derived *)
 Local Hint Resolve later_mono : core.
-Global Instance later_mono' : Proper ((⊢) ==> (⊢)) (@bi_later SI PROP).
+Global Instance later_mono' : Proper ((⊢) ==> (⊢)) (@bi_later _ PROP).
 Proof. intros P Q; apply later_mono. Qed.
 Global Instance later_flip_mono' :
-  Proper (flip (⊢) ==> flip (⊢)) (@bi_later SI PROP).
+  Proper (flip (⊢) ==> flip (⊢)) (@bi_later _ PROP).
 Proof. intros P Q; apply later_mono. Qed.
 
 Lemma later_True : ▷ True ⊣⊢ True.
@@ -186,10 +186,10 @@ Proof.
 Qed.
 
 (* Iterated later modality *)
-Global Instance laterN_ne m : NonExpansive (@bi_laterN SI PROP m).
+Global Instance laterN_ne m : NonExpansive (@bi_laterN _ PROP m).
 Proof. induction m; simpl; [by intros ???|]. solve_proper. Qed.
 Global Instance laterN_proper m :
-  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_laterN SI PROP m) := ne_proper _.
+  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_laterN _ PROP m) := ne_proper _.
 
 Lemma laterN_0 P : ▷^0 P ⊣⊢ P.
 Proof. done. Qed.
@@ -207,10 +207,10 @@ Proof. induction n; f_equal/=; auto. Qed.
 
 Lemma laterN_mono n P Q : (P ⊢ Q) → ▷^n P ⊢ ▷^n Q.
 Proof. induction n; simpl; auto. Qed.
-Global Instance laterN_mono' n : Proper ((⊢) ==> (⊢)) (@bi_laterN SI PROP n).
+Global Instance laterN_mono' n : Proper ((⊢) ==> (⊢)) (@bi_laterN _ PROP n).
 Proof. intros P Q; apply laterN_mono. Qed.
 Global Instance laterN_flip_mono' n :
-  Proper (flip (⊢) ==> flip (⊢)) (@bi_laterN SI PROP n).
+  Proper (flip (⊢) ==> flip (⊢)) (@bi_laterN _ PROP n).
 Proof. intros P Q; apply laterN_mono. Qed.
 
 Lemma laterN_intro n P : P ⊢ ▷^n P.
@@ -256,14 +256,14 @@ Global Instance laterN_absorbing n P : Absorbing P → Absorbing (▷^n P).
 Proof. induction n; apply _. Qed.
 
 (* Except-0 *)
-Global Instance except_0_ne : NonExpansive (@bi_except_0 SI PROP).
+Global Instance except_0_ne : NonExpansive (@bi_except_0 _ PROP).
 Proof. solve_proper. Qed.
-Global Instance except_0_proper : Proper ((⊣⊢) ==> (⊣⊢)) (@bi_except_0 SI PROP).
+Global Instance except_0_proper : Proper ((⊣⊢) ==> (⊣⊢)) (@bi_except_0 _ PROP).
 Proof. solve_proper. Qed.
-Global Instance except_0_mono' : Proper ((⊢) ==> (⊢)) (@bi_except_0 SI PROP).
+Global Instance except_0_mono' : Proper ((⊢) ==> (⊢)) (@bi_except_0 _ PROP).
 Proof. solve_proper. Qed.
 Global Instance except_0_flip_mono' :
-  Proper (flip (⊢) ==> flip (⊢)) (@bi_except_0 SI PROP).
+  Proper (flip (⊢) ==> flip (⊢)) (@bi_except_0 _ PROP).
 Proof. solve_proper. Qed.
 
 Lemma except_0_intro P : P ⊢ ◇ P.
@@ -524,7 +524,7 @@ Global Instance only_0_absorbing P : Absorbing P → Absorbing (<only0> P).
 Proof. rewrite /bi_only_0; apply _. Qed.
 
 (* Timeless instances *)
-Global Instance Timeless_proper : Proper ((≡) ==> iff) (@Timeless SI PROP).
+Global Instance Timeless_proper : Proper ((≡) ==> iff) (@Timeless _ PROP).
 Proof. solve_proper. Qed.
 
 Global Instance pure_timeless φ : Timeless (PROP:=PROP) ⌜φ⌝.
@@ -600,21 +600,21 @@ Qed.
 
 (* Big op stuff *)
 Global Instance bi_later_monoid_and_homomorphism :
-  MonoidHomomorphism bi_and bi_and (≡) (@bi_later SI PROP).
+  MonoidHomomorphism bi_and bi_and (≡) (@bi_later _ PROP).
 Proof.
   split; [split|]; try apply _.
   - apply later_and.
   - apply later_True.
 Qed.
 Global Instance bi_laterN_and_homomorphism n :
-  MonoidHomomorphism bi_and bi_and (≡) (@bi_laterN SI PROP n).
+  MonoidHomomorphism bi_and bi_and (≡) (@bi_laterN _ PROP n).
 Proof.
   split; [split|]; try apply _.
   - apply laterN_and.
   - apply laterN_True.
 Qed.
 Global Instance bi_except_0_and_homomorphism :
-  MonoidHomomorphism bi_and bi_and (≡) (@bi_except_0 SI PROP).
+  MonoidHomomorphism bi_and bi_and (≡) (@bi_except_0 _ PROP).
 Proof.
   split; [split|]; try apply _.
   - apply except_0_and.
@@ -622,53 +622,53 @@ Proof.
 Qed.
 
 Global Instance bi_later_monoid_or_homomorphism :
-  WeakMonoidHomomorphism bi_or bi_or (≡) (@bi_later SI PROP).
+  WeakMonoidHomomorphism bi_or bi_or (≡) (@bi_later _ PROP).
 Proof. split; try apply _. apply later_or. Qed.
 Global Instance bi_laterN_or_homomorphism n :
-  WeakMonoidHomomorphism bi_or bi_or (≡) (@bi_laterN SI PROP n).
+  WeakMonoidHomomorphism bi_or bi_or (≡) (@bi_laterN _ PROP n).
 Proof. split; try apply _. apply laterN_or. Qed.
 Global Instance bi_except_0_or_homomorphism :
-  WeakMonoidHomomorphism bi_or bi_or (≡) (@bi_except_0 SI PROP).
+  WeakMonoidHomomorphism bi_or bi_or (≡) (@bi_except_0 _ PROP).
 Proof. split; try apply _. apply except_0_or. Qed.
 
 Global Instance bi_later_monoid_sep_weak_homomorphism :
-  WeakMonoidHomomorphism bi_sep bi_sep (≡) (@bi_later SI PROP).
+  WeakMonoidHomomorphism bi_sep bi_sep (≡) (@bi_later _ PROP).
 Proof. split; try apply _. apply later_sep. Qed.
 Global Instance bi_laterN_sep_weak_homomorphism n :
-  WeakMonoidHomomorphism bi_sep bi_sep (≡) (@bi_laterN SI PROP n).
+  WeakMonoidHomomorphism bi_sep bi_sep (≡) (@bi_laterN _ PROP n).
 Proof. split; try apply _. apply laterN_sep. Qed.
 Global Instance bi_except_0_sep_weak_homomorphism :
-  WeakMonoidHomomorphism bi_sep bi_sep (≡) (@bi_except_0 SI PROP).
+  WeakMonoidHomomorphism bi_sep bi_sep (≡) (@bi_except_0 _ PROP).
 Proof. split; try apply _. apply except_0_sep. Qed.
 
 Global Instance bi_later_monoid_sep_homomorphism `{!BiAffine PROP} :
-  MonoidHomomorphism bi_sep bi_sep (≡) (@bi_later SI PROP).
+  MonoidHomomorphism bi_sep bi_sep (≡) (@bi_later _ PROP).
 Proof. split; try apply _. apply later_emp. Qed.
 Global Instance bi_laterN_sep_homomorphism `{!BiAffine PROP} n :
-  MonoidHomomorphism bi_sep bi_sep (≡) (@bi_laterN SI PROP n).
+  MonoidHomomorphism bi_sep bi_sep (≡) (@bi_laterN _ PROP n).
 Proof. split; try apply _. apply laterN_emp. Qed.
 Global Instance bi_except_0_sep_homomorphism `{!BiAffine PROP} :
-  MonoidHomomorphism bi_sep bi_sep (≡) (@bi_except_0 SI PROP).
+  MonoidHomomorphism bi_sep bi_sep (≡) (@bi_except_0 _ PROP).
 Proof. split; try apply _. apply except_0_emp. Qed.
 
 Global Instance bi_later_monoid_sep_entails_weak_homomorphism :
-  WeakMonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_later SI PROP).
+  WeakMonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_later _ PROP).
 Proof. split; try apply _. intros P Q. by rewrite later_sep. Qed.
 Global Instance bi_laterN_sep_entails_weak_homomorphism n :
-  WeakMonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_laterN SI PROP n).
+  WeakMonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_laterN _ PROP n).
 Proof. split; try apply _. intros P Q. by rewrite laterN_sep. Qed.
 Global Instance bi_except_0_sep_entails_weak_homomorphism :
-  WeakMonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_except_0 SI PROP).
+  WeakMonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_except_0 _ PROP).
 Proof. split; try apply _. intros P Q. by rewrite except_0_sep. Qed.
 
 Global Instance bi_later_monoid_sep_entails_homomorphism :
-  MonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_later SI PROP).
+  MonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_later _ PROP).
 Proof. split; try apply _. apply later_intro. Qed.
 Global Instance bi_laterN_sep_entails_homomorphism n :
-  MonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_laterN SI PROP n).
+  MonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_laterN _ PROP n).
 Proof. split; try apply _. apply laterN_intro. Qed.
 Global Instance bi_except_0_sep_entails_homomorphism :
-  MonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_except_0 SI PROP).
+  MonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_except_0 _ PROP).
 Proof. split; try apply _. apply except_0_intro. Qed.
 End later_derived.
 End bi.

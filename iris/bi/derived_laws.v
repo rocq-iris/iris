@@ -27,7 +27,7 @@ Notation "P ⊢ Q" := (P ⊢@{PROP} Q).
 Notation "P ⊣⊢ Q" := (P ⊣⊢@{PROP} Q).
 
 (* Derived stuff about the entailment *)
-Global Instance entails_anti_sym : AntiSymm (⊣⊢) (@bi_entails SI PROP).
+Global Instance entails_anti_sym : AntiSymm (⊣⊢) (@bi_entails _ PROP).
 Proof. intros P Q ??. by apply equiv_entails. Qed.
 Lemma equiv_entails_1_1 P Q : (P ⊣⊢ Q) → (P ⊢ Q).
 Proof. apply equiv_entails. Qed.
@@ -47,41 +47,41 @@ Lemma entails_equiv_l P Q R : (P ⊣⊢ Q) → (Q ⊢ R) → (P ⊢ R).
 Proof. by intros ->. Qed.
 Lemma entails_equiv_r P Q R : (P ⊢ Q) → (Q ⊣⊢ R) → (P ⊢ R).
 Proof. by intros ? <-. Qed.
-Global Instance bi_emp_valid_proper : Proper ((⊣⊢) ==> iff) (@bi_emp_valid SI PROP).
+Global Instance bi_emp_valid_proper : Proper ((⊣⊢) ==> iff) (@bi_emp_valid _ PROP).
 Proof. solve_proper. Qed.
-Global Instance bi_emp_valid_mono : Proper ((⊢) ==> impl) (@bi_emp_valid SI PROP).
+Global Instance bi_emp_valid_mono : Proper ((⊢) ==> impl) (@bi_emp_valid _ PROP).
 Proof. solve_proper. Qed.
 Global Instance bi_emp_valid_flip_mono :
-  Proper (flip (⊢) ==> flip impl) (@bi_emp_valid SI PROP).
+  Proper (flip (⊢) ==> flip impl) (@bi_emp_valid _ PROP).
 Proof. solve_proper. Qed.
 
 (* Propers *)
-Global Instance pure_proper : Proper (iff ==> (⊣⊢)) (@bi_pure SI PROP) | 0.
+Global Instance pure_proper : Proper (iff ==> (⊣⊢)) (@bi_pure _ PROP) | 0.
 Proof. intros φ1 φ2 Hφ. apply equiv_dist=> n. by apply pure_ne. Qed.
 Global Instance and_proper :
-  Proper ((⊣⊢) ==> (⊣⊢) ==> (⊣⊢)) (@bi_and SI PROP) := ne_proper_2 _.
+  Proper ((⊣⊢) ==> (⊣⊢) ==> (⊣⊢)) (@bi_and _ PROP) := ne_proper_2 _.
 Global Instance or_proper :
-  Proper ((⊣⊢) ==> (⊣⊢) ==> (⊣⊢)) (@bi_or SI PROP) := ne_proper_2 _.
+  Proper ((⊣⊢) ==> (⊣⊢) ==> (⊣⊢)) (@bi_or _ PROP) := ne_proper_2 _.
 Global Instance impl_proper :
-  Proper ((⊣⊢) ==> (⊣⊢) ==> (⊣⊢)) (@bi_impl SI PROP) := ne_proper_2 _.
+  Proper ((⊣⊢) ==> (⊣⊢) ==> (⊣⊢)) (@bi_impl _ PROP) := ne_proper_2 _.
 Global Instance sep_proper :
-  Proper ((⊣⊢) ==> (⊣⊢) ==> (⊣⊢)) (@bi_sep SI PROP) := ne_proper_2 _.
+  Proper ((⊣⊢) ==> (⊣⊢) ==> (⊣⊢)) (@bi_sep _ PROP) := ne_proper_2 _.
 Global Instance wand_proper :
-  Proper ((⊣⊢) ==> (⊣⊢) ==> (⊣⊢)) (@bi_wand SI PROP) := ne_proper_2 _.
+  Proper ((⊣⊢) ==> (⊣⊢) ==> (⊣⊢)) (@bi_wand _ PROP) := ne_proper_2 _.
 Global Instance forall_proper A :
-  Proper (pointwise_relation _ (⊣⊢) ==> (⊣⊢)) (@bi_forall SI PROP A).
+  Proper (pointwise_relation _ (⊣⊢) ==> (⊣⊢)) (@bi_forall _ PROP A).
 Proof.
   intros Φ1 Φ2 HΦ. apply equiv_dist=> n.
   apply forall_ne=> x. apply equiv_dist, HΦ.
 Qed.
 Global Instance exist_proper A :
-  Proper (pointwise_relation _ (⊣⊢) ==> (⊣⊢)) (@bi_exist SI PROP A).
+  Proper (pointwise_relation _ (⊣⊢) ==> (⊣⊢)) (@bi_exist _ PROP A).
 Proof.
   intros Φ1 Φ2 HΦ. apply equiv_dist=> n.
   apply exist_ne=> x. apply equiv_dist, HΦ.
 Qed.
 Global Instance persistently_proper :
-  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_persistently SI PROP) := ne_proper _.
+  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_persistently _ PROP) := ne_proper _.
 
 (* Derived logical stuff *)
 Lemma and_elim_l' P Q R : (P ⊢ R) → P ∧ Q ⊢ R.
@@ -158,64 +158,64 @@ Lemma exist_mono {A} (Φ Ψ : A → PROP) :
   (∀ a, Φ a ⊢ Ψ a) → (∃ a, Φ a) ⊢ ∃ a, Ψ a.
 Proof. intros HΦ. apply exist_elim=> a; rewrite (HΦ a); apply exist_intro. Qed.
 
-Global Instance and_mono' : Proper ((⊢) ==> (⊢) ==> (⊢)) (@bi_and SI PROP).
+Global Instance and_mono' : Proper ((⊢) ==> (⊢) ==> (⊢)) (@bi_and _ PROP).
 Proof. by intros P P' HP Q Q' HQ; apply and_mono. Qed.
 Global Instance and_flip_mono' :
-  Proper (flip (⊢) ==> flip (⊢) ==> flip (⊢)) (@bi_and SI PROP).
+  Proper (flip (⊢) ==> flip (⊢) ==> flip (⊢)) (@bi_and _ PROP).
 Proof. by intros P P' HP Q Q' HQ; apply and_mono. Qed.
-Global Instance or_mono' : Proper ((⊢) ==> (⊢) ==> (⊢)) (@bi_or SI PROP).
+Global Instance or_mono' : Proper ((⊢) ==> (⊢) ==> (⊢)) (@bi_or _ PROP).
 Proof. by intros P P' HP Q Q' HQ; apply or_mono. Qed.
 Global Instance or_flip_mono' :
-  Proper (flip (⊢) ==> flip (⊢) ==> flip (⊢)) (@bi_or SI PROP).
+  Proper (flip (⊢) ==> flip (⊢) ==> flip (⊢)) (@bi_or _ PROP).
 Proof. by intros P P' HP Q Q' HQ; apply or_mono. Qed.
 Global Instance impl_mono' :
-  Proper (flip (⊢) ==> (⊢) ==> (⊢)) (@bi_impl SI PROP).
+  Proper (flip (⊢) ==> (⊢) ==> (⊢)) (@bi_impl _ PROP).
 Proof. by intros P P' HP Q Q' HQ; apply impl_mono. Qed.
 Global Instance impl_flip_mono' :
-  Proper ((⊢) ==> flip (⊢) ==> flip (⊢)) (@bi_impl SI PROP).
+  Proper ((⊢) ==> flip (⊢) ==> flip (⊢)) (@bi_impl _ PROP).
 Proof. by intros P P' HP Q Q' HQ; apply impl_mono. Qed.
 Global Instance forall_mono' A :
-  Proper (pointwise_relation _ (⊢) ==> (⊢)) (@bi_forall SI PROP A).
+  Proper (pointwise_relation _ (⊢) ==> (⊢)) (@bi_forall _ PROP A).
 Proof. intros P1 P2; apply forall_mono. Qed.
 Global Instance forall_flip_mono' A :
-  Proper (pointwise_relation _ (flip (⊢)) ==> flip (⊢)) (@bi_forall SI PROP A).
+  Proper (pointwise_relation _ (flip (⊢)) ==> flip (⊢)) (@bi_forall _ PROP A).
 Proof. intros P1 P2; apply forall_mono. Qed.
 Global Instance exist_mono' A :
-  Proper (pointwise_relation _ ((⊢)) ==> (⊢)) (@bi_exist SI PROP A).
+  Proper (pointwise_relation _ ((⊢)) ==> (⊢)) (@bi_exist _ PROP A).
 Proof. intros P1 P2; apply exist_mono. Qed.
 Global Instance exist_flip_mono' A :
-  Proper (pointwise_relation _ (flip (⊢)) ==> flip (⊢)) (@bi_exist SI PROP A).
+  Proper (pointwise_relation _ (flip (⊢)) ==> flip (⊢)) (@bi_exist _ PROP A).
 Proof. intros P1 P2; apply exist_mono. Qed.
 
-Global Instance and_idem : IdemP (⊣⊢) (@bi_and SI PROP).
+Global Instance and_idem : IdemP (⊣⊢) (@bi_and _ PROP).
 Proof. intros P; apply (anti_symm (⊢)); auto. Qed.
-Global Instance or_idem : IdemP (⊣⊢) (@bi_or SI PROP).
+Global Instance or_idem : IdemP (⊣⊢) (@bi_or _ PROP).
 Proof. intros P; apply (anti_symm (⊢)); auto. Qed.
-Global Instance and_comm : Comm (⊣⊢) (@bi_and SI PROP).
+Global Instance and_comm : Comm (⊣⊢) (@bi_and _ PROP).
 Proof. intros P Q; apply (anti_symm (⊢)); auto. Qed.
-Global Instance True_and : LeftId (⊣⊢) True%I (@bi_and SI PROP).
+Global Instance True_and : LeftId (⊣⊢) True%I (@bi_and _ PROP).
 Proof. intros P; apply (anti_symm (⊢)); auto. Qed.
-Global Instance and_True : RightId (⊣⊢) True%I (@bi_and SI PROP).
+Global Instance and_True : RightId (⊣⊢) True%I (@bi_and _ PROP).
 Proof. intros P; apply (anti_symm (⊢)); auto. Qed.
-Global Instance False_and : LeftAbsorb (⊣⊢) False%I (@bi_and SI PROP).
+Global Instance False_and : LeftAbsorb (⊣⊢) False%I (@bi_and _ PROP).
 Proof. intros P; apply (anti_symm (⊢)); auto. Qed.
-Global Instance and_False : RightAbsorb (⊣⊢) False%I (@bi_and SI PROP).
+Global Instance and_False : RightAbsorb (⊣⊢) False%I (@bi_and _ PROP).
 Proof. intros P; apply (anti_symm (⊢)); auto. Qed.
-Global Instance True_or : LeftAbsorb (⊣⊢) True%I (@bi_or SI PROP).
+Global Instance True_or : LeftAbsorb (⊣⊢) True%I (@bi_or _ PROP).
 Proof. intros P; apply (anti_symm (⊢)); auto. Qed.
-Global Instance or_True : RightAbsorb (⊣⊢) True%I (@bi_or SI PROP).
+Global Instance or_True : RightAbsorb (⊣⊢) True%I (@bi_or _ PROP).
 Proof. intros P; apply (anti_symm (⊢)); auto. Qed.
-Global Instance False_or : LeftId (⊣⊢) False%I (@bi_or SI PROP).
+Global Instance False_or : LeftId (⊣⊢) False%I (@bi_or _ PROP).
 Proof. intros P; apply (anti_symm (⊢)); auto. Qed.
-Global Instance or_False : RightId (⊣⊢) False%I (@bi_or SI PROP).
+Global Instance or_False : RightId (⊣⊢) False%I (@bi_or _ PROP).
 Proof. intros P; apply (anti_symm (⊢)); auto. Qed.
-Global Instance and_assoc : Assoc (⊣⊢) (@bi_and SI PROP).
+Global Instance and_assoc : Assoc (⊣⊢) (@bi_and _ PROP).
 Proof. intros P Q R; apply (anti_symm (⊢)); auto. Qed.
-Global Instance or_comm : Comm (⊣⊢) (@bi_or SI PROP).
+Global Instance or_comm : Comm (⊣⊢) (@bi_or _ PROP).
 Proof. intros P Q; apply (anti_symm (⊢)); auto. Qed.
-Global Instance or_assoc : Assoc (⊣⊢) (@bi_or SI PROP).
+Global Instance or_assoc : Assoc (⊣⊢) (@bi_or _ PROP).
 Proof. intros P Q R; apply (anti_symm (⊢)); auto. Qed.
-Global Instance True_impl : LeftId (⊣⊢) True%I (@bi_impl SI PROP).
+Global Instance True_impl : LeftId (⊣⊢) True%I (@bi_impl _ PROP).
 Proof.
   intros P; apply (anti_symm (⊢)).
   - by rewrite -(left_id True%I (∧)%I (_ → _)%I) impl_elim_r.
@@ -334,10 +334,10 @@ Proof.
   - intros; apply (anti_symm _); auto.
 Qed.
 
-Global Instance iff_ne : NonExpansive2 (@bi_iff SI PROP).
+Global Instance iff_ne : NonExpansive2 (@bi_iff _ PROP).
 Proof. unfold bi_iff; solve_proper. Qed.
 Global Instance iff_proper :
-  Proper ((⊣⊢) ==> (⊣⊢) ==> (⊣⊢)) (@bi_iff SI PROP) := ne_proper_2 _.
+  Proper ((⊣⊢) ==> (⊣⊢) ==> (⊣⊢)) (@bi_iff _ PROP) := ne_proper_2 _.
 
 Lemma iff_refl Q P : Q ⊢ P ↔ P.
 Proof. rewrite /bi_iff. apply and_intro; apply impl_refl. Qed.
@@ -361,36 +361,36 @@ Lemma sep_mono_l P P' Q : (P ⊢ Q) → P ∗ P' ⊢ Q ∗ P'.
 Proof. by intros; apply sep_mono. Qed.
 Lemma sep_mono_r P P' Q' : (P' ⊢ Q') → P ∗ P' ⊢ P ∗ Q'.
 Proof. by apply sep_mono. Qed.
-Global Instance sep_mono' : Proper ((⊢) ==> (⊢) ==> (⊢)) (@bi_sep SI PROP).
+Global Instance sep_mono' : Proper ((⊢) ==> (⊢) ==> (⊢)) (@bi_sep _ PROP).
 Proof. by intros P P' HP Q Q' HQ; apply sep_mono. Qed.
 Global Instance sep_flip_mono' :
-  Proper (flip (⊢) ==> flip (⊢) ==> flip (⊢)) (@bi_sep SI PROP).
+  Proper (flip (⊢) ==> flip (⊢) ==> flip (⊢)) (@bi_sep _ PROP).
 Proof. by intros P P' HP Q Q' HQ; apply sep_mono. Qed.
 Lemma wand_mono P P' Q Q' : (Q ⊢ P) → (P' ⊢ Q') → (P -∗ P') ⊢ Q -∗ Q'.
 Proof.
   intros HP HQ; apply wand_intro_r. rewrite HP -HQ. by apply wand_elim_l'.
 Qed.
-Global Instance wand_mono' : Proper (flip (⊢) ==> (⊢) ==> (⊢)) (@bi_wand SI PROP).
+Global Instance wand_mono' : Proper (flip (⊢) ==> (⊢) ==> (⊢)) (@bi_wand _ PROP).
 Proof. by intros P P' HP Q Q' HQ; apply wand_mono. Qed.
 Global Instance wand_flip_mono' :
-  Proper ((⊢) ==> flip (⊢) ==> flip (⊢)) (@bi_wand SI PROP).
+  Proper ((⊢) ==> flip (⊢) ==> flip (⊢)) (@bi_wand _ PROP).
 Proof. by intros P P' HP Q Q' HQ; apply wand_mono. Qed.
 
-Global Instance sep_comm : Comm (⊣⊢) (@bi_sep SI PROP).
+Global Instance sep_comm : Comm (⊣⊢) (@bi_sep _ PROP).
 Proof. intros P Q; apply (anti_symm _); auto using sep_comm'. Qed.
-Global Instance sep_assoc : Assoc (⊣⊢) (@bi_sep SI PROP).
+Global Instance sep_assoc : Assoc (⊣⊢) (@bi_sep _ PROP).
 Proof.
   intros P Q R; apply (anti_symm _); auto using sep_assoc'.
   by rewrite !(comm _ P) !(comm _ _ R) sep_assoc'.
 Qed.
-Global Instance emp_sep : LeftId (⊣⊢) emp%I (@bi_sep SI PROP).
+Global Instance emp_sep : LeftId (⊣⊢) emp%I (@bi_sep _ PROP).
 Proof. intros P; apply (anti_symm _); auto using emp_sep_1, emp_sep_2. Qed.
-Global Instance sep_emp : RightId (⊣⊢) emp%I (@bi_sep SI PROP).
+Global Instance sep_emp : RightId (⊣⊢) emp%I (@bi_sep _ PROP).
 Proof. by intros P; rewrite comm left_id. Qed.
 
-Global Instance sep_False : LeftAbsorb (⊣⊢) False%I (@bi_sep SI PROP).
+Global Instance sep_False : LeftAbsorb (⊣⊢) False%I (@bi_sep _ PROP).
 Proof. intros P; apply (anti_symm _); auto using wand_elim_l'. Qed.
-Global Instance False_sep : RightAbsorb (⊣⊢) False%I (@bi_sep SI PROP).
+Global Instance False_sep : RightAbsorb (⊣⊢) False%I (@bi_sep _ PROP).
 Proof. intros P. by rewrite comm left_absorb. Qed.
 
 Lemma True_sep_2 P : P ⊢ True ∗ P.
@@ -425,7 +425,7 @@ Proof.
   apply sep_mono_r, wand_elim_r.
 Qed.
 
-Global Instance emp_wand : LeftId (⊣⊢) emp%I (@bi_wand SI PROP).
+Global Instance emp_wand : LeftId (⊣⊢) emp%I (@bi_wand _ PROP).
 Proof.
   intros P. apply (anti_symm _).
   - by rewrite -[(emp -∗ P)%I]left_id wand_elim_r.
@@ -484,10 +484,10 @@ Proof.
     apply wand_intro_r. by rewrite (forall_elim x) wand_elim_r.
 Qed.
 
-Global Instance wand_iff_ne : NonExpansive2 (@bi_wand_iff SI PROP).
+Global Instance wand_iff_ne : NonExpansive2 (@bi_wand_iff _ PROP).
 Proof. solve_proper. Qed.
 Global Instance wand_iff_proper :
-  Proper ((⊣⊢) ==> (⊣⊢) ==> (⊣⊢)) (@bi_wand_iff SI PROP) := ne_proper_2 _.
+  Proper ((⊣⊢) ==> (⊣⊢) ==> (⊣⊢)) (@bi_wand_iff _ PROP) := ne_proper_2 _.
 
 Lemma wand_iff_refl P : ⊢ P ∗-∗ P.
 Proof. apply and_intro; apply wand_intro_l; by rewrite right_id. Qed.
@@ -544,14 +544,14 @@ Lemma wandM_sound (mP : option PROP) Q :
 Proof. destruct mP; simpl; first done. rewrite emp_wand //. Qed.
 
 (* Properties of the affinely modality *)
-Global Instance affinely_ne : NonExpansive (@bi_affinely SI PROP).
+Global Instance affinely_ne : NonExpansive (@bi_affinely _ PROP).
 Proof. solve_proper. Qed.
-Global Instance affinely_proper : Proper ((⊣⊢) ==> (⊣⊢)) (@bi_affinely SI PROP).
+Global Instance affinely_proper : Proper ((⊣⊢) ==> (⊣⊢)) (@bi_affinely _ PROP).
 Proof. solve_proper. Qed.
-Global Instance affinely_mono' : Proper ((⊢) ==> (⊢)) (@bi_affinely SI PROP).
+Global Instance affinely_mono' : Proper ((⊢) ==> (⊢)) (@bi_affinely _ PROP).
 Proof. solve_proper. Qed.
 Global Instance affinely_flip_mono' :
-  Proper (flip (⊢) ==> flip (⊢)) (@bi_affinely SI PROP).
+  Proper (flip (⊢) ==> flip (⊢)) (@bi_affinely _ PROP).
 Proof. solve_proper. Qed.
 
 Lemma affinely_elim_emp P : <affine> P ⊢ emp.
@@ -632,14 +632,14 @@ Global Instance sep_affine P Q : Affine P → Affine Q → Affine (P ∗ Q).
 Proof. rewrite /Affine=>-> ->. by rewrite left_id. Qed.
 
 (* Properties of the absorbingly modality *)
-Global Instance absorbingly_ne : NonExpansive (@bi_absorbingly SI PROP).
+Global Instance absorbingly_ne : NonExpansive (@bi_absorbingly _ PROP).
 Proof. solve_proper. Qed.
-Global Instance absorbingly_proper : Proper ((⊣⊢) ==> (⊣⊢)) (@bi_absorbingly SI PROP).
+Global Instance absorbingly_proper : Proper ((⊣⊢) ==> (⊣⊢)) (@bi_absorbingly _ PROP).
 Proof. solve_proper. Qed.
-Global Instance absorbingly_mono' : Proper ((⊢) ==> (⊢)) (@bi_absorbingly SI PROP).
+Global Instance absorbingly_mono' : Proper ((⊢) ==> (⊢)) (@bi_absorbingly _ PROP).
 Proof. solve_proper. Qed.
 Global Instance absorbingly_flip_mono' :
-  Proper (flip (⊢) ==> flip (⊢)) (@bi_absorbingly SI PROP).
+  Proper (flip (⊢) ==> flip (⊢)) (@bi_absorbingly _ PROP).
 Proof. solve_proper. Qed.
 
 Lemma absorbingly_intro P : P ⊢ <absorb> P.
@@ -730,9 +730,9 @@ Proof.
 Qed.
 
 (* Affine and absorbing propositions *)
-Global Instance Affine_proper : Proper ((⊣⊢) ==> iff) (@Affine SI PROP).
+Global Instance Affine_proper : Proper ((⊣⊢) ==> iff) (@Affine _ PROP).
 Proof. solve_proper. Qed.
-Global Instance Absorbing_proper : Proper ((⊣⊢) ==> iff) (@Absorbing SI PROP).
+Global Instance Absorbing_proper : Proper ((⊣⊢) ==> iff) (@Absorbing _ PROP).
 Proof. solve_proper. Qed.
 
 Lemma affine_affinely P `{!Affine P} : <affine> P ⊣⊢ P.
@@ -802,14 +802,14 @@ Section bi_affine.
   Lemma True_emp : True ⊣⊢ emp.
   Proof. apply (anti_symm _); auto using affine. Qed.
 
-  Global Instance emp_and' : LeftId (⊣⊢) emp%I (@bi_and SI PROP).
+  Global Instance emp_and' : LeftId (⊣⊢) emp%I (@bi_and _ PROP).
   Proof. intros P. by rewrite -True_emp left_id. Qed.
-  Global Instance and_emp' : RightId (⊣⊢) emp%I (@bi_and SI PROP).
+  Global Instance and_emp' : RightId (⊣⊢) emp%I (@bi_and _ PROP).
   Proof. intros P. by rewrite -True_emp right_id. Qed.
 
-  Global Instance True_sep' : LeftId (⊣⊢) True%I (@bi_sep SI PROP).
+  Global Instance True_sep' : LeftId (⊣⊢) True%I (@bi_sep _ PROP).
   Proof. intros P. by rewrite True_emp left_id. Qed.
-  Global Instance sep_True' : RightId (⊣⊢) True%I (@bi_sep SI PROP).
+  Global Instance sep_True' : RightId (⊣⊢) True%I (@bi_sep _ PROP).
   Proof. intros P. by rewrite True_emp right_id. Qed.
 
   Lemma impl_wand_1 P Q : (P → Q) ⊢ P -∗ Q.
@@ -825,9 +825,9 @@ Proof.
 Qed.
 Lemma pure_mono φ1 φ2 : (φ1 → φ2) → ⌜φ1⌝ ⊢ ⌜φ2⌝.
 Proof. auto using pure_elim', pure_intro. Qed.
-Global Instance pure_mono' : Proper (impl ==> (⊢)) (@bi_pure SI PROP).
+Global Instance pure_mono' : Proper (impl ==> (⊢)) (@bi_pure _ PROP).
 Proof. intros φ1 φ2; apply pure_mono. Qed.
-Global Instance pure_flip_mono : Proper (flip impl ==> flip (⊢)) (@bi_pure SI PROP).
+Global Instance pure_flip_mono : Proper (flip impl ==> flip (⊢)) (@bi_pure _ PROP).
 Proof. intros φ1 φ2; apply pure_mono. Qed.
 Lemma pure_iff φ1 φ2 : (φ1 ↔ φ2) → ⌜φ1⌝ ⊣⊢ ⌜φ2⌝.
 Proof. intros [??]; apply (anti_symm _); auto using pure_mono. Qed.
@@ -917,10 +917,10 @@ Qed.
 
 (* Properties of the persistence modality *)
 Local Hint Resolve persistently_mono : core.
-Global Instance persistently_mono' : Proper ((⊢) ==> (⊢)) (@bi_persistently SI PROP).
+Global Instance persistently_mono' : Proper ((⊢) ==> (⊢)) (@bi_persistently _ PROP).
 Proof. intros P Q; apply persistently_mono. Qed.
 Global Instance persistently_flip_mono' :
-  Proper (flip (⊢) ==> flip (⊢)) (@bi_persistently SI PROP).
+  Proper (flip (⊢) ==> flip (⊢)) (@bi_persistently _ PROP).
 Proof. intros P Q; apply persistently_mono. Qed.
 
 Global Instance persistently_persistent P : Persistent (<pers> P).
@@ -1195,16 +1195,16 @@ Global Instance from_option_persistent {A} P (Ψ : A → PROP) (mx : option A) :
 Proof. destruct mx; apply _. Qed.
 
 (* The intuitionistic modality *)
-Global Instance intuitionistically_ne : NonExpansive (@bi_intuitionistically SI PROP).
+Global Instance intuitionistically_ne : NonExpansive (@bi_intuitionistically _ PROP).
 Proof. solve_proper. Qed.
 Global Instance intuitionistically_proper :
-  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_intuitionistically SI PROP).
+  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_intuitionistically _ PROP).
 Proof. solve_proper. Qed.
 Global Instance intuitionistically_mono' :
-  Proper ((⊢) ==> (⊢)) (@bi_intuitionistically SI PROP).
+  Proper ((⊢) ==> (⊢)) (@bi_intuitionistically _ PROP).
 Proof. solve_proper. Qed.
 Global Instance intuitionistically_flip_mono' :
-  Proper (flip (⊢) ==> flip (⊢)) (@bi_intuitionistically SI PROP).
+  Proper (flip (⊢) ==> flip (⊢)) (@bi_intuitionistically _ PROP).
 Proof. solve_proper. Qed.
 
 Global Instance intuitionistically_affine P : Affine (□ P).
@@ -1348,16 +1348,16 @@ Section bi_affine_intuitionistically.
 End bi_affine_intuitionistically.
 
 (* Conditional affinely modality *)
-Global Instance affinely_if_ne p : NonExpansive (@bi_affinely_if SI PROP p).
+Global Instance affinely_if_ne p : NonExpansive (@bi_affinely_if _ PROP p).
 Proof. solve_proper. Qed.
 Global Instance affinely_if_proper p :
-  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_affinely_if SI PROP p).
+  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_affinely_if _ PROP p).
 Proof. solve_proper. Qed.
 Global Instance affinely_if_mono' p :
-  Proper ((⊢) ==> (⊢)) (@bi_affinely_if SI PROP p).
+  Proper ((⊢) ==> (⊢)) (@bi_affinely_if _ PROP p).
 Proof. solve_proper. Qed.
 Global Instance affinely_if_flip_mono' p :
-  Proper (flip (⊢) ==> flip (⊢)) (@bi_affinely_if SI PROP p).
+  Proper (flip (⊢) ==> flip (⊢)) (@bi_affinely_if _ PROP p).
 Proof. solve_proper. Qed.
 
 Global Instance affinely_if_affine p P : Affine P → Affine (<affine>?p P).
@@ -1406,16 +1406,16 @@ Lemma affinely_if_and_lr p P Q : <affine>?p P ∧ Q ⊣⊢ P ∧ <affine>?p Q.
 Proof. destruct p; simpl; auto using affinely_and_lr. Qed.
 
 (* Conditional absorbingly modality *)
-Global Instance absorbingly_if_ne p : NonExpansive (@bi_absorbingly_if SI PROP p).
+Global Instance absorbingly_if_ne p : NonExpansive (@bi_absorbingly_if _ PROP p).
 Proof. solve_proper. Qed.
 Global Instance absorbingly_if_proper p :
-  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_absorbingly_if SI PROP p).
+  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_absorbingly_if _ PROP p).
 Proof. solve_proper. Qed.
 Global Instance absorbingly_if_mono' p :
-  Proper ((⊢) ==> (⊢)) (@bi_absorbingly_if SI PROP p).
+  Proper ((⊢) ==> (⊢)) (@bi_absorbingly_if _ PROP p).
 Proof. solve_proper. Qed.
 Global Instance absorbingly_if_flip_mono' p :
-  Proper (flip (⊢) ==> flip (⊢)) (@bi_absorbingly_if SI PROP p).
+  Proper (flip (⊢) ==> flip (⊢)) (@bi_absorbingly_if _ PROP p).
 Proof. solve_proper. Qed.
 
 Global Instance absorbingly_if_persistent p P :
@@ -1468,16 +1468,16 @@ Lemma affinely_if_absorbingly_if_elim `{!BiPositive PROP} p P :
 Proof. destruct p; simpl; auto using affinely_absorbingly_elim. Qed.
 
 (* Conditional persistently *)
-Global Instance persistently_if_ne p : NonExpansive (@bi_persistently_if SI PROP p).
+Global Instance persistently_if_ne p : NonExpansive (@bi_persistently_if _ PROP p).
 Proof. solve_proper. Qed.
 Global Instance persistently_if_proper p :
-  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_persistently_if SI PROP p).
+  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_persistently_if _ PROP p).
 Proof. solve_proper. Qed.
 Global Instance persistently_if_mono' p :
-  Proper ((⊢) ==> (⊢)) (@bi_persistently_if SI PROP p).
+  Proper ((⊢) ==> (⊢)) (@bi_persistently_if _ PROP p).
 Proof. solve_proper. Qed.
 Global Instance persistently_if_flip_mono' p :
-  Proper (flip (⊢) ==> flip (⊢)) (@bi_persistently_if SI PROP p).
+  Proper (flip (⊢) ==> flip (⊢)) (@bi_persistently_if _ PROP p).
 Proof. solve_proper. Qed.
 
 Global Instance persistently_if_absorbing P p :
@@ -1513,16 +1513,16 @@ Proof. destruct p; simpl; auto using persistently_idemp. Qed.
 
 (* Conditional intuitionistically *)
 Global Instance intuitionistically_if_ne p :
-  NonExpansive (@bi_intuitionistically_if SI PROP p).
+  NonExpansive (@bi_intuitionistically_if _ PROP p).
 Proof. solve_proper. Qed.
 Global Instance intuitionistically_if_proper p :
-  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_intuitionistically_if SI PROP p).
+  Proper ((⊣⊢) ==> (⊣⊢)) (@bi_intuitionistically_if _ PROP p).
 Proof. solve_proper. Qed.
 Global Instance intuitionistically_if_mono' p :
-  Proper ((⊢) ==> (⊢)) (@bi_intuitionistically_if SI PROP p).
+  Proper ((⊢) ==> (⊢)) (@bi_intuitionistically_if _ PROP p).
 Proof. solve_proper. Qed.
 Global Instance intuitionistically_if_flip_mono' p :
-  Proper (flip (⊢) ==> flip (⊢)) (@bi_intuitionistically_if SI PROP p).
+  Proper (flip (⊢) ==> flip (⊢)) (@bi_intuitionistically_if _ PROP p).
 Proof. solve_proper. Qed.
 
 Global Instance intuitionistically_if_affine p P : Affine P → Affine (□?p P).
@@ -1572,7 +1572,7 @@ Lemma intuitionistically_if_unfold p P : □?p P ⊣⊢ <affine>?p <pers>?p P.
 Proof. by destruct p. Qed.
 
 (* Properties of persistent propositions *)
-Global Instance Persistent_proper : Proper ((≡) ==> iff) (@Persistent SI PROP).
+Global Instance Persistent_proper : Proper ((≡) ==> iff) (@Persistent _ PROP).
 Proof. solve_proper. Qed.
 
 Lemma persistent_persistently_2 P `{!Persistent P} : P ⊢ <pers> P.
@@ -1700,15 +1700,15 @@ Proof.
 Qed.
 
 (* For big ops *)
-Global Instance bi_and_monoid : Monoid (@bi_and SI PROP) True%I.
+Global Instance bi_and_monoid : Monoid (@bi_and _ PROP) True%I.
 Proof. split; apply _. Qed.
-Global Instance bi_or_monoid : Monoid (@bi_or SI PROP) False%I.
+Global Instance bi_or_monoid : Monoid (@bi_or _ PROP) False%I.
 Proof. split; apply _. Qed.
-Global Instance bi_sep_monoid : Monoid (@bi_sep SI PROP) emp%I.
+Global Instance bi_sep_monoid : Monoid (@bi_sep _ PROP) emp%I.
 Proof. split; apply _. Qed.
 
 Global Instance bi_persistently_and_homomorphism :
-  MonoidHomomorphism bi_and bi_and (≡) (@bi_persistently SI PROP).
+  MonoidHomomorphism bi_and bi_and (≡) (@bi_persistently _ PROP).
 Proof.
   split; [split|]; try apply _.
   - apply persistently_and.
@@ -1716,7 +1716,7 @@ Proof.
 Qed.
 
 Global Instance bi_persistently_or_homomorphism_2 :
-  MonoidHomomorphism bi_or bi_or (flip (⊢)) (@bi_persistently SI PROP).
+  MonoidHomomorphism bi_or bi_or (flip (⊢)) (@bi_persistently _ PROP).
 Proof.
   split; [split|]; try apply _.
   - apply persistently_or_2.
@@ -1724,7 +1724,7 @@ Proof.
 Qed.
 
 Global Instance bi_persistently_or_homomorphism `{!BiPersistentlyExist PROP} :
-  MonoidHomomorphism bi_or bi_or (≡) (@bi_persistently SI PROP).
+  MonoidHomomorphism bi_or bi_or (≡) (@bi_persistently _ PROP).
 Proof.
   split; [split|]; try apply _.
   - apply persistently_or.
@@ -1732,19 +1732,19 @@ Proof.
 Qed.
 
 Global Instance bi_persistently_sep_weak_homomorphism `{!BiPositive PROP} :
-  WeakMonoidHomomorphism bi_sep bi_sep (≡) (@bi_persistently SI PROP).
+  WeakMonoidHomomorphism bi_sep bi_sep (≡) (@bi_persistently _ PROP).
 Proof. split; [by apply _ ..|]. apply persistently_sep. Qed.
 
 Global Instance bi_persistently_sep_homomorphism `{!BiAffine PROP} :
-  MonoidHomomorphism bi_sep bi_sep (≡) (@bi_persistently SI PROP).
+  MonoidHomomorphism bi_sep bi_sep (≡) (@bi_persistently _ PROP).
 Proof. split; [by apply _ ..|]. apply persistently_emp. Qed.
 
 Global Instance bi_persistently_sep_entails_weak_homomorphism :
-  WeakMonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_persistently SI PROP).
+  WeakMonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_persistently _ PROP).
 Proof. split; [by apply _ ..|]. intros P Q; by rewrite persistently_sep_2. Qed.
 
 Global Instance bi_persistently_sep_entails_homomorphism :
-  MonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_persistently SI PROP).
+  MonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_persistently _ PROP).
 Proof. split; [by apply _ ..|]. simpl. apply persistently_emp_intro. Qed.
 
 (* Limits *)
