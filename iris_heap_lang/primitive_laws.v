@@ -130,12 +130,12 @@ Proof.
   (** TODO: We should try to use a generic lifting lemma (and avoid [wp_unfold])
   here, since this breaks the WP abstraction. *)
   rewrite !wp_unfold /wp_pre /=. iIntros (->) "Hlb Hwp".
-  iIntros (σ1 ns κ κs m) "(Hσ & Hκ & Hsteps)".
+  iIntros (σ1 ns κs m) "(Hσ & Hκ & Hsteps)".
   iDestruct (steps_lb_valid with "Hsteps Hlb") as %?.
-  iMod ("Hwp" $! σ1 ns κ κs m with "[$Hσ $Hκ $Hsteps]") as "[%Hs Hwp]".
+  iMod ("Hwp" $! σ1 ns κs m with "[$Hσ $Hκ $Hsteps]") as "[%Hs Hwp]".
   iModIntro. iSplit; [done|].
-  iIntros (e2 σ2 efs Hstep) "Hcred".
-  iMod ("Hwp" with "[//] Hcred") as "Hwp".
+  iIntros (e2 σ2 efs κ κs' Hsplit Hstep) "Hcred".
+  iMod ("Hwp" with "[//] [//] Hcred") as "Hwp".
   iIntros "!> !>". iMod "Hwp" as "Hwp". iIntros "!>".
   iApply (step_fupdN_wand with "Hwp").
   iIntros "Hwp". iMod "Hwp" as "(($ & $ & Hsteps)& Hwp & $)".
@@ -222,8 +222,8 @@ Lemma wp_fork_fupd s E e Φ :
   ▷ (|={E}=> WP e @ s; ⊤ {{ _, True }} ∗ Φ (LitV LitUnit)) ⊢ WP Fork e @ s; E {{ Φ }}.
 Proof.
   iIntros "HeΦ". iApply wp_lift_atomic_base_step; [done|].
-  iIntros (σ1 ns κ κs nt) "(?&?&Hsteps) !>"; iSplit; first by eauto with base_step.
-  iIntros "!>" (v2 σ2 efs Hstep) "_"; inv_base_step.
+  iIntros (σ1 ns κs nt) "(?&?&Hsteps) !>". iSplit; first by eauto with base_step.
+  iIntros "!>" (v2 σ2 efs κ κs' Hsplit Hstep) "_"; inv_base_step.
   iMod (steps_auth_update_S with "Hsteps") as "Hsteps".
   iMod "HeΦ" as "[He HΦ]".
   by iFrame.
@@ -680,8 +680,8 @@ Lemma wp_new_proph s E :
   {{{ pvs p, RET (LitV (LitProphecy p)); proph p pvs }}}.
 Proof.
   iIntros (Φ) "_ HΦ". iApply wp_lift_atomic_base_step_no_fork; first done.
-  iIntros (σ1 ns κ κs nt) "(Hσ & HR & Hsteps) !>". iSplit; first by eauto with base_step.
-  iIntros "!>" (v2 σ2 efs Hstep) "_". inv_base_step.
+  iIntros (σ1 ns κs nt) "(Hσ & HR & Hsteps) !>". iSplit; first by eauto with base_step.
+  iIntros "!>" (v2 σ2 efs κ κs' Hsplit Hstep) "_". inv_base_step.
   rename select proph_id into p.
   iMod (steps_auth_update_S with "Hsteps") as "Hsteps".
   iMod (proph_map_new_proph p with "HR") as "[HR Hp]"; first done.
@@ -742,27 +742,21 @@ Proof.
   (* TODO we should try to use a generic lifting lemma (and avoid [wp_unfold])
      here, since this breaks the WP abstraction. *)
   iIntros (A He) "Hp WPe". rewrite !wp_unfold /wp_pre /= He. simpl in *.
-  iIntros (σ1 ns κ κs nt) "(Hσ & Hκ & Hsteps)".
+  iIntros (σ1 ns κs nt) "(Hσ & Hκ & Hsteps)".
   iPoseProof (proph_map_agree with "Hκ Hp") as "[%Hin #_]".
   iSpecialize ("WPe" with "Hp").
-  destruct κ as [|[p' [w' v']] κ' _] using rev_ind.
-  - iMod ("WPe" $! σ1 ns [] κs nt with "[$Hσ $Hκ $Hsteps]") as "[Hs WPe]".
-    iModIntro. iSplit.
-    { iDestruct "Hs" as "%". iPureIntro. destruct s; [ by apply resolve_reducible | done]. }
-    iIntros (e2 σ2 efs step). exfalso. apply step_resolve in step; last done.
-    inv_base_step. match goal with H: ?κs ++ [_] = [] |- _ => by destruct κs end.
-  - rewrite -assoc.
-    iMod ("WPe" $! σ1 ns _ _ nt with "[$Hσ $Hκ $Hsteps]") as "[Hs WPe]". iModIntro. iSplit.
-    { iDestruct "Hs" as %?. iPureIntro. destruct s; [ by apply resolve_reducible | done]. }
-    iIntros (e2 σ2 efs step) "Hcred". apply step_resolve in step; last done.
-    inv_base_step; simplify_list_eq.
-    iMod ("WPe" $! (Val w') σ2 efs with "[%] Hcred") as "WPe".
-    { by eexists [] _ _. }
-    iModIntro. iNext. iMod "WPe" as "WPe". iModIntro.
-    iApply (step_fupdN_wand with "WPe"); iIntros "> [($ & Hκ & $) WPe]".
-    rewrite !wp_unfold /wp_pre /=. iDestruct "WPe" as "[>(%pvs' & Hp & HΦ) $]".
-    iMod (proph_map_resolve_proph p' (w',v') κs with "[$Hκ $Hp]") as (vs' ->) "[$ Hp]".
-    do 2 iModIntro. iApply ("HΦ" with "[//] Hp").
+  iMod ("WPe" $! σ1 ns κs nt with "[$Hσ $Hκ $Hsteps]") as "[Hs WPe]".
+  iModIntro. iSplit.
+  { iDestruct "Hs" as %?. iPureIntro. destruct s; [by apply resolve_reducible|done]. }
+  iIntros (e2 σ2 efs κ κs' Hsplit step) "Hcred". apply step_resolve in step; last done.
+  inv_base_step; simplify_list_eq.
+  iMod ("WPe" $! (Val _) σ2 efs _ ((p, (_, v)) :: κs') with "[% //] [%] Hcred") as "WPe";
+    [by apply base_prim_step|].
+  iModIntro. iNext. iMod "WPe" as "WPe". iModIntro.
+  iApply (step_fupdN_wand with "WPe"). iIntros "> [($ & Hκ & $) WPe]".
+  rewrite !wp_unfold /wp_pre /=. iDestruct "WPe" as "[>(%pvs' & Hp & HΦ) $]".
+  iMod (proph_map_resolve_proph p _ κs' with "[$Hκ $Hp]") as (vs' ->) "[$ Hp]".
+  iApply ("HΦ" with "[//] Hp").
 Qed.
 
 (* A variant of [wp_resolve_strong] where [proph] ownership is not available

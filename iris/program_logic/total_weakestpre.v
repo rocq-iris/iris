@@ -202,11 +202,12 @@ Lemma twp_wp s E e Φ : WP e @ s; E [{ Φ }] -∗ WP e @ s; E {{ Φ }}.
 Proof.
   iIntros "H". iLöb as "IH" forall (E e Φ).
   rewrite wp_unfold twp_unfold /wp_pre /twp_pre. destruct (to_val e) as [v|]=>//=.
-  iIntros (σ1 ns κ κs nt) "Hσ". iMod ("H" with "Hσ") as "[% H]".
+  iIntros (σ1 ns κs nt) "Hσ". iMod ("H" with "Hσ") as "[% H]".
   iIntros "!>". iSplitR.
   { destruct s; eauto using reducible_no_obs_reducible. }
-  iIntros (e2 σ2 efs) "Hstep _". iMod ("H" with "Hstep") as (->) "(Hσ & H & Hfork)".
-  iApply fupd_mask_intro; [set_solver+|]. iIntros "Hclose".
+  iIntros (e2 σ2 efs κ κs' -> Hstep) "_".
+  iMod ("H" $! κ e2 σ2 efs with "[//]") as (->) "(Hσ & H & Hfork)".
+  iApply fupd_mask_intro; [set_solver|]. iIntros "Hclose".
   iIntros "!>!>". iApply step_fupdN_intro=>//. iModIntro. iMod "Hclose" as "_".
   iModIntro. iFrame "Hσ". iSplitL "H".
   { by iApply "IH". }
@@ -231,13 +232,13 @@ Proof.
     iIntros (v) "H". iApply ("H" with "[>HP]"). iMod "HP".
     iMod lc_zero as "Hlc". by iApply "HP". }
   rewrite wp_unfold twp_unfold /wp_pre /twp_pre. iIntros (-> ?) "H".
-  iIntros (σ1 ns κ κs nt) "Hσ".
+  iIntros (σ1 ns κs nt) "Hσ".
   destruct (decide (n ≤ num_laters_per_step ns)) as [Hn|Hn]; first last.
   { iDestruct "H" as "[Hn _]". iMod ("Hn" with "Hσ") as %?. lia. }
   iDestruct "H" as "[_ [>HP Hwp]]". iMod ("Hwp" with "[$]") as "[% H]".
   iIntros "!>". iSplitR.
   { destruct s; eauto using reducible_no_obs_reducible. }
-  iIntros (e2 σ2 efs Hstep) "Hcred /=".
+  iIntros (e2 σ2 efs κ κs' -> Hstep) "Hcred /=".
   iDestruct ("H" $! κ e2 σ2 efs with "[% //]") as "H".
   iMod ("HP" with "[Hcred]") as "HP".
   { iApply (lc_weaken with "Hcred"); lia. }

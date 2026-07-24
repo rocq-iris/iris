@@ -250,9 +250,11 @@ Finally, weakest precondition takes a parameter $\stuckness \in \set{\NotStuck, 
 \begin{align*}
   \textdom{wp}(\stateinterp, \pred_F, \stuckness) \eqdef{}& \MU \textdom{wp\any rec}. \Lam \mask, \expr, \pred. \\
         & (\Exists\val. \toval(\expr) = \val \land \pvs[\mask] \pred(\val)) \lor {}\\
-        & \Bigl(\toval(\expr) = \bot \land \All \pstate, n_s, \vec\obs, \vec\obs', n_t. \stateinterp(\pstate, n_s, \vec\obs \dplus \vec\obs', n_t) \vsW[\mask][\emptyset] {}\\
-        &\qquad (s = \NotStuck \Ra \red(\expr, \pstate)) * \All \expr', \pstate', \vec\expr. (\expr, \pstate \step[\vec\obs] \expr', \pstate', \vec\expr) \wand \laterCredit{(n_\rhd(n_s)+1)} \wand {}\\
-        &\qquad\qquad (\pvs[\emptyset]\later\pvs[\emptyset])^{n_\rhd(n_s)+1} \pvs[\emptyset][\mask]\stateinterp(\pstate', n_s + 1, \vec\obs', n + |\vec\expr|) * \textdom{wp\any rec}(\mask, \expr', \pred) * {}\\
+        & \Bigl(\toval(\expr) = \bot \land \All \pstate, n_s, \vec\obs, n_t. \stateinterp(\pstate, n_s, \vec\obs, n_t) \vsW[\mask][\emptyset] {}\\
+        &\qquad (s = \NotStuck \Ra \red(\expr, \pstate)) * \All \expr', \pstate', \vec\expr, \vec\obs_1, \vec\obs_2. \\
+        & \qquad\qquad \vec\obs = \vec\obs_1 \dplus \vec\obs_2 \Ra {}
+        (\expr, \pstate \step[\vec\obs_1] \expr', \pstate', \vec\expr) \wand \laterCredit{(n_\rhd(n_s)+1)} \wand {}\\
+        &\qquad\qquad (\pvs[\emptyset]\later\pvs[\emptyset])^{n_\rhd(n_s)+1} \pvs[\emptyset][\mask]\stateinterp(\pstate', n_s + 1, \vec\obs_2, n + |\vec\expr|) * \textdom{wp\any rec}(\mask, \expr', \pred) * {}\\
         &\qquad\qquad\qquad \Sep_{\expr'' \in \vec\expr} \textdom{wp\any rec}(\top, \expr'', \pred_F)\Bigr) \\
   \wpre[\stateinterp;\pred_F]\expr[\stuckness;\mask]{\Ret\val. \prop} \eqdef{}& \textdom{wp}(\stateinterp,\pred_F,\stuckness)(\mask, \expr, \Lam\val.\prop)
 \end{align*}
@@ -310,9 +312,10 @@ This basically just copies the second branch (the non-value case) of the definit
   \inferH{wp-lift-step}
   {\toval(\expr_1) = \bot}
   { {\begin{inbox} % for some crazy reason, LaTeX is actually sensitive to the space between the "{ {" here and the "} }" below...
-        ~~\All \pstate_1,\vec\obs,\vec\obs',n. \stateinterp(\pstate_1,n_s,\vec\obs \dplus \vec\obs', n_t) \vsW[\mask][\emptyset] (\stuckness = \NotStuck \Ra \red(\expr_1,\pstate_1)) * {}\\
-        \qquad~ \All \expr_2, \pstate_2, \vec\expr.  (\expr_1, \pstate_1 \step[\vec\obs] \expr_2, \pstate_2, \vec\expr) \wand \laterCredit{(n_\rhd(n_s) + 1)} \wand (\pvs[\emptyset]\later\pvs[\emptyset])^{n_\rhd(n_s)}\pvs[\emptyset][\mask] {}\\
-        \qquad\qquad\left(\stateinterp(\pstate_2,n_s+1,\vec\obs',n_t+|\vec\expr|) * \wpre[\stateinterp;\pred_F]{\expr_2}[\stuckness;\mask]{\Ret\var.\prop} * \Sep_{\expr_\f \in \vec\expr} \wpre[\stateinterp\pred_F]{\expr_\f}[\stuckness;\top]{\pred_F}\right)  {}\\
+        ~~\All \pstate_1,\vec\obs. \stateinterp(\pstate_1,n_s,\vec\obs, n_t) \vsW[\mask][\emptyset] (\stuckness = \NotStuck \Ra \red(\expr_1,\pstate_1)) * {}\\
+        \qquad~ \All \expr_2, \pstate_2, \vec\expr, \vec\obs_1, \vec\obs_2.  \vec\obs = \vec\obs_1 \dplus \vec\obs_2 \Ra {}\\
+        \qquad\qquad (\expr_1, \pstate_1 \step[\vec\obs_1] \expr_2, \pstate_2, \vec\expr) \wand \laterCredit{(n_\rhd(n_s) + 1)} \wand (\pvs[\emptyset]\later\pvs[\emptyset])^{n_\rhd(n_s)}\pvs[\emptyset][\mask] {}\\
+        \qquad\qquad\left(\stateinterp(\pstate_2,n_s+1,\vec\obs_2,n_t+|\vec\expr|) * \wpre[\stateinterp;\pred_F]{\expr_2}[\stuckness;\mask]{\Ret\var.\prop} * \Sep_{\expr_\f \in \vec\expr} \wpre[\stateinterp\pred_F]{\expr_\f}[\stuckness;\top]{\pred_F}\right)  {}\\
         \proves \wpre[\stateinterp\pred_F]{\expr_1}[\stuckness;\mask]{\Ret\var.\prop}
       \end{inbox}} }
 \end{mathpar}
