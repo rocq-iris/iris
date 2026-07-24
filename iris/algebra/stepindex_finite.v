@@ -80,24 +80,17 @@ Section finite.
     by rewrite dist_later_S.
   Qed.
 
-  (** Shorthand for defining OFEs that only work for [natSI] *)
+  (** Shorthands for defining (C)OFEs that only work for [natSI] *)
   Lemma ofe_mixin_finite A `{!Equiv A, !Dist A} :
     (∀ x y : A, x ≡ y ↔ ∀ n, x ≡{n}≡ y) →
     (∀ n, Equivalence (@dist natSI A _ n)) →
     (∀ n (x y : A), x ≡{S n}≡ y → x ≡{n}≡ y) → (* [S] instead of [<] *)
     OfeMixin A.
-  Proof.
-    intros; split; [done..|].
-    intros n m x y Heq Hlt. induction Hlt; eauto.
-  Qed.
+  Proof. apply ofe_mixin_finite. Qed.
 
-  (** Shorthand for defining COFEs that only work for [natSI] *)
-  Program Definition cofe_finite {A} (compl : Compl A)
-      (conv_compl: ∀ n c, compl c ≡{n}≡ c n) : Cofe A :=
-    {| compl := compl; lbcompl n Hn := False_rect _ (SIdx.limit_finite _ Hn) |}.
-  Next Obligation. auto. Qed.
-  Next Obligation. intros. simpl. by destruct (SIdx.limit_finite _ _). Qed.
-  Next Obligation. intros. simpl. by destruct (SIdx.limit_finite _ _). Qed.
+  Definition cofe_finite {A} (compl : Compl A)
+      (conv_compl : ∀ n c, compl c ≡{n}≡ c n) : Cofe A :=
+    cofe_finite compl conv_compl.
 End finite.
 
 (** For backwards compatibility, we define the tactic [f_contractive_fin] that
