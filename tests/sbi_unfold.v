@@ -4,7 +4,7 @@ From iris.bi Require Import bi.
 Unset Mangle Names.
 
 Section tests.
-  Context `{!Sbi PROP}.
+  Context {SI : sidx} `{!Sbi PROP}.
 
   (** The following tests should *not* include a [∀ n', n' ≤ n → ..] *)
   Check "test_impl".

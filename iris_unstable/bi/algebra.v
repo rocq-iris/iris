@@ -5,7 +5,7 @@ From iris.unstable.algebra Require Import list.
 From iris.bi Require Import algebra.
 
 Section algebra.
-  Context `{!Sbi PROP}.
+  Context {SI : sidx} `{!Sbi PROP}.
 
   (* Force implicit argument [PROP] *)
   Notation "P ⊢ Q" := (bi_entails (PROP:=PROP) P Q).

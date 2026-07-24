@@ -4,7 +4,7 @@ From iris.proofmode Require Import proofmode.
 Unset Mangle Names.
 
 Check "unseal_test".
-Lemma unseal_test (P Q : siProp) (Φ : nat → siProp) :
+Lemma unseal_test {SI : sidx} (P Q : siProp) (Φ : nat → siProp) :
   P ∧ ▷ Q ∧ (∃ x, Φ x) ⊣⊢ ∃ x, P ∗ ▷ Q ∧ emp ∨ Φ x.
 Proof.
   siProp.unseal.
@@ -12,11 +12,12 @@ Proof.
 Abort.
 
 (** Make sure that [siProp]s are parsed in [bi_scope]. *)
-Definition test : siProp := ▷ True.
-Definition testI : siPropI := ▷ True.
+Definition test {SI : sidx} : siProp := ▷ True.
+Definition testI {SI : sidx} : siPropI := ▷ True.
 
 Check "test_persistently_exist".
-Lemma test_persistently_exist {A} (Φ : A → siProp) : (∃ x, Φ x) -∗ True.
+Lemma test_persistently_exist {A} (Φ : A → siProp) :
+  (∃ x, Φ x) -∗ True.
 Proof.
   iIntros "#H".
   (* Since [siProp] satisfies [BiPersistentlyExist], the hypothesis [H] should

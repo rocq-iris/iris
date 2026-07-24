@@ -2,25 +2,25 @@ From iris.algebra Require Export cmra.
 From iris.bi Require Export sbi plainly.
 From iris.bi Require Import derived_laws_later.
 
-Definition internal_cmra_valid `{!Sbi PROP} {A : cmra} (a : A) : PROP :=
+Definition internal_cmra_valid {SI : sidx} `{!Sbi PROP} {A : cmra} (a : A) : PROP :=
   <si_pure> siProp_cmra_valid a.
 Global Arguments internal_cmra_valid : simpl never.
 Global Typeclasses Opaque internal_cmra_valid.
-Global Instance: Params (@internal_cmra_valid) 3 := {}.
+Global Instance: Params (@internal_cmra_valid) 4 := {}.
 Notation "✓ a" := (internal_cmra_valid a) : bi_scope.
 
 (** Derived [≼] connective on [cmra] elements. This can be defined on any [bi]
 that has internal equality [≡]. It corresponds to the step-indexed [≼{n}]
 connective in the [siProp] model. *)
-Definition internal_included `{!Sbi PROP} {A : cmra} (a b : A) : PROP :=
+Definition internal_included {SI : sidx} `{!Sbi PROP} {A : cmra} (a b : A) : PROP :=
   ∃ c, b ≡ a ⋅ c.
 Global Arguments internal_included : simpl never.
-Global Instance: Params (@internal_included) 3 := {}.
+Global Instance: Params (@internal_included) 4 := {}.
 Global Typeclasses Opaque internal_included.
 Infix "≼" := internal_included : bi_scope.
 
 Section cmra_valid.
-  Context `{!Sbi PROP}.
+  Context {SI : sidx} `{!Sbi PROP}.
   Implicit Types P Q : PROP.
 
   (* Force implicit argument PROP *)
@@ -28,12 +28,12 @@ Section cmra_valid.
   Notation "P ⊣⊢ Q" := (P ⊣⊢@{PROP} Q).
 
   Global Instance internal_cmra_valid_ne {A : cmra} :
-    NonExpansive (@internal_cmra_valid PROP _ A).
+    NonExpansive (internal_cmra_valid (PROP:=PROP) (A:=A)).
   Proof.
     intros n x x' ?. by apply si_pure_ne, siProp_primitive.cmra_valid_ne.
   Qed.
   Global Instance internal_cmra_valid_proper {A : cmra} :
-    Proper ((≡) ==> (⊣⊢)) (@internal_cmra_valid PROP _ A).
+    Proper ((≡) ==> (⊣⊢)) (internal_cmra_valid (PROP:=PROP) (A:=A)).
   Proof. apply ne_proper, _. Qed.
 
   Lemma internal_cmra_valid_intro {A : cmra} P (a : A) : ✓ a → P ⊢ (✓ a).
@@ -41,7 +41,7 @@ Section cmra_valid.
     intros. rewrite (bi.True_intro P) -si_pure_pure.
     by apply si_pure_mono, siProp_primitive.cmra_valid_intro.
   Qed.
-  Lemma internal_cmra_valid_elim {A : cmra} (a : A) : ✓ a ⊢ ⌜ ✓{0} a ⌝.
+  Lemma internal_cmra_valid_elim {A : cmra} (a : A) : ✓ a ⊢ ⌜ ✓{0ᵢ} a ⌝.
   Proof.
     rewrite -si_pure_pure.
     by apply si_pure_mono, siProp_primitive.cmra_valid_elim.
@@ -49,7 +49,8 @@ Section cmra_valid.
   (* FIXME: Remove in favor of cmra_validN_op_r *)
   Lemma internal_cmra_valid_weaken {A : cmra} (a b : A) : ✓ (a ⋅ b) ⊢ ✓ a.
   Proof. by apply si_pure_mono, siProp_primitive.cmra_valid_weaken. Qed.
-  Lemma internal_cmra_valid_entails {A B : cmra} (a : A) (b : B) :
+  (** TODO: Remove [SIdxFinite] once we use [SI] instead of [nat] for [siProp]. *)
+  Lemma internal_cmra_valid_entails `{!SIdxFinite SI} {A B : cmra} (a : A) (b : B) :
     (✓ a ⊢ ✓ b) ↔ ∀ n, ✓{n} a → ✓{n} b.
   Proof. rewrite si_pure_entails. apply siProp_primitive.valid_entails. Qed.
 

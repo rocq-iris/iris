@@ -2,11 +2,11 @@ From iris.algebra Require Import excl csum.
 From iris.bi Require Export sbi.
 From iris.bi Require Import derived_laws_later.
 
-Definition internal_eq `{!Sbi PROP} {A : ofe} (a b : A) : PROP :=
+Definition internal_eq {SI : sidx} `{!Sbi PROP} {A : ofe} (a b : A) : PROP :=
   <si_pure> siProp_internal_eq a b.
 Global Arguments internal_eq : simpl never.
 Global Typeclasses Opaque internal_eq.
-Global Instance: Params (@internal_eq) 3 := {}.
+Global Instance: Params (@internal_eq) 4 := {}.
 
 Infix "≡" := internal_eq : bi_scope.
 Infix "≡@{ A }" := (internal_eq (A := A)) (only parsing) : bi_scope.
@@ -17,13 +17,13 @@ Notation "(≡@{ A } )" := (internal_eq (A:=A)) (only parsing) : bi_scope.
 (** A smart constructor for [SbiPropExtMixin] that uses the public notion [≡]
 instead of the private notion [siProp_internal_eq]. See the documentation about
 [SbiPropExtMixin] in [iris.bi.sbi] for more details. *)
-Lemma sbi_prop_ext_mixin {PROP : bi} `{!SiEmpValid PROP} :
+Lemma sbi_prop_ext_mixin {SI : sidx} {PROP : bi} `{!SiEmpValid PROP} :
   (∀ P Q : PROP, <si_emp_valid> (P ∗-∗ Q) ⊢@{siPropI} P ≡ Q) →
   SbiPropExtMixin PROP _.
 Proof. done. Qed.
 
 Section internal_eq.
-  Context `{!Sbi PROP}.
+  Context {SI : sidx} `{!Sbi PROP}.
   Implicit Types P Q : PROP.
 
   Local Hint Resolve bi.or_elim bi.or_intro_l' bi.or_intro_r' : core.
@@ -39,12 +39,13 @@ Section internal_eq.
   Lemma prop_ext_si_emp_valid_2 P Q : <si_emp_valid> (P ∗-∗ Q) ⊢@{siPropI} P ≡ Q.
   Proof. apply sbi_mixin_prop_ext_si_emp_valid_2, sbi_sbi_prop_ext_mixin. Qed.
 
-  Global Instance internal_eq_ne (A : ofe) : NonExpansive2 (@internal_eq PROP _ A).
+  Global Instance internal_eq_ne (A : ofe) :
+    NonExpansive2 (@internal_eq _ PROP _ A).
   Proof.
     intros n x x' ? y y' ?. by apply si_pure_ne, siProp_primitive.internal_eq_ne.
   Qed.
   Global Instance internal_eq_proper (A : ofe) :
-    Proper ((≡) ==> (≡) ==> (⊣⊢)) (@internal_eq PROP _ A).
+    Proper ((≡) ==> (≡) ==> (⊣⊢)) (@internal_eq _ PROP _ A).
   Proof. apply (ne_proper_2 _). Qed.
 
   Lemma internal_eq_refl {A : ofe} P (a : A) : P ⊢ a ≡ a.
@@ -320,7 +321,7 @@ Section internal_eq.
   Lemma prop_ext_si_emp_valid P Q : P ≡ Q ⊣⊢@{siPropI} <si_emp_valid> (P ∗-∗ Q).
   Proof.
     apply (anti_symm _); [|apply prop_ext_si_emp_valid_2].
-    rewrite -(@si_pure_entails PROP) si_pure_internal_eq.
+    rewrite -(@si_pure_entails _ PROP) si_pure_internal_eq.
     apply (internal_eq_rewrite' P Q
       (λ Q, <si_pure> <si_emp_valid> (P ∗-∗ Q)))%I; auto.
     rewrite -bi.wand_iff_refl si_emp_valid_emp si_pure_pure. auto.
@@ -332,23 +333,26 @@ Section internal_eq.
     by rewrite -si_emp_valid_later bi.later_wand_iff.
   Qed.
 
-  Lemma internal_eq_soundness {A : ofe} (x y : A) : (⊢@{PROP} x ≡ y) → x ≡ y.
+  (** TODO: Remove [SIdxFinite] once we use [SI] instead of [nat] for [siProp]
+  in all of the lemmas below. *)
+  Lemma internal_eq_soundness `{!SIdxFinite SI} {A : ofe} (x y : A) :
+    (⊢@{PROP} x ≡ y) → x ≡ y.
   Proof.
     intros ?%si_pure_emp_valid. by apply siProp_primitive.internal_eq_soundness.
   Qed.
 
   (** Derive [NonExpansive]/[Contractive] from an internal statement *)
-  Lemma internal_eq_entails {A B : ofe} (a1 a2 : A) (b1 b2 : B) :
+  Lemma internal_eq_entails `{!SIdxFinite SI} {A B : ofe} (a1 a2 : A) (b1 b2 : B) :
     (a1 ≡ a2 ⊢ b1 ≡ b2) ↔ (∀ n, a1 ≡{n}≡ a2 → b1 ≡{n}≡ b2).
   Proof. rewrite si_pure_entails. apply siProp_primitive.internal_eq_entails. Qed.
 
-  Lemma ne_internal_eq {A B : ofe} (f : A → B) :
+  Lemma ne_internal_eq `{!SIdxFinite SI} {A B : ofe} (f : A → B) :
     NonExpansive f ↔ ∀ x1 x2, x1 ≡ x2 ⊢ f x1 ≡ f x2.
   Proof.
     split; [apply f_equivI|]. intros Hf n x1 x2. by apply internal_eq_entails.
   Qed.
 
-  Lemma ne_2_internal_eq {A B C : ofe} (f : A → B → C) :
+  Lemma ne_2_internal_eq `{!SIdxFinite SI} {A B C : ofe} (f : A → B → C) :
     NonExpansive2 f ↔ ∀ x1 x2 y1 y2, x1 ≡ x2 ∧ y1 ≡ y2 ⊢ f x1 y1 ≡ f x2 y2.
   Proof.
     split.
@@ -362,7 +366,7 @@ Section internal_eq.
       intros [??] [??]. rewrite prod_equivI. apply Hf.
   Qed.
 
-  Lemma contractive_internal_eq {A B : ofe} (f : A → B) :
+  Lemma contractive_internal_eq `{!SIdxFinite SI} {A B : ofe} (f : A → B) :
     Contractive f ↔ ∀ x1 x2, ▷ (x1 ≡ x2) ⊢ f x1 ≡ f x2.
   Proof.
     split; [apply f_equivI_contractive|].
@@ -370,13 +374,14 @@ Section internal_eq.
     rewrite -later_equivI internal_eq_entails in Hf. apply Hf. by f_contractive.
   Qed.
 
-  Global Instance sbi_later_contractive : BiLaterContractive PROP.
+  Global Instance sbi_later_contractive `{!SIdxFinite SI} : BiLaterContractive PROP.
   Proof using Type*.
     rewrite /BiLaterContractive.
     apply contractive_internal_eq, later_equivI_prop_2.
   Qed.
 
-  Lemma only_0_internal_eq P Q : <only0> (P ≡ Q) ⊣⊢@{PROP} <only0> P ≡ <only0> Q.
+  Lemma only_0_internal_eq `{!SIdxFinite SI} P Q :
+    <only0> (P ≡ Q) ⊣⊢@{PROP} <only0> P ≡ <only0> Q.
   Proof.
     rewrite -si_pure_internal_eq prop_ext_si_emp_valid.
     rewrite -si_pure_only_0 -si_emp_valid_only_0 bi.only_0_wand_iff.
