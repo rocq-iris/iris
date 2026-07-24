@@ -2852,24 +2852,14 @@ Section gset.
     ([∗ set] y ∈ filter φ X, Φ y) ⊣⊢ ([∗ set] y ∈ X, ⌜φ y⌝ → Φ y).
   Proof. setoid_rewrite <-decide_emp. apply big_sepS_filter'. Qed.
 
-  Lemma big_sepS_filter_acc' (φ : A → Prop) `{∀ y, Decision (φ y)} Φ X Y :
-    (∀ y, y ∈ Y → φ y → y ∈ X) →
+  Lemma big_sepS_filter_acc (φ : A → Prop) `{∀ y, Decision (φ y)} Φ X :
     ([∗ set] y ∈ X, Φ y) -∗
-      ([∗ set] y ∈ Y, if decide (φ y) then Φ y else emp) ∗
-      (([∗ set] y ∈ Y, if decide (φ y) then Φ y else emp) -∗ [∗ set] y ∈ X, Φ y).
+      ([∗ set] y ∈ filter φ X, Φ y) ∗
+      (([∗ set] y ∈ filter φ X, Φ y) -∗ [∗ set] y ∈ X, Φ y).
   Proof.
-    intros ?. destruct (proj1 (subseteq_disjoint_union_L (filter φ Y) X))
-      as (Z&->&?); first set_solver.
-    rewrite big_sepS_union // big_sepS_filter'.
+    rewrite -{1 4}(filter_union_complement_L φ X X) big_sepS_union; last set_solver.
     by apply entails_wand, sep_mono_r, wand_intro_l.
   Qed.
-  Lemma big_sepS_filter_acc `{!BiAffine PROP}
-      (φ : A → Prop) `{∀ y, Decision (φ y)} Φ X Y :
-    (∀ y, y ∈ Y → φ y → y ∈ X) →
-    ([∗ set] y ∈ X, Φ y) -∗
-      ([∗ set] y ∈ Y, ⌜φ y⌝ → Φ y) ∗
-      (([∗ set] y ∈ Y, ⌜φ y⌝ → Φ y) -∗ [∗ set] y ∈ X, Φ y).
-  Proof. intros. setoid_rewrite <-decide_emp. by apply big_sepS_filter_acc'. Qed.
 
   Lemma big_sepS_list_to_set Φ (l : list A) :
     NoDup l →
