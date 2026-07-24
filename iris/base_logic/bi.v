@@ -1,4 +1,3 @@
-From iris.algebra Require Import stepindex_finite.
 From iris.bi Require Export derived_connectives extensions.
 From iris.bi Require Export sbi updates internal_eq plainly cmra.
 From iris.si_logic Require Export bi.
