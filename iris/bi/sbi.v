@@ -95,22 +95,22 @@ the Iris proofmode: primitive projections for the bi-records makes the proofmode
 faster. *)
 Local Set Primitive Projections.
 
-Class SiPure (PROP : Type) : Type := si_pure : siProp → PROP.
-Global Instance : Params (@si_pure) 2 := {}.
-Global Hint Mode SiPure ! : typeclass_instances.
-Global Arguments si_pure {_}%_type_scope {_} _%_bi_scope.
+Class SiPure {SI : sidx} (PROP : Type) : Type := si_pure : siProp → PROP.
+Global Instance : Params (@si_pure) 3 := {}.
+Global Hint Mode SiPure - ! : typeclass_instances.
+Global Arguments si_pure {_ _%_type_scope _} _%_bi_scope.
 Global Typeclasses Opaque si_pure.
 Notation "<si_pure> Pi" := (si_pure Pi) : bi_scope.
-Notation "<si_pure>@{ PROP } Pi" := (@si_pure PROP _ Pi) (only parsing) : bi_scope.
+Notation "<si_pure>@{ PROP } Pi" := (@si_pure _ PROP _ Pi) (only parsing) : bi_scope.
 
-Class SiEmpValid (PROP : Type) : Type := si_emp_valid : PROP → siProp.
-Global Instance : Params (@si_emp_valid) 2 := {}.
-Global Hint Mode SiEmpValid ! : typeclass_instances.
+Class SiEmpValid {SI : sidx} (PROP : Type) : Type := si_emp_valid : PROP → siProp.
+Global Instance : Params (@si_emp_valid) 3 := {}.
+Global Hint Mode SiEmpValid - ! : typeclass_instances.
 Global Typeclasses Opaque si_emp_valid.
-Global Arguments si_emp_valid {_}%_type_scope {_} _%_bi_scope.
+Global Arguments si_emp_valid {_ _%_type_scope _} _%_bi_scope.
 Notation "<si_emp_valid> P" := (si_emp_valid P) : bi_scope.
 
-Record SbiMixin (PROP : bi) `(!SiPure PROP, SiEmpValid PROP) := {
+Record SbiMixin {SI : sidx} (PROP : bi) `(!SiPure PROP, !SiEmpValid PROP) := {
   (** [si_pure] and [si_emp_valid] are non-expansive and monotone *)
   sbi_mixin_si_pure_ne : NonExpansive (si_pure (PROP:=PROP));
   sbi_mixin_si_emp_valid_ne : NonExpansive (si_emp_valid (PROP:=PROP));
@@ -180,18 +180,18 @@ mixin, but rather one of the following lemmas:
   prop_ext_2 : ■ (P ∗-∗ Q) ⊢@{PROP} P ≡ Q
   prop_ext_si_emp_valid_2 : <si_emp_valid> (P ∗-∗ Q) ⊢@{siPropI} P ≡ Q
 *)
-Record SbiPropExtMixin (PROP : bi) `(!SiEmpValid PROP) := {
+Record SbiPropExtMixin {SI : sidx} (PROP : bi) `(!SiEmpValid PROP) := {
   sbi_mixin_prop_ext_si_emp_valid_2 (P Q : PROP) :
     <si_emp_valid> (P ∗-∗ Q) ⊢@{siPropI} siProp_internal_eq P Q;
 }.
 
-Class Sbi (PROP : bi) := {
+Class Sbi {SI : sidx} (PROP : bi) := {
   #[global] sbi_si_pure :: SiPure PROP;
   #[global] sbi_si_emp_valid :: SiEmpValid PROP;
   sbi_sbi_mixin : SbiMixin PROP sbi_si_pure sbi_si_emp_valid;
   sbi_sbi_prop_ext_mixin : SbiPropExtMixin PROP sbi_si_emp_valid;
 }.
-Global Hint Mode Sbi ! : typeclass_instances.
+Global Hint Mode Sbi - ! : typeclass_instances.
 Global Arguments sbi_si_pure : simpl never.
 Global Arguments sbi_si_emp_valid : simpl never.
 
@@ -206,34 +206,35 @@ So on the LHS we can have a different [x] for each [i], while on the RHS we need
 one [i] for any [x]. However, if [I] has a bottom element, we can obtain the
 witness [x] for the bottom element on the LHS, and use monotonicy to conclude it
 holds for any [i] on the RHS. See also [monPred_sbi_emp_valid_exist]. *)
-Class SbiEmpValidExist PROP `{!Sbi PROP} :=
+Class SbiEmpValidExist {SI : sidx} PROP `{!Sbi PROP} :=
   si_emp_valid_exist_1 : ∀ {A} (Φ : A → PROP),
     <si_emp_valid> (∃ x, Φ x) ⊢@{siPropI} ∃ x, <si_emp_valid> Φ x.
-Global Arguments SbiEmpValidExist _ {_}.
-Global Arguments si_emp_valid_exist_1 _ {_ _} _.
-Global Hint Mode SbiEmpValidExist ! - : typeclass_instances.
+Global Arguments SbiEmpValidExist {_} _ {_}.
+Global Arguments si_emp_valid_exist_1 {_} _ {_ _} _.
+Global Hint Mode SbiEmpValidExist - ! - : typeclass_instances.
 
 (** [siProp] is an SBI by taking [<si_pure>] and [<si_emp_valid>] to be the
 identity. Although this instance is trivial, it is a very useful one. It means
 that all lemmas and instances about internal equality [≡] and internal validity
 [✓] also apply to [siProp] (and we do not need to state specialized versions). *)
-Lemma siprop_sbi_mixin : SbiMixin siProp id id.
+Lemma siprop_sbi_mixin {SI : sidx} : SbiMixin siProp id id.
 Proof.
   split; rewrite /si_pure /si_emp_valid; try (done || apply _).
   intros P. by rewrite bi.affine_affinely.
 Qed.
-Lemma siprop_sbi_prop_ext_mixin : SbiPropExtMixin siProp id.
+Lemma siprop_sbi_prop_ext_mixin {SI : sidx} : SbiPropExtMixin siProp id.
 Proof. split; intros P Q. apply siProp_primitive.prop_ext_2. Qed.
 
-Global Instance siprop_sbi : Sbi siPropI :=
+Global Instance siprop_sbi {SI : sidx} : Sbi siPropI :=
   {| sbi_sbi_mixin := siprop_sbi_mixin;
      sbi_sbi_prop_ext_mixin := siprop_sbi_prop_ext_mixin |}.
-Global Instance siprop_sbi_emp_valid_exist : SbiEmpValidExist siPropI.
+Global Instance siprop_sbi_emp_valid_exist {SI : sidx} :
+  SbiEmpValidExist siPropI.
 Proof. done. Qed.
 
 (** ** The primitive laws *)
 Section sbi_laws.
-  Context `{!Sbi PROP}.
+  Context {SI : sidx} `{!Sbi PROP}.
   Implicit Types Pi Qi Ri : siProp.
   Implicit Types P Q R : PROP.
 
@@ -281,7 +282,7 @@ End sbi_laws.
 
 (** ** The derived laws *)
 Section sbi_derived.
-  Context `{!Sbi PROP}.
+  Context {SI : sidx} `{!Sbi PROP}.
   Implicit Types Pi Qi Ri : siProp.
   Implicit Types P Q R : PROP.
 

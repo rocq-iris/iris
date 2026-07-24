@@ -1,4 +1,3 @@
-From iris.algebra Require Import stepindex_finite.
 From iris.bi Require Export interface extensions.
 From iris.si_logic Require Export siprop.
 Import siProp_primitive.
@@ -9,17 +8,17 @@ terms of the BI interface.  This file does *not* unseal. *)
 (** We pick [*] and [-*] to coincide with [∧] and [→], respectively. This seems
 to be the most reasonable choice to fit a "pure" higher-order logic into the
 proofmode's BI framework. *)
-Definition siProp_emp : siProp := siProp_pure True.
-Definition siProp_sep : siProp → siProp → siProp := siProp_and.
-Definition siProp_wand : siProp → siProp → siProp := siProp_impl.
-Definition siProp_persistently (P : siProp) : siProp := P.
+Definition siProp_emp {SI : sidx} : siProp := siProp_pure True.
+Definition siProp_sep {SI : sidx} : siProp → siProp → siProp := siProp_and.
+Definition siProp_wand {SI : sidx} : siProp → siProp → siProp := siProp_impl.
+Definition siProp_persistently {SI : sidx} (P : siProp) : siProp := P.
 
 Local Existing Instance entails_po.
 
-Lemma siProp_bi_mixin :
+Lemma siProp_bi_mixin {SI : sidx} :
   BiMixin
     siProp_entails siProp_emp siProp_pure siProp_and siProp_or siProp_impl
-    (@siProp_forall) (@siProp_exist) siProp_sep siProp_wand.
+    (@siProp_forall _) (@siProp_exist _) siProp_sep siProp_wand.
 Proof.
   split.
   - exact: entails_po.
@@ -67,7 +66,7 @@ Proof.
     apply impl_elim_l'.
 Qed.
 
-Lemma siProp_bi_persistently_mixin :
+Lemma siProp_bi_persistently_mixin {SI : sidx} :
   BiPersistentlyMixin
     siProp_entails siProp_emp siProp_and
     siProp_sep siProp_persistently.
@@ -88,10 +87,10 @@ Proof.
     done.
 Qed.
 
-Lemma siProp_bi_later_mixin :
+Lemma siProp_bi_later_mixin {SI : sidx} :
   BiLaterMixin
     siProp_entails siProp_pure siProp_or siProp_impl
-    (@siProp_forall) (@siProp_exist) siProp_sep siProp_persistently siProp_later.
+    (@siProp_forall _) (@siProp_exist _) siProp_sep siProp_persistently siProp_later.
 Proof.
   split.
   - apply contractive_ne, later_contractive.
@@ -121,36 +120,38 @@ Proof.
   - exact: later_false_em.
 Qed.
 
-Canonical Structure siPropI : bi :=
+Canonical Structure siPropI {SI : sidx} : bi :=
   {| bi_ofe_mixin := ofe_mixin_of siProp;
      bi_bi_mixin := siProp_bi_mixin;
      bi_bi_persistently_mixin := siProp_bi_persistently_mixin;
      bi_bi_later_mixin := siProp_bi_later_mixin |}.
 
-Global Instance siProp_pure_forall : BiPureForall siPropI.
+Global Instance siProp_pure_forall {SI : sidx} : BiPureForall siPropI.
 Proof. exact: @pure_forall_2. Qed.
-Global Instance siProp_persistently_forall : BiPersistentlyForall siPropI.
+Global Instance siProp_persistently_forall {SI : sidx} : BiPersistentlyForall siPropI.
 Proof. done. Qed.
-Global Instance siProp_persistently_exist : BiPersistentlyExist siPropI.
+Global Instance siProp_persistently_exist {SI : sidx} : BiPersistentlyExist siPropI.
 Proof. done. Qed.
 
-Global Instance siProp_later_contractive : BiLaterContractive siPropI.
+Global Instance siProp_later_contractive {SI : sidx} : BiLaterContractive siPropI.
 Proof. exact: @later_contractive. Qed.
 
 (** extra BI instances *)
 
-Global Instance siProp_affine : BiAffine siPropI | 0.
+Global Instance siProp_affine {SI : sidx} : BiAffine siPropI | 0.
 Proof. intros P. exact: pure_intro. Qed.
 (* Also add this to the global hint database, otherwise [eauto] won't work for
 many lemmas that have [BiAffine] as a premise. *)
 Global Hint Immediate siProp_affine : core.
 
-Global Instance siProp_persistent (P : siProp) : Persistent P.
+Global Instance siProp_persistent {SI : sidx} (P : siProp) : Persistent P.
 Proof. done. Qed.
 
 (** Re-state/export soundness lemmas *)
 Module siProp.
 Section restate.
+  Context {SI : sidx}.
+
   (** The internal equality, internal validity, and soundness lemmas are
   lifted to any BI with equality in [iris.bi.internal_eq], [iris.bi.cmra] and
   [iris.bi.sbi]. The versions specific for [siProp] should never be used by
@@ -158,27 +159,27 @@ Section restate.
 
   (** We restate the unsealing lemmas so that they also unfold the BI layer. The
   sealing lemmas are partially applied so that they also work under binders. *)
-  Local Lemma siProp_emp_unseal : bi_emp = @siprop.siProp_pure_def True.
+  Local Lemma siProp_emp_unseal : bi_emp = siprop.siProp_pure_def True.
   Proof. by rewrite -siprop.siProp_pure_unseal. Qed.
-  Local Lemma siProp_pure_unseal : bi_pure = @siprop.siProp_pure_def.
+  Local Lemma siProp_pure_unseal : bi_pure = siprop.siProp_pure_def.
   Proof. by rewrite -siprop.siProp_pure_unseal. Qed.
-  Local Lemma siProp_and_unseal : bi_and = @siprop.siProp_and_def.
+  Local Lemma siProp_and_unseal : bi_and = siprop.siProp_and_def.
   Proof. by rewrite -siprop.siProp_and_unseal. Qed.
-  Local Lemma siProp_or_unseal : bi_or = @siprop.siProp_or_def.
+  Local Lemma siProp_or_unseal : bi_or = siprop.siProp_or_def.
   Proof. by rewrite -siprop.siProp_or_unseal. Qed.
-  Local Lemma siProp_impl_unseal : bi_impl = @siprop.siProp_impl_def.
+  Local Lemma siProp_impl_unseal : bi_impl = siprop.siProp_impl_def.
   Proof. by rewrite -siprop.siProp_impl_unseal. Qed.
-  Local Lemma siProp_forall_unseal : @bi_forall _ _ = @siprop.siProp_forall_def.
+  Local Lemma siProp_forall_unseal : @bi_forall _ _ = @siprop.siProp_forall_def _.
   Proof. by rewrite -siprop.siProp_forall_unseal. Qed.
-  Local Lemma siProp_exist_unseal : @bi_exist _ _ = @siprop.siProp_exist_def.
+  Local Lemma siProp_exist_unseal : @bi_exist _ _ = @siprop.siProp_exist_def _.
   Proof. by rewrite -siprop.siProp_exist_unseal. Qed.
-  Local Lemma siProp_sep_unseal : bi_sep = @siprop.siProp_and_def.
+  Local Lemma siProp_sep_unseal : bi_sep = siprop.siProp_and_def.
   Proof. by rewrite -siprop.siProp_and_unseal. Qed.
-  Local Lemma siProp_wand_unseal : bi_wand = @siprop.siProp_impl_def.
+  Local Lemma siProp_wand_unseal : bi_wand = siprop.siProp_impl_def.
   Proof. by rewrite -siprop.siProp_impl_unseal. Qed.
   Local Lemma siProp_persistently_unseal : bi_persistently = @id siProp.
   Proof. done. Qed.
-  Local Lemma siProp_later_unseal : bi_later = @siprop.siProp_later_def.
+  Local Lemma siProp_later_unseal : bi_later = siprop.siProp_later_def.
   Proof. by rewrite -siprop.siProp_later_unseal. Qed.
   Local Lemma siProp_internal_eq_unseal :
     @siProp_internal_eq = @siprop.siProp_internal_eq_def.

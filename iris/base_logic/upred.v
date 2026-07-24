@@ -3,6 +3,11 @@ From iris.algebra Require Export stepindex_finite.
 From iris.bi Require Import notation.
 From iris.si_logic Require Import siprop.
 
+(** TODO: This lemma will be removed once [siProp] has been ported to support
+any [sidx]. *)
+ Lemma nat_to_sidx_id (n : nat) : nat_to_sidx n = n.
+Proof. induction n; by f_equal/=. Qed.
+
 Local Hint Extern 1 (_ ≼ _) => etrans; [eassumption|] : core.
 Local Hint Extern 1 (_ ≼ _) => etrans; [|eassumption] : core.
 Local Hint Extern 10 (_ ≤ _) => lia : core.
@@ -475,12 +480,15 @@ Section primitive.
 
   (** Non-expansiveness and setoid morphisms *)
   Lemma si_pure_ne : NonExpansive (@uPred_si_pure M).
-  Proof. intros n Pi Pi' HPi. unseal; split; intros; by apply HPi. Qed.
+  Proof.
+    intros n Pi Pi' HPi. unseal; split; intros. apply HPi.
+    by rewrite nat_to_sidx_id.
+  Qed.
 
   Lemma si_emp_valid_ne : NonExpansive (@uPred_si_emp_valid M).
   Proof.
-    intros n P P' HP.
-    unseal; split; intros; apply HP; auto using ucmra_unit_validN.
+    intros n P P' HP. unseal; split=> n'. rewrite nat_to_sidx_id.
+    intros. apply HP; auto using ucmra_unit_validN.
   Qed.
 
   Lemma and_ne : NonExpansive2 (@uPred_and M).
@@ -604,8 +612,8 @@ Section primitive.
     siProp_entails (<si_emp_valid> ((P -∗ Q) ∧ (Q -∗ P)))
                    (siProp_internal_eq P Q).
   Proof.
-    unseal; siProp_primitive.unseal.
-    split=> n /=. setoid_rewrite (left_id ε op). split; naive_solver.
+    unseal; siProp_primitive.unseal. split=> n /=.
+    setoid_rewrite (left_id ε op). rewrite nat_to_sidx_id. split; naive_solver.
   Qed.
 
   (** Introduction and elimination rules *)
@@ -803,7 +811,7 @@ Section primitive.
     split=> -[|n] x /= ? Hax; first by eauto using ucmra_unit_leastN.
     destruct Hax as [y ?].
     destruct (cmra_extend n x a y) as (a'&y'&Hx&?&?); auto using cmra_validN_S.
-    exists a'. rewrite Hx. eauto using cmra_includedN_l.
+    exists a'. rewrite Hx nat_to_sidx_id. eauto using cmra_includedN_l.
   Qed.
 
   Lemma bupd_ownM_updateP x (Φ : M → Prop) :
@@ -822,13 +830,13 @@ Section primitive.
   Proof.
     unseal; siProp_primitive.unseal.
     split=> n y /= Hval Hf. exists y. split; [done|]. intros a.
-    destruct (Hf a) as [xf ?]; eauto.
+    rewrite nat_to_sidx_id. destruct (Hf a) as [xf ?]; eauto.
   Qed.
 
   Lemma ownM_valid (a : M) : uPred_ownM a ⊢ <si_pure> siProp_cmra_valid a.
   Proof.
-    unseal; siProp_primitive.unseal.
-    split=> n x Hv [a' ?]; ofe_subst; eauto using cmra_validN_op_l.
+    unseal; siProp_primitive.unseal. split=> n x Hv [a' ?].
+    ofe_subst. rewrite nat_to_sidx_id. eauto using cmra_validN_op_l.
   Qed.
 End primitive.
 End uPred_primitive.

@@ -70,14 +70,14 @@ Class BiEmbedFUpd {SI : sidx} (PROP1 PROP2 : bi)
 Global Hint Mode BiEmbedFUpd - - ! - - - : typeclass_instances.
 Global Hint Mode BiEmbedFUpd - ! - - - - : typeclass_instances.
 
-Class BiEmbedSbi (PROP1 PROP2 : bi)
+Class BiEmbedSbi {SI : sidx} (PROP1 PROP2 : bi)
     `{!BiEmbed PROP1 PROP2, !Sbi PROP1, !Sbi PROP2} := {
   embed_si_emp_valid (P : PROP1) :
     <si_emp_valid> ⎡ P ⎤ ⊣⊢@{siPropI} <si_emp_valid> P;
   embed_si_pure_1 Pi : ⎡ <si_pure> Pi ⎤ ⊢@{PROP2} <si_pure> Pi;
 }.
-Global Hint Mode BiEmbedSbi - ! - - - : typeclass_instances.
-Global Hint Mode BiEmbedSbi ! - - - - : typeclass_instances.
+Global Hint Mode BiEmbedSbi - - ! - - - : typeclass_instances.
+Global Hint Mode BiEmbedSbi - ! - - - - : typeclass_instances.
 
 Section embed_laws.
   Context {SI : sidx} {PROP1 PROP2 : bi} `{!BiEmbed PROP1 PROP2}.
@@ -282,7 +282,7 @@ End embed.
 
 Section embed_sbi.
   (* Sbi embeddings use natSI for the step-index type *)
-  Context {PROP1 PROP2 : bi} `{!BiEmbed PROP1 PROP2}.
+  Context {SI : sidx} {PROP1 PROP2 : bi} `{!BiEmbed PROP1 PROP2}.
   Context `{!Sbi PROP1, !Sbi PROP2, !BiEmbedSbi PROP1 PROP2}.
   Local Notation embed := (embed (A:=bi_car PROP1) (B:=bi_car PROP2)).
   Local Notation "⎡ P ⎤" := (embed P) : bi_scope.
@@ -373,7 +373,7 @@ Section embed_embed.
 End embed_embed.
 
 Section embed_embed_sbi.
-  Context {PROP1 PROP2 PROP3 : bi}
+  Context {SI : sidx} {PROP1 PROP2 PROP3 : bi}
     `{!BiEmbed PROP1 PROP2, !BiEmbed PROP2 PROP3}.
   Context `{!Sbi PROP1, !Sbi PROP2, !Sbi PROP3}.
   Local Existing Instances embed_embed embed_bi_embed.

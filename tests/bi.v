@@ -1,12 +1,11 @@
 From stdpp Require Import strings.
-From iris.algebra Require Import stepindex_finite.
 From iris.bi Require Import bi plainly big_op.
 
 Unset Mangle Names.
 Set Default Proof Using "Type*".
 
 Section tests.
-  Context {PROP : bi}.
+  Context {SI : sidx} {PROP : bi}.
 
   (** See https://gitlab.mpi-sws.org/iris/iris/-/merge_requests/610 *)
   Lemma test_impl_persistent_1 `{!Sbi PROP, !BiPersistentlyImplSiPure PROP} :
@@ -93,7 +92,7 @@ Section tests.
   (* Similarly for [plainly], but here it should leave the [Sbi] instance that
   was introduced by [eexists _] unshelved. *)
   Goal ∀ (P : PROP),
-    ∃ sbi_instance, Persistent (@plainly PROP sbi_instance P).
+    ∃ sbi_instance, Persistent (@plainly _ PROP sbi_instance P).
   Proof. intros. eexists _. apply _. Unshelve. Abort.
 
   Section internal_eq_ne.

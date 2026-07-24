@@ -108,14 +108,14 @@ Class BiBUpdFUpd {SI : sidx} (PROP : bi) `{!BiBUpd PROP, !BiFUpd PROP} :=
   bupd_fupd E (P : PROP) : (|==> P) ⊢ |={E}=> P.
 Global Hint Mode BiBUpdFUpd - ! - - : typeclass_instances.
 
-Class BiBUpdSbi (PROP : bi) `{!BiBUpd PROP, !Sbi PROP} :=
+Class BiBUpdSbi {SI : sidx} (PROP : bi) `{!BiBUpd PROP, !Sbi PROP} :=
   bupd_si_pure Pi : (|==> <si_pure> Pi) ⊢@{PROP} <si_pure> Pi.
-Global Hint Mode BiBUpdSbi ! - - : typeclass_instances.
+Global Hint Mode BiBUpdSbi - ! - - : typeclass_instances.
 
 (** These rules for the interaction between [<si_pure>] and the [|={E1,E2=>]
 modality only make sense for affine logics. For general BIs we do not know the
 canonical set of rules and linear models in which they might hold. *)
-Class BiFUpdSbi (PROP : bi) `{!BiFUpd PROP, !Sbi PROP} := {
+Class BiFUpdSbi {SI : sidx} (PROP : bi) `{!BiFUpd PROP, !Sbi PROP} := {
   (** This rule allows you to use the current context for proving a purely
   step-indexed proposition [Pi] *without* actually using up the context. You can
   then continue the proof in the second conjunct. The mask-changing version
@@ -131,7 +131,7 @@ Class BiFUpdSbi (PROP : bi) `{!BiFUpd PROP, !Sbi PROP} := {
   fupd_si_pure_forall_2 E {A} (Φi : A → siProp) :
     (∀ x, |={E}=> <si_pure> Φi x) ⊢@{PROP} |={E}=> ∀ x, <si_pure> Φi x
 }.
-Global Hint Mode BiFUpdSbi ! - - : typeclass_instances.
+Global Hint Mode BiFUpdSbi - ! - - : typeclass_instances.
 
 Section bupd_laws.
   Context {SI : sidx} {PROP : bi} `{!BiBUpd PROP}.
@@ -254,7 +254,7 @@ Section bupd_derived.
 End bupd_derived.
 
 Section bupd_derived_sbi.
-  Context {PROP : bi} `{!BiBUpd PROP, !Sbi PROP, !BiBUpdSbi PROP}.
+  Context {SI : sidx} {PROP : bi} `{!BiBUpd PROP, !Sbi PROP, !BiBUpdSbi PROP}.
   Implicit Types P Q R : PROP.
 
   Lemma bupd_plainly P : (|==> ■ P) ⊢ ■ P.
@@ -585,7 +585,7 @@ Section fupd_derived.
 End fupd_derived.
 
 Section fupd_derived_sbi.
-  Context {PROP : bi} `{!BiFUpd PROP, !Sbi PROP, !BiFUpdSbi PROP, !BiAffine PROP}.
+  Context {SI : sidx} {PROP : bi} `{!BiFUpd PROP, !Sbi PROP, !BiFUpdSbi PROP, !BiAffine PROP}.
   Implicit Types P Q R : PROP.
 
   Lemma fupd_keep_si_pure {E1 E2} E2' Pi R :

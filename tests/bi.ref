@@ -1,5 +1,6 @@
 The command has indeed failed with message:
 In environment
+SI : sidx
 PROP : bi
 m : gmap nat nat
 The term "m" has type "gmap nat nat" while it is expected to have type
@@ -9,6 +10,7 @@ The term "m" has type "gmap nat nat" while it is expected to have type
      : string
 1 goal
   
+  SI : sidx
   PROP : bi
   A : Type
   Φ : A → PROP
@@ -16,6 +18,7 @@ The term "m" has type "gmap nat nat" while it is expected to have type
   ⊢ emp
 The command has indeed failed with message:
 In environment:
+SI : sidx
 PROP : bi
 P : PROP
 Could not find an instance for the following existential variables:
@@ -25,5 +28,6 @@ Could not find an instance for the following existential variables:
 The command has indeed failed with message:
 Cannot infer this placeholder of type "Persistent (match_foo b)" (no type
 class instance found) in environment:
+SI : sidx
 PROP : bi
 b : bool

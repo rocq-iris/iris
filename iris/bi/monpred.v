@@ -273,14 +273,14 @@ Section monPred_defs.
     @fupd _ monPred_fupd = monPred_fupd_def.
   Proof. by rewrite -monPred_fupd_aux.(seal_eq). Qed.
 
-  Local Definition monPred_si_pure_def `{Sbi PROP} (Pi : siProp) : monPred :=
+  Local Definition monPred_si_pure_def `{!Sbi PROP} (Pi : siProp) : monPred :=
     MonPred (λ _, <si_pure> Pi)%I _.
   Local Definition monPred_si_pure_aux : seal (@monPred_si_pure_def).
   Proof. by eexists. Qed.
   Definition monPred_si_pure := monPred_si_pure_aux.(unseal).
   Global Arguments monPred_si_pure {_}.
-  Local Definition monPred_si_pure_unseal `{Sbi PROP} :
-    @si_pure _ monPred_si_pure = monPred_si_pure_def.
+  Local Definition monPred_si_pure_unseal `{!Sbi PROP} :
+    @si_pure _ _ monPred_si_pure = monPred_si_pure_def.
   Proof. by rewrite -monPred_si_pure_aux.(seal_eq). Qed.
 
   Local Definition monPred_si_emp_valid_def `{!Sbi PROP} P : siProp :=
@@ -290,7 +290,7 @@ Section monPred_defs.
   Definition monPred_si_emp_valid := monPred_si_emp_valid_aux.(unseal).
   Global Arguments monPred_si_emp_valid {_}.
   Local Definition monPred_si_emp_valid_unseal `{!Sbi PROP} :
-    @si_emp_valid _ monPred_si_emp_valid = monPred_si_emp_valid_def.
+    @si_emp_valid _ _ monPred_si_emp_valid = monPred_si_emp_valid_def.
   Proof. by rewrite -monPred_si_emp_valid_aux.(seal_eq). Qed.
 End monPred_defs.
 
@@ -616,11 +616,11 @@ Section instances.
     + rewrite si_emp_valid_forall. by apply bi.forall_intro.
   Qed.
 
-  Global Instance monPred_bi_bupd_sbi `{BiBUpdSbi PROP} :
+  Global Instance monPred_bi_bupd_sbi `{!Sbi PROP, !BiBUpd PROP, !BiBUpdSbi PROP} :
     BiBUpdSbi monPredI.
   Proof. intros P. split=> /= i. unseal. apply bupd_si_pure. Qed.
 
-  Global Instance monPred_bi_fupd_sbi `{BiFUpdSbi PROP} :
+  Global Instance monPred_bi_fupd_sbi `{!Sbi PROP, !BiFUpd PROP, !BiFUpdSbi PROP} :
     BiFUpdSbi monPredI.
   Proof.
     split; rewrite /bi_except_0; unseal.
@@ -1188,10 +1188,10 @@ Section bi_facts.
     Context `{!Sbi PROP}.
 
     Lemma monPred_si_pure_unfold :
-      @si_pure monPredI _ = λ Pi, ⎡ <si_pure> Pi ⎤%I.
+      @si_pure _ monPredI _ = λ Pi, ⎡ <si_pure> Pi ⎤%I.
     Proof. by unseal. Qed.
     Lemma monPred_si_emp_valid_unfold :
-      @si_emp_valid monPredI _ = λ P, (<si_emp_valid> ∀ i, P i)%I.
+      @si_emp_valid _ monPredI _ = λ P, (<si_emp_valid> ∀ i, P i)%I.
     Proof. by unseal. Qed.
 
     Global Instance si_pure_objective Pi :
@@ -1200,7 +1200,7 @@ Section bi_facts.
 
     (** Internal equality *)
     Lemma monPred_internal_eq_unfold :
-      @internal_eq monPredI _ = λ A x y, ⎡ x ≡ y ⎤%I.
+      @internal_eq _ monPredI _ = λ A x y, ⎡ x ≡ y ⎤%I.
     Proof. by rewrite /internal_eq monPred_si_pure_unfold. Qed.
 
     Lemma monPred_at_internal_eq {A : ofe} i (a b : A) :

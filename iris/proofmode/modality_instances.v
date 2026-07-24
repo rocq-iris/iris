@@ -47,7 +47,7 @@ Section modalities.
     Modality _ modality_embed_mixin.
 
   Lemma modality_plainly_mixin `{!Sbi PROP} :
-    modality_mixin (@plainly PROP _) (MIEnvForall Plain) MIEnvClear.
+    modality_mixin (plainly (PROP:=PROP)) (MIEnvForall Plain) MIEnvClear.
   Proof.
     split; simpl; split_and?; eauto using equiv_entails_1_2, plainly_intro,
       plainly_mono, plainly_and, plainly_sep_2 with typeclass_instances.
