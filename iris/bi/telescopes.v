@@ -7,11 +7,11 @@ Import bi.
 (** Telescopic quantifiers *)
 Definition bi_texist {SI : sidx} {PROP : bi} {TT : tele@{Quant}}
     (Ψ : TT → PROP) : PROP :=
-  tele_fold (@bi_exist SI PROP) (tele_bind Ψ).
+  tele_fold (@bi_exist _ PROP) (tele_bind Ψ).
 Global Arguments bi_texist {SI _ !_} _ /.
 Definition bi_tforall {SI : sidx} {PROP : bi} {TT : tele@{Quant}}
     (Ψ : TT → PROP) : PROP :=
-  tele_fold (@bi_forall SI PROP) (tele_bind Ψ).
+  tele_fold (@bi_forall _ PROP) (tele_bind Ψ).
 Global Arguments bi_tforall {SI _ !_} _ /.
 
 Notation "'∃..' x .. y , P" := (bi_texist (λ x, .. (bi_texist (λ y, P)) .. )%I)
@@ -50,17 +50,17 @@ Section telescopes.
   Qed.
 
   Global Instance bi_tforall_ne n :
-    Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_tforall SI PROP TT).
+    Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_tforall _ PROP TT).
   Proof. intros ?? EQ. rewrite !bi_tforall_forall. rewrite EQ //. Qed.
   Global Instance bi_tforall_proper :
-    Proper (pointwise_relation _ (⊣⊢) ==> (⊣⊢)) (@bi_tforall SI PROP TT).
+    Proper (pointwise_relation _ (⊣⊢) ==> (⊣⊢)) (@bi_tforall _ PROP TT).
   Proof. intros ?? EQ. rewrite !bi_tforall_forall. rewrite EQ //. Qed.
 
   Global Instance bi_texist_ne n :
-    Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_texist SI PROP TT).
+    Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_texist _ PROP TT).
   Proof. intros ?? EQ. rewrite !bi_texist_exist. rewrite EQ //. Qed.
   Global Instance bi_texist_proper :
-    Proper (pointwise_relation _ (⊣⊢) ==> (⊣⊢)) (@bi_texist SI PROP TT).
+    Proper (pointwise_relation _ (⊣⊢) ==> (⊣⊢)) (@bi_texist _ PROP TT).
   Proof. intros ?? EQ. rewrite !bi_texist_exist. rewrite EQ //. Qed.
 
   Global Instance bi_tforall_absorbing Ψ :

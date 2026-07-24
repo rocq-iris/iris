@@ -164,7 +164,7 @@ Section embed.
   Qed.
   Lemma embed_pure φ : ⎡⌜φ⌝⎤ ⊣⊢ ⌜φ⌝.
   Proof.
-    rewrite (@bi.pure_alt SI PROP1) (@bi.pure_alt SI PROP2) embed_exist.
+    rewrite (@bi.pure_alt _ PROP1) (@bi.pure_alt _ PROP2) embed_exist.
     do 2 f_equiv. apply bi.equiv_entails. split; [apply bi.True_intro|].
     rewrite -(_ : (emp → emp : PROP1) ⊢ True) ?embed_impl;
       last apply bi.True_intro.

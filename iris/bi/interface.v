@@ -328,8 +328,10 @@ Global Hint Extern 0 (bi_entails _ _) => reflexivity : core.
   ([impl], [iff], [eq], ...) and [≡] but below [⊑].
   [eq] (at 100) < [≡] (at 150) < [bi_entails _] (at 170) < [⊑] (at 200)
 *)
-Global Instance bi_rewrite_relation {SI : sidx} (PROP : bi) : RewriteRelation (@bi_entails SI PROP) | 170 := {}.
-Global Instance bi_inhabited {SI : sidx} {PROP : bi} : Inhabited PROP := populate (bi_pure True).
+Global Instance bi_rewrite_relation {SI : sidx} (PROP : bi) :
+  RewriteRelation (@bi_entails _ PROP) | 170 := {}.
+Global Instance bi_inhabited {SI : sidx} {PROP : bi} : Inhabited PROP :=
+  populate (bi_pure True).
 
 Notation "'emp'" := (bi_emp) : bi_scope.
 Notation "'⌜' φ '⌝'" := (bi_pure φ%type%stdpp) : bi_scope.
@@ -386,31 +388,31 @@ Implicit Types P Q R : PROP.
 Implicit Types A : Type.
 
 (* About the entailment *)
-Global Instance entails_po : PreOrder (@bi_entails SI PROP).
+Global Instance entails_po : PreOrder (@bi_entails _ PROP).
 Proof. eapply bi_mixin_entails_po, bi_bi_mixin. Qed.
 Lemma equiv_entails P Q : P ≡ Q ↔ (P ⊢ Q) ∧ (Q ⊢ P).
 Proof. eapply bi_mixin_equiv_entails, bi_bi_mixin. Qed.
 
 (* Non-expansiveness *)
-Global Instance pure_ne n : Proper (iff ==> dist n) (@bi_pure SI PROP).
+Global Instance pure_ne n : Proper (iff ==> dist n) (@bi_pure _ PROP).
 Proof. eapply bi_mixin_pure_ne, bi_bi_mixin. Qed.
-Global Instance and_ne : NonExpansive2 (@bi_and SI PROP).
+Global Instance and_ne : NonExpansive2 (@bi_and _ PROP).
 Proof. eapply bi_mixin_and_ne, bi_bi_mixin. Qed.
-Global Instance or_ne : NonExpansive2 (@bi_or SI PROP).
+Global Instance or_ne : NonExpansive2 (@bi_or _ PROP).
 Proof. eapply bi_mixin_or_ne, bi_bi_mixin. Qed.
-Global Instance impl_ne : NonExpansive2 (@bi_impl SI PROP).
+Global Instance impl_ne : NonExpansive2 (@bi_impl _ PROP).
 Proof. eapply bi_mixin_impl_ne, bi_bi_mixin. Qed.
 Global Instance forall_ne A n :
-  Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_forall SI PROP A).
+  Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_forall _ PROP A).
 Proof. eapply bi_mixin_forall_ne, bi_bi_mixin. Qed.
 Global Instance exist_ne A n :
-  Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_exist SI PROP A).
+  Proper (pointwise_relation _ (dist n) ==> dist n) (@bi_exist _ PROP A).
 Proof. eapply bi_mixin_exist_ne, bi_bi_mixin. Qed.
-Global Instance sep_ne : NonExpansive2 (@bi_sep SI PROP).
+Global Instance sep_ne : NonExpansive2 (@bi_sep _ PROP).
 Proof. eapply bi_mixin_sep_ne, bi_bi_mixin. Qed.
-Global Instance wand_ne : NonExpansive2 (@bi_wand SI PROP).
+Global Instance wand_ne : NonExpansive2 (@bi_wand _ PROP).
 Proof. eapply bi_mixin_wand_ne, bi_bi_mixin. Qed.
-Global Instance persistently_ne : NonExpansive (@bi_persistently SI PROP).
+Global Instance persistently_ne : NonExpansive (@bi_persistently _ PROP).
 Proof. eapply bi_mixin_persistently_ne, bi_bi_persistently_mixin. Qed.
 
 (* Higher-order logic *)
@@ -487,7 +489,7 @@ Proof.
 Qed.
 
 (* Later *)
-Global Instance later_ne : NonExpansive (@bi_later SI PROP).
+Global Instance later_ne : NonExpansive (@bi_later _ PROP).
 Proof. eapply bi_mixin_later_ne, bi_bi_later_mixin. Qed.
 
 Lemma later_mono P Q : (P ⊢ Q) → ▷ P ⊢ ▷ Q.
