@@ -12,7 +12,6 @@ Definition siProp_emp : siProp := siProp_pure True.
 Definition siProp_sep : siProp → siProp → siProp := siProp_and.
 Definition siProp_wand : siProp → siProp → siProp := siProp_impl.
 Definition siProp_persistently (P : siProp) : siProp := P.
-Definition siProp_plainly (P : siProp) : siProp := P.
 
 Local Existing Instance entails_po.
 
