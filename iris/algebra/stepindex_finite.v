@@ -2,10 +2,16 @@ From iris.algebra Require Import stepindex ofe cmra.
 
 (** * [sidx] instance for [nat] *)
 (** This file provides an instantiation of the [sidx] stepindex type for [nat],
-which is the stepindex type traditionally used by Iris.
+called [natSI], which is the stepindex type traditionally used by Iris.
+
+The file also provides variants of (C)OFE and camera lemmas that are specialized
+to the [natSI] index type. These restated lemmas use [0], [S], [≤], [<] directly,
+so they can be used in combination with [lia], which does not unfold the
+projections of the [sidx] class.
 
 Side-effect: every development importing this file will automatically use finite
-indices due to the declared instances and canonical structures for [sidx]. *)
+indices due to the declared instances and canonical structures for [sidx]. The
+names of the specialized lemmas shadow the names of the original lemmas. *)
 
 Lemma nat_sidx_mixin : SIdxMixin lt le 0 S.
 Proof.
@@ -24,16 +30,8 @@ Global Existing Instance natSI | 0.
 Global Instance nat_sidx_finite : SIdxFinite natSI.
 Proof. intros [|n]; eauto. Qed.
 
-(** We define a notion of finite OFEs and COFEs that matches Iris's traditional
-definitions, and makes it easier to define OFEs and COFEs specialized to the
-[natSI] index type. *)
-
 Section finite.
   Local Set Default Proof Using "Type*".
-
-  (** Variants of lemmas with [S] and [≤] that use the definitions on [nat]
-  directly. These are convenient in combination with [lia], which does not
-  unfold the projections of the [sidx] class. *)
 
   Lemma dist_later_S {A : ofe} (n : nat) (a b : A) :
     a ≡{n}≡ b ↔ dist_later (S n) a b.
