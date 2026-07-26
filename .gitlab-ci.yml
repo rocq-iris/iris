@@ -104,7 +104,7 @@ trigger-stdpp.dev:
   <<: *template
   variables:
     STDPP_REPO: "iris/stdpp"
-    OPAM_PINS: "coq version $NIGHTLY_COQ   git+https://gitlab.mpi-sws.org/$STDPP_REPO#$STDPP_REV"
+    OPAM_PINS: "rocq-core version $NIGHTLY_COQ   git+https://gitlab.mpi-sws.org/$STDPP_REPO#$STDPP_REV"
     CI_COQCHK: "1"
   rules:
   - if: $CI_PROJECT_NAMESPACE != "iris"
