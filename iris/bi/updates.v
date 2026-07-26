@@ -251,39 +251,37 @@ Section bupd_derived.
     Absorbing P → Absorbing (|==> P).
   Proof. rewrite /Absorbing /bi_absorbingly bupd_frame_l =>-> //. Qed.
 
+  Section bupd_sbi.
+    Context `{!Sbi PROP, !BiBUpdSbi PROP}.
+
+    Lemma bupd_plainly P : (|==> ■ P) ⊢ ■ P.
+    Proof. apply bupd_si_pure. Qed.
+
+    Lemma bupd_plainly_elim P `{!Absorbing P} : (|==> ■ P) ⊢ P.
+    Proof. by rewrite bupd_plainly plainly_elim. Qed.
+
+    Lemma bupd_elim P `{!Plain P, !Absorbing P} : (|==> P) ⊢ P.
+    Proof.
+      by rewrite {1}(plain P) /plainly bupd_si_pure si_pure_si_emp_valid_elim.
+    Qed.
+
+    Lemma bupd_plain_forall {A} (Φ : A → PROP)
+        `{!∀ x, Plain (Φ x), !∀ x, Absorbing (Φ x)} :
+      (|==> ∀ x, Φ x) ⊣⊢ (∀ x, |==> Φ x).
+    Proof.
+      apply (anti_symm _).
+      - apply bupd_forall.
+      - rewrite -bupd_intro. apply forall_intro=> x.
+        by rewrite (forall_elim x) bupd_elim.
+    Qed.
+
+    Global Instance bupd_plain P : Plain P → Plain (|==> P).
+    Proof.
+      intros. rewrite /Plain. rewrite {1}(plain P) {1}bupd_elim.
+      by rewrite -bupd_intro.
+    Qed.
+  End bupd_sbi.
 End bupd_derived.
-
-Section bupd_derived_sbi.
-  Context {SI : sidx} {PROP : bi} `{!BiBUpd PROP, !Sbi PROP, !BiBUpdSbi PROP}.
-  Implicit Types P Q R : PROP.
-
-  Lemma bupd_plainly P : (|==> ■ P) ⊢ ■ P.
-  Proof. apply bupd_si_pure. Qed.
-
-  Lemma bupd_plainly_elim P `{!Absorbing P} : (|==> ■ P) ⊢ P.
-  Proof. by rewrite bupd_plainly plainly_elim. Qed.
-
-  Lemma bupd_elim P `{!Plain P, !Absorbing P} : (|==> P) ⊢ P.
-  Proof.
-    by rewrite {1}(plain P) /plainly bupd_si_pure si_pure_si_emp_valid_elim.
-  Qed.
-
-  Lemma bupd_plain_forall {A} (Φ : A → PROP)
-      `{!∀ x, Plain (Φ x), !∀ x, Absorbing (Φ x)} :
-    (|==> ∀ x, Φ x) ⊣⊢ (∀ x, |==> Φ x).
-  Proof.
-    apply (anti_symm _).
-    - apply bupd_forall.
-    - rewrite -bupd_intro. apply forall_intro=> x.
-      by rewrite (forall_elim x) bupd_elim.
-  Qed.
-
-  Global Instance bupd_plain P : Plain P → Plain (|==> P).
-  Proof.
-    intros. rewrite /Plain. rewrite {1}(plain P) {1}bupd_elim.
-    by rewrite -bupd_intro.
-  Qed.
-End bupd_derived_sbi.
 
 Section fupd_derived.
   Context {SI : sidx} {PROP : bi} `{!BiFUpd PROP}.
@@ -582,125 +580,123 @@ Section fupd_derived.
     by rewrite -laterN_intro.
   Qed.
 
+  Section fupd_sbi_derived.
+    Context `{!Sbi PROP, !BiFUpdSbi PROP, !BiAffine PROP}.
+
+    Lemma fupd_keep_si_pure {E1 E2} E2' Pi R :
+      (|={E1,E2'}=> <si_pure> Pi) ∧ (<si_pure> Pi ={E1,E2}=∗ R) ⊢ |={E1,E2}=> R.
+    Proof.
+      rewrite -{2}(fupd_trans E1 E1 E2) -(fupd_keep_si_pure' E2' Pi).
+      by rewrite -fupd_intro.
+    Qed.
+
+    Lemma fupd_keep_plainly {E1 E2} E2' P R :
+      (|={E1,E2'}=> ■ P) ∧ (P ={E1,E2}=∗ R) ⊢ |={E1,E2}=> R.
+    Proof.
+      rewrite -{2}(fupd_keep_si_pure E2' (<si_emp_valid> P) R).
+      by rewrite {2}si_pure_si_emp_valid_elim.
+    Qed.
+
+    Lemma fupd_plainly_later E P : (▷ |={E}=> ■ P) ⊢ |={E}=> ▷ ◇ P.
+    Proof.
+      by rewrite /plainly fupd_si_pure_later si_pure_si_emp_valid_elim.
+    Qed.
+
+    Lemma fupd_plainly_forall_2 E {A} (Φ : A → PROP) :
+      (∀ x, |={E}=> ■ Φ x) ⊢ |={E}=> ∀ x, Φ x.
+    Proof.
+      rewrite /plainly fupd_si_pure_forall_2.
+      by setoid_rewrite si_pure_si_emp_valid_elim; last apply _.
+    Qed.
+
+    Lemma fupd_plainly_mask E E' P : (|={E,E'}=> ■ P) ⊢ |={E}=> P.
+    Proof.
+      etrans; [|apply (fupd_keep_plainly E' P)]. apply and_intro; [done|].
+      apply wand_intro_l. by rewrite sep_elim_l -fupd_intro.
+    Qed.
+
+    Lemma fupd_plainly_laterN E n P : (▷^n |={E}=> ■ P) ⊢ |={E}=> ▷^n ◇ P.
+    Proof.
+      revert P. induction n as [|n IH]=> P /=.
+      { by rewrite -except_0_intro plainly_elim. }
+      rewrite -!later_laterN !laterN_later.
+      rewrite -plainly_idemp fupd_plainly_later.
+      by rewrite except_0_plainly_1 later_plainly_1 IH except_0_later.
+    Qed.
+
+    (** Laws for general plain propositions. *)
+    Lemma fupd_keep_plain {E1 E2} E2' P `{!Plain P} R :
+      (|={E1,E2'}=> P) ∧ (P ={E1,E2}=∗ R) ⊢ |={E1,E2}=> R.
+    Proof. by rewrite -{1}(plain_plainly P) fupd_keep_plainly. Qed.
+
+    Lemma fupd_plain_mask E E' P `{!Plain P} : (|={E,E'}=> P) ⊢ |={E}=> P.
+    Proof. by rewrite {1}(plain P) fupd_plainly_mask. Qed.
+
+    (** This is an alternative version of [fupd_keep_plain] that might look more
+    intuitive, but is more annoying to use: we can eliminate a [fupd] that
+    "consumes" [R] to produce some plain [P] without actually using up [R]. *)
+    Lemma fupd_keep_plain_sep {E} E' P `{!Plain P} R :
+      (R ={E,E'}=∗ P) -∗ R -∗ |={E}=> P ∗ R.
+    Proof.
+      apply entails_wand, wand_intro_r.
+      etrans; [|apply (fupd_keep_plain E' P)]. apply and_intro.
+      - by rewrite wand_elim_l.
+      - rewrite sep_elim_r -fupd_intro. by apply wand_intro_l.
+    Qed.
+
+    Lemma fupd_plain_later E P `{!Plain P} : (▷ |={E}=> P) ⊢ |={E}=> ▷ ◇ P.
+    Proof. by rewrite {1}(plain P) fupd_plainly_later. Qed.
+    Lemma fupd_plain_laterN E n P `{!Plain P} : (▷^n |={E}=> P) ⊢ |={E}=> ▷^n ◇ P.
+    Proof. by rewrite {1}(plain P) fupd_plainly_laterN. Qed.
+
+    Lemma fupd_plain_forall_2 E {A} (Φ : A → PROP) `{!∀ x, Plain (Φ x)} :
+      (∀ x, |={E}=> Φ x) ⊢ |={E}=> ∀ x, Φ x.
+    Proof.
+      rewrite -fupd_plainly_forall_2. apply forall_mono=> x.
+      by rewrite {1}(plain (Φ _)).
+    Qed.
+    Lemma fupd_plain_forall E1 E2 {A} (Φ : A → PROP) `{!∀ x, Plain (Φ x)} :
+      E2 ⊆ E1 →
+      (|={E1,E2}=> ∀ x, Φ x) ⊣⊢ (∀ x, |={E1,E2}=> Φ x).
+    Proof.
+      intros. apply (anti_symm _); first apply fupd_forall.
+      trans (∀ x, |={E1}=> Φ x)%I.
+      { apply forall_mono=> x. by rewrite fupd_plain_mask. }
+      rewrite fupd_plain_forall_2. apply fupd_elim.
+      rewrite {1}(plain (∀ x, Φ x)) (fupd_mask_intro_discard E1 E2 (■ _)) //.
+      by rewrite plainly_elim.
+    Qed.
+    Lemma fupd_plain_forall' E {A} (Φ : A → PROP) `{!∀ x, Plain (Φ x)} :
+      (|={E}=> ∀ x, Φ x) ⊣⊢ (∀ x, |={E}=> Φ x).
+    Proof. by apply fupd_plain_forall. Qed.
+
+    Lemma step_fupd_plain Eo Ei P `{!Plain P} : (|={Eo}[Ei]▷=> P) ⊢ |={Eo}=> ▷ ◇ P.
+    Proof.
+      rewrite -(fupd_plain_mask _ Ei (▷ ◇ P)).
+      apply fupd_elim. by rewrite fupd_plain_mask -fupd_plain_later.
+    Qed.
+
+    Lemma step_fupdN_plain Eo Ei n P `{!Plain P} : (|={Eo}[Ei]▷=>^n P) ⊢ |={Eo}=> ▷^n ◇ P.
+    Proof.
+      induction n as [|n IH].
+      - by rewrite -fupd_intro -except_0_intro.
+      - rewrite Nat.iter_succ step_fupd_fupd IH !fupd_trans step_fupd_plain.
+        apply fupd_mono. destruct n as [|n]; simpl.
+        * by rewrite except_0_idemp.
+        * by rewrite except_0_later.
+    Qed.
+
+    Lemma step_fupd_plain_forall Eo Ei {A} (Φ : A → PROP) `{!∀ x, Plain (Φ x)} :
+      Ei ⊆ Eo →
+      (|={Eo}[Ei]▷=> ∀ x, Φ x) ⊣⊢ (∀ x, |={Eo}[Ei]▷=> Φ x).
+    Proof.
+      intros. apply (anti_symm _).
+      { apply forall_intro=> x. by rewrite (forall_elim x). }
+      trans (∀ x, |={Eo}=> ▷ ◇ Φ x)%I.
+      { apply forall_mono=> x. by rewrite step_fupd_plain. }
+      rewrite -fupd_plain_forall'. apply fupd_elim.
+      rewrite -(fupd_except_0 Ei Eo) -step_fupd_intro //.
+      by rewrite -later_forall -except_0_forall.
+    Qed.
+  End fupd_sbi_derived.
 End fupd_derived.
-
-Section fupd_derived_sbi.
-  Context {SI : sidx} {PROP : bi} `{!BiFUpd PROP, !Sbi PROP, !BiFUpdSbi PROP, !BiAffine PROP}.
-  Implicit Types P Q R : PROP.
-
-  Lemma fupd_keep_si_pure {E1 E2} E2' Pi R :
-    (|={E1,E2'}=> <si_pure> Pi) ∧ (<si_pure> Pi ={E1,E2}=∗ R) ⊢ |={E1,E2}=> R.
-  Proof.
-    rewrite -{2}(fupd_trans E1 E1 E2) -(fupd_keep_si_pure' E2' Pi).
-    by rewrite -fupd_intro.
-  Qed.
-
-  Lemma fupd_keep_plainly {E1 E2} E2' P R :
-    (|={E1,E2'}=> ■ P) ∧ (P ={E1,E2}=∗ R) ⊢ |={E1,E2}=> R.
-  Proof.
-    rewrite -{2}(fupd_keep_si_pure E2' (<si_emp_valid> P) R).
-    by rewrite {2}si_pure_si_emp_valid_elim.
-  Qed.
-
-  Lemma fupd_plainly_later E P : (▷ |={E}=> ■ P) ⊢ |={E}=> ▷ ◇ P.
-  Proof.
-    by rewrite /plainly fupd_si_pure_later si_pure_si_emp_valid_elim.
-  Qed.
-
-  Lemma fupd_plainly_forall_2 E {A} (Φ : A → PROP) :
-    (∀ x, |={E}=> ■ Φ x) ⊢ |={E}=> ∀ x, Φ x.
-  Proof.
-    rewrite /plainly fupd_si_pure_forall_2.
-    by setoid_rewrite si_pure_si_emp_valid_elim; last apply _.
-  Qed.
-
-  Lemma fupd_plainly_mask E E' P : (|={E,E'}=> ■ P) ⊢ |={E}=> P.
-  Proof.
-    etrans; [|apply (fupd_keep_plainly E' P)]. apply and_intro; [done|].
-    apply wand_intro_l. by rewrite sep_elim_l -fupd_intro.
-  Qed.
-
-  Lemma fupd_plainly_laterN E n P : (▷^n |={E}=> ■ P) ⊢ |={E}=> ▷^n ◇ P.
-  Proof.
-    revert P. induction n as [|n IH]=> P /=.
-    { by rewrite -except_0_intro plainly_elim. }
-    rewrite -!later_laterN !laterN_later.
-    rewrite -plainly_idemp fupd_plainly_later.
-    by rewrite except_0_plainly_1 later_plainly_1 IH except_0_later.
-  Qed.
-
-  (** Laws for general plain propositions. *)
-  Lemma fupd_keep_plain {E1 E2} E2' P `{!Plain P} R :
-    (|={E1,E2'}=> P) ∧ (P ={E1,E2}=∗ R) ⊢ |={E1,E2}=> R.
-  Proof. by rewrite -{1}(plain_plainly P) fupd_keep_plainly. Qed.
-
-  Lemma fupd_plain_mask E E' P `{!Plain P} : (|={E,E'}=> P) ⊢ |={E}=> P.
-  Proof. by rewrite {1}(plain P) fupd_plainly_mask. Qed.
-
-  (** This is an alternative version of [fupd_keep_plain] that might look more
-  intuitive, but is more annoying to use: we can eliminate a [fupd] that
-  "consumes" [R] to produce some plain [P] without actually using up [R]. *)
-  Lemma fupd_keep_plain_sep {E} E' P `{!Plain P} R :
-    (R ={E,E'}=∗ P) -∗ R -∗ |={E}=> P ∗ R.
-  Proof.
-    apply entails_wand, wand_intro_r.
-    etrans; [|apply (fupd_keep_plain E' P)]. apply and_intro.
-    - by rewrite wand_elim_l.
-    - rewrite sep_elim_r -fupd_intro. by apply wand_intro_l.
-  Qed.
-
-  Lemma fupd_plain_later E P `{!Plain P} : (▷ |={E}=> P) ⊢ |={E}=> ▷ ◇ P.
-  Proof. by rewrite {1}(plain P) fupd_plainly_later. Qed.
-  Lemma fupd_plain_laterN E n P `{!Plain P} : (▷^n |={E}=> P) ⊢ |={E}=> ▷^n ◇ P.
-  Proof. by rewrite {1}(plain P) fupd_plainly_laterN. Qed.
-
-  Lemma fupd_plain_forall_2 E {A} (Φ : A → PROP) `{!∀ x, Plain (Φ x)} :
-    (∀ x, |={E}=> Φ x) ⊢ |={E}=> ∀ x, Φ x.
-  Proof.
-    rewrite -fupd_plainly_forall_2. apply forall_mono=> x.
-    by rewrite {1}(plain (Φ _)).
-  Qed.
-  Lemma fupd_plain_forall E1 E2 {A} (Φ : A → PROP) `{!∀ x, Plain (Φ x)} :
-    E2 ⊆ E1 →
-    (|={E1,E2}=> ∀ x, Φ x) ⊣⊢ (∀ x, |={E1,E2}=> Φ x).
-  Proof.
-    intros. apply (anti_symm _); first apply fupd_forall.
-    trans (∀ x, |={E1}=> Φ x)%I.
-    { apply forall_mono=> x. by rewrite fupd_plain_mask. }
-    rewrite fupd_plain_forall_2. apply fupd_elim.
-    rewrite {1}(plain (∀ x, Φ x)) (fupd_mask_intro_discard E1 E2 (■ _)) //.
-    by rewrite plainly_elim.
-  Qed.
-  Lemma fupd_plain_forall' E {A} (Φ : A → PROP) `{!∀ x, Plain (Φ x)} :
-    (|={E}=> ∀ x, Φ x) ⊣⊢ (∀ x, |={E}=> Φ x).
-  Proof. by apply fupd_plain_forall. Qed.
-
-  Lemma step_fupd_plain Eo Ei P `{!Plain P} : (|={Eo}[Ei]▷=> P) ⊢ |={Eo}=> ▷ ◇ P.
-  Proof.
-    rewrite -(fupd_plain_mask _ Ei (▷ ◇ P)).
-    apply fupd_elim. by rewrite fupd_plain_mask -fupd_plain_later.
-  Qed.
-
-  Lemma step_fupdN_plain Eo Ei n P `{!Plain P} : (|={Eo}[Ei]▷=>^n P) ⊢ |={Eo}=> ▷^n ◇ P.
-  Proof.
-    induction n as [|n IH].
-    - by rewrite -fupd_intro -except_0_intro.
-    - rewrite Nat.iter_succ step_fupd_fupd IH !fupd_trans step_fupd_plain.
-      apply fupd_mono. destruct n as [|n]; simpl.
-      * by rewrite except_0_idemp.
-      * by rewrite except_0_later.
-  Qed.
-
-  Lemma step_fupd_plain_forall Eo Ei {A} (Φ : A → PROP) `{!∀ x, Plain (Φ x)} :
-    Ei ⊆ Eo →
-    (|={Eo}[Ei]▷=> ∀ x, Φ x) ⊣⊢ (∀ x, |={Eo}[Ei]▷=> Φ x).
-  Proof.
-    intros. apply (anti_symm _).
-    { apply forall_intro=> x. by rewrite (forall_elim x). }
-    trans (∀ x, |={Eo}=> ▷ ◇ Φ x)%I.
-    { apply forall_mono=> x. by rewrite step_fupd_plain. }
-    rewrite -fupd_plain_forall'. apply fupd_elim.
-    rewrite -(fupd_except_0 Ei Eo) -step_fupd_intro //.
-    by rewrite -later_forall -except_0_forall.
-  Qed.
-End fupd_derived_sbi.
