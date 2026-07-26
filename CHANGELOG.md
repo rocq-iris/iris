@@ -34,6 +34,8 @@ Iris now depends on rocq-elpi (version 3).
 * Add lemma `bi.later_emp_2` (by Paolo G. Giarrusso, SkyLabs AI).
 * Add lemma `bi_affine_alt_later_emp` to give an alternative characterization
   of affine BIs in terms of `▷ emp ⊢ emp`.
+* Simplify lemma `big_sepS_filter_acc` to use the `filter` operation, and remove
+  `big_sepS_filter_acc'`.
 
 **Changes in `proofmode`:**
 
