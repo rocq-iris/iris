@@ -2,10 +2,16 @@ From iris.algebra Require Import stepindex ofe cmra.
 
 (** * [sidx] instance for [nat] *)
 (** This file provides an instantiation of the [sidx] stepindex type for [nat],
-which is the stepindex type traditionally used by Iris.
+called [natSI], which is the stepindex type traditionally used by Iris.
+
+The file also provides variants of (C)OFE and camera lemmas that are specialized
+to the [natSI] index type. These restated lemmas use [0], [S], [≤], [<] directly,
+so they can be used in combination with [lia], which does not unfold the
+projections of the [sidx] class.
 
 Side-effect: every development importing this file will automatically use finite
-indices due to the declared instances and canonical structures for [sidx]. *)
+indices due to the declared instances and canonical structures for [sidx]. The
+names of the specialized lemmas shadow the names of the original lemmas. *)
 
 Lemma nat_sidx_mixin : SIdxMixin lt le 0 S.
 Proof.
@@ -24,16 +30,8 @@ Global Existing Instance natSI | 0.
 Global Instance nat_sidx_finite : SIdxFinite natSI.
 Proof. intros [|n]; eauto. Qed.
 
-(** We define a notion of finite OFEs and COFEs that matches Iris's traditional
-definitions, and makes it easier to define OFEs and COFEs specialized to the
-[natSI] index type. *)
-
 Section finite.
   Local Set Default Proof Using "Type*".
-
-  (** Variants of lemmas with [S] and [≤] that use the definitions on [nat]
-  directly. These are convenient in combination with [lia], which does not
-  unfold the projections of the [sidx] class. *)
 
   Lemma dist_later_S {A : ofe} (n : nat) (a b : A) :
     a ≡{n}≡ b ↔ dist_later (S n) a b.
@@ -80,24 +78,17 @@ Section finite.
     by rewrite dist_later_S.
   Qed.
 
-  (** Shorthand for defining OFEs that only work for [natSI] *)
+  (** Shorthands for defining (C)OFEs that only work for [natSI] *)
   Lemma ofe_mixin_finite A `{!Equiv A, !Dist A} :
     (∀ x y : A, x ≡ y ↔ ∀ n, x ≡{n}≡ y) →
     (∀ n, Equivalence (@dist natSI A _ n)) →
     (∀ n (x y : A), x ≡{S n}≡ y → x ≡{n}≡ y) → (* [S] instead of [<] *)
     OfeMixin A.
-  Proof.
-    intros; split; [done..|].
-    intros n m x y Heq Hlt. induction Hlt; eauto.
-  Qed.
+  Proof. apply ofe_mixin_finite. Qed.
 
-  (** Shorthand for defining COFEs that only work for [natSI] *)
-  Program Definition cofe_finite {A} (compl : Compl A)
-      (conv_compl: ∀ n c, compl c ≡{n}≡ c n) : Cofe A :=
-    {| compl := compl; lbcompl n Hn := False_rect _ (SIdx.limit_finite _ Hn) |}.
-  Next Obligation. auto. Qed.
-  Next Obligation. intros. simpl. by destruct (SIdx.limit_finite _ _). Qed.
-  Next Obligation. intros. simpl. by destruct (SIdx.limit_finite _ _). Qed.
+  Definition cofe_finite {A} (compl : Compl A)
+      (conv_compl : ∀ n c, compl c ≡{n}≡ c n) : Cofe A :=
+    cofe_finite compl conv_compl.
 End finite.
 
 (** For backwards compatibility, we define the tactic [f_contractive_fin] that

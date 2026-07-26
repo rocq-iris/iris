@@ -322,6 +322,29 @@ Section ofe.
   Proof. intros ?? EQ. unfold_leibniz. apply (is_solve_proper_subrelation EQ). Qed.
 End ofe.
 
+(** Shorthands for defining (C)OFEs that only work for finite step-indexing. *)
+Lemma ofe_mixin_finite `{!SIdxFinite SI} A `{!Equiv A, !Dist A} :
+  (∀ x y : A, x ≡ y ↔ ∀ n, x ≡{n}≡ y) →
+  (∀ n, Equivalence (@dist SI A _ n)) →
+  (∀ n (x y : A), x ≡{Sᵢ n}≡ y → x ≡{n}≡ y) → (* [S] instead of [<] *)
+  OfeMixin A.
+Proof.
+  intros ?? HdistS; split; [done..|]. intros n m x y Heq Hle.
+  induction (SIdx.lt_wf n) as [n _ IH].
+  apply SIdx.le_lteq in Hle as [Hlt| ->]; [|done].
+  destruct (finite_index n) as [->|[n' ->]].
+  - by apply SIdx.nlt_0_r in Hlt.
+  - eapply IH;
+      [by apply SIdx.lt_succ_diag_r|by apply HdistS|by apply SIdx.lt_succ_r].
+Qed.
+
+Program Definition cofe_finite `{!SIdxFinite SI} {A} (compl : Compl A)
+    (conv_compl: ∀ n c, compl c ≡{n}≡ c n) : Cofe A :=
+  {| compl := compl; lbcompl n Hn := False_rect _ (SIdx.limit_finite _ Hn) |}.
+Next Obligation. auto. Qed.
+Next Obligation. intros. simpl. by destruct (SIdx.limit_finite _ _). Qed.
+Next Obligation. intros. simpl. by destruct (SIdx.limit_finite _ _). Qed.
+
 (** Contractive functions *)
 (** Defined as a record to avoid eager unfolding. *)
 Record dist_later {SI : sidx} `{!Dist A} (n : SI) (x y : A) : Prop :=
