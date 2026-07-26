@@ -20,6 +20,12 @@ Iris now depends on rocq-elpi (version 3).
   obtain a closure operation on OFEs. (by Simcha van Collem)
 * Remove incorrect unit instance for `max_Z`. (by Markus de Medeiros)
 
+**Changes in `si_logic`:**
+
+* Make the `siProp` parametric in the type of "step indices" to prepare for the
+  support of transfinite step indexing. Internally, `siProp` still uses finite
+  step indexing (i.e., `nat`), so this is only an intermediate step.
+
 **Changes in `bi`:**
 
 * Change atomic update notations (`AU` and `AACC`) to level 0.
@@ -61,6 +67,11 @@ Iris now depends on rocq-elpi (version 3).
   characterization of timeless propositions) to use the `<only0>` modality.
 * Add commuting rules for monPred's `<subj>` modality with `<pers>`, `<absorb>`,
   `<affine>` and `□`. Add a rule to apply a `-∗` under the `<subj>` modality.
+* Make the `bi` folder (with the exception of `monPred`) parametric in the type
+  of "step indices" to prepare for the support of transfinite step indexing. The
+  laws of the BI interfaces have not been changed, so BIs cannot yet be
+  instantiated with logics that actually use Transfinite step-indexing. (by
+  Simon Spies)
 
 **Changes in `proofmode`:**
 
