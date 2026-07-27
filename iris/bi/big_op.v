@@ -2857,7 +2857,7 @@ Section gset.
       ([∗ set] y ∈ filter φ X, Φ y) ∗
       (([∗ set] y ∈ filter φ X, Φ y) -∗ [∗ set] y ∈ X, Φ y).
   Proof.
-    rewrite -{1 4}(filter_union_complement_L φ X X) big_sepS_union; last set_solver.
+    rewrite -{1 4}(filter_union_complement_L φ X) big_sepS_union; last set_solver.
     by apply entails_wand, sep_mono_r, wand_intro_l.
   Qed.
 
