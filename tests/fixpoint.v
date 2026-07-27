@@ -12,14 +12,14 @@ Section fixpoint.
   for details. *)
   Lemma ind_test (a : A) :
     ∀ x, L x -∗ x ≡ a.
-  Proof.
+  Proof using Type*.
     iApply (least_fixpoint_ind F); first by solve_proper. Undo.
     iApply (least_fixpoint_ind_wf F); first by solve_proper. Undo.
   Abort.
 
   Lemma coind_test (a : A) :
     ∀ x, x ≡ a -∗ G x.
-  Proof.
+  Proof using Type*.
     iApply (greatest_fixpoint_coind F); first by solve_proper. Undo.
     iApply (greatest_fixpoint_paco F); first by solve_proper. Undo.
   Abort.
