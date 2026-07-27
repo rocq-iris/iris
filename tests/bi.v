@@ -121,7 +121,7 @@ Section tests.
     Lemma match_absorbing :
       Absorbing (PROP:=PROP) (∃ b : bool, if b then False else False).
     Proof. apply _. Qed.
-    Lemma match_timeless :
+    Lemma match_timeless `{!BiLöb PROP} :
       Timeless (PROP:=PROP) (∃ b : bool, if b then False else False).
     Proof. apply _. Qed.
     Lemma match_plain `{!Sbi PROP} :
@@ -134,7 +134,7 @@ Section tests.
     Proof. apply _. Qed.
 
     (* From https://gitlab.mpi-sws.org/iris/iris/-/issues/576. *)
-    Lemma pair_timeless `{!Timeless (emp%I : PROP)} (m : gset (nat * nat)) :
+    Lemma pair_timeless `{!BiLöb PROP, !Timeless (emp%I : PROP)} (m : gset (nat * nat)) :
       Timeless (PROP:=PROP) ([∗ set] '(k1, k2) ∈ m, False).
     Proof. apply _. Qed.
 

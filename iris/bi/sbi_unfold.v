@@ -1,5 +1,10 @@
 From iris.bi Require Export cmra internal_eq.
 Local Set Default Proof Using "Type*".
+Local Open Scope sidx_scope.
+
+Local Hint Extern 1 (_ ≤ _) => etrans; [done|] : core.
+Local Hint Extern 1 (_ < _) => eapply SIdx.lt_le_trans; [done|] : core.
+Local Hint Extern 1 (_ < _) => eapply SIdx.le_lt_trans; [done|] : core.
 
 (** The tactic takes a (bi-)entailment of plain propositions and turns it into a
 a (bi-)implication in the pure step-indexed model. For example, given the goal:
@@ -61,7 +66,7 @@ Export sbi_unfold_closure_indicator (sbi_unfold_closure_indicator).
 Import sbi_unfold_closure_indicator (DownClosed, NotClosed).
 
 Class SbiUnfold {SI : sidx} `{!Sbi PROP} (clo : sbi_unfold_closure_indicator)
-    (P : PROP) (Pi : nat → Prop) := {
+    (P : PROP) (Pi : SI → Prop) := {
   sbi_unfold_closed n1 n2 : clo = DownClosed → Pi n1 → n2 ≤ n1 → Pi n2;
   (* If [closed] then [SiProp_downclose] is not needed, so use the smart
   constructor [SbiUnfold_closed] below. *)
@@ -74,7 +79,7 @@ Lemma SbiUnfold_closed {SI : sidx} `{!Sbi PROP} clo (P : PROP) Pi
   P ⊣⊢ <si_pure> SiProp Pi Piclosed → SbiUnfold clo P Pi.
 Proof.
   intros HP. split; [naive_solver|]. rewrite HP.
-  f_equiv. split=> n; rewrite /siProp_holds /=; naive_solver eauto with lia.
+  f_equiv. split=> n; rewrite /siProp_holds /=; naive_solver.
 Qed.
 
 (* Implications and bi-implications need to be down closed when [clo = true],
@@ -82,17 +87,17 @@ see e.g., [sbi_unfold_impl]. We use the following definition and smart
 constructor to achieve that without having two instances. Occurrences of
 [sbi_unfold_maybe_downclose] will be simplified away by the top-level
 [sbi_unfold] tactic. *)
-Definition sbi_unfold_maybe_downclose (clo : sbi_unfold_closure_indicator)
-    (Pi : nat → Prop) (n : nat) : Prop :=
+Definition sbi_unfold_maybe_downclose {SI : sidx}
+    (clo : sbi_unfold_closure_indicator)
+    (Pi : SI → Prop) (n : SI) : Prop :=
   if clo is DownClosed then ∀ n', n' ≤ n → Pi n' else Pi n.
 
 Lemma SbiUnfold_downclose {SI : sidx} `{!Sbi PROP} clo (P : PROP) Pi :
   P ⊣⊢ <si_pure> SiProp_downclose Pi →
   SbiUnfold clo P (sbi_unfold_maybe_downclose clo Pi).
 Proof.
-  destruct clo; [|by split].
-  intros HP. split; [naive_solver eauto with lia|]. rewrite HP.
-  f_equiv. split=> n; rewrite /siProp_holds /=; naive_solver eauto with lia.
+  destruct clo; simpl; [|by split]. intros HP. split; [naive_solver|].
+  rewrite HP. f_equiv. split=> n; rewrite /siProp_holds /=. naive_solver.
 Qed.
 
 Lemma sbi_unfold_closed_weaken {SI : sidx} `{!Sbi PROP} clo (P : PROP) Pi :
@@ -142,27 +147,24 @@ Section sbi_unfold.
     apply: SbiUnfold_closed. rewrite -si_pure_pure. f_equiv. by siProp.unseal.
   Qed.
 
-  (** TODO: Remove [nat_to_sidx] in the lemmas below once [siProp] has been
-  ported to support any [sidx]. *)
   Global Instance sbi_unfold_internal_eq {A : ofe} clo (x y : A) :
-    SbiUnfold clo (x ≡ y) (λ n, x ≡{nat_to_sidx n}≡ y).
+    SbiUnfold clo (x ≡ y) (λ n, x ≡{n}≡ y).
   Proof.
-    apply: SbiUnfold_closed; [by eauto using dist_le, nat_to_sidx_mono|].
+    apply: SbiUnfold_closed; [by eauto using dist_le|].
     intros ?. rewrite /internal_eq. f_equiv. by siProp.unseal.
   Qed.
 
   Global Instance sbi_unfold_internal_cmra_valid {A : cmra} clo (x : A) :
-    SbiUnfold clo (✓ x) (λ n, ✓{nat_to_sidx n} x).
+    SbiUnfold clo (✓ x) (λ n, ✓{n} x).
   Proof.
-    apply: SbiUnfold_closed; [by eauto using cmra_validN_le, nat_to_sidx_mono|].
+    apply: SbiUnfold_closed; [by eauto using cmra_validN_le|].
     intros ?. rewrite /internal_cmra_valid. f_equiv. by siProp.unseal.
   Qed.
 
   Global Instance sbi_unfold_internal_included {A : cmra} clo (x y : A) :
-    SbiUnfold clo (x ≼ y) (λ n, x ≼{nat_to_sidx n} y).
+    SbiUnfold clo (x ≼ y) (λ n, x ≼{n} y).
   Proof.
-    apply: SbiUnfold_closed;
-      [by eauto using cmra_includedN_le, nat_to_sidx_mono|].
+    apply: SbiUnfold_closed; [by eauto using cmra_includedN_le|].
     intros ?. rewrite /internal_included /internal_eq -si_pure_exist.
     f_equiv. by siProp.unseal.
   Qed.
@@ -211,7 +213,7 @@ Section sbi_unfold.
   Proof.
     intros [? HP] [? HQ]. apply SbiUnfold_downclose.
     rewrite HP HQ -si_pure_impl. f_equiv.
-    split=> n /=; siProp.unseal; naive_solver eauto with lia.
+    split=> n /=; siProp.unseal; naive_solver.
   Qed.
 
   Global Instance sbi_unfold_wand clo P Q Pi Qi :
@@ -221,7 +223,7 @@ Section sbi_unfold.
   Proof.
     intros [? HP] [? HQ]. apply SbiUnfold_downclose.
     rewrite HP HQ -si_pure_impl_wand. f_equiv.
-    split=> n /=; siProp.unseal; naive_solver eauto with lia.
+    split=> n /=; siProp.unseal; naive_solver.
   Qed.
 
   Global Instance sbi_unfold_iff clo P Q Pi Qi :
@@ -231,7 +233,7 @@ Section sbi_unfold.
   Proof.
     intros [? HP] [? HQ]. apply SbiUnfold_downclose.
     rewrite HP HQ -si_pure_iff. f_equiv.
-    split=> n /=; rewrite /bi_iff; siProp.unseal; naive_solver eauto with lia.
+    split=> n /=; rewrite /bi_iff; siProp.unseal; naive_solver.
   Qed.
 
   Global Instance sbi_unfold_iff_wand clo P Q Pi Qi :
@@ -241,7 +243,7 @@ Section sbi_unfold.
   Proof.
     intros [? HP] [? HQ]. apply SbiUnfold_downclose.
     rewrite HP HQ -si_pure_impl_iff_wand. f_equiv.
-    split=> n /=; rewrite /bi_iff; siProp.unseal; naive_solver eauto with lia.
+    split=> n /=; rewrite /bi_iff; siProp.unseal; naive_solver.
   Qed.
 
   Global Instance sbi_unfold_forall {A} clo (Φ : A → PROP) Φi :
@@ -250,7 +252,7 @@ Section sbi_unfold.
   Proof.
     intros HΦ. split; [naive_solver|]. etrans; [f_equiv=> x; apply HΦ|].
     rewrite -si_pure_forall. f_equiv.
-    split=> n /=; siProp.unseal; destruct clo; naive_solver eauto with lia.
+    split=> n /=; siProp.unseal; destruct clo; naive_solver.
   Qed.
 
   (** The instance for existential needs the sub-expression to be already down
@@ -262,19 +264,16 @@ Section sbi_unfold.
     intros HΦ. apply: SbiUnfold_closed; [naive_solver|].
     intros ?. etrans; [f_equiv=> x; apply HΦ|].
     rewrite -si_pure_exist. f_equiv.
-    split=> n /=; siProp.unseal; destruct clo; naive_solver eauto with lia.
+    split=> n /=; siProp.unseal; destruct clo; naive_solver.
   Qed.
 
   Global Instance sbi_unfold_later clo P Pi :
     SbiUnfold clo P Pi →
-    SbiUnfold clo (▷ P) (λ n, match n with 0 => True | S n' => Pi n' end).
+    SbiUnfold clo (▷ P) (λ n, ∀ n', n' < n → Pi n').
   Proof.
-    intros [? HP]. split.
-    { intros [] []; naive_solver eauto with lia. }
-    rewrite HP -si_pure_later. f_equiv.
-    split=> n /=; siProp.unseal; simpl. split.
-    - destruct n; intros ? []; naive_solver eauto with lia.
-    - destruct n; [done|]. intros HPi n' ?. apply (HPi (S n')); lia.
+    intros HP. split; [naive_solver|]. etrans; [f_equiv; apply HP|].
+    rewrite -si_pure_later. f_equiv.
+    split=> n /=; siProp.unseal; destruct clo; naive_solver.
   Qed.
 End sbi_unfold.
 

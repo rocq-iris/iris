@@ -475,14 +475,11 @@ Section primitive.
 
   (** Non-expansiveness and setoid morphisms *)
   Lemma si_pure_ne : NonExpansive (@uPred_si_pure M).
-  Proof.
-    intros n Pi Pi' HPi. unseal; split; intros. apply HPi.
-    by rewrite nat_to_sidx_id.
-  Qed.
+  Proof. intros n Pi Pi' HPi. unseal; split; intros. by apply HPi. Qed.
 
   Lemma si_emp_valid_ne : NonExpansive (@uPred_si_emp_valid M).
   Proof.
-    intros n P P' HP. unseal; split=> n'. rewrite nat_to_sidx_id.
+    intros n P P' HP. unseal; split=> n'.
     intros. apply HP; auto using ucmra_unit_validN.
   Qed.
 
@@ -575,11 +572,18 @@ Section primitive.
    (∀ x, <si_pure> Φi x) ⊢ <si_pure> siProp_forall Φi.
   Proof. by unseal; siProp_primitive.unseal. Qed.
   Lemma si_pure_later Pi : <si_pure> siProp_later Pi ⊣⊢ ▷ <si_pure> Pi.
-  Proof. by unseal; siProp_primitive.unseal. Qed.
+  Proof.
+    unseal; siProp_primitive.unseal. split=> -[|n] x ? /=; [split; lia|].
+    split=> HPi; [apply HPi; lia|]. intros n' ?.
+    by eapply siProp_closed, SIdx.lt_succ_r.
+  Qed.
 
   Lemma si_emp_valid_later_1 P :
     siProp_entails (<si_emp_valid> ▷ P) (siProp_later (<si_emp_valid> P)).
-  Proof. by unseal; siProp_primitive.unseal. Qed.
+  Proof.
+    unseal; siProp_primitive.unseal. split=> -[|n] /=; [lia|].
+    intros ? n' ?. by eapply uPred_mono, SIdx.lt_succ_r.
+  Qed.
   Lemma si_emp_valid_exist_1 {A} (Φ : A → uPred M) :
     siProp_entails (<si_emp_valid> ∃ x, Φ x)
                    (siProp_exist (λ x, <si_emp_valid> Φ x)).
@@ -608,7 +612,7 @@ Section primitive.
                    (siProp_internal_eq P Q).
   Proof.
     unseal; siProp_primitive.unseal. split=> n /=.
-    setoid_rewrite (left_id ε op). rewrite nat_to_sidx_id. split; naive_solver.
+    setoid_rewrite (left_id ε op). split; naive_solver.
   Qed.
 
   (** Introduction and elimination rules *)
@@ -720,11 +724,46 @@ Section primitive.
     unseal; split=> -[|n] /= x ? HP; first done.
     apply uPred_mono with (S n) x; eauto using cmra_validN_S.
   Qed.
+
   Lemma later_forall_2 {A} (Φ : A → uPred M) : (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a.
   Proof. unseal; by split=> -[|n] x. Qed.
+
+  (** FIXME: The rule [later_false_exist] is derivable from Löb and
+  [later_exist_false] with finite step-indexing, but not with Transfinite. To
+  ensure forwards compatibility with !1273, we prove the law directly in the
+  model instead of deriving it. *)
+  Lemma later_false_exist {A} (Φ : A → uPred M) :
+    (▷ False → ∃ a, Φ a) ⊢ ∃ a, ▷ False → Φ a.
+  Proof.
+    unseal; siProp_primitive.unseal; split=> -n x Hx HΦ /=.
+    destruct (HΦ 0 x) as [a Ha]; [done|lia| |done|].
+    { by eapply cmra_validN_le, SIdx.le_0_l. }
+    exists a. intros [|n'] x' ????; [|done].
+    eapply uPred_mono; [done|by apply cmra_included_includedN|done].
+  Qed.
   Lemma later_exist_false {A} (Φ : A → uPred M) :
     (▷ ∃ a, Φ a) ⊢ ▷ False ∨ (∃ a, ▷ Φ a).
   Proof. unseal; split=> -[|[|n]] x /=; eauto. Qed.
+
+  (** FIXME: The rule [later_false_sep] is derivable from Löb and
+  [later_sep_1] with finite step-indexing, but not with Transfinite. To
+  ensure forwards compatibility with !1273, we prove the law directly in the
+  model instead of deriving it. *)
+  Lemma later_false_sep P Q :
+    (▷ False → P ∗ Q) ⊢ (▷ False → P) ∗ (▷ False → Q).
+  Proof.
+    unseal; siProp_primitive.unseal; split=> -n x Hx HΦ /=.
+    destruct (HΦ 0 x) as (x1 & x2 & ? & ? & ?); [done|lia| |done|].
+    { by eapply cmra_validN_le, SIdx.le_0_l. }
+    destruct (cmra_extend 0 x x1 x2) as (y1&y2&Hx'&Hy1&Hy2); [|done|].
+    { by eapply cmra_validN_le, SIdx.le_0_l. }
+    exists y1, y2.
+    split_and!; [by eapply equiv_dist|intros [|n'] ?????; [|done]..].
+    - eapply uPred_mono; [done|..|done].
+      rewrite -Hy1. by apply cmra_included_includedN.
+    - eapply uPred_mono; [done|..|done].
+      rewrite -Hy2. by apply cmra_included_includedN.
+  Qed.
   Lemma later_sep_1 P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q.
   Proof.
     unseal; split=> n x ?.
@@ -806,7 +845,7 @@ Section primitive.
     split=> -[|n] x /= ? Hax; first by eauto using ucmra_unit_leastN.
     destruct Hax as [y ?].
     destruct (cmra_extend n x a y) as (a'&y'&Hx&?&?); auto using cmra_validN_S.
-    exists a'. rewrite Hx nat_to_sidx_id. eauto using cmra_includedN_l.
+    exists a'. rewrite Hx. eauto using cmra_includedN_l.
   Qed.
 
   Lemma bupd_ownM_updateP x (Φ : M → Prop) :
@@ -825,13 +864,13 @@ Section primitive.
   Proof.
     unseal; siProp_primitive.unseal.
     split=> n y /= Hval Hf. exists y. split; [done|]. intros a.
-    rewrite nat_to_sidx_id. destruct (Hf a) as [xf ?]; eauto.
+    destruct (Hf a) as [xf ?]; eauto.
   Qed.
 
   Lemma ownM_valid (a : M) : uPred_ownM a ⊢ <si_pure> siProp_cmra_valid a.
   Proof.
     unseal; siProp_primitive.unseal. split=> n x Hv [a' ?].
-    ofe_subst. rewrite nat_to_sidx_id. eauto using cmra_validN_op_l.
+    ofe_subst. eauto using cmra_validN_op_l.
   Qed.
 End primitive.
 End uPred_primitive.

@@ -84,7 +84,7 @@ Section telescopes.
     (∀ x, Timeless (Ψ x)) → Timeless (∀.. x, Ψ x).
   Proof. rewrite bi_tforall_forall. apply _. Qed.
 
-  Global Instance bi_texist_timeless Ψ :
+  Global Instance bi_texist_timeless `{!BiLöb PROP} Ψ :
     (∀ x, Timeless (Ψ x)) → Timeless (∃.. x, Ψ x).
   Proof. rewrite bi_texist_exist. apply _. Qed.
 End telescopes.

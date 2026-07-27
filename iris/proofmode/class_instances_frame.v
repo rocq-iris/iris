@@ -413,7 +413,7 @@ Global Instance frame_later p R R' P Q Q' :
   Frame p R' (▷ P) Q'. (* Default cost > 1 *)
 Proof.
   rewrite /Frame /MakeLaterN /MaybeIntoLaterN=>-[->] <- <-.
-  by rewrite later_intuitionistically_if_2 later_sep.
+  by rewrite later_intuitionistically_if_2 -later_sep_2.
 Qed.
 Global Instance frame_laterN p n R R' P Q Q' :
   TCNoBackTrack (MaybeIntoLaterN true n R' R) →
@@ -421,7 +421,7 @@ Global Instance frame_laterN p n R R' P Q Q' :
   Frame p R' (▷^n P) Q'. (* Default cost > 1 *)
 Proof.
   rewrite /Frame /MakeLaterN /MaybeIntoLaterN=>-[->] <- <-.
-  by rewrite laterN_intuitionistically_if_2 laterN_sep.
+  by rewrite laterN_intuitionistically_if_2 -laterN_sep_2.
 Qed.
 
 Global Instance frame_bupd `{!BiBUpd PROP} p R P Q :

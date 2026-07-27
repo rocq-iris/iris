@@ -575,8 +575,7 @@ Section plainly.
       by rewrite -entails_wand // -(plainly_emp_intro True) True_impl.
   Qed.
 
-  (** TODO: Remove [SIdxFinite] once we use [SI] instead of [nat] for [siProp]. *)
-  Global Instance internal_eq_timeless `{!SIdxFinite SI} P Q :
+  Global Instance internal_eq_timeless P Q :
     Timeless P → Timeless Q → Timeless (PROP:=PROP) (P ≡ Q).
   Proof. rewrite prop_ext. apply _. Qed.
 

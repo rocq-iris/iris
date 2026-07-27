@@ -84,6 +84,7 @@
 1 goal
   
   SI : sidx
+  SIdxFinite0 : SIdxFinite SI
   PROP : bi
   ============================
   "H" : ∃ x x0 : nat, <affine> ⌜x = x0⌝
@@ -92,6 +93,7 @@
 1 goal
   
   SI : sidx
+  SIdxFinite0 : SIdxFinite SI
   PROP : bi
   x : nat
   ============================
@@ -101,6 +103,7 @@
 1 goal
   
   SI : sidx
+  SIdxFinite0 : SIdxFinite SI
   PROP : bi
   x : nat
   ============================

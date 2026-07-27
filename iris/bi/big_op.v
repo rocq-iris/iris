@@ -168,15 +168,17 @@ Section sep_list.
   Global Instance big_sepL_nil_timeless `{!Timeless (emp%I : PROP)} Φ :
     Timeless ([∗ list] k↦x ∈ [], Φ k x).
   Proof. simpl; apply _. Qed.
-  Lemma big_sepL_timeless `{!Timeless (emp%I : PROP)} Φ l :
+  Lemma big_sepL_timeless `{!BiLöb PROP, !Timeless (emp%I : PROP)} Φ l :
     (∀ k x, l !! k = Some x → Timeless (Φ k x)) →
     Timeless ([∗ list] k↦x ∈ l, Φ k x).
   Proof. apply big_opL_closed; apply _. Qed.
-  Global Instance big_sepL_timeless' `{!Timeless (emp%I : PROP)} Φ l :
+  Global Instance big_sepL_timeless'
+      `{!BiLöb PROP, !Timeless (emp%I : PROP)} Φ l :
     (∀ k x, Timeless (Φ k x)) →
     Timeless ([∗ list] k↦x ∈ l, Φ k x).
   Proof. intros. apply big_sepL_timeless, _. Qed.
-  Global Instance big_sepL_timeless_id `{!Timeless (emp%I : PROP)} Ps :
+  Global Instance big_sepL_timeless_id
+      `{!BiLöb PROP, !Timeless (emp%I : PROP)} Ps :
     TCForall Timeless Ps → Timeless ([∗] Ps).
   Proof. induction 1; simpl; apply _. Qed.
 
@@ -392,14 +394,14 @@ Section sep_list.
     [∗] replicate (length l) P ⊣⊢ [∗ list] y ∈ l, P.
   Proof. induction l as [|x l]=> //=; by f_equiv. Qed.
 
-  Lemma big_sepL_later `{!BiAffine PROP} Φ l :
+  Lemma big_sepL_later `{!SIdxFinite SI, !BiAffine PROP} Φ l :
     ▷ ([∗ list] k↦x ∈ l, Φ k x) ⊣⊢ ([∗ list] k↦x ∈ l, ▷ Φ k x).
   Proof. apply (big_opL_commute _). Qed.
   Lemma big_sepL_later_2 Φ l :
     ([∗ list] k↦x ∈ l, ▷ Φ k x) ⊢ ▷ [∗ list] k↦x ∈ l, Φ k x.
   Proof. by rewrite (big_opL_commute _). Qed.
 
-  Lemma big_sepL_laterN `{!BiAffine PROP} Φ n l :
+  Lemma big_sepL_laterN `{!SIdxFinite SI, !BiAffine PROP} Φ n l :
     ▷^n ([∗ list] k↦x ∈ l, Φ k x) ⊣⊢ ([∗ list] k↦x ∈ l, ▷^n Φ k x).
   Proof. apply (big_opL_commute _). Qed.
   Lemma big_sepL_laterN_2 Φ n l :
@@ -678,11 +680,12 @@ Section sep_list2.
   Global Instance big_sepL2_nil_timeless `{!Timeless (emp%I : PROP)} Φ :
     Timeless ([∗ list] k↦y1;y2 ∈ []; [], Φ k y1 y2).
   Proof. simpl; apply _. Qed.
-  Lemma big_sepL2_timeless `{!Timeless (emp%I : PROP)} Φ l1 l2 :
+  Lemma big_sepL2_timeless `{!BiLöb PROP, !Timeless (emp%I : PROP)} Φ l1 l2 :
     (∀ k x1 x2, l1 !! k = Some x1 → l2 !! k = Some x2 → Timeless (Φ k x1 x2)) →
     Timeless ([∗ list] k↦y1;y2 ∈ l1;l2, Φ k y1 y2).
   Proof. apply big_sepL2_closed; apply _. Qed.
-  Global Instance big_sepL2_timeless' `{!Timeless (emp%I : PROP)} Φ l1 l2 :
+  Global Instance big_sepL2_timeless'
+      `{!BiLöb PROP, !Timeless (emp%I : PROP)} Φ l1 l2 :
     (∀ k x1 x2, Timeless (Φ k x1 x2)) →
     Timeless ([∗ list] k↦y1;y2 ∈ l1;l2, Φ k y1 y2).
   Proof. intros; apply big_sepL2_timeless, _. Qed.
@@ -953,7 +956,7 @@ Section sep_list2.
     by rewrite pure_True //left_id intuitionistically_elim wand_elim_l.
   Qed.
 
-  Lemma big_sepL2_later_1 `{!BiAffine PROP} Φ l1 l2 :
+  Lemma big_sepL2_later_1 `{!SIdxFinite SI, !BiAffine PROP} Φ l1 l2 :
     (▷ [∗ list] k↦y1;y2 ∈ l1;l2, Φ k y1 y2) ⊢ ◇ [∗ list] k↦y1;y2 ∈ l1;l2, ▷ Φ k y1 y2.
   Proof.
     rewrite !big_sepL2_alt later_and big_sepL_later (timeless ⌜ _ ⌝).
@@ -1307,11 +1310,11 @@ Section or_list.
   Global Instance big_orL_nil_timeless Φ :
     Timeless ([∨ list] k↦x ∈ [], Φ k x).
   Proof. simpl; apply _. Qed.
-  Global Instance big_orL_timeless Φ l :
+  Global Instance big_orL_timeless `{!BiLöb PROP} Φ l :
     (∀ k x, l !! k = Some x → Timeless (Φ k x)) →
     Timeless ([∨ list] k↦x ∈ l, Φ k x).
   Proof. apply big_opL_closed; apply _. Qed.
-  Global Instance big_orL_timeless' Φ l :
+  Global Instance big_orL_timeless' `{!BiLöb PROP} Φ l :
     (∀ k x, Timeless (Φ k x)) → Timeless ([∨ list] k↦x ∈ l, Φ k x).
   Proof. intros; apply big_orL_timeless, _. Qed.
 
@@ -1379,11 +1382,11 @@ Section or_list.
     ([∨ list] k↦x ∈ l, Φ k x) ∗ Q ⊣⊢ ([∨ list] k↦x ∈ l, Φ k x ∗ Q).
   Proof. setoid_rewrite (comm bi_sep). apply big_orL_sep_l. Qed.
 
-  Lemma big_orL_later Φ l :
+  Lemma big_orL_later `{!SIdxFinite SI} Φ l :
     l ≠ [] →
     ▷ ([∨ list] k↦x ∈ l, Φ k x) ⊣⊢ ([∨ list] k↦x ∈ l, ▷ Φ k x).
   Proof. apply (big_opL_commute1 _). Qed.
-  Lemma big_orL_laterN Φ n l :
+  Lemma big_orL_laterN `{!SIdxFinite SI} Φ n l :
     l ≠ [] →
     ▷^n ([∨ list] k↦x ∈ l, Φ k x) ⊣⊢ ([∨ list] k↦x ∈ l, ▷^n Φ k x).
   Proof. apply (big_opL_commute1 _). Qed.
@@ -1457,11 +1460,11 @@ Section sep_map.
   Global Instance big_sepM_empty_timeless `{!Timeless (emp%I : PROP)} Φ :
     Timeless ([∗ map] k↦x ∈ ∅, Φ k x).
   Proof. rewrite big_opM_empty. apply _. Qed.
-  Lemma big_sepM_timeless `{!Timeless (emp%I : PROP)} Φ m :
+  Lemma big_sepM_timeless `{!BiLöb PROP, !Timeless (emp%I : PROP)} Φ m :
     (∀ k x, m !! k = Some x → Timeless (Φ k x)) →
     Timeless ([∗ map] k↦x ∈ m, Φ k x).
   Proof. apply big_opM_closed; apply _. Qed.
-  Global Instance big_sepM_timeless' `{!Timeless (emp%I : PROP)} Φ m :
+  Global Instance big_sepM_timeless' `{!BiLöb PROP, !Timeless (emp%I : PROP)} Φ m :
     (∀ k x, Timeless (Φ k x)) → Timeless ([∗ map] k↦x ∈ m, Φ k x).
   Proof. intros; apply big_sepM_timeless, _. Qed.
 
@@ -1731,14 +1734,14 @@ Section sep_map.
     do 2 f_equiv. intros ?; naive_solver.
   Qed.
 
-  Lemma big_sepM_later `{!BiAffine PROP} Φ m :
+  Lemma big_sepM_later `{!SIdxFinite SI, !BiAffine PROP} Φ m :
     ▷ ([∗ map] k↦x ∈ m, Φ k x) ⊣⊢ ([∗ map] k↦x ∈ m, ▷ Φ k x).
   Proof. apply (big_opM_commute _). Qed.
   Lemma big_sepM_later_2 Φ m :
     ([∗ map] k↦x ∈ m, ▷ Φ k x) ⊢ ▷ [∗ map] k↦x ∈ m, Φ k x.
   Proof. by rewrite big_opM_commute. Qed.
 
-  Lemma big_sepM_laterN `{!BiAffine PROP} Φ n m :
+  Lemma big_sepM_laterN `{!SIdxFinite SI, !BiAffine PROP} Φ n m :
     ▷^n ([∗ map] k↦x ∈ m, Φ k x) ⊣⊢ ([∗ map] k↦x ∈ m, ▷^n Φ k x).
   Proof. apply (big_opM_commute _). Qed.
   Lemma big_sepM_laterN_2 Φ n m :
@@ -2244,11 +2247,12 @@ Section map2.
   Global Instance big_sepM2_empty_timeless `{!Timeless (emp%I : PROP)} Φ :
     Timeless ([∗ map] k↦x1;x2 ∈ ∅;∅, Φ k x1 x2).
   Proof. rewrite big_sepM2_alt map_zip_with_empty. apply _. Qed.
-  Lemma big_sepM2_timeless `{!Timeless (emp%I : PROP)} Φ m1 m2 :
+  Lemma big_sepM2_timeless `{!BiLöb PROP, !Timeless (emp%I : PROP)} Φ m1 m2 :
     (∀ k x1 x2, m1 !! k = Some x1 → m2 !! k = Some x2 → Timeless (Φ k x1 x2)) →
     Timeless ([∗ map] k↦x1;x2 ∈ m1;m2, Φ k x1 x2).
   Proof. apply big_sepM2_closed; apply _. Qed.
-  Global Instance big_sepM2_timeless' `{!Timeless (emp%I : PROP)} Φ m1 m2 :
+  Global Instance big_sepM2_timeless'
+      `{!BiLöb PROP, !Timeless (emp%I : PROP)} Φ m1 m2 :
     (∀ k x1 x2, Timeless (Φ k x1 x2)) →
     Timeless ([∗ map] k↦x1;x2 ∈ m1;m2, Φ k x1 x2).
   Proof. intros; apply big_sepM2_timeless, _. Qed.
@@ -2571,7 +2575,7 @@ Section map2.
     do 2 f_equiv. intros ?; naive_solver.
   Qed.
 
-  Lemma big_sepM2_later_1 `{!BiAffine PROP} Φ m1 m2 :
+  Lemma big_sepM2_later_1 `{!SIdxFinite SI, !BiAffine PROP} Φ m1 m2 :
     (▷ [∗ map] k↦x1;x2 ∈ m1;m2, Φ k x1 x2)
     ⊢ ◇ ([∗ map] k↦x1;x2 ∈ m1;m2, ▷ Φ k x1 x2).
   Proof.
@@ -2732,10 +2736,10 @@ Section gset.
   Global Instance big_sepS_empty_timeless `{!Timeless (emp%I : PROP)} Φ :
     Timeless ([∗ set] x ∈ ∅, Φ x).
   Proof. rewrite big_opS_empty. apply _. Qed.
-  Lemma big_sepS_timeless `{!Timeless (emp%I : PROP)} Φ X :
+  Lemma big_sepS_timeless `{!BiLöb PROP, !Timeless (emp%I : PROP)} Φ X :
     (∀ x, x ∈ X → Timeless (Φ x)) → Timeless ([∗ set] x ∈ X, Φ x).
   Proof. apply big_opS_closed; apply _. Qed.
-  Global Instance big_sepS_timeless' `{!Timeless (emp%I : PROP)} Φ X :
+  Global Instance big_sepS_timeless' `{!BiLöb PROP, !Timeless (emp%I : PROP)} Φ X :
     (∀ x, Timeless (Φ x)) → Timeless ([∗ set] x ∈ X, Φ x).
   Proof. intros; apply big_sepS_timeless, _. Qed.
 
@@ -3013,14 +3017,14 @@ Section gset.
     rewrite assoc wand_elim_r -assoc. apply sep_mono; done.
   Qed.
 
-  Lemma big_sepS_later `{!BiAffine PROP} Φ X :
+  Lemma big_sepS_later `{!SIdxFinite SI, !BiAffine PROP} Φ X :
     ▷ ([∗ set] y ∈ X, Φ y) ⊣⊢ ([∗ set] y ∈ X, ▷ Φ y).
   Proof. apply (big_opS_commute _). Qed.
   Lemma big_sepS_later_2 Φ X :
     ([∗ set] y ∈ X, ▷ Φ y) ⊢ ▷ ([∗ set] y ∈ X, Φ y).
   Proof. by rewrite big_opS_commute. Qed.
 
-  Lemma big_sepS_laterN `{!BiAffine PROP} Φ n X :
+  Lemma big_sepS_laterN `{!SIdxFinite SI, !BiAffine PROP} Φ n X :
     ▷^n ([∗ set] y ∈ X, Φ y) ⊣⊢ ([∗ set] y ∈ X, ▷^n Φ y).
   Proof. apply (big_opS_commute _). Qed.
   Lemma big_sepS_laterN_2 Φ n X :
@@ -3094,10 +3098,10 @@ Section gmultiset.
   Global Instance big_sepMS_empty_timeless `{!Timeless (emp%I : PROP)} Φ :
     Timeless ([∗ mset] x ∈ ∅, Φ x).
   Proof. rewrite big_opMS_empty. apply _. Qed.
-  Lemma big_sepMS_timeless `{!Timeless (emp%I : PROP)} Φ X :
+  Lemma big_sepMS_timeless `{!BiLöb PROP, !Timeless (emp%I : PROP)} Φ X :
     (∀ x, x ∈ X → Timeless (Φ x)) → Timeless ([∗ mset] x ∈ X, Φ x).
   Proof. apply big_opMS_closed; apply _. Qed.
-  Global Instance big_sepMS_timeless' `{!Timeless (emp%I : PROP)} Φ X :
+  Global Instance big_sepMS_timeless' `{!BiLöb PROP, !Timeless (emp%I : PROP)} Φ X :
     (∀ x, Timeless (Φ x)) → Timeless ([∗ mset] x ∈ X, Φ x).
   Proof. intros; apply big_sepMS_timeless, _. Qed.
 
@@ -3159,14 +3163,14 @@ Section gmultiset.
     ([∗ mset] y ∈ X, Φ y ∧ Ψ y) ⊢ ([∗ mset] y ∈ X, Φ y) ∧ ([∗ mset] y ∈ X, Ψ y).
   Proof. auto using and_intro, big_sepMS_mono, and_elim_l, and_elim_r. Qed.
 
-  Lemma big_sepMS_later `{!BiAffine PROP} Φ X :
+  Lemma big_sepMS_later `{!SIdxFinite SI, !BiAffine PROP} Φ X :
     ▷ ([∗ mset] y ∈ X, Φ y) ⊣⊢ ([∗ mset] y ∈ X, ▷ Φ y).
   Proof. apply (big_opMS_commute _). Qed.
   Lemma big_sepMS_later_2 Φ X :
     ([∗ mset] y ∈ X, ▷ Φ y) ⊢ ▷ [∗ mset] y ∈ X, Φ y.
   Proof. by rewrite big_opMS_commute. Qed.
 
-  Lemma big_sepMS_laterN `{!BiAffine PROP} Φ n X :
+  Lemma big_sepMS_laterN `{!SIdxFinite SI, !BiAffine PROP} Φ n X :
     ▷^n ([∗ mset] y ∈ X, Φ y) ⊣⊢ ([∗ mset] y ∈ X, ▷^n Φ y).
   Proof. apply (big_opMS_commute _). Qed.
   Lemma big_sepMS_laterN_2 Φ n X :

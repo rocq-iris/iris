@@ -25,7 +25,10 @@ Global Arguments into_laterable_result_laterable {_ _} P%_I Q%_I {_}.
 Global Hint Mode IntoLaterable - + ! - : typeclass_instances.
 
 Section instances.
-  Context {SI : sidx} `{!BiPersistentlyExist PROP}.
+  (** Many of the lemmas rely on distribution of [▷] and [∗], which only holds
+  when using finite step-indexing. In the future, we could investigate if an
+  alternative definition exists that works in the transfinite setting. *)
+  Context `{!SIdxFinite SI, !BiPersistentlyExist PROP}.
   Implicit Types P : PROP.
   Implicit Types Ps : list PROP.
 

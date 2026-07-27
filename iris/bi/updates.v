@@ -494,11 +494,12 @@ Section fupd_derived.
   Proof. by rewrite (big_opMS_commute _). Qed.
 
   (** Fancy updates that take a step derived rules. *)
-  Lemma step_fupd_wand Eo Ei P Q : (|={Eo}[Ei]▷=> P) -∗ (P -∗ Q) -∗ |={Eo}[Ei]▷=> Q.
+  Lemma step_fupd_wand Eo Ei P Q :
+    (|={Eo}[Ei]▷=> P) -∗ (P -∗ Q) -∗ |={Eo}[Ei]▷=> Q.
   Proof.
     apply entails_wand, wand_intro_l.
-    by rewrite (later_intro (P -∗ Q)) fupd_frame_l -later_sep fupd_frame_l
-               wand_elim_l.
+    rewrite (later_intro (P -∗ Q)) fupd_frame_l.
+    by rewrite later_sep_2 fupd_frame_l wand_elim_l.
   Qed.
 
   Lemma step_fupd_mask_frame_r Eo Ei Ef P :
@@ -516,7 +517,7 @@ Section fupd_derived.
     rewrite fupd_frame_l -(fupd_trans Eo1 Ei1 Ei2). f_equiv.
     rewrite (fupd_mask_intro_subseteq Ei1 Ei2 (|={_,_}=> emp)) //.
     rewrite fupd_frame_r. f_equiv.
-    rewrite [X in (X ∗ _)%I]later_intro -later_sep. f_equiv.
+    rewrite [X in (X ∗ _)%I]later_intro later_sep_2. f_equiv.
     rewrite fupd_frame_r -(fupd_trans Ei2 Ei1 Eo2). f_equiv.
     rewrite fupd_frame_l -(fupd_trans Ei1 Eo1 Eo2). f_equiv.
     by rewrite fupd_frame_r left_id.
@@ -530,7 +531,7 @@ Section fupd_derived.
   Proof.
     rewrite fupd_frame_l.
     apply fupd_mono.
-    rewrite [P in P ∗ _ ⊢ _](later_intro R) -later_sep fupd_frame_l.
+    rewrite [P in P ∗ _ ⊢ _](later_intro R) later_sep_2 fupd_frame_l.
     by apply later_mono, fupd_mono.
   Qed.
 
@@ -579,7 +580,7 @@ Section fupd_derived.
   Proof.
     apply entails_wand, wand_intro_l. induction n as [|n IH]=> /=.
     { by rewrite wand_elim_l. }
-    rewrite -IH -fupd_frame_l later_sep -fupd_frame_l.
+    rewrite -IH -fupd_frame_l -later_sep_2 -fupd_frame_l.
     by apply sep_mono; first apply later_intro.
   Qed.
 

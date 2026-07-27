@@ -48,8 +48,7 @@ Module löb_em. Section löb_em.
     - iExFalso. iLöb as "IH". iSpecialize ("HnotP" with "IH"). done.
   Qed.
 
-  (** TODO: Remove [SIdxFinite] once [siProp] has been ported to [sidx]. *)
-  Lemma later_inconsistent `{!SIdxFinite SI, !Sbi PROP} : ⊢@{PROP} False.
+  Lemma later_inconsistent `{!Sbi PROP} : ⊢@{PROP} False.
   Proof. apply later_soundness, later_anything. Qed.
 End löb_em. End löb_em.
 

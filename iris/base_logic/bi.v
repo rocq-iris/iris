@@ -119,8 +119,10 @@ Proof.
   - exact: later_mono.
   - exact: later_intro.
   - exact: @later_forall_2.
-  - exact: @later_exist_false.
-  - exact: later_sep_1.
+  - exact: @later_false_exist.
+  - intros _. exact: @later_exist_false.
+  - exact: later_false_sep.
+  - intros _. exact: later_sep_1.
   - exact: later_sep_2.
   - exact: later_persistently_1.
   - exact: later_persistently_2.

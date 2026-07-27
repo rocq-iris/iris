@@ -6,11 +6,11 @@ From iris.bi Require Export bi.
 From iris.proofmode Require Import proofmode.
 Import bi.
 
-(** TODO: Remove [SIdxFinite] and [Proof Using] once [siProp] has been ported
-to support any [sidx]. *)
 Set Default Proof Using "Type*".
 
 Section fixpoint_laws.
+  (** The lemmas in this file rely on the properties of [LimitPreserving], which
+  only hold when using finite step-indexing. *)
   Context `{!SIdxFinite SI} {PROP : bi}.
   Implicit Types P Q : PROP.
 
