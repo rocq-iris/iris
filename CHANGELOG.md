@@ -16,6 +16,8 @@ Iris now depends on rocq-elpi (version 3).
 * Add non-expansiveness instances for `intersection_with`, `difference_with`,
   `intersection`, and `difference` on `gmap`s. (by Simcha van Collem)
 * Generalize `ofe_mixin_finite` and `cofe_finite` to `SIdxFinite`.
+* Define a COFE structure on `chain A` (when using finite step-indexing) to
+  obtain a closure operation on OFEs. (by Simcha van Collem)
 
 **Changes in `bi`:**
 

@@ -13,6 +13,7 @@ iris/algebra/numbers.v
 iris/algebra/view.v
 iris/algebra/auth.v
 iris/algebra/gmap.v
+iris/algebra/chain.v
 iris/algebra/ofe.v
 iris/algebra/cofe_solver.v
 iris/algebra/agree.v

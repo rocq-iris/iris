@@ -183,7 +183,10 @@ A COFE extends an OFE [A] with two additional operations:
 We will see the need for the two different limit operations of a COFE below
 as part of the [fixpoint] construction. A more detailed explanation can be
 found in the Iris Reference and the Transfinite Iris Documentation (see
-https://iris-project.org/pdfs/2021-pldi-transfinite-iris-final-appendix.pdf). *)
+https://iris-project.org/pdfs/2021-pldi-transfinite-iris-final-appendix.pdf).
+
+In a finite spte-indexing setting, [chain] also serves as a closure operation
+on OFEs. We show this in [chain.v]. *)
 
 (** These notations [Compl] and [LBCompl] are convenient to define instances
 (e.g., [ofe_mor_compl] without having to repeat the type. The notation [BCompl]
