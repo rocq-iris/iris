@@ -196,14 +196,15 @@ Section bi_mixin.
   (** We equip any BI with a later modality. This avoids an additional layer in
   the BI hierarchy and improves performance significantly (see Iris issue #303).
 
-  For non step-indexed BIs the later modality can simply be defined as the
-  identity function, as the Löb axiom or contractiveness of later is not part of
-  [BiLaterMixin]. For step-indexed BIs one should separately prove an instance
-  of the class [BiLaterContractive PROP] or [BiLöb PROP]. (Note that there is an
-  instance [BiLaterContractive PROP → BiLöb PROP] in [derived_laws_later].)
+  For non step-indexed BIs one can simply get a "free" instance of [BiLaterMixin]
+  using the smart constructor [bi_later_mixin_True] below, which defines [▷ P] as
+  just [True].
 
-  For non step-indexed BIs one can get a "free" instance of [BiLaterMixin] using
-  the smart constructor [bi_later_mixin_id] below. *)
+  For step-indexed BIs, in addition to [BiLaterMixin], one should prove an
+  instance of the class [Sbi PROP], [BiLaterContractive PROP] or [BiLöb PROP].
+  (Note that there is an instance [Sbi PROP → BiLaterContractive PROP] in
+  [internal_eq], and an instance [BiLaterContractive PROP → BiLöb PROP] in
+  [derived_laws_later].) *)
   Context (bi_later : PROP → PROP).
   Local Notation "▷ P" := (bi_later P) : bi_scope.
 
@@ -230,19 +231,33 @@ Section bi_mixin.
     bi_mixin_later_false_em P : ▷ P ⊢ ▷ False ∨ (▷ False → P);
   }.
 
-  Lemma bi_later_mixin_id :
-    (∀ (P : PROP), (▷ P)%I = P) →
-    BiMixin → BiLaterMixin.
+  (** Defining [▷ P := True] is the "canonical" choice in a non-step indexed
+  setting. Normally, one would define [▷ P := λ n, ∀ n', n' < n → P n']. By
+  using the unit type for step-indexes, the only choice of the strict order [<]
+  is [False]. Hence [▷ P] becomes [True]. *)
+  Lemma bi_later_mixin_True :
+    (∀ n, Reflexive (≡{n}@{PROP}≡)) →
+    (∀ (P : PROP), (▷ P)%I = True%I) →
+    BiMixin →
+    BiPersistentlyMixin →
+    BiLaterMixin.
   Proof.
-    intros Hlater Hbi. pose proof (bi_mixin_entails_po Hbi).
-    split; repeat intro; rewrite ?Hlater //.
-    - apply (bi_mixin_forall_intro Hbi)=> a.
-      etrans; [apply (bi_mixin_forall_elim Hbi a)|]. by rewrite Hlater.
-    - etrans; [|apply (bi_mixin_or_intro_r Hbi)].
-      apply (bi_mixin_exist_elim Hbi)=> a.
-      etrans; [|apply (bi_mixin_exist_intro Hbi a)]. by rewrite /= Hlater.
-    - etrans; [|apply (bi_mixin_or_intro_r Hbi)].
-      apply (bi_mixin_impl_intro_r Hbi), (bi_mixin_and_elim_l Hbi).
+    intros ? Hlater Hbi Hbip.
+    pose proof (bi_mixin_entails_po Hbi).
+    assert (True ⊢ <pers> True).
+    { trans (<pers> emp)%I; last first.
+      { by apply (bi_mixin_persistently_mono Hbip), (bi_mixin_pure_intro Hbi). }
+      etrans; [apply (bi_mixin_emp_sep_1 Hbi True)|].
+      etrans; [|apply (bi_mixin_persistently_absorbing Hbip)].
+      apply (bi_mixin_sep_mono Hbi); [|done].
+      apply (bi_mixin_persistently_emp_2 Hbip). }
+    split; repeat intro; rewrite ?Hlater; try by apply (bi_mixin_pure_intro Hbi).
+    - done.
+    - apply (bi_mixin_or_intro_l Hbi).
+    - etrans; [|apply (bi_mixin_persistently_and_sep_elim Hbip)].
+      by apply (bi_mixin_and_intro Hbi).
+    - done.
+    - apply (bi_mixin_or_intro_l Hbi).
   Qed.
 End bi_mixin.
 

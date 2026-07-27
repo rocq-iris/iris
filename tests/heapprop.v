@@ -101,8 +101,8 @@ Local Definition heapProp_persistently_unseal:
   @heapProp_persistently = @heapProp_persistently_def := seal_eq heapProp_persistently_aux.
 
 (** Iris's [bi] class requires the presence of a later modality, but for non
-step-indexed logics, it can be defined as the identity. *)
-Definition heapProp_later (P : heapProp) : heapProp := P.
+step-indexed logics, it can be defined as just True. *)
+Definition heapProp_later (P : heapProp) : heapProp := heapProp_pure True.
 
 Local Definition heapProp_unseal :=
   (heapProp_emp_unseal, heapProp_pure_unseal, heapProp_and_unseal,
@@ -209,7 +209,10 @@ Section mixins.
       heapProp_entails heapProp_pure heapProp_or heapProp_impl
       (@heapProp_forall) (@heapProp_exist)
       heapProp_sep heapProp_persistently heapProp_later.
-  Proof. eapply bi_later_mixin_id; [done|apply heapProp_bi_mixin]. Qed.
+  Proof.
+    eapply bi_later_mixin_True; rewrite /heapProp_later;
+      [done..|apply heapProp_bi_mixin|apply heapProp_bi_persistently_mixin].
+  Qed.
 End mixins.
 
 Canonical Structure heapPropI : bi :=

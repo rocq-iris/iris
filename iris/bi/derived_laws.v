@@ -966,6 +966,7 @@ Qed.
 
 Lemma persistently_True_emp : <pers> True ⊣⊢ <pers> emp.
 Proof. apply (anti_symm _); auto using persistently_emp_intro. Qed.
+
 Lemma persistently_True : <pers> True ⊣⊢ True.
 Proof.
   apply (anti_symm _); auto.
