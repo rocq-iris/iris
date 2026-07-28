@@ -54,6 +54,10 @@ Iris now depends on rocq-elpi (version 3).
   might have to add the new class as an assumption to remain compatible, and
   code that instantiates the BI interface needs to provide an instance for the
   new class.
+* Add the `<only0> P` modality, which expresses that a proposition `P` holds at
+  step-index 0. (based on joint work with David Läwen)
+* Update the lemma `timeless_alt` (which provides an alternative
+  characterization of timeless propositions) to use the `<only0>` modality.
 
 **Changes in `proofmode`:**
 
