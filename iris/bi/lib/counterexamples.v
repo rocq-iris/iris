@@ -11,7 +11,7 @@ proposition is affine we additionally get [P ∧ Q -∗ P ∗ Q].
 Our proof essentially follows the structure of the proof of Theorem 3 in
 https://www.cs.princeton.edu/~appel/papers/bringing-order.pdf *)
 Module affine_em. Section affine_em.
-  Context {PROP : bi}.
+  Context `{!BiPersistentlyExist PROP}.
   Context (em : ∀ P : PROP, ⊢ P ∨ ¬P).
   Implicit Types P Q : PROP.
 
@@ -37,7 +37,7 @@ it gives [▷ P] for any [P], or equivalently [▷ P ≡ True]. In an SBI, the
 excluded-middle axiom results in inconsistency (proof of [False]) due to
 [later_soundness : (⊢ ▷ P) → ⊢ P]. *)
 Module löb_em. Section löb_em.
-  Context {PROP : bi}.
+  Context `{!BiPersistentlyExist PROP}.
   Context (em : ∀ P : PROP, ⊢ P ∨ ¬P).
   Implicit Types P : PROP.
 
@@ -55,7 +55,7 @@ End löb_em. End löb_em.
 (** This proves that we need the ▷ in a "Saved Proposition" construction with
 name-dependent allocation. *)
 Module savedprop. Section savedprop.
-  Context {PROP : bi} `{!BiAffine PROP}.
+  Context `{!BiPersistentlyExist PROP, !BiAffine PROP}.
   Implicit Types P : PROP.
 
   Context (bupd : PROP → PROP).
@@ -429,7 +429,7 @@ is unsound. The [fupd_keep_si_pure'] law is used to derive [fupd_keep_plainly],
 which allows `keeping` resources used to establish plain propositions after
 a (non later-eliminating) fancy update. *)
 Module later_credits_plain. Section later_credits_plain.
-  Context PROP `{!Sbi PROP, !BiFUpd PROP}.
+  Context PROP `{!BiPersistentlyExist PROP, !Sbi PROP, !BiFUpd PROP}.
 
   (** Assumptions. *)
   (** We have a single later credit and the corresponding soundness and

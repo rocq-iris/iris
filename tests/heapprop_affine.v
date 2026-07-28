@@ -111,7 +111,7 @@ Local Definition heapProp_wand_unseal:
   @heapProp_wand = @heapProp_wand_def := seal_eq heapProp_wand_aux.
 
 Local Definition heapProp_persistently_def (P : heapProp) : heapProp :=
-  heapProp_pure (heapProp_entails heapProp_emp P).
+  heapProp_pure_def (heapProp_entails (heapProp_pure_def True) P).
 Local Definition heapProp_persistently_aux : seal (@heapProp_persistently_def).
 Proof. by eexists. Qed.
 Definition heapProp_persistently := unseal heapProp_persistently_aux.
@@ -216,16 +216,10 @@ Section mixins.
   Lemma heapProp_bi_persistently_mixin :
     BiPersistentlyMixin
       heapProp_entails heapProp_emp heapProp_and
-      (@heapProp_exist) heapProp_sep heapProp_persistently.
+      heapProp_sep heapProp_persistently.
   Proof.
     eapply bi_persistently_mixin_discrete, heapProp_bi_mixin; [done|..].
-    - (* The "existential property" [(emp ⊢ ∃ x, Φ x) → ∃ x, emp ⊢ Φ x]. For an
-      affine BI the proof relies on there being a smallest resource/the unit
-      (here the empty heap [∅]). *)
-      unfold heapProp_emp. unseal. intros A Φ [H].
-      destruct (H ∅) as [x ?]; [done|]. exists x. split=> σ _.
-      eapply heapProp_closed; [done|]. by apply map_empty_subseteq.
-    - by rewrite heapProp_persistently_unseal.
+    rewrite /heapProp_emp. by unseal.
   Qed.
 
   Lemma heapProp_bi_later_mixin :
@@ -247,6 +241,23 @@ Canonical Structure heapPropI : bi :=
 
 Global Instance heapProp_pure_forall : BiPureForall heapPropI.
 Proof. intros A φ. rewrite /bi_forall /bi_pure /=. unseal. by split. Qed.
+
+Global Instance heapProp_persistently_forall : BiPersistentlyForall heapPropI.
+Proof.
+  intros A Φ. rewrite /bi_forall /bi_persistently /=.
+  unseal; split=> σ HΦ; split=> σ' ? x. by apply HΦ.
+Qed.
+
+Global Instance heapProp_persistently_exist : BiPersistentlyExist heapPropI.
+Proof.
+  (* By definition [<pers> P := ⌜ True ⊢ P ⌝], we implicitly prove the
+  "existential property" [(True ⊢ ∃ x, Φ x) → (∃ x, True ⊢ Φ x)]. For an affine
+  BI the proof relies on there being a smallest resource/the unit (here the
+  empty heap [∅]). *)
+  intros A Φ. rewrite /bi_exist /bi_persistently /=.
+  unseal; split=> σ [] /(_ ∅ I) [x HΦ]. exists x.
+  split=> σ' _. by eapply heapProp_closed, map_empty_subseteq.
+Qed.
 
 Global Instance heapProp_affine : BiAffine heapPropI.
 Proof. exact: bi.True_intro. Qed.

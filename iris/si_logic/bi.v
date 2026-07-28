@@ -69,7 +69,7 @@ Qed.
 Lemma siProp_bi_persistently_mixin :
   BiPersistentlyMixin
     siProp_entails siProp_emp siProp_and
-    (@siProp_exist) siProp_sep siProp_persistently.
+    siProp_sep siProp_persistently.
 Proof.
   split.
   - solve_proper.
@@ -80,8 +80,6 @@ Proof.
   - (* emp ⊢ <pers> emp *)
     done.
   - (* (∀ a, <pers> (Ψ a)) ⊢ <pers> (∀ a, Ψ a) *)
-    done.
-  - (* <pers> (∃ a, Ψ a) ⊢ ∃ a, <pers> (Ψ a) *)
     done.
   - (* <pers> P ∗ Q ⊢ <pers> P *)
     apply and_elim_l.

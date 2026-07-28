@@ -45,6 +45,15 @@ Iris now depends on rocq-elpi (version 3).
 * Adjust smart constructor for BIs without step-indexing: replace
   `bi_later_mixin_id` (which defines `▷ P := P`) by `bi_later_mixin_True` (which
   defines `▷ P := True`).
+* Move `persistently_exist_1` (`<pers> ∃ ⊢ ∃ <pers>`) out of the BI interface
+  into a new type class `BiPersistentlyExist`. This enables the IPM to support
+  (temporal) logics where this law does not hold. In such logics, when
+  performing `iDestruct` on a hypothesis `H : P ∨ Q` or `H : ∃ x, P` in the
+  persistent context, the result is moved to the spatial context instead of kept
+  in the persistent context. Existing proofs proofs that are generic in `PROP`
+  might have to add the new class as an assumption to remain compatible, and
+  code that instantiates the BI interface needs to provide an instance for the
+  new class.
 
 **Changes in `proofmode`:**
 

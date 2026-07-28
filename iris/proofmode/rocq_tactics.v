@@ -857,23 +857,29 @@ Proof.
   rewrite envs_entails_unseal=> ? ->. rewrite -(from_or P). by apply or_intro_r'.
 Qed.
 
-Lemma tac_or_destruct Δ i p j1 j2 P P1 P2 Q :
+Lemma tac_or_destruct Δ i p q j1 j2 P P1 P2 Q :
+  (* We can keep the result in the persistent context only if the persistence
+  modality commutes with [∃]. Otherwise, we move it to the spatial context. *)
+  TCIf (BiPersistentlyExist PROP) (TCEq q true) (TCEq q false) →
   envs_lookup i Δ = Some (p, P) → IntoOr P P1 P2 →
-  match envs_simple_replace i p (Esnoc Enil j1 P1) Δ,
-        envs_simple_replace i p (Esnoc Enil j2 P2) Δ with
+  match envs_replace i p (q &&& p) (Esnoc Enil j1 P1) Δ,
+        envs_replace i p (q &&& p) (Esnoc Enil j2 P2) Δ with
   | Some Δ1, Some Δ2 => envs_entails Δ1 Q ∧ envs_entails Δ2 Q
   | _, _ => False
   end →
   envs_entails Δ Q.
 Proof.
-  destruct (envs_simple_replace i p (Esnoc Enil j1 P1)) as [Δ1|] eqn:?; last done.
-  destruct (envs_simple_replace i p (Esnoc Enil j2 P2)) as [Δ2|] eqn:?; last done.
-  rewrite envs_entails_unseal. intros ?? (HP1&HP2). rewrite envs_lookup_sound //.
-  rewrite (into_or P) intuitionistically_if_or sep_or_r; apply or_elim.
-  - rewrite (envs_simple_replace_singleton_sound' _ Δ1) //.
-    by rewrite wand_elim_r.
-  - rewrite (envs_simple_replace_singleton_sound' _ Δ2) //.
-    by rewrite wand_elim_r.
+  destruct (envs_replace i p _ (Esnoc Enil j1 P1)) as [Δ1|] eqn:?; last done.
+  destruct (envs_replace i p _ (Esnoc Enil j2 P2)) as [Δ2|] eqn:?; last done.
+  rewrite envs_entails_unseal. intros Hq ?? (HP1&HP2).
+  rewrite envs_lookup_sound //. rewrite (into_or P).
+  trans ((□?(q &&& p) P1 ∨ □?(q &&& p) P2) ∗ of_envs (envs_delete true i p Δ))%I.
+  { f_equiv. destruct Hq as [? ->%TCEq_eq| ->%TCEq_eq]; simpl.
+    - by rewrite intuitionistically_if_or.
+    - by rewrite intuitionistically_if_elim. }
+  rewrite sep_or_r; apply or_elim.
+  - rewrite (envs_replace_singleton_sound' _ Δ1) //. by rewrite wand_elim_r.
+  - rewrite (envs_replace_singleton_sound' _ Δ2) //. by rewrite wand_elim_r.
 Qed.
 
 (** * Forall *)
@@ -912,24 +918,33 @@ Proof.
   rewrite -(from_exist P). eauto using exist_intro'.
 Qed.
 
-Lemma tac_exist_destruct {A} Δ i p j P (Φ : A → PROP) (name: ident_name) Q :
-  envs_lookup i Δ = Some (p, P) → IntoExist P Φ name →
+Lemma tac_exist_destruct {A} Δ i p q j P (Φ : A → PROP) (name: ident_name) Q :
+  (* We can keep the result in the persistent context only if the persistence
+  modality commutes with [∃]. Otherwise, we move it to the spatial context. *)
+  TCIf (BiPersistentlyExist PROP) (TCEq q true) (TCEq q false) →
+  envs_lookup i Δ = Some (p, P) →
+  IntoExist P Φ name →
   ( (* this let binding makes it easy for the tactic [iExistDestruct] to use
        [name] (from resolving [IntoExist] in an earlier subgoal) within this
        goal *)
     let _ := name in
     ∀ a,
-     match envs_simple_replace i p (Esnoc Enil j (Φ a)) Δ with
+     match envs_replace i p (q &&& p) (Esnoc Enil j (Φ a)) Δ with
      | Some Δ' => envs_entails Δ' Q
      | None => False
      end) →
   envs_entails Δ Q.
 Proof.
-  rewrite envs_entails_unseal => ?? HΦ. rewrite envs_lookup_sound //.
-  rewrite (into_exist P) intuitionistically_if_exist sep_exist_r.
+  rewrite envs_entails_unseal => Hq ?? HΦ. rewrite envs_lookup_sound //.
+  rewrite (into_exist P).
+  trans ((∃ x, □?(q &&& p) (Φ x)) ∗ of_envs (envs_delete true i p Δ))%I.
+  { f_equiv. destruct Hq as [? ->%TCEq_eq| ->%TCEq_eq]; simpl.
+    - by rewrite intuitionistically_if_exist.
+    - by rewrite intuitionistically_if_elim. }
+  rewrite sep_exist_r.
   apply exist_elim=> a; specialize (HΦ a) as Hmatch.
-  destruct (envs_simple_replace _ _ _ _) as [Δ'|] eqn:Hrep; last done.
-  rewrite envs_simple_replace_singleton_sound' //; simpl. by rewrite wand_elim_r.
+  destruct (envs_replace _ _ _ _ _) as [Δ'|] eqn:Hrep; last done.
+  rewrite envs_replace_singleton_sound' //; simpl. by rewrite wand_elim_r.
 Qed.
 
 (** * Modalities *)

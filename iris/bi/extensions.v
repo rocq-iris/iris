@@ -31,10 +31,27 @@ Class BiLaterContractive (PROP : bi) :=
 
 (** The class [BiPersistentlyForall] states that universal quantification
 commutes with the persistently modality. The reverse direction of the entailment
-described by this type class is derivable, so it is not included. *)
+described by this type class is derivable, so it is not included.
+
+Main consequences of inhabiting this class:
+- We have [Persistent (∀ x, Ψ x)] provided [∀ x, Persistent (Ψ x)]. *)
 Class BiPersistentlyForall (PROP : bi) :=
   persistently_forall_2 : ∀ {A} (Ψ : A → PROP), (∀ a, <pers> (Ψ a)) ⊢ <pers> (∀ a, Ψ a).
 Global Hint Mode BiPersistentlyForall ! : typeclass_instances.
+
+(** The class [BiPersistentlyExist] states that existential quantification
+commutes with the persistently modality. The reverse direction of the entailment
+described by this type class is derivable, so it is not included.
+
+Main consequences of inhabiting this class:
+- When performing [iDestruct] on a hypothesis [H : P ∨ Q] or [H : ∃ x, P] in the
+  persistent context, the result remains there. If the class is not inhabited,
+  the resulting hypothesis is moved to the spatial context.
+- The persistence modality preserves [Timeless]. *)
+Class BiPersistentlyExist (PROP : bi) :=
+  persistently_exist_1 : ∀ {A} (Ψ : A → PROP),
+    <pers> (∃ a, Ψ a) ⊢ ∃ a, <pers> Ψ a.
+Global Hint Mode BiPersistentlyExist ! : typeclass_instances.
 
 (** The class [BiPureForall] states that universal quantification commutes with
 the embedding of pure propositions. The reverse direction of the entailment

@@ -1342,7 +1342,7 @@ Section or_list.
     ⊣⊢ ([∨ list] k↦x ∈ l, Φ k x) ∨ ([∨ list] k↦x ∈ l, Ψ k x).
   Proof. by rewrite big_opL_op. Qed.
 
-  Lemma big_orL_persistently Φ l :
+  Lemma big_orL_persistently `{!BiPersistentlyExist PROP} Φ l :
     <pers> ([∨ list] k↦x ∈ l, Φ k x) ⊣⊢ [∨ list] k↦x ∈ l, <pers> (Φ k x).
   Proof. apply (big_opL_commute _). Qed.
 

@@ -93,7 +93,7 @@ Local Definition heapProp_wand_unseal:
   @heapProp_wand = @heapProp_wand_def := seal_eq heapProp_wand_aux.
 
 Local Definition heapProp_persistently_def (P : heapProp) : heapProp :=
-  heapProp_pure (heapProp_entails heapProp_emp P).
+  heapProp_pure_def (heapProp_entails heapProp_emp_def P).
 Local Definition heapProp_persistently_aux : seal (@heapProp_persistently_def).
 Proof. by eexists. Qed.
 Definition heapProp_persistently := unseal heapProp_persistently_aux.
@@ -195,13 +195,9 @@ Section mixins.
   Lemma heapProp_bi_persistently_mixin :
     BiPersistentlyMixin
       heapProp_entails heapProp_emp heapProp_and
-      (@heapProp_exist) heapProp_sep heapProp_persistently.
+      heapProp_sep heapProp_persistently.
   Proof.
-    eapply bi_persistently_mixin_discrete, heapProp_bi_mixin; [done|..].
-    - (* [(emp ⊢ ∃ x, Φ x) → ∃ x, emp ⊢ Φ x] *)
-      unseal. intros A Φ [H]. destruct (H ∅) as [x ?]; [done|].
-      exists x. by split=> σ ->.
-    - by rewrite heapProp_persistently_unseal.
+    eapply bi_persistently_mixin_discrete, heapProp_bi_mixin; [done|by unseal].
   Qed.
 
   Lemma heapProp_bi_later_mixin :
@@ -223,6 +219,18 @@ Canonical Structure heapPropI : bi :=
 
 Global Instance heapProp_pure_forall : BiPureForall heapPropI.
 Proof. intros A φ. rewrite /bi_forall /bi_pure /=. unseal. by split. Qed.
+
+Global Instance heapProp_persistently_forall : BiPersistentlyForall heapPropI.
+Proof.
+  intros A Φ. rewrite /bi_forall /bi_persistently /=.
+  unseal; split=> σ HΦ; split=> σ' ? x. by apply HΦ.
+Qed.
+
+Global Instance heapProp_persistently_exist : BiPersistentlyExist heapPropI.
+Proof.
+  intros A Φ. rewrite /bi_exist /bi_persistently /=.
+  unseal; split=> σ [] /(_ ∅ eq_refl) [x HΦ]. exists x. by split=> σ' ->.
+Qed.
 
 Lemma heapProp_proofmode_test {A} (P Q R : heapProp) (Φ Ψ : A → heapProp) :
   P ∗ Q -∗

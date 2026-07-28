@@ -358,7 +358,7 @@ Section instances.
   Lemma monPred_bi_persistently_mixin :
     BiPersistentlyMixin (PROP:=monPred I PROP)
       monPred_entails monPred_emp monPred_and
-      monPred_exist monPred_sep monPred_persistently.
+      monPred_sep monPred_persistently.
   Proof.
     split; rewrite ?monPred_defs.monPred_unseal;
       try by (split=> ? /=; repeat f_equiv).
@@ -366,7 +366,6 @@ Section instances.
     - intros P. split=> i. by apply bi.persistently_idemp_2.
     - split=> i. by apply bi.persistently_emp_intro.
     - intros A Ψ. split=> i. by apply bi.persistently_and_2.
-    - intros A Ψ. split=> i. by apply bi.persistently_exist_1.
     - intros P Q. split=> i. apply bi.sep_elim_l, _.
     - intros P Q. split=> i. by apply bi.persistently_and_sep_elim.
   Qed.
@@ -569,6 +568,10 @@ Section instances.
   Global Instance monPred_bi_persistently_forall :
     BiPersistentlyForall PROP → BiPersistentlyForall monPredI.
   Proof. intros ? A φ. split=> /= i. unseal. by apply persistently_forall_2. Qed.
+
+  Global Instance monPred_bi_persistently_exist :
+    BiPersistentlyExist PROP → BiPersistentlyExist monPredI.
+  Proof. intros ? A φ. split=> /= i. unseal. apply persistently_exist_1. Qed.
 
   Global Instance monPred_bi_pure_forall :
     BiPureForall PROP → BiPureForall monPredI.
