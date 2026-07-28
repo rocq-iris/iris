@@ -39,6 +39,9 @@ Iris now depends on rocq-elpi (version 3).
   of affine BIs in terms of `▷ emp ⊢ emp`.
 * Simplify lemma `big_sepS_filter_acc` to use the `filter` operation, and remove
   `big_sepS_filter_acc'`.
+* Add `big_sepS_filter_acc_impl` lemma that provides ownership of a filtered
+  set and permits changing the quantified-over predicate when re-assembling
+  the big-op. (by Simcha van Collem)
 
 **Changes in `proofmode`:**
 
