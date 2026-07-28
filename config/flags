@@ -32,6 +32,10 @@
 -w
 -postfix-notation-not-level-1
 
+# Need Rocq 9.3 for the rw tactic.
+-w
+-rewrite-rw
+
 # Overwrite some default Rocq options
 -set
 'Default Goal Selector=!'
