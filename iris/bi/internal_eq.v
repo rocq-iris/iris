@@ -376,7 +376,7 @@ Section internal_eq.
     apply contractive_internal_eq, later_equivI_prop_2.
   Qed.
 
-  Lemma only_0_internal_eq P Q : ◇₀ (P ≡ Q) ⊣⊢@{PROP} ◇₀ P ≡ ◇₀ Q.
+  Lemma only_0_internal_eq P Q : <only0> (P ≡ Q) ⊣⊢@{PROP} <only0> P ≡ <only0> Q.
   Proof.
     rewrite -si_pure_internal_eq prop_ext_si_emp_valid.
     rewrite -si_pure_only_0 -si_emp_valid_only_0 bi.only_0_wand_iff.

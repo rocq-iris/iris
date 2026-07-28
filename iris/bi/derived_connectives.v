@@ -101,14 +101,14 @@ Notation "◇ P" := (bi_except_0 P) : bi_scope.
 Global Instance: Params (@bi_except_0) 1 := {}.
 Global Typeclasses Opaque bi_except_0.
 
-(** The "only-0" modality [◇₀ P] says that [P] holds at step-index 0. In the
-step-indexed model, the definition expands to [(◇₀ P) n] iff [P 0] for
-[P : nat → Prop]. (If you unfold the definition of [(◇₀ P) n] directly into the
+(** The "only-0" modality [<only0> P] says that [P] holds at step-index 0. In the
+step-indexed model, the definition expands to [(<only0> P) n] iff [P 0] for
+[P : nat → Prop]. (If you unfold the definition of [(<only0> P) n] directly into the
 model, you get [∀ n' ≤ n, n' = 0 → P n'], which is equivalent to [P 0].) *)
 Definition bi_only_0 {SI : sidx} {PROP : bi} (P : PROP) : PROP := ▷ False → P.
 Global Typeclasses Opaque bi_only_0.
 Global Instance: Params (@bi_only_0) 2 := {}.
-Notation "◇₀ P" := (bi_only_0 P)
+Notation "<only0> P" := (bi_only_0 P)
   (at level 20, right associativity) : bi_scope.
 
 (* Timeless propositions are propositions that do not depend on the step-index.
@@ -118,7 +118,7 @@ Notation "◇₀ P" := (bi_only_0 P)
      is stated as [▷ P ⊢ ◇ P] (which actually reads [∀ n > 0, P (n-1) → P n],
      but this is trivially equivalent).
    * Option two says that [∀ n, P 0 → P n]. In the logic, this is stated as a
-     [◇₀ P ⊢ P]. The [▷ False] in the definition of [◇₀] expresses that we
+     [<only0> P ⊢ P]. The [▷ False] in the definition of [<only0>] expresses that we
      can only obtain [P] at step-index is 0.
 
    Both formulations are equivalent. In the logic, this can be shown using Löb

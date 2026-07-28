@@ -590,7 +590,7 @@ Section plainly.
   Lemma except_0_plainly P : ◇ ■ P ⊣⊢ ■ ◇ P.
   Proof. by rewrite /plainly si_emp_valid_except_0 si_pure_except_0. Qed.
 
-  Lemma only_0_plainly P : ◇₀ ■ P ⊣⊢ ■ ◇₀ P.
+  Lemma only_0_plainly P : <only0> ■ P ⊣⊢ ■ <only0> P.
   Proof. by rewrite /plainly -si_pure_only_0 -si_emp_valid_only_0. Qed.
 
   Global Instance later_plain P : Plain P → Plain (▷ P).

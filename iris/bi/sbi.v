@@ -374,7 +374,7 @@ Section sbi_derived.
 
   Lemma si_pure_except_0 Pi : <si_pure> ◇ Pi ⊣⊢@{PROP} ◇ <si_pure> Pi.
   Proof. by rewrite /bi_except_0 si_pure_or si_pure_later si_pure_pure. Qed.
-  Lemma si_pure_only_0 Pi : <si_pure> ◇₀ Pi ⊣⊢@{PROP} ◇₀ <si_pure> Pi.
+  Lemma si_pure_only_0 Pi : <si_pure> <only0> Pi ⊣⊢@{PROP} <only0> <si_pure> Pi.
   Proof. by rewrite /bi_only_0 si_pure_impl si_pure_later si_pure_pure. Qed.
 
   Lemma absorbingly_si_pure Pi : <absorb> <si_pure> Pi ⊣⊢@{PROP} <si_pure> Pi.
@@ -507,7 +507,7 @@ Section sbi_derived.
     - rewrite /bi_except_0 -si_emp_valid_or_2.
       by rewrite si_emp_valid_later si_emp_valid_pure.
   Qed.
-  Lemma si_emp_valid_only_0 P : <si_emp_valid> ◇₀ P ⊣⊢ ◇₀ <si_emp_valid> P.
+  Lemma si_emp_valid_only_0 P : <si_emp_valid> <only0> P ⊣⊢ <only0> <si_emp_valid> P.
   Proof.
     rewrite /bi_only_0. apply (anti_symm _); last first.
     { by rewrite si_emp_valid_impl_si_pure si_pure_later si_pure_pure. }
@@ -523,7 +523,7 @@ Section sbi_derived.
     by rewrite -si_emp_valid_later -si_emp_valid_except_0 HP.
   Qed.
 
-  Lemma only_0_persistently P : ◇₀ <pers> P ⊣⊢ <pers> ◇₀ P.
+  Lemma only_0_persistently P : <only0> <pers> P ⊣⊢ <pers> <only0> P.
   Proof.
     apply (anti_symm _); [|apply bi.only_0_persistently_2].
     rewrite /bi_only_0 -(si_pure_pure False) -si_pure_later.
@@ -533,12 +533,12 @@ Section sbi_derived.
   (** The [BiLöb] condition is redundant, we could get it from [sbi_later_contractive],
   but that only appears later in the dependency chain ([iris.bi.internal_eq]). *)
   Lemma only_0_intuitionistically `{!BiLöb PROP, !@Timeless PROP emp} P :
-    ◇₀ □ P ⊣⊢ □ ◇₀ P.
+    <only0> □ P ⊣⊢ □ <only0> P.
   Proof.
     by rewrite /bi_intuitionistically bi.only_0_affinely only_0_persistently.
   Qed.
 
-  Global Instance only_0_persistent P : Persistent P → Persistent (◇₀ P).
+  Global Instance only_0_persistent P : Persistent P → Persistent (<only0> P).
   Proof. rewrite /Persistent=> HP. by rewrite {1}HP -only_0_persistently. Qed.
 
   (** Relating [⊢] in [siProp] to [⊢] in [PROP] *)
