@@ -389,6 +389,10 @@ Qed.
 Lemma later_except_0_only_0 P : ▷ P ⊢ ◇ ◇₀ P.
 Proof. apply later_false_em. Qed.
 
+(** This lemma shows that our characterization of timeless propositions (via
+the except-0 modality) is equivalent to the characterization via the only-0
+modality. See the comment above the definition of [Timeless] in
+[iris.bi.interface] for more details. *)
 Lemma timeless_alt `{!BiLöb PROP} P : Timeless P ↔ (◇₀ P ⊢ P).
 Proof.
   rewrite /Timeless. split; intros HP.
