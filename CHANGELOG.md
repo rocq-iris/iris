@@ -42,6 +42,9 @@ Iris now depends on rocq-elpi (version 3).
 * Add `big_sepS_filter_acc_impl` lemma that provides ownership of a filtered
   set and permits changing the quantified-over predicate when re-assembling
   the big-op. (by Simcha van Collem)
+* Adjust smart constructor for BIs without step-indexing: replace
+  `bi_later_mixin_id` (which defines `▷ P := P`) by `bi_later_mixin_True` (which
+  defines `▷ P := True`).
 
 **Changes in `proofmode`:**
 
