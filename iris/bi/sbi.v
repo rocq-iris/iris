@@ -371,8 +371,12 @@ Section sbi_derived.
     induction n as [|n IH]; simpl; [done|].
     by rewrite si_pure_later IH.
   Qed.
+
   Lemma si_pure_except_0 Pi : <si_pure> ◇ Pi ⊣⊢@{PROP} ◇ <si_pure> Pi.
   Proof. by rewrite /bi_except_0 si_pure_or si_pure_later si_pure_pure. Qed.
+  Lemma si_pure_only_0 Pi : <si_pure> ◇₀ Pi ⊣⊢@{PROP} ◇₀ <si_pure> Pi.
+  Proof. by rewrite /bi_only_0 si_pure_impl si_pure_later si_pure_pure. Qed.
+
   Lemma absorbingly_si_pure Pi : <absorb> <si_pure> Pi ⊣⊢@{PROP} <si_pure> Pi.
   Proof. by rewrite bi.absorbing_absorbingly. Qed.
   Lemma persistently_si_pure Pi : <pers> <si_pure> Pi ⊣⊢@{PROP} <si_pure> Pi.
@@ -503,6 +507,14 @@ Section sbi_derived.
     - rewrite /bi_except_0 -si_emp_valid_or_2.
       by rewrite si_emp_valid_later si_emp_valid_pure.
   Qed.
+  Lemma si_emp_valid_only_0 P : <si_emp_valid> ◇₀ P ⊣⊢ ◇₀ <si_emp_valid> P.
+  Proof.
+    rewrite /bi_only_0. apply (anti_symm _); last first.
+    { by rewrite si_emp_valid_impl_si_pure si_pure_later si_pure_pure. }
+    apply bi.impl_intro_l.
+    rewrite -{1}(si_emp_valid_pure False) -si_emp_valid_later.
+    by rewrite -si_emp_valid_and bi.impl_elim_r.
+  Qed.
 
   Global Instance si_emp_valid_timeless P :
     Timeless P → Timeless (<si_emp_valid> P).
@@ -510,6 +522,24 @@ Section sbi_derived.
     rewrite /Timeless=> HP.
     by rewrite -si_emp_valid_later -si_emp_valid_except_0 HP.
   Qed.
+
+  Lemma only_0_persistently P : ◇₀ <pers> P ⊣⊢ <pers> ◇₀ P.
+  Proof.
+    apply (anti_symm _); [|apply bi.only_0_persistently_2].
+    rewrite /bi_only_0 -(si_pure_pure False) -si_pure_later.
+    apply persistently_impl_si_pure.
+  Qed.
+
+  (** The [BiLöb] condition is redundant, we could get it from [sbi_later_contractive],
+  but that only appears later in the dependency chain ([iris.bi.internal_eq]). *)
+  Lemma only_0_intuitionistically `{!BiLöb PROP, !@Timeless PROP emp} P :
+    ◇₀ □ P ⊣⊢ □ ◇₀ P.
+  Proof.
+    by rewrite /bi_intuitionistically bi.only_0_affinely only_0_persistently.
+  Qed.
+
+  Global Instance only_0_persistent P : Persistent P → Persistent (◇₀ P).
+  Proof. rewrite /Persistent=> HP. by rewrite {1}HP -only_0_persistently. Qed.
 
   (** Relating [⊢] in [siProp] to [⊢] in [PROP] *)
   Lemma si_emp_valid_emp_valid P : (⊢@{siPropI} <si_emp_valid> P) ↔ ⊢ P.

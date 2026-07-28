@@ -92,11 +92,24 @@ Global Arguments bi_laterN {_} !_%_nat_scope _%_I.
 Global Instance: Params (@bi_laterN) 2 := {}.
 Notation "▷? p P" := (bi_laterN (Nat.b2n p) P) : bi_scope.
 
+(** The "except-0" modality [◇ P] says that we are either at step-index 0 or [P]
+holds, i.e., it holds at all step indices except 0. In the step-indexed model,
+the definition expands to [(◇ P) n] iff [n = 0 ∨ P n] for [P : nat → Prop]. *)
 Definition bi_except_0 {PROP : bi} (P : PROP) : PROP := ▷ False ∨ P.
 Global Arguments bi_except_0 {_} _%_I : simpl never.
 Notation "◇ P" := (bi_except_0 P) : bi_scope.
 Global Instance: Params (@bi_except_0) 1 := {}.
 Global Typeclasses Opaque bi_except_0.
+
+(** The "only-0" modality [◇₀ P] says that [P] holds at step-index 0. In the
+step-indexed model, the definition expands to [(◇₀ P) n] iff [P 0] for
+[P : nat → Prop]. (If you unfold the definition of [(◇₀ P) n] directly into the
+model, you get [∀ n' ≤ n, n' = 0 → P n'], which is equivalent to [P 0].) *)
+Definition bi_only_0 {SI : sidx} {PROP : bi} (P : PROP) : PROP := ▷ False → P.
+Global Typeclasses Opaque bi_only_0.
+Global Instance: Params (@bi_only_0) 2 := {}.
+Notation "◇₀ P" := (bi_only_0 P)
+  (at level 20, right associativity) : bi_scope.
 
 (* Timeless propositions are propositions that do not depend on the step-index.
    There are two equivalent ways of expressing that a step-indexed proposition
@@ -105,8 +118,8 @@ Global Typeclasses Opaque bi_except_0.
      is stated as [▷ P ⊢ ◇ P] (which actually reads [∀ n > 0, P (n-1) → P n],
      but this is trivially equivalent).
    * Option two says that [∀ n, P 0 → P n]. In the logic, this is stated as a
-     meta-entailment [∀ P, (▷ False ∧ P ⊢ Q) → (P ⊢ Q)]. The assumption
-     [▷ False] expresses that the step-index is 0.
+     [◇₀ P ⊢ P]. The [▷ False] in the definition of [◇₀] expresses that we
+     can only obtain [P] at step-index is 0.
 
    Both formulations are equivalent. In the logic, this can be shown using Löb
    induction and [later_false_em]. In the model, this follows from regular

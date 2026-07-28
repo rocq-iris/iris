@@ -589,6 +589,10 @@ Section plainly.
   Proof. by rewrite /bi_except_0 -plainly_or_2 -later_plainly plainly_pure. Qed.
   Lemma except_0_plainly P : ◇ ■ P ⊣⊢ ■ ◇ P.
   Proof. by rewrite /plainly si_emp_valid_except_0 si_pure_except_0. Qed.
+
+  Lemma only_0_plainly P : ◇₀ ■ P ⊣⊢ ■ ◇₀ P.
+  Proof. by rewrite /plainly -si_pure_only_0 -si_emp_valid_only_0. Qed.
+
   Global Instance later_plain P : Plain P → Plain (▷ P).
   Proof. intros. by rewrite /Plain -later_plainly {1}(plain P). Qed.
   Global Instance laterN_plain n P : Plain P → Plain (▷^n P).
