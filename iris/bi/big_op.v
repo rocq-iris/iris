@@ -2980,6 +2980,29 @@ Section gset.
     do 2 f_equiv. intros ?; set_solver.
   Qed.
 
+  (* A version of [big_sepS_filter_acc] that also allows changing the predicate [Φ]
+  to [Ψ]. *)
+  Lemma big_sepS_filter_acc_impl (φ : A → Prop) `{∀ x, Decision (φ x)} Φ X :
+    ([∗ set] x ∈ X, Φ x) -∗
+    (* we obtain the filtered bigop *)
+    ([∗ set] x ∈ filter φ X, Φ x) ∗
+    (* we reobtain the bigop for a predicate [Ψ] selected by the user *)
+    ∀ Ψ,
+      (* [Φ] implies [Ψ] for the remaining elements *)
+      □ (∀ x, ⌜x ∈ X⌝ → ⌜¬ φ x⌝ → Φ x -∗ Ψ x) -∗
+      ([∗ set] x ∈ filter φ X, Ψ x) -∗
+      [∗ set] x ∈ X, Ψ x.
+  Proof.
+    rewrite -{1 5}(filter_union_complement_L φ X)
+      big_sepS_union; last set_solver.
+    apply entails_wand, sep_mono_r, forall_intro=> Ψ.
+    rewrite big_sepS_union; last set_solver.
+    apply wand_intro_r, wand_intro_l. apply sep_mono_r.
+    eapply wand_apply; [apply wand_entails, big_sepS_impl|apply sep_mono_r].
+    f_equiv; f_equiv=> x. by rewrite elem_of_filter (comm (∧))
+      pure_and impl_curry.
+  Qed.
+
   Lemma big_sepS_dup P `{!Affine P} X :
     □ (P -∗ P ∗ P) -∗ P -∗ [∗ set] x ∈ X, P.
   Proof.
