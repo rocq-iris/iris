@@ -128,6 +128,10 @@ Canonical Structure siPropI : bi :=
 
 Global Instance siProp_pure_forall : BiPureForall siPropI.
 Proof. exact: @pure_forall_2. Qed.
+Global Instance siProp_persistently_forall : BiPersistentlyForall siPropI.
+Proof. done. Qed.
+Global Instance siProp_persistently_exist : BiPersistentlyExist siPropI.
+Proof. done. Qed.
 
 Global Instance siProp_later_contractive : BiLaterContractive siPropI.
 Proof. exact: @later_contractive. Qed.

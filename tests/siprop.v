@@ -1,5 +1,6 @@
 From stdpp Require Import strings.
 From iris.si_logic Require Import bi.
+From iris.proofmode Require Import proofmode.
 Unset Mangle Names.
 
 Check "unseal_test".
@@ -13,3 +14,13 @@ Abort.
 (** Make sure that [siProp]s are parsed in [bi_scope]. *)
 Definition test : siProp := ▷ True.
 Definition testI : siPropI := ▷ True.
+
+Check "test_persistently_exist".
+Lemma test_persistently_exist {A} (Φ : A → siProp) : (∃ x, Φ x) -∗ True.
+Proof.
+  iIntros "#H".
+  (* Since [siProp] satisfies [BiPersistentlyExist], the hypothesis [H] should
+  remain in the persistent context. *)
+  iDestruct "H" as (x) "H".
+  Show.
+Abort.
