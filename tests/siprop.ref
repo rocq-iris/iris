@@ -15,3 +15,14 @@
                (siprop.siProp_and_def (siprop.siProp_later_def Q)
                   (siprop.siProp_pure_def True)))
             (Φ x))
+"test_persistently_exist"
+     : string
+1 goal
+  
+  A : Type
+  Φ : A → siProp
+  x : A
+  ============================
+  "H" : Φ x
+  --------------------------------------□
+  True
