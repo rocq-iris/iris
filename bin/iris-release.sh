@@ -141,7 +141,7 @@ delete_tarball() {
 }
 
 set_pkg stdpp "$stdpp_version"
-download_tarball "https://gitlab.mpi-sws.org/iris/stdpp/-/archive/stdpp-$version.tar.gz"
+download_tarball "https://github.com/rocq-iris/stdpp/archive/refs/tags/stdpp-$version.tar.gz"
 extract_opam
 
 set_pkg stdpp-bitvector "$stdpp_version"
@@ -149,7 +149,7 @@ extract_opam
 delete_tarball
 
 set_pkg iris "$iris_version"
-download_tarball "https://gitlab.mpi-sws.org/iris/iris/-/archive/iris-$version.tar.gz"
+download_tarball "https://github.com/rocq-iris/iris/archive/refs/tags/iris-$version.tar.gz"
 extract_opam
 set_stdpp_dep
 
