@@ -1710,7 +1710,7 @@ Lemma test_iSplit_wand_iff (P : PROP) :
   ⊢ P ∗-∗ P.
 Proof.
   iSplit; by auto.
-Restart.
+Restart. Proof.
   (* fails without [BiAffine] instance *)
   Fail iSplitL. Fail iSplitR.
 Abort.
@@ -1719,7 +1719,7 @@ Lemma test_iSplit_bi_wand_iff_affine `{!BiAffine PROP} (P : PROP) :
   ⊢ P ∗-∗ P.
 Proof.
   iSplit; by auto.
-Restart.
+Restart. Proof.
   iSplitL; by auto.
 Restart. Proof.
   iSplitR; by auto.
@@ -1730,7 +1730,7 @@ Lemma test_iSplit_iff (P : PROP) :
   ⊢ P ↔ P.
 Proof.
   iSplit; by auto.
-Restart.
+Restart. Proof.
   (* fails without [BiAffine] instance *)
   Fail iSplitL. Fail iSplitR.
 Abort.
@@ -1739,7 +1739,7 @@ Lemma test_iSplit_bi_iff_affine `{!BiAffine PROP} (P : PROP) :
   ⊢ P ↔ P.
 Proof.
   iSplit; by auto.
-Restart.
+Restart. Proof.
   iSplitL; by auto.
 Restart. Proof.
   iSplitR; by auto.
