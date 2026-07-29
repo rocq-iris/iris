@@ -65,6 +65,7 @@ build-rocq.9.2.0:
     DENY_WARNINGS: "1"
     MANGLE_NAMES: "1"
     OPAM_PKG: "1"
+    OPAM_PKG_ALT_SOURCE_REPO: "https://github.com/rocq-iris/iris.git"
     DOC_DIR: "coqdoc@center.mpi-sws.org:iris"
     DOC_OPTS: "--external https://plv.mpi-sws.org/coqdoc/stdpp/ stdpp"
   tags:
