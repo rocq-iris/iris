@@ -139,8 +139,7 @@ Section cmra_valid.
     rewrite assoc. apply: (f_equivI (λ z, z ⋅ b')). solve_proper.
   Qed.
 
-  Global Instance internal_included_timeless `{!BiLöb PROP}
-      {A : cmra} (a b : A) `{!Discrete b} :
+  Global Instance internal_included_timeless {A : cmra} (a b : A) `{!Discrete b} :
     Timeless (PROP:=PROP) (a ≼ b).
   Proof. rewrite /internal_included. apply _. Qed.
 

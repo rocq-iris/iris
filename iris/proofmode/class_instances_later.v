@@ -247,9 +247,12 @@ Proof. by rewrite /FromModal /= -except_0_intro. Qed.
 Global Instance into_except_0_except_0 P : IntoExcept0 (◇ P) P.
 Proof. by rewrite /IntoExcept0. Qed.
 Global Instance into_except_0_later P : Timeless P → IntoExcept0 (▷ P) P.
-Proof. by rewrite /IntoExcept0. Qed.
+Proof. intros. by rewrite /IntoExcept0 timeless_except_0. Qed.
 Global Instance into_except_0_later_if p P : Timeless P → IntoExcept0 (▷?p P) P.
-Proof. rewrite /IntoExcept0. destruct p; auto using except_0_intro. Qed.
+Proof.
+  intros. rewrite /IntoExcept0. destruct p; simpl; last by apply except_0_intro.
+  by rewrite timeless_except_0.
+Qed.
 
 Global Instance into_except_0_affinely P Q :
   IntoExcept0 P Q → IntoExcept0 (<affine> P) (<affine> Q).
@@ -284,13 +287,13 @@ Qed.
 Global Instance add_modal_later_except_0 P Q :
   Timeless P → AddModal (▷ P) P (◇ Q) | 0.
 Proof.
-  intros. rewrite /AddModal (except_0_intro (_ -∗ _)) (timeless P).
+  intros. rewrite /AddModal (except_0_intro (_ -∗ _)) (timeless_except_0 P).
   by rewrite -except_0_sep wand_elim_r except_0_idemp.
 Qed.
 Global Instance add_modal_later P Q :
   Timeless P → AddModal (▷ P) P (▷ Q) | 0.
 Proof.
-  intros. rewrite /AddModal (except_0_intro (_ -∗ _)) (timeless P).
+  intros. rewrite /AddModal (except_0_intro (_ -∗ _)) (timeless_except_0 P).
   by rewrite -except_0_sep wand_elim_r except_0_later.
 Qed.
 Global Instance add_modal_except_0 P Q : AddModal (◇ P) P (◇ Q) | 1.

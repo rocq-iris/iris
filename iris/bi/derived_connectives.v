@@ -131,7 +131,7 @@ Notation "<only0> P" := (bi_only_0 P) : bi_scope.
    natural induction.
    The law [timeless_alt] in [derived_laws_later.v] provides option two, by
    proving that both versions are equivalent in the logic.  *)
-Class Timeless {SI : sidx} {PROP : bi} (P : PROP) := timeless : ▷ P ⊢ ◇ P.
+Class Timeless {SI : sidx} {PROP : bi} (P : PROP) := timeless : <only0> P ⊢ P.
 Global Arguments Timeless {SI _} _%_I : simpl never.
 Global Arguments timeless {SI _} _%_I {_}.
 Global Hint Mode Timeless - + ! : typeclass_instances.

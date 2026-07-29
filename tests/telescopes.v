@@ -43,7 +43,7 @@ Section basic_tests.
   Lemma test_timeless_tforall {TT : tele} (φ : TT → Prop) :
     ▷ (∀.. x, ⌜ φ x ⌝) -∗ ◇ ∀.. x, ⌜ φ x ⌝ : PROP.
   Proof. iIntros ">H1 !>". done. Qed.
-  Lemma test_timeless_texist `{!BiLöb PROP} {TT : tele} (φ : TT → Prop) :
+  Lemma test_timeless_texist {TT : tele} (φ : TT → Prop) :
     ▷ (∃.. x, ⌜ φ x ⌝) -∗ ◇ ∃.. x, ⌜ φ x ⌝ : PROP.
   Proof. iIntros ">H1 !>". done. Qed.
   Lemma test_add_model_texist `{!BiBUpd PROP} {TT : tele} P Q (Φ : TT → PROP) :

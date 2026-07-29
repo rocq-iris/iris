@@ -272,11 +272,11 @@ Section embed.
     Proof. induction n=>//=. rewrite embed_later. by f_equiv. Qed.
     Lemma embed_except_0 P : ⎡◇ P⎤ ⊣⊢ ◇ ⎡P⎤.
     Proof. by rewrite embed_or embed_later embed_pure. Qed.
+    Lemma embed_only_0 P : ⎡<only0> P⎤ ⊣⊢ <only0> ⎡P⎤.
+    Proof. by rewrite /bi_only_0 embed_impl embed_later embed_pure. Qed.
 
     Global Instance embed_timeless P : Timeless P → Timeless ⎡P⎤.
-    Proof.
-      intros ?. by rewrite /Timeless -embed_except_0 -embed_later timeless.
-    Qed.
+    Proof. rewrite /Timeless=> ?. rewrite -embed_only_0. by f_equiv. Qed.
   End later.
 
   Section sbi.
