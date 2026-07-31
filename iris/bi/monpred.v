@@ -795,6 +795,50 @@ Section bi_facts.
     Proper (flip (⊢) ==> flip (⊢)) (@monPred_subjectively I PROP).
   Proof. intros ???. by apply monPred_subjectively_mono. Qed.
 
+  Lemma monPred_subjectively_persistently `{!BiPersistentlyExist PROP} P :
+    <subj> <pers> P ⊣⊢ <pers> <subj> P.
+  Proof.
+    rewrite monPred_subjectively_unfold -embed_persistently.
+    rewrite bi.persistently_exist. by setoid_rewrite monPred_at_persistently.
+  Qed.
+
+  Lemma monPred_subjectively_absorbingly P :
+    <subj> <absorb> P ⊣⊢ <absorb> <subj> P.
+  Proof.
+    rewrite monPred_subjectively_unfold -embed_absorbingly.
+    rewrite bi.absorbingly_exist. by setoid_rewrite monPred_at_absorbingly.
+  Qed.
+
+  Lemma monPred_subjectively_affinely P :
+    <subj> <affine> P ⊣⊢ <affine> <subj> P.
+  Proof.
+    rewrite monPred_subjectively_unfold -embed_affinely.
+    rewrite bi.affinely_exist. by setoid_rewrite monPred_at_affinely.
+  Qed.
+
+  Lemma monPred_subjectively_intuitionistically `{!BiPersistentlyExist PROP} P :
+    <subj> □ P ⊣⊢ □ <subj> P.
+  Proof.
+    by rewrite /bi_intuitionistically
+      monPred_subjectively_affinely monPred_subjectively_persistently.
+  Qed.
+
+  Lemma monPred_subjectively_persistently_if `{!BiPersistentlyExist PROP} P p :
+    <subj> <pers>?p P ⊣⊢ <pers>?p <subj> P.
+  Proof. destruct p; simpl; auto using monPred_subjectively_persistently. Qed.
+
+  Lemma monPred_subjectively_absorbingly_if P p :
+    <subj> <absorb>?p P ⊣⊢ <absorb>?p <subj> P.
+  Proof. destruct p; simpl; auto using monPred_subjectively_absorbingly. Qed.
+
+  Lemma monPred_subjectively_affinely_if P p :
+    <subj> <affine>?p P ⊣⊢ <affine>?p <subj> P.
+  Proof. destruct p; simpl; auto using monPred_subjectively_affinely. Qed.
+
+  Lemma monPred_subjectively_intuitionistically_if `{!BiPersistentlyExist PROP} P p :
+    <subj> □?p P ⊣⊢ □?p <subj> P.
+  Proof. destruct p; simpl; auto using monPred_subjectively_intuitionistically. Qed.
+
   Global Instance monPred_subjectively_persistent P :
     Persistent P → Persistent (<subj> P).
   Proof. rewrite monPred_subjectively_unfold. apply _. Qed.
@@ -888,6 +932,20 @@ Section bi_facts.
   Proof.
     apply bi.equiv_entails; split; [|by apply monPred_subjectively_intro].
     unseal. split=>i /=. by apply bi.exist_elim=>_.
+  Qed.
+
+  (** Apply a wand under the [<subj>] modality (which uses [∃] quantification
+  over the index). Needs the wand itself to be objective (that is, is [∀]
+  quantified over the index) so that it can apply at whatever index [i : I]
+  that [<subj> P] holds for. *)
+  Lemma monPred_subjectively_wand P Q :
+    <subj> P -∗ <obj> (P -∗ <subj> Q) -∗ <subj> Q.
+  Proof.
+    apply bi.entails_wand, bi.wand_intro_r, monPred_at_entails=> i.
+    rewrite monPred_at_sep !monPred_at_subjectively monPred_at_objectively.
+    rewrite bi.sep_exist_r. apply bi.exist_elim=> j.
+    rewrite (bi.forall_elim j) monPred_at_wand (bi.forall_elim j).
+    by rewrite bi.pure_True // left_id bi.wand_elim_r monPred_at_subjectively.
   Qed.
 
   Lemma objective_objectively P `{!Objective P} : P ⊢ <obj> P.

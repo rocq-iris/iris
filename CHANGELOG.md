@@ -58,6 +58,8 @@ Iris now depends on rocq-elpi (version 3).
   step-index 0. (based on joint work with David Läwen)
 * Update the lemma `timeless_alt` (which provides an alternative
   characterization of timeless propositions) to use the `<only0>` modality.
+* Add commuting rules for monPred's `<subj>` modality with `<pers>`, `<absorb>`,
+  `<affine>` and `□`. Add a rule to apply a `-∗` under the `<subj>` modality.
 
 **Changes in `proofmode`:**
 
