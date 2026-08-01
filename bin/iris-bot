@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import sys, os, subprocess
+import sys, os, subprocess, json
 import requests, argparse
 from datetime import datetime, timezone
 from collections import namedtuple
@@ -51,7 +51,7 @@ GITLAB_TOKEN = os.environ["GITLAB_TOKEN"]
 # 'PROJECT' to 'user:branch', or set 'PROJECT_REPO' and 'PROJECT_REV'
 # automatically.
 BUILD_BRANCHES = {}
-for project in ['stdpp', 'iris', 'orc11', 'gpfsl']:
+for project in ['stdpp', 'iris', 'gpfsl']:
     var = project.upper()
     if var in os.environ:
         (repo, rev) = os.environ[var].split(':')
@@ -71,12 +71,17 @@ if not "iris" in BUILD_BRANCHES:
 def trigger_build(project, branch, vars):
     id = "iris%2F{}".format(project)
     url = "https://gitlab.mpi-sws.org/api/v4/projects/{}/pipeline".format(id)
-    json = {
+    json_data = {
         'ref': branch,
         'variables': [{ 'key': key, 'value': val } for (key, val) in vars.items()],
     }
-    r = requests.post(url, headers={'PRIVATE-TOKEN': GITLAB_TOKEN}, json=json)
-    r.raise_for_status()
+    # MPI apparently bans the default python user-agent so we pretend to be curl
+    r = requests.post(url, headers={'PRIVATE-TOKEN': GITLAB_TOKEN, 'User-Agent': 'curl'}, json=json_data)
+    try:
+        r.raise_for_status()
+    except:
+        print("Failed reqest with payload: {}".format(json.dumps(json_data)))
+        raise
     return r.json()
 
 # The commands
@@ -179,8 +184,8 @@ if __name__ == "__main__":
 
     parser_time = subparsers.add_parser('time', help='Time one reverse dependency against an Iris branch')
     parser_time.add_argument("project", help="the project to measure the time of, or 'all' to measure all of them")
-    parser_time.add_argument("--test-rev", help="use different branch/tag of the project for the test build (in case the project requires changes to still build)")
-    parser_time.add_argument("--base-rev", help="use different branch/tag of the project for the baseline build (for benchmarking against old versions); defaults to the projects main branch")
+    parser_time.add_argument("--test-rev", help="use different branch/tag of the project for the test build (in case the project requires changes to still build); must be in the main repo, not a fork, and cannot be just a commit ID")
+    parser_time.add_argument("--base-rev", help="use different branch/tag of the project for the baseline build (for benchmarking against old versions); defaults to the project's main branch")
     parser_time.add_argument("--iris-base-rev", help="use different revision of Iris for the baseline build (for benchmarking against old versions); defaults to 'master'")
     parser_time.set_defaults(func=time)
 
