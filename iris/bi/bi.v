@@ -1,5 +1,5 @@
 From iris.bi Require Export derived_laws derived_laws_later big_op.
-From iris.bi Require Export updates embedding.
+From iris.bi Require Export updates later_credits embedding.
 From iris.bi Require Export sbi sbi_unfold internal_eq plainly cmra algebra.
 
 Module Import bi.
