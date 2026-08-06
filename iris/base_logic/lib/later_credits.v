@@ -43,14 +43,14 @@ Proof. solve_inG. Qed.
 
 (** The user-facing credit resource, denoting ownership of [n] credits
 (but only if later credits are enabled). *)
-Local Definition lc_def `{!lcGS hlc Σ} (n : nat) : iProp Σ :=
+Local Definition uPred_lc_def `{!lcGS hlc Σ} (n : nat) : iProp Σ :=
   if hlc is HasLc then own lcGS_name (◯ n) else True.
-Local Definition lc_aux : seal (@lc_def). Proof. by eexists. Qed.
-Definition lc := lc_aux.(unseal).
-Local Definition lc_unseal : @lc = @lc_def := lc_aux.(seal_eq).
-Global Arguments lc {hlc Σ _} n.
-
-Notation "'£'  n" := (lc n) (at level 1).
+Local Definition uPred_lc_aux : seal (@uPred_lc_def). Proof. by eexists. Qed.
+Definition uPred_lc := uPred_lc_aux.(unseal).
+Global Arguments uPred_lc {hlc Σ _} n.
+Local Lemma uPred_lc_unseal `{!lcGS hlc Σ} :
+  @lc _ uPred_lc = uPred_lc_def.
+Proof. rewrite -uPred_lc_aux.(seal_eq) //. Qed.
 
 (** The internal authoritative part of the credit ghost state, tracking how many
 credits are available in total. Users should not directly interface with this. *)
@@ -62,71 +62,35 @@ Local Definition lc_supply_unseal :
   @lc_supply = @lc_supply_def := lc_supply_aux.(seal_eq).
 Global Arguments lc_supply {hlc Σ _} n.
 
-Local Lemma lc_no_lc `{!lcGS HasNoLc Σ} n : £ n ⊣⊢ True.
-Proof. by rewrite lc_unseal. Qed.
-Local Lemma lc_supply_no_lc `{!lcGS HasNoLc Σ} n : lc_supply n ⊣⊢ ⌜ n = 0 ⌝.
-Proof. by rewrite lc_supply_unseal. Qed.
-
-(** The splitting rules for [£] hold regardless of whether later credits are
+(** The primitive rules for [£] hold regardless of whether later credits are
 enabled. If later credits are disabled ([hlc = HasNoLc], these rules are not
 useful on their own, but they can be used to write adequacy/soundness proof that
 are generic in the choice of [hlc]. *)
-Section lc_rules.
-  Context `{!lcGS hlc Σ}.
-
-  Lemma lc_split n m : £ (n + m) ⊣⊢ £ n ∗ £ m.
-  Proof.
-    rewrite lc_unseal /lc_def. destruct hlc; [|by iSplit; auto].
+Lemma uPred_lc_mixin `{!lcGS hlc Σ} : BiLaterCreditsMixin (iPropI Σ) uPred_lc.
+Proof.
+  split.
+  - rewrite uPred_lc_unseal /uPred_lc_def=> n m.
+    destruct hlc; [|by iSplit; auto].
     rewrite -own_op auth_frag_op //=.
-  Qed.
+  - rewrite uPred_lc_unseal /uPred_lc_def=> n. apply _.
+  - rewrite uPred_lc_unseal /uPred_lc_def. apply _.
+  - rewrite uPred_lc_unseal /uPred_lc_def=> n. apply _.
+Qed.
+Global Instance uPred_bi_lc `{!lcGS hlc Σ} : BiLaterCredits (iPropI Σ) :=
+  {| bi_lc_mixin := uPred_lc_mixin |}.
 
-  Lemma lc_zero : ⊢ |==> £ 0.
-  Proof.
-    rewrite lc_unseal /lc_def. destruct hlc; [|by auto]. iApply own_unit.
-  Qed.
+Local Lemma lc_no_lc `{!lcGS HasNoLc Σ} n : £ n ⊣⊢@{iPropI Σ} True.
+Proof. by rewrite uPred_lc_unseal. Qed.
+Local Lemma lc_supply_no_lc `{!lcGS HasNoLc Σ} n : lc_supply n ⊣⊢ ⌜ n = 0 ⌝.
+Proof. by rewrite lc_supply_unseal. Qed.
 
-  Lemma lc_succ n : £ (S n) ⊣⊢ £ 1 ∗ £ n.
-  Proof. rewrite -lc_split //=. Qed.
-
-  Lemma lc_weaken {n} m : m ≤ n → £ n -∗ £ m.
-  Proof. intros [k ->]%Nat.le_sum. rewrite lc_split. iIntros "[$ _]". Qed.
-
-  Global Instance lc_timeless n : Timeless (£ n).
-  Proof. rewrite lc_unseal /lc_def. apply _. Qed.
-
-  Global Instance lc_0_persistent : Persistent (£ 0).
-  Proof. rewrite lc_unseal /lc_def. apply _. Qed.
-
-  (** Make sure that the rule for [+] is used before [S], otherwise Rocq's
-  unification applies the [S] hint too eagerly. See Iris issue #470. *)
-  Global Instance from_sep_lc_add n m : FromSep (£ (n + m)) (£ n) (£ m) | 0.
-  Proof. by rewrite /FromSep lc_split. Qed.
-  Global Instance from_sep_lc_S n : FromSep (£ (S n)) (£ 1) (£ n) | 1.
-  Proof. by rewrite /FromSep (lc_succ n). Qed.
-
-  (** When combining later credits with [iCombine], the priorities are
-  reversed when compared to [FromSep] and [IntoSep]. This causes
-  [£ n] and [£ 1] to be combined as [£ (S n)], not as [£ (n + 1)]. *)
-  Global Instance combine_sep_lc_add n m :
-    CombineSepAs (£ n) (£ m) (£ (n + m)) | 1.
-  Proof. by rewrite /CombineSepAs lc_split. Qed.
-  Global Instance combine_sep_lc_S_l n :
-    CombineSepAs (£ n) (£ 1) (£ (S n)) | 0.
-  Proof. by rewrite /CombineSepAs comm (lc_succ n). Qed.
-
-  Global Instance into_sep_lc_add n m : IntoSep (£ (n + m)) (£ n) (£ m) | 0.
-  Proof. by rewrite /IntoSep lc_split. Qed.
-  Global Instance into_sep_lc_S n : IntoSep (£ (S n)) (£ 1) (£ n) | 1.
-  Proof. by rewrite /IntoSep (lc_succ n). Qed.
-End lc_rules.
-
-(** The (internal) [lc_supply] rules are only vald if later credits are enabled. *)
+(** The (internal) [lc_supply] rules are only valid if later credits are enabled. *)
 Section lc_supply_rules.
   Context `{!lcGS HasLc Σ}.
 
   Local Lemma lc_supply_bound n m : lc_supply m -∗ £ n -∗ ⌜n ≤ m⌝.
   Proof.
-    rewrite lc_unseal /lc_def lc_supply_unseal /lc_supply_def.
+    rewrite uPred_lc_unseal /uPred_lc_def lc_supply_unseal /lc_supply_def.
     iIntros "H1 H2". iCombine "H1 H2" gives %Hop.
     iPureIntro. eapply auth_both_valid_discrete in Hop as [Hlt _].
     by eapply nat_included.
@@ -135,7 +99,7 @@ Section lc_supply_rules.
   Local Lemma lc_decrease_supply n m :
     lc_supply (n + m) -∗ £ n ==∗ lc_supply m.
   Proof.
-    rewrite lc_unseal /lc_def lc_supply_unseal /lc_supply_def.
+    rewrite uPred_lc_unseal /uPred_lc_def lc_supply_unseal /lc_supply_def.
     iIntros "H1 H2". iMod (own_update_2 with "H1 H2") as "Hown".
     { eapply auth_update. eapply (nat_local_update _ _ m 0). lia. }
     by iDestruct "Hown" as "[Hm _]".
@@ -144,7 +108,7 @@ Section lc_supply_rules.
  Local Lemma lc_increase_supply n m :
     lc_supply m ==∗ lc_supply (n + m) ∗ £ n.
   Proof.
-    rewrite lc_unseal /lc_def lc_supply_unseal /lc_supply_def.
+    rewrite uPred_lc_unseal /uPred_lc_def lc_supply_unseal /lc_supply_def.
     iIntros "H"; iMod (own_update with "H") as "Hown".
     { eapply auth_update_alloc. eapply (nat_local_update m 0 (n + m) n). lia. }
     iDestruct "Hown" as "[Hm ?]"; by iFrame.
@@ -335,17 +299,18 @@ Module le_upd.
   Local Lemma lc_alloc `{!lcGpreS Σ} n :
     ⊢ |==> ∃ _ : lcGS HasLc Σ, lc_supply n ∗ £ n.
   Proof.
-    rewrite lc_unseal /lc_def lc_supply_unseal /lc_supply_def.
     iMod (own_alloc (● n ⋅ ◯ n)) as (γLC) "[H● H◯]";
       first (apply auth_both_valid; split; done).
-    iModIntro. iExists (LcGS HasLc _ _ γLC). iFrame.
+    iModIntro. iExists (LcGS HasLc _ _ γLC).
+    rewrite uPred_lc_unseal /uPred_lc_def lc_supply_unseal /lc_supply_def.
+    iFrame.
   Qed.
   Local Lemma lc_alloc_no_lc `{!lcGpreS Σ} n :
     ⊢ ∃ _ : lcGS HasNoLc Σ, lc_supply 0 ∗ £ n.
   Proof.
-    rewrite lc_unseal /lc_def lc_supply_unseal /lc_supply_def.
     (* Use [fresh] to pick *any* ghost name (it is unused anyway). *)
-    by iExists (LcGS HasNoLc _ _ (fresh (∅ : gset gname))).
+    iExists (LcGS HasNoLc _ _ (fresh (∅ : gset gname))).
+    by rewrite uPred_lc_unseal /uPred_lc_def lc_supply_unseal /lc_supply_def.
   Qed.
 
   (** Flexible soundness theorem through "finally" modality. *)

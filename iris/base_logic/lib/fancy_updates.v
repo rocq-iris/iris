@@ -65,7 +65,7 @@ Local Lemma uPred_fupd_unseal `{!invGS_gen hlc Σ} :
 Proof. rewrite -uPred_fupd_aux.(seal_eq) //. Qed.
 
 Lemma uPred_fupd_mixin `{!invGS_gen hlc Σ} :
-  BiFUpdMixin (uPredI (iResUR Σ)) uPred_fupd.
+  BiFUpdMixin (iPropI Σ) uPred_fupd.
 Proof.
   split.
   - rewrite uPred_fupd_unseal. solve_proper.
@@ -85,10 +85,10 @@ Proof.
     iIntros "!>". by iApply "HP".
   - rewrite uPred_fupd_unseal /uPred_fupd_def. by iIntros (????) "[HwP $]".
 Qed.
-Global Instance uPred_bi_fupd `{!invGS_gen hlc Σ} : BiFUpd (uPredI (iResUR Σ)) :=
+Global Instance uPred_bi_fupd `{!invGS_gen hlc Σ} : BiFUpd (iPropI Σ) :=
   {| bi_fupd_mixin := uPred_fupd_mixin |}.
 
-Global Instance uPred_bi_bupd_fupd `{!invGS_gen hlc Σ} : BiBUpdFUpd (uPredI (iResUR Σ)).
+Global Instance uPred_bi_bupd_fupd `{!invGS_gen hlc Σ} : BiBUpdFUpd (iPropI Σ).
 Proof. rewrite /BiBUpdFUpd uPred_fupd_unseal. by iIntros (E P) ">? [$ $] !>". Qed.
 
 (** If later credits are disabled, this lemma shows that [fupd] is just the
@@ -100,49 +100,22 @@ Proof.
   by rewrite later_credits.le_upd.le_upd_unfold_no_le.
 Qed.
 
+Global Instance uPred_bi_bupd_lc `{!lcGS hlc Σ} :
+  BiBUpdLaterCredits (iPropI Σ).
+Proof.
+  rewrite /BiBUpdLaterCredits later_credits.uPred_lc_unseal
+    /later_credits.uPred_lc_def.
+  destruct hlc; [|by auto]. iApply own_unit.
+Qed.
+
 (** Later credits: the laws for spending credits are only available when we opt
 into later credit support ([hlc = HasLc]). *)
-
-(** [lc_fupd_elim_later] allows to eliminate a later from a hypothesis at an update.
-This is typically used as [iMod (lc_fupd_elim_later with "Hcredit HP") as "HP".],
-where ["Hcredit"] is a credit available in the context and ["HP"] is the
-assumption from which a later should be stripped. *)
-Lemma lc_fupd_elim_later `{!invGS_gen HasLc Σ} E P :
-   £ 1 -∗ (▷ P) -∗ |={E}=> P.
+Global Instance uPred_bi_fupd_lc `{!invGS_gen HasLc Σ} :
+  BiFUpdLaterCredits (iPropI Σ).
 Proof.
+  rewrite /BiFUpdLaterCredits uPred_fupd_unseal /uPred_fupd_def=> E P.
   iIntros "Hf Hupd".
-  rewrite uPred_fupd_unseal /uPred_fupd_def.
   iIntros "[$ $]". by iApply (lc_le_upd_elim_later with "Hf").
-Qed.
-
-(** If the goal is a fancy update, this lemma can be used to make a later appear
-in front of it in exchange for a later credit. This is typically used as
-[iApply (lc_fupd_add_later with "Hcredit")], where ["Hcredit"] is a credit
-available in the context. *)
-Lemma lc_fupd_add_later `{!invGS_gen HasLc Σ} E1 E2 P :
-  £ 1 -∗ (▷ |={E1, E2}=> P) -∗ |={E1, E2}=> P.
-Proof.
-  iIntros "Hf Hupd". iApply (fupd_trans E1 E1).
-  iApply (lc_fupd_elim_later with "Hf Hupd").
-Qed.
-
-(** Similar to above, but here we are adding [n] laters. *)
-Lemma lc_fupd_add_laterN `{!invGS_gen HasLc Σ} E1 E2 P n :
-  £ n -∗ (▷^n |={E1, E2}=> P) -∗ |={E1, E2}=> P.
-Proof.
-  iIntros "Hf Hupd". iInduction n as [|n] "IH"; first done.
-  iDestruct "Hf" as "[H1 Hf]".
-  iApply (lc_fupd_add_later with "H1"); iNext.
-  iApply ("IH" with "[$] [$]").
-Qed.
-
-Lemma lc_fupd_add_step_fupdN `{!invGS_gen HasLc Σ} E1 E2 E3 P n :
-  £ n -∗ (|={E1}[E2]▷=>^n |={E1,E3}=> P) -∗ |={E1,E3}=> P.
-Proof.
-  iIntros "Hf Hupd". iInduction n as [|n] "IH"; simpl; first done.
-  iMod "Hupd". iDestruct "Hf" as "[H1 Hf]".
-  iApply (lc_fupd_add_later with "H1"); iNext.
-  iMod "Hupd". iApply ("IH" with "[$] [$]").
 Qed.
 
 (** * [fupd] soundness lemmas *)
@@ -385,7 +358,7 @@ End fupd_finally.
 opt out of the support for later credits. These rules are derived from the rules
 of the *finally* modality. *)
 Global Instance uPred_bi_fupd_sbi_no_lc `{!invGS_gen HasNoLc Σ} :
-  BiFUpdSbi (uPredI (iResUR Σ)).
+  BiFUpdSbi (iPropI Σ).
 Proof.
   split.
   - iIntros (E E' Pi R) "H".
