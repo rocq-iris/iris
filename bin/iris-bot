@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import sys, os, subprocess, json
+import sys, os, subprocess, json, re
 import requests, argparse
 from datetime import datetime, timezone
 from collections import namedtuple
@@ -13,10 +13,8 @@ from collections import namedtuple
 # Select only the "api" scope.
 #
 # Set at least one of IRIS_REV or STDPP_REV to control which branches of these
-# projects to build against (defaults to default git branch). IRIS_REPO and
-# STDPP_REPO can be used to take branches from forks. Setting IRIS to
-# "user:branch" will use the given branch on that user's fork of Iris, and
-# similar for STDPP.
+# projects to build against (defaults to default git branch). You can also set
+# them to a URL such as https://gitlab.mpi-sws.org/$user/iris/-/tree/$branch.
 #
 # Supported commands:
 # - `./iris-bot build [$filter]`: Builds all reverse dependencies against the
@@ -52,18 +50,16 @@ GITLAB_TOKEN = os.environ["GITLAB_TOKEN"]
 # automatically.
 BUILD_BRANCHES = {}
 for project in ['stdpp', 'iris', 'gpfsl']:
-    var = project.upper()
-    if var in os.environ:
-        (repo, rev) = os.environ[var].split(':')
-        repo = repo + "/" + project
-    else:
-        repo = os.environ.get(var+"_REPO", "iris/"+project)
-        rev = os.environ.get(var+"_REV")
+    rev = os.environ.get(project.upper()+"_REV")
     if rev is not None:
-        BUILD_BRANCHES[project] = (repo, rev)
+        url_matcher = re.fullmatch(r'https://gitlab.mpi-sws.org/([^/]+/[^/]+)/-/tree/([^/]+)', rev)
+        if url_matcher:
+            BUILD_BRANCHES[project] = (url_matcher.group(1), url_matcher.group(2))
+        else:
+            BUILD_BRANCHES[project] = ("iris/"+project, rev)
 
 if not "iris" in BUILD_BRANCHES:
-    print("Please set IRIS_REV, STDPP_REV, ORC11_REV and GPFSL_REV environment variables to the branch/tag/commit of the respective project that you want to use.")
+    print("Please set IRIS_REV, STDPP_REV, and GPFSL_REV environment variables to the branch/tag/commit of the respective project that you want to use.")
     print("Only IRIS_REV is mandatory, the rest defaults to the default git branch.")
     sys.exit(1)
 

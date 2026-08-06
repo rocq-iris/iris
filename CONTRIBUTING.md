@@ -108,10 +108,9 @@ Then you can easily get the token back into the environment via `. .env`.
 
 Once that setup is done, you can now use `iris-bot`. Set at least one of
 `IRIS_REV` or `STDPP_REV` to control which branches of these projects to build
-against (they default to the default git branch). `IRIS_REPO` and `STDPP_REPO`
-can be used to control the repository in which the branch is situated. Setting
-`IRIS` to "user:branch" will use the given branch on that user's fork of Iris,
-and similar for `STDPP`.
+against (they default to the default git branch). You can also set these
+variables to the URL of a branch in any fork of Iris (which you can obtain by
+right0clicking on the branch name in an MR and selecting "Copy Link").
 
 Supported commands:
 - `bin/iris-bot build [$filter]`: Builds all reverse dependencies against the
@@ -124,15 +123,15 @@ Supported commands:
 Examples:
 - `IRIS_REV=myname/mybranch ./iris-bot build` builds *all* reverse dependencies
   against `myname/mybranch` from the main Iris repository.
-- `IRIS=user:branch ./iris-bot build examples` builds the [examples] against
-  the `branch` in `user`'s fork of Iris.
+- `IRIS_REV=https://gitlab.mpi-sws.org/user/iris/-/tree/branch ./iris-bot build
+  examples` builds the [examples] against the `branch` in `user`'s fork of Iris.
 - `IRIS_REV=myname/mybranch ./iris-bot time all` measures the timing impact
   of `myname/mybranch` from the main Iris repository on *all* reverse
   dependencies with timing CI.
 - `IRIS_REV=myname/mybranch ./iris-bot time examples` measures the timing impact
-  of `myname/mybranch` from the main Iris repository on the [examples].
-  You can add `--test-rev` in case the examples need to be patched to
-  still build against `myname/mybranch`.
+  of `myname/mybranch` from the main Iris repository on the [examples]. You can
+  add `--test-rev` in case the examples need to be patched to still build
+  against `myname/mybranch` (but this has to be a branch in the main repo).
 
 [examples]: https://gitlab.mpi-sws.org/iris/examples
 
