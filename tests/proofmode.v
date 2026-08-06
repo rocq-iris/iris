@@ -1173,6 +1173,40 @@ Lemma text_iNext_Next `{!Sbi PROP} {A B : ofe} (f : A -n> A) x y :
   Next x ≡ Next y -∗ (Next (f x) ≡ Next (f y) : PROP).
 Proof. iIntros "H". iNext. by iRewrite "H". Qed.
 
+Lemma test_iNext_lc_discard `{!BiLaterCredits PROP, !BiFUpd PROP}
+    `{!BiFUpdLaterCredits PROP} E (P : PROP) :
+  £ 1 -∗ ▷ P ={E}=∗ P.
+Proof.
+  iIntros "Hcred HP". iNext credit: "Hcred".
+  (* Check that there is no [£ 0] left in the context *)
+  Show. auto.
+Qed.
+
+Lemma test_iNext_lc_keep `{!BiLaterCredits PROP, !BiFUpd PROP}
+   `{!BiFUpdLaterCredits PROP} n E (P : PROP) :
+  £ (S n) -∗ ▷ P ={E}=∗ P.
+Proof.
+  iIntros "Hcred HP". iNext credit: "Hcred".
+  (* Check that there is [£ n] left in the context *)
+  Show. auto.
+Qed.
+
+Lemma test_iNext_2 `{!BiLaterCredits PROP, !BiFUpd PROP}
+    `{!BiFUpdLaterCredits PROP} E (P : PROP) :
+  £ 2 -∗ ▷ ▷ P ={E}=∗ P.
+Proof.
+  iIntros "Hcred HP". iNext 2 credit: "Hcred".
+  (* Check that both later credits have been used *)
+  Show. auto.
+Qed.
+
+Lemma test_iNext_missing_instance `{!BiLaterCredits PROP, !BiFUpd PROP}
+    E (P: PROP) :
+  £ 1 -∗ ▷ P ={E}=∗ P.
+Proof.
+  iIntros "Hcred HP". Show. Fail iNext credit: "Hcred".
+Abort.
+
 Lemma test_iFrame_persistent (P Q : PROP) :
   □ P -∗ Q -∗ <pers> (P ∗ P) ∗ (P ∗ Q ∨ Q).
 Proof. iIntros "#HP". iFrame "HP". iIntros "$". Qed.

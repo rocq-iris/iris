@@ -132,6 +132,7 @@ iris/proofmode/classes.v
 iris/proofmode/classes_make.v
 iris/proofmode/class_instances.v
 iris/proofmode/class_instances_later.v
+iris/proofmode/class_instances_later_credits.v
 iris/proofmode/class_instances_updates.v
 iris/proofmode/class_instances_embedding.v
 iris/proofmode/class_instances_plainly.v
