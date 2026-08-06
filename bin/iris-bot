@@ -45,6 +45,10 @@ if not "GITLAB_TOKEN" in os.environ:
     sys.exit(1)
 GITLAB_TOKEN = os.environ["GITLAB_TOKEN"]
 
+def error(msg):
+    print("ERROR: " + msg)
+    sys.exit(1)
+
 # Pre-processing for branch variables of dependency projects: you can set
 # 'PROJECT' to 'user:branch', or set 'PROJECT_REPO' and 'PROJECT_REV'
 # automatically.
@@ -52,9 +56,11 @@ BUILD_BRANCHES = {}
 for project in ['stdpp', 'iris', 'gpfsl']:
     rev = os.environ.get(project.upper()+"_REV")
     if rev is not None:
-        url_matcher = re.fullmatch(r'https://gitlab.mpi-sws.org/([^/]+/[^/]+)/-/tree/([^/]+)', rev)
-        if url_matcher:
-            BUILD_BRANCHES[project] = (url_matcher.group(1), url_matcher.group(2))
+        if ':' in rev:
+            matcher = re.fullmatch(r'https://gitlab.mpi-sws.org/([^/]+/[^/]+)/-/tree/([^/]+)', rev)
+            if matcher is None:
+                error("{}={} seems to be invalid (not a valid branch name or URL)".format(project.upper()+"_REV", rev))
+            BUILD_BRANCHES[project] = (matcher.group(1), matcher.group(2))
         else:
             BUILD_BRANCHES[project] = ("iris/"+project, rev)
 
@@ -135,14 +141,12 @@ def time(args):
     # currently seem worth the effort / hacks.
     for project in BUILD_BRANCHES.keys():
         if project != 'iris':
-            print("'time' command only supports Iris branches")
-            sys.exit(1)
+            error("'time' command only supports Iris branches")
     (iris_repo, iris_rev) = BUILD_BRANCHES['iris']
     # Special mode: time everything
     if args.project == 'all':
         if args.test_rev is not None or args.base_rev is not None or args.iris_base_rev is not None:
-            print("'time all' does not support '--test-rev' nor '--base-rev' nor '--iris-base-rev'")
-            sys.exit(1)
+            error("'time all' does not support '--test-rev' nor '--base-rev' nor '--iris-base-rev'")
         for (name, project) in PROJECTS.items():
             if not project.get('timing'):
                 continue
@@ -152,20 +156,31 @@ def time(args):
     # Get project to test and ensure it supports timing
     project_name = args.project
     if project_name not in PROJECTS:
-        print("ERROR: no such project: {}".format(project_name))
-        sys.exit(1)
+        error("no such project: {}".format(project_name))
     project = PROJECTS[project_name]
     if not project.get('timing'):
-        print("ERROR: {} does not support timing".format(project_name))
-        sys.exit(1)
+        error("{} does not support timing".format(project_name))
+    # Prepare the test rev, if it is in a fork
+    test_rev = args.test_rev
+    if test_rev is not None and ':' in test_rev:
+        matcher = re.fullmatch(r'https://gitlab.mpi-sws.org/([^/]+/[^/]+)/-/tree/([^/]+)', test_rev)
+        if matcher is None:
+            error("--test-rev={} seems to be invalid (not a valid branch name or URL)".format(test_rev))
+        if args.scratch is None:
+            error("when --test-rev is a URL, --scratch must be set")
+        repo = matcher.group(1)
+        branch = matcher.group(2)
+        # Fetch that branch
+        subprocess.run(["git", "fetch", "-q", "https://gitlab.mpi-sws.org/{}".format(repo), branch], cwd=args.scratch, check=True)
+        # And push it to a 'bench' branch
+        subprocess.run(["git", "push", "-q", "-f", "https://gitlab.mpi-sws.org/iris/{}".format(project['name']), "FETCH_HEAD:refs/heads/bench"], cwd=args.scratch, check=True)
+        # Now we can test that branch
+        test_rev = "bench"
     # Run it!
-    job = time_project(project, iris_repo, iris_rev, args.iris_base_rev, args.test_rev, args.base_rev)
+    job = time_project(project, iris_repo, iris_rev, args.iris_base_rev, test_rev, args.base_rev)
     print("Triggering timing builds for {} with Iris base commit {} and test commit {} using ad-hoc ID {}...".format(project_name, job.iris_base_commit[:8], job.iris_test_commit[:8], job.id))
     print("    Base pipeline running at {}".format(job.base_pipeline))
-    if args.test_rev is None:
-        print("    Test pipeline running at {}".format(job.test_pipeline))
-    else:
-        print("    Test pipeline (on non-standard branch {}) running at {}".format(args.test_rev, job.test_pipeline))
+    print("    Test pipeline running at {}".format(job.test_pipeline))
     print("    Once done, timing comparison will be available at {}".format(job.compare))
 
 # Dispatch
@@ -180,7 +195,8 @@ if __name__ == "__main__":
 
     parser_time = subparsers.add_parser('time', help='Time one reverse dependency against an Iris branch')
     parser_time.add_argument("project", help="the project to measure the time of, or 'all' to measure all of them")
-    parser_time.add_argument("--test-rev", help="use different branch/tag of the project for the test build (in case the project requires changes to still build); must be in the main repo, not a fork, and cannot be just a commit ID")
+    parser_time.add_argument("--test-rev", help="use different branch/tag of the project for the test build (in case the project requires changes to still build); cannot be just a commit ID and if it is a branch URL for a fork, --scratch must be set")
+    parser_time.add_argument("--scratch", help="path to a local git clone of the project in question whose 'bench' branch can be overwritten; if this is set, --test-rev can also refer to a fork (using the same URL syntax as IRIS_REV)")
     parser_time.add_argument("--base-rev", help="use different branch/tag of the project for the baseline build (for benchmarking against old versions); defaults to the project's main branch")
     parser_time.add_argument("--iris-base-rev", help="use different revision of Iris for the baseline build (for benchmarking against old versions); defaults to 'master'")
     parser_time.set_defaults(func=time)

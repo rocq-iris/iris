@@ -131,7 +131,9 @@ Examples:
 - `IRIS_REV=myname/mybranch ./iris-bot time examples` measures the timing impact
   of `myname/mybranch` from the main Iris repository on the [examples]. You can
   add `--test-rev` in case the examples need to be patched to still build
-  against `myname/mybranch` (but this has to be a branch in the main repo).
+  against `myname/mybranch`. `--test-rev` can also be a branch URL in a fork,
+  but in that case `--scratch` must also be set to a checkout of the project
+  that is being benchmarked.
 
 [examples]: https://gitlab.mpi-sws.org/iris/examples
 
