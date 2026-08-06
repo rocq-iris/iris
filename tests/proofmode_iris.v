@@ -295,17 +295,17 @@ Section iris_tests.
   (** Make sure that the splitting rule for [+] gets preferred over the one for
   [S]. See issue #470. *)
   Check "test_iIntros_lc".
-  Lemma test_iIntros_lc n m : £ (S n + m) -∗ £ (S n).
+  Lemma test_iIntros_lc n m : £ (S n + m) ⊢@{iProp Σ} £ (S n).
   Proof. iIntros "[Hlc1 Hlc2]". Show. iExact "Hlc1". Qed.
 
   Check "lc_iSplit_lc".
-  Lemma lc_iSplit_lc n m : £ (S n) -∗ £ m -∗ £ (S n + m).
+  Lemma lc_iSplit_lc n m : £ (S n) ⊢@{iProp Σ} £ m -∗ £ (S n + m).
   Proof. iIntros "Hlc1 Hlc2". iSplitL "Hlc1". Show. all: done. Qed.
 
   (** Make sure that combining [n] and [1] later credits results in [S n] rather
   than [n + 1] later credits. *)
   Check "lc_iCombine_lc".
-  Lemma lc_iCombine_lc n : £ 1 -∗ £ n -∗ £ (S n).
+  Lemma lc_iCombine_lc n : £ 1 ⊢@{iProp Σ} £ n -∗ £ (S n).
   Proof. iIntros "Hlc1 Hlc2". iCombine "Hlc2 Hlc1" as "Hlc". Show. done. Qed.
 
   (** Make sure [iCombine] doesn't leave behind beta redexes. *)
