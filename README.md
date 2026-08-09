@@ -1,11 +1,11 @@
-# Iris Rocq Development [[rocqdoc]](https://plv.mpi-sws.org/coqdoc/iris/)
+# Iris Rocq Development [[rocqdoc]](https://plv.mpi-sws.org/rocqdoc/iris/)
 
 This is the Rocq development of the [Iris Project](http://iris-project.org),
 which includes [MoSeL](http://iris-project.org/mosel/), a general proof mode
 for carrying out separation logic proofs in Rocq.
 
 For using the Rocq library, check out the
-[API documentation](https://plv.mpi-sws.org/coqdoc/iris/).
+[API documentation](https://plv.mpi-sws.org/rocqdoc/iris/).
 
 For understanding the theory of Iris, a LaTeX version of the core logic
 definitions and some derived forms is available in
@@ -173,7 +173,7 @@ Getting along with Iris in Rocq:
 * The Iris tactics are described in the
   [the Iris Proof Mode (IPM) / MoSeL documentation](docs/proof_mode.md) as well as the
   [HeapLang documentation](docs/heap_lang.md).
-* The generated rocqdoc is [available online](https://plv.mpi-sws.org/coqdoc/iris/).
+* The generated rocqdoc is [available online](https://plv.mpi-sws.org/rocqdoc/iris/).
 
 Contacting the developers:
 
