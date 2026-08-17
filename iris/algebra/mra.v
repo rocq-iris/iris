@@ -92,10 +92,10 @@ Section mra.
   Proof. split; last done. intros ? ?; done. Qed.
 
   Local Instance mra_unit : Unit (mra R) := {| mra_car := [] |}.
-  Lemma auth_ucmra_mixin : UcmraMixin (mra R).
+  Lemma mra_ucmra_mixin : UcmraMixin (mra R).
   Proof. split; done. Qed.
 
-  Canonical Structure mraUR := Ucmra (mra R) auth_ucmra_mixin.
+  Canonical Structure mraUR := Ucmra (mra R) mra_ucmra_mixin.
 
   (* Laws *)
   Lemma mra_idemp x : x ⋅ x ≡ x.
