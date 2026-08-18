@@ -134,6 +134,7 @@ Iris now depends on rocq-elpi (version 3).
 * Change level of `resolve_proph:` to 99 so that it binds stronger than `;;`.
 * Reduce and re-organize re-exports to avoid shadowing issues around `val`.
 * Strengthen total WP adequacy to allocate a fixed number of later credits.
+* Strengthen `heap_closed_alloc` to no longer require freshness. (by Markus de Medeiros)
 
 The following `sed` script helps adjust your code to the renaming (on macOS,
 replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
