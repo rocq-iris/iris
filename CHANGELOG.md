@@ -18,6 +18,7 @@ Iris now depends on rocq-elpi (version 3).
 * Generalize `ofe_mixin_finite` and `cofe_finite` to `SIdxFinite`.
 * Define a COFE structure on `chain A` (when using finite step-indexing) to
   obtain a closure operation on OFEs. (by Simcha van Collem)
+* Remove incorrect unit instance for `max_Z`. (by Markus de Medeiros)
 
 **Changes in `bi`:**
 

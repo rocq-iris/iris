@@ -251,7 +251,6 @@ Section max_Z.
   Context {SI : sidx}.
   Local Open Scope Z_scope.
 
-  Local Instance max_Z_unit_instance : Unit max_Z := MaxZ 0.
   Local Instance max_Z_valid_instance : Valid max_Z := λ x, True.
   Local Instance max_Z_validN_instance : ValidN max_Z := λ n x, True.
   Local Instance max_Z_pcore_instance : PCore max_Z := Some.
