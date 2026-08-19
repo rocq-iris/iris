@@ -49,6 +49,8 @@
                 { "label": "mapsto", "body": "↦", "description": "↦" },
                 { "label": "hookrightarrow", "body": "↪", "description": "↪" },
                 { "label": "uparrow", "body": "↑", "description": "↑" },
+                { "label": "langle", "body": "⟨", "description": "⟨" },
+                { "label": "rangle", "body": "⟩", "description": "⟩" },
 
                 // Iris specific
                 { "label": "fun", "body": "λ", "description": "λ" },
