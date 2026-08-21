@@ -333,7 +333,7 @@ Section internal_eq.
     by rewrite -si_emp_valid_later bi.later_wand_iff.
   Qed.
 
-  (** TODO: Remove [SIdxFinite] once we use [SI] instead of [nat] for [siProp]
+  (** TODO: Remove [SIdxFinite] here and below once we use [SI] instead of [nat] for [siProp]
   in all of the lemmas below. *)
   Lemma internal_eq_soundness `{!SIdxFinite SI} {A : ofe} (x y : A) :
     (⊢@{PROP} x ≡ y) → x ≡ y.

@@ -5,7 +5,7 @@ From iris.si_logic Require Import siprop.
 
 (** TODO: This lemma will be removed once [siProp] has been ported to support
 any [sidx]. *)
- Lemma nat_to_sidx_id (n : nat) : nat_to_sidx n = n.
+Lemma nat_to_sidx_id (n : nat) : nat_to_sidx n = n.
 Proof. induction n; by f_equal/=. Qed.
 
 Local Hint Extern 1 (_ ≼ _) => etrans; [eassumption|] : core.

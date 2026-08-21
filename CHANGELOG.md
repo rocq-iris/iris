@@ -24,7 +24,8 @@ Iris now depends on rocq-elpi (version 3).
 
 * Make the `siProp` parametric in the type of "step indices" to prepare for the
   support of transfinite step indexing. Internally, `siProp` still uses finite
-  step indexing (i.e., `nat`), so this is only an intermediate step.
+  step indexing (i.e., `nat`), so transfinite step indices are not actually
+  properly supported. This is only an intermediate step.
 
 **Changes in `bi`:**
 
@@ -70,7 +71,7 @@ Iris now depends on rocq-elpi (version 3).
 * Make the `bi` folder (with the exception of `monPred`) parametric in the type
   of "step indices" to prepare for the support of transfinite step indexing. The
   laws of the BI interfaces have not been changed, so BIs cannot yet be
-  instantiated with logics that actually use Transfinite step-indexing. (by
+  instantiated with logics that actually use transfinite step-indexing. (by
   Simon Spies)
 
 **Changes in `proofmode`:**
