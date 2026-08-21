@@ -1748,6 +1748,7 @@ Global Instance bi_persistently_sep_entails_homomorphism :
 Proof. split; [by apply _ ..|]. simpl. apply persistently_emp_intro. Qed.
 
 (* Limits *)
+(** These lemmas need [SIdxFinite], see comment of [limit_preserving_equiv]. *)
 Lemma limit_preserving_entails
     `{!SIdxFinite SI} {A : ofe} `{!Cofe A} (Φ Ψ : A → PROP) :
   NonExpansive Φ → NonExpansive Ψ → LimitPreserving (λ x, Φ x ⊢ Ψ x).

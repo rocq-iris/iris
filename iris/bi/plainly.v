@@ -342,6 +342,7 @@ Section plainly.
     - apply persistently_mono, wand_intro_l. by rewrite sep_and impl_elim_r.
   Qed.
 
+  (** Needs [SIdxFinite], see comment of [limit_preserving_equiv]. *)
   Global Instance limit_preserving_Plain `{!SIdxFinite SI, !Cofe A} (Φ : A → PROP) :
     NonExpansive Φ → LimitPreserving (λ x, Plain (Φ x)).
   Proof. intros. apply limit_preserving_entails; solve_proper. Qed.

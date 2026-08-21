@@ -1,4 +1,5 @@
 From stdpp Require Import coPset.
+(** TODO: Remove when the Transfinite transition is complete. *)
 From iris.algebra Require Import stepindex_finite.
 From iris.bi Require Import bi.
 

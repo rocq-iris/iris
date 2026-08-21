@@ -4,8 +4,10 @@ From iris.bi Require Import notation.
 From iris.si_logic Require Import siprop.
 
 (** TODO: This lemma will be removed once [siProp] has been ported to support
-any [sidx]. *)
- Lemma nat_to_sidx_id (n : nat) : nat_to_sidx n = n.
+any [sidx]. This lemma is not next to the other [nat_to_sidx] lemmas in the
+[siprop] file because it requires the [natSI] instance, which is not imported
+there. *)
+Lemma nat_to_sidx_id (n : nat) : nat_to_sidx n = n.
 Proof. induction n; by f_equal/=. Qed.
 
 Local Hint Extern 1 (_ ≼ _) => etrans; [eassumption|] : core.

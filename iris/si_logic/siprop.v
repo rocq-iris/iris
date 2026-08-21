@@ -5,7 +5,7 @@ From iris.bi Require Import notation.
 define the usual connectives of higher-order logic, and prove that these satisfy
 the usual laws of higher-order logic. *)
 Record siProp {SI : sidx} := SiProp {
-  siProp_holds : nat → Prop;
+  siProp_holds : nat → Prop; (* see below for why this is still [nat] *)
   siProp_closed n1 n2 : siProp_holds n1 → n2 ≤ n1 → siProp_holds n2
 }.
 Local Coercion siProp_holds : siProp >-> Funclass.
@@ -35,7 +35,7 @@ Lemma nat_to_sidx_mono {SI : sidx} n m :
   n ≤ m → (nat_to_sidx n ≤ nat_to_sidx m)%sidx.
 Proof. induction 1; simpl; [done|]. etrans; [done|apply SIdx.le_succ_diag_r]. Qed.
 
-Lemma nat_to_sidx_mono_foo {SI : sidx} n m :
+Lemma nat_to_sidx_mono_inv {SI : sidx} n m :
   (nat_to_sidx n ≤ nat_to_sidx m)%sidx → n ≤ m.
 Proof.
   revert m. induction n as [|n IH]; [lia|]; intros [|m] Hnm; simpl in *.
@@ -391,7 +391,7 @@ Section primitive.
   Proof.
     unseal; split=> n /= HPQ. split=> n' Hn.
     move: HPQ=> [] /(_ n') ? /(_ n').
-    apply nat_to_sidx_mono_foo in Hn. naive_solver.
+    apply nat_to_sidx_mono_inv in Hn. naive_solver.
   Qed.
 
   Lemma fun_extI {A} {B : A → ofe} (g1 g2 : discrete_fun B) :

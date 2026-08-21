@@ -10,6 +10,16 @@ The tactic [sbi_unfold] turns it into
 
   ∀ n, x ≼{n} y ↔ x.1 ≼{n} y.1 ∧ x.2 ≼{n} y.2
 
+TODO: As part of the Transfinite transition, the tactic generates goals:
+
+  ∀ n : nat, x ≼{nat_to_sdix n} y ↔
+             x.1 ≼{nat_to_sdix n} y.1 ∧ x.2 ≼{nat_to_sdix n} y.2
+
+The [nat_to_sdix] coercion should not affect most uses of the tactic. Simply use
+[sbi_unfold=> n], and then apply your lemma with explicit step-indexing. See
+[iris.bi.algebra] for examples. Once the Transfinite transition is complete,
+the tactic will generate goals of the form [∀ n : SI].
+
 The tactic [sbi_unfold] works for goals of the shape [⊢ P], [P ⊢ Q], [P ⊣⊢ Q].
 Here, [P] and [Q] should be in the "plain" subset of propositions, i.e., [⌜ _ ⌝],
 [<si_pure>], [✓], [≡], [≼], closed under [∧], [∨], [→], [∀], [∃], [▷], and
