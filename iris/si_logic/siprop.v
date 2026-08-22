@@ -35,7 +35,7 @@ Lemma nat_to_sidx_mono {SI : sidx} n m :
   n ≤ m → (nat_to_sidx n ≤ nat_to_sidx m)%sidx.
 Proof. induction 1; simpl; [done|]. etrans; [done|apply SIdx.le_succ_diag_r]. Qed.
 
-Lemma nat_to_sidx_mono_foo {SI : sidx} n m :
+Lemma nat_to_sidx_mono_inv {SI : sidx} n m :
   (nat_to_sidx n ≤ nat_to_sidx m)%sidx → n ≤ m.
 Proof.
   revert m. induction n as [|n IH]; [lia|]; intros [|m] Hnm; simpl in *.
@@ -391,7 +391,7 @@ Section primitive.
   Proof.
     unseal; split=> n /= HPQ. split=> n' Hn.
     move: HPQ=> [] /(_ n') ? /(_ n').
-    apply nat_to_sidx_mono_foo in Hn. naive_solver.
+    apply nat_to_sidx_mono_inv in Hn. naive_solver.
   Qed.
 
   Lemma fun_extI {A} {B : A → ofe} (g1 g2 : discrete_fun B) :

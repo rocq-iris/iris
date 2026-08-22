@@ -42,9 +42,9 @@ Proof. by rewrite /MakeEmbed. Qed.
 
 (** Sep *)
 Global Instance make_sep_emp_l P : KnownLMakeSep emp P P.
-Proof. apply left_id, _. Qed.
+Proof. rewrite /KnownLMakeSep /MakeSep. by rewrite left_id. Qed.
 Global Instance make_sep_emp_r P : KnownRMakeSep P emp P.
-Proof. rewrite /KnownRMakeSep /MakeSep. apply right_id, _. Qed.
+Proof. rewrite /KnownRMakeSep /MakeSep. by rewrite right_id. Qed.
 Global Instance make_sep_true_l P : QuickAbsorbing P → KnownLMakeSep True P P.
 Proof. rewrite /QuickAbsorbing /KnownLMakeSep /MakeSep=> ?. by apply True_sep. Qed.
 Global Instance make_sep_true_r P : QuickAbsorbing P →  KnownRMakeSep P True P.
@@ -54,33 +54,33 @@ Proof. by rewrite /MakeSep. Qed.
 
 (** And *)
 Global Instance make_and_true_l P : KnownLMakeAnd True P P.
-Proof. apply left_id, _. Qed.
+Proof. rewrite /KnownLMakeAnd /MakeAnd. by rewrite left_id. Qed.
 Global Instance make_and_true_r P : KnownRMakeAnd P True P.
-Proof. by rewrite /KnownRMakeAnd /MakeAnd right_id. Qed.
+Proof. rewrite /KnownRMakeAnd /MakeAnd. by rewrite right_id. Qed.
 Global Instance make_and_emp_l P : QuickAffine P → KnownLMakeAnd emp P P.
 Proof. apply emp_and. Qed.
 Global Instance make_and_emp_r P : QuickAffine P → KnownRMakeAnd P emp P.
 Proof. apply and_emp. Qed.
 Global Instance make_and_false_l P : KnownLMakeAnd False P False.
-Proof. apply left_absorb, _. Qed.
+Proof. rewrite /KnownLMakeAnd /MakeAnd. by rewrite left_absorb. Qed.
 Global Instance make_and_false_r P : KnownRMakeAnd P False False.
-Proof. by rewrite /KnownRMakeAnd /MakeAnd right_absorb. Qed.
+Proof. rewrite /KnownRMakeAnd /MakeAnd. by rewrite right_absorb. Qed.
 Global Instance make_and_default P Q : MakeAnd P Q (P ∧ Q) | 100.
 Proof. by rewrite /MakeAnd. Qed.
 
 (** Or *)
 Global Instance make_or_true_l P : KnownLMakeOr True P True.
-Proof. apply left_absorb, _. Qed.
+Proof. rewrite /KnownLMakeOr /MakeOr. by rewrite left_absorb. Qed.
 Global Instance make_or_true_r P : KnownRMakeOr P True True.
-Proof. by rewrite /KnownRMakeOr /MakeOr right_absorb. Qed.
+Proof. rewrite /KnownRMakeOr /MakeOr. by rewrite right_absorb. Qed.
 Global Instance make_or_emp_l P : QuickAffine P → KnownLMakeOr emp P emp.
 Proof. apply emp_or. Qed.
 Global Instance make_or_emp_r P : QuickAffine P → KnownRMakeOr P emp emp.
 Proof. apply or_emp. Qed.
 Global Instance make_or_false_l P : KnownLMakeOr False P P.
-Proof. apply left_id, _. Qed.
+Proof. rewrite /KnownLMakeOr /MakeOr. by rewrite left_id. Qed.
 Global Instance make_or_false_r P : KnownRMakeOr P False P.
-Proof. by rewrite /KnownRMakeOr /MakeOr right_id. Qed.
+Proof. rewrite /KnownRMakeOr /MakeOr. by rewrite right_id. Qed.
 Global Instance make_or_default P Q : MakeOr P Q (P ∨ Q) | 100.
 Proof. by rewrite /MakeOr. Qed.
 
