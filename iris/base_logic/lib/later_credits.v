@@ -413,7 +413,7 @@ Module le_upd.
     Proof.
       rewrite le_upd_finally_unseal /le_upd_finally_def. iIntros "H %m Hlc".
       iEval (rewrite -later_plainly -except_0_plainly
-        -except_0_intro -laterN_later /=).
+        -except_0_intro -laterN_succ_r /=).
       iNext. by iApply "H".
     Qed.
 
@@ -423,7 +423,7 @@ Module le_upd.
     Lemma le_upd_finally_add_lc P : (£ 1 -∗ |==£|■> P) ⊢ |==£|■> ▷ ◇ P.
     Proof.
       rewrite le_upd_finally_unseal. iIntros "H %m Hlc".
-      rewrite -except_0_intro -later_plainly -except_0_plainly -laterN_later.
+      rewrite -except_0_intro -later_plainly -except_0_plainly -laterN_succ_r.
       destruct hlc.
       - iMod (later_credits.lc_increase_supply 1 with "Hlc") as "[Hlc H£]".
         iApply ("H" with "H£ Hlc").
@@ -450,7 +450,7 @@ Module le_upd.
         - iDestruct (lc_supply_no_lc with "Hc") as %->; simpl.
           iApply ("H" with "Hc").
         - iApply (timeless_laterN _ (S n)). iSpecialize ("H" with "Hc").
-          by iEval (rewrite except_0_into_later -laterN_later) in "H". }
+          by iEval (rewrite except_0_into_later -laterN_succ_r) in "H". }
       iDestruct "H" as "[_ H]". by iApply (le_upd_unfold with "(H [//])").
     Qed.
 
@@ -471,7 +471,7 @@ Module le_upd.
   Proof.
     rewrite le_upd_finally_unseal. intros HP. destruct hlc.
     - apply (laterN_soundness _ (S n)).
-      rewrite laterN_later -except_0_into_later -(plainly_elim P).
+      rewrite laterN_succ_r -except_0_into_later -(plainly_elim P).
       iMod (lc_alloc n) as (Hc) "[Hlc H£]". iApply (HP with "H£ Hlc").
     - apply (laterN_soundness _ 1).
       iDestruct (lc_alloc_no_lc n) as (Hc) "[Hlc H£]".

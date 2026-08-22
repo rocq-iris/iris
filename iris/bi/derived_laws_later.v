@@ -193,9 +193,9 @@ Global Instance laterN_proper m :
 
 Lemma laterN_0 P : ▷^0 P ⊣⊢ P.
 Proof. done. Qed.
-Lemma later_laterN n P : ▷^(S n) P ⊣⊢ ▷ ▷^n P.
+Lemma laterN_succ_l n P : ▷^(S n) P ⊣⊢ ▷ ▷^n P.
 Proof. done. Qed.
-Lemma laterN_later n P : ▷^(S n) P ⊣⊢ ▷^n ▷ P.
+Lemma laterN_succ_r n P : ▷^(S n) P ⊣⊢ ▷^n ▷ P.
 Proof. induction n; f_equiv/=; auto. Qed.
 Lemma laterN_add n1 n2 P : ▷^(n1 + n2) P ⊣⊢ ▷^n1 ▷^n2 P.
 Proof. induction n1; f_equiv/=; auto. Qed.

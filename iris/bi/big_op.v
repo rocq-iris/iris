@@ -2592,7 +2592,7 @@ Section map2.
     ⊢ ▷^n [∗ map] k↦x1;x2 ∈ m1;m2, Φ k x1 x2.
   Proof.
     induction n as [|n IHn]; first done.
-    rewrite later_laterN -IHn -big_sepM2_later_2.
+    rewrite laterN_succ_l -IHn -big_sepM2_later_2.
     apply big_sepM2_mono. eauto.
   Qed.
 

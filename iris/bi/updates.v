@@ -619,7 +619,7 @@ Section fupd_derived.
     Proof.
       revert P. induction n as [|n IH]=> P /=.
       { by rewrite -except_0_intro plainly_elim. }
-      rewrite -!later_laterN !laterN_later.
+      rewrite -!laterN_succ_l !laterN_succ_r.
       rewrite -plainly_idemp fupd_plainly_later.
       by rewrite except_0_plainly_1 later_plainly_1 IH except_0_later.
     Qed.
