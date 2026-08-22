@@ -61,6 +61,7 @@ Iris now depends on rocq-elpi (version 3).
   characterization of timeless propositions) to use the `<only0>` modality.
 * Add commuting rules for monPred's `<subj>` modality with `<pers>`, `<absorb>`,
   `<affine>` and `□`. Add a rule to apply a `-∗` under the `<subj>` modality.
+* Rename `later_laterN` → `laterN_succ_l` and `laterN_later` → `laterN_succ_r`.
 
 **Changes in `proofmode`:**
 
@@ -164,6 +165,9 @@ s/\bstep_fupdN_soundness_lc'\b/step_fupdN_soundness HasLc/g
 s/\bstep_fupdN_soundness_no_lc'\b/step_fupdN_soundness HasNoLc/g
 # Coq/Rocq rename
 s/\bcoq_tactics\b/rocq_tactics/g
+# later succ
+s/\blater_laterN\b/laterN_succ_l/g
+s/\blaterN_later\b/laterN_succ_r/g
 EOF
 ```
 
