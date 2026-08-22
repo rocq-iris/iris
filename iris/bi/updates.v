@@ -556,10 +556,10 @@ Section fupd_derived.
 
   Lemma step_fupdN_0 Eo Ei P : (|={Eo}[Ei]▷=>^0 P) ⊣⊢ P.
   Proof. done. Qed.
-  Lemma step_fupd_step_fupdN Eo Ei n P :
+  Lemma step_fupdN_succ_l Eo Ei n P :
     (|={Eo}[Ei]▷=>^(S n) P) ⊣⊢ |={Eo}[Ei]▷=> |={Eo}[Ei]▷=>^n P.
   Proof. done. Qed.
-  Lemma step_fupdN_step_fupd Eo Ei n P :
+  Lemma step_fupdN_succ_r Eo Ei n P :
     (|={Eo}[Ei]▷=>^(S n) P) ⊣⊢ |={Eo}[Ei]▷=>^n |={Eo}[Ei]▷=> P.
   Proof. induction n; simpl; by repeat f_equiv. Qed.
   Lemma step_fupdN_add n m Eo Ei P :
@@ -584,7 +584,7 @@ Section fupd_derived.
   Lemma step_fupdN_S_fupd n E P :
     (|={E}[∅]▷=>^(S n) P) ⊣⊢ (|={E}[∅]▷=>^(S n) |={E}=> P).
   Proof.
-    apply (anti_symm (⊢)); rewrite !step_fupdN_step_fupd -step_fupd_fupd //.
+    apply (anti_symm (⊢)); rewrite !step_fupdN_succ_r -step_fupd_fupd //.
   Qed.
 
   Lemma step_fupdN_frame_l Eo Ei n R Q :
@@ -705,9 +705,9 @@ Section fupd_derived.
     Lemma step_fupdN_plain Eo Ei n P `{!Plain P} :
       (|={Eo}[Ei]▷=>^n P) ⊢ |={Eo}=> ▷^n ◇ P.
     Proof.
-      induction n as [|n IH].
+      induction n as [|n IH]; simpl.
       { by rewrite -fupd_intro -except_0_intro. }
-      rewrite step_fupd_step_fupdN step_fupd_fupd IH !fupd_trans /=.
+      rewrite step_fupd_fupd IH !fupd_trans /=.
       by rewrite step_fupd_plain except_0_laterN except_0_idemp.
     Qed.
 
