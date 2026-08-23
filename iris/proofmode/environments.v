@@ -84,6 +84,16 @@ Inductive env_subenv {A} : relation (env A) :=
   | env_subenv_skip Γ1 Γ2 i y :
      env_subenv Γ1 Γ2 → env_subenv Γ1 (Esnoc Γ2 i y).
 
+Fixpoint env_to_prop_go {PROP : bi} (acc : PROP) (Γ : env PROP) : PROP :=
+  match Γ with Enil => acc | Esnoc Γ _ P => env_to_prop_go (P ∗ acc) Γ end.
+Definition env_to_prop {PROP : bi} (Γ : env PROP) : PROP :=
+  match Γ with Enil => emp | Esnoc Γ _ P => env_to_prop_go P Γ end.
+
+Fixpoint env_to_prop_and_go {PROP : bi} (acc : PROP) (Γ : env PROP) : PROP :=
+  match Γ with Enil => acc | Esnoc Γ _ P => env_to_prop_and_go (P ∧ acc) Γ end.
+Definition env_to_prop_and {PROP : bi} (Γ : env PROP) : PROP :=
+  match Γ with Enil => True | Esnoc Γ _ P => env_to_prop_and_go P Γ end.
+
 Section env.
   Context {A : Type}.
   Implicit Types Γ : env A.
@@ -250,7 +260,7 @@ Definition envs_wf {PROP : bi} (Δ : envs PROP) :=
 Notation env_and_persistently Γ := ([∧ list] P ∈ env_to_list Γ, <pers> P)%I.
 
 Definition of_envs' {PROP : bi} (Γp Γs : env PROP) : PROP :=
-  (⌜envs_wf' Γp Γs⌝ ∧ env_and_persistently Γp ∧ [∗] Γs)%I.
+  ⌜envs_wf' Γp Γs⌝ ∧ env_and_persistently Γp ∧ [∗] Γs.
 Global Instance: Params (@of_envs') 1 := {}.
 Definition of_envs {PROP : bi} (Δ : envs PROP) : PROP :=
   of_envs' (env_intuitionistic Δ) (env_spatial Δ).
@@ -367,16 +377,6 @@ Definition envs_split {PROP} (d : direction)
     (js : list ident) (Δ : envs PROP) : option (envs PROP * envs PROP) :=
   '(Δ1,Δ2) ← envs_split_go js Δ (envs_clear_spatial Δ);
   if d is Right then Some (Δ1,Δ2) else Some (Δ2,Δ1).
-
-Fixpoint env_to_prop_go {PROP : bi} (acc : PROP) (Γ : env PROP) : PROP :=
-  match Γ with Enil => acc | Esnoc Γ _ P => env_to_prop_go (P ∗ acc)%I Γ end.
-Definition env_to_prop {PROP : bi} (Γ : env PROP) : PROP :=
-  match Γ with Enil => emp%I | Esnoc Γ _ P => env_to_prop_go P Γ end.
-
-Fixpoint env_to_prop_and_go {PROP : bi} (acc : PROP) (Γ : env PROP) : PROP :=
-  match Γ with Enil => acc | Esnoc Γ _ P => env_to_prop_and_go (P ∧ acc)%I Γ end.
-Definition env_to_prop_and {PROP : bi} (Γ : env PROP) : PROP :=
-  match Γ with Enil => True%I | Esnoc Γ _ P => env_to_prop_and_go P Γ end.
 
 Section envs.
   Context {PROP : bi}.
