@@ -906,6 +906,7 @@ Chen, and Yusuke Matsushita. Thanks a lot to everyone involved!
 * Add `envs_to_prop` to transform the environment into a "pretty" proposition.
 * Generalize `env_to_prop_and_pers_sound` to work on any `env` instead of just
   `Esnoc`.
+* Remove `env_subenv`.
 
 **Changes in `base_logic`:**
 
