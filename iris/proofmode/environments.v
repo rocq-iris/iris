@@ -77,13 +77,6 @@ Inductive env_Forall2 {A B} (P : A → B → Prop) : env A → env B → Prop :=
   | env_Forall2_snoc Γ1 Γ2 i x y :
      env_Forall2 P Γ1 Γ2 → P x y → env_Forall2 P (Esnoc Γ1 i x) (Esnoc Γ2 i y).
 
-Inductive env_subenv {A} : relation (env A) :=
-  | env_subenv_nil : env_subenv Enil Enil
-  | env_subenv_snoc Γ1 Γ2 i x :
-     env_subenv Γ1 Γ2 → env_subenv (Esnoc Γ1 i x) (Esnoc Γ2 i x)
-  | env_subenv_skip Γ1 Γ2 i y :
-     env_subenv Γ1 Γ2 → env_subenv Γ1 (Esnoc Γ2 i y).
-
 (** Defined as a [Notation] so that [env_and_persistently] is "refolded" after
 a [simpl]. *)
 Notation env_and_persistently Γ := ([∧ list] P ∈ env_to_list Γ, <pers> P)%I.
@@ -213,14 +206,6 @@ Section env.
   Lemma env_Forall2_wf {B} (P : A → B → Prop) Γ Σ :
     env_Forall2 P Γ Σ → env_wf Γ → env_wf Σ.
   Proof. induction 1; inversion_clear 1; eauto using env_Forall2_fresh. Qed.
-
-  Lemma env_subenv_fresh Γ Σ i : env_subenv Γ Σ → Σ !! i = None → Γ !! i = None.
-  Proof. by induction 1; simplify. Qed.
-  Lemma env_subenv_wf Γ Σ : env_subenv Γ Σ → env_wf Σ → env_wf Γ.
-  Proof. induction 1; inversion_clear 1; eauto using env_subenv_fresh. Qed.
-  Global Instance env_to_list_subenv_proper :
-    Proper (env_subenv ==> sublist) (@env_to_list A).
-  Proof. induction 1; simpl; constructor; auto. Qed.
 End env.
 
 Section env_bi.
