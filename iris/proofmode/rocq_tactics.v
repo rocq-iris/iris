@@ -22,20 +22,11 @@ Proof.
 Qed.
 
 Lemma tac_stop Δ P :
-  (match env_intuitionistic Δ, env_spatial Δ with
-   | Enil, Γs => env_to_prop Γs
-   | Γp, Enil => □ env_to_prop_and Γp
-   | Γp, Γs => □ env_to_prop_and Γp ∗ env_to_prop Γs
-   end ⊢ P) →
+  (envs_to_prop Δ ⊢ P) →
   envs_entails Δ P.
 Proof.
-  rewrite envs_entails_unseal !of_envs_eq. intros <-. rewrite and_elim_r.
-  destruct (env_intuitionistic Δ).
-  { rewrite env_to_prop_sound and_elim_r //. }
-  cbv zeta. destruct (env_spatial Δ).
-  - rewrite env_to_prop_and_pers_sound. rewrite comm. done.
-  - rewrite env_to_prop_and_pers_sound env_to_prop_sound.
-    rewrite /bi_affinely [(emp ∧ _)%I]comm -persistent_and_sep_assoc left_id //.
+  intros HP. rewrite envs_entails_unseal -envs_to_prop_sound.
+  by rewrite HP and_elim_r.
 Qed.
 
 (** * Basic rules *)
