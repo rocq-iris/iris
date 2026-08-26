@@ -84,6 +84,10 @@ Inductive env_subenv {A} : relation (env A) :=
   | env_subenv_skip Γ1 Γ2 i y :
      env_subenv Γ1 Γ2 → env_subenv Γ1 (Esnoc Γ2 i y).
 
+(** Defined as a [Notation] so that [env_and_persistently] is "refolded" after
+a [simpl]. *)
+Notation env_and_persistently Γ := ([∧ list] P ∈ env_to_list Γ, <pers> P)%I.
+
 Fixpoint env_to_prop_go {PROP : bi} (acc : PROP) (Γ : env PROP) : PROP :=
   match Γ with Enil => acc | Esnoc Γ _ P => env_to_prop_go (P ∗ acc) Γ end.
 Definition env_to_prop {PROP : bi} (Γ : env PROP) : PROP :=
@@ -219,6 +223,31 @@ Section env.
   Proof. induction 1; simpl; constructor; auto. Qed.
 End env.
 
+Section env_bi.
+  Context {PROP : bi}.
+  Implicit Types Γ : env PROP.
+
+  Lemma env_to_prop_sound Γ : env_to_prop Γ ⊣⊢ [∗] Γ.
+  Proof.
+    destruct Γ as [|Γ i P]; simpl; first done.
+    revert P. induction Γ as [|Γ IH ? Q]=>P; simpl.
+    - by rewrite right_id.
+    - rewrite /= IH (comm _ Q _) assoc. done.
+  Qed.
+
+  Lemma env_to_prop_and_pers_sound Γ :
+    □ env_to_prop_and Γ ⊣⊢ <affine> env_and_persistently Γ.
+  Proof.
+    destruct Γ as [|Γ i P]; simpl.
+    { by rewrite intuitionistically_True_emp affinely_True_emp. }
+    revert P. induction Γ as [|Γ IH ? Q]=>P; simpl.
+    - by rewrite right_id.
+    - rewrite /= IH. clear IH. f_equiv. simpl.
+      rewrite assoc. f_equiv.
+      rewrite persistently_and comm. done.
+  Qed.
+End env_bi.
+
 Record envs (PROP : bi) := Envs {
   env_intuitionistic : env PROP;
   env_spatial : env PROP;
@@ -256,8 +285,6 @@ Record envs_wf' {PROP : bi} (Γp Γs : env PROP) := {
 }.
 Definition envs_wf {PROP : bi} (Δ : envs PROP) :=
   envs_wf' (env_intuitionistic Δ) (env_spatial Δ).
-
-Notation env_and_persistently Γ := ([∧ list] P ∈ env_to_list Γ, <pers> P)%I.
 
 Definition of_envs' {PROP : bi} (Γp Γs : env PROP) : PROP :=
   ⌜envs_wf' Γp Γs⌝ ∧ env_and_persistently Γp ∧ [∗] Γs.
@@ -377,6 +404,13 @@ Definition envs_split {PROP} (d : direction)
     (js : list ident) (Δ : envs PROP) : option (envs PROP * envs PROP) :=
   '(Δ1,Δ2) ← envs_split_go js Δ (envs_clear_spatial Δ);
   if d is Right then Some (Δ1,Δ2) else Some (Δ2,Δ1).
+
+Definition envs_to_prop {PROP} (Δ : envs PROP) : PROP :=
+  match env_intuitionistic Δ, env_spatial Δ with
+  | Enil, Γs => env_to_prop Γs
+  | Γp, Enil => □ env_to_prop_and Γp
+  | Γp, Γs => □ env_to_prop_and Γp ∗ env_to_prop Γs
+  end.
 
 Section envs.
   Context {PROP : bi}.
@@ -814,21 +848,14 @@ Section envs.
     destruct d; simplify_eq/=; [|done]. by rewrite comm.
   Qed.
 
-  Lemma env_to_prop_sound Γ : env_to_prop Γ ⊣⊢ [∗] Γ.
+  Lemma envs_to_prop_sound Δ : ⌜envs_wf Δ⌝ ∧ envs_to_prop Δ ⊣⊢ of_envs Δ.
   Proof.
-    destruct Γ as [|Γ i P]; simpl; first done.
-    revert P. induction Γ as [|Γ IH ? Q]=>P; simpl.
-    - by rewrite right_id.
-    - rewrite /= IH (comm _ Q _) assoc. done.
-  Qed.
-
-  Lemma env_to_prop_and_pers_sound Γ i P :
-    □ env_to_prop_and (Esnoc Γ i P) ⊣⊢ <affine> env_and_persistently (Esnoc Γ i P).
-  Proof.
-    revert P. induction Γ as [|Γ IH ? Q]=>P; simpl.
-    - by rewrite right_id.
-    - rewrite /= IH. clear IH. f_equiv. simpl.
-      rewrite assoc. f_equiv.
-      rewrite persistently_and comm. done.
+    rewrite /envs_to_prop !of_envs_eq. f_equiv.
+    destruct (env_intuitionistic Δ) as [|Γp].
+    { by rewrite env_to_prop_sound /= left_id. }
+    destruct (env_spatial Δ) as [|Γs].
+    { by rewrite env_to_prop_and_pers_sound /= /bi_affinely (comm _ emp%I). }
+    rewrite env_to_prop_and_pers_sound env_to_prop_sound.
+    rewrite /bi_affinely [(emp ∧ _)%I]comm -persistent_and_sep_assoc left_id //.
   Qed.
 End envs.

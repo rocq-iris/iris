@@ -899,6 +899,9 @@ Chen, and Yusuke Matsushita. Thanks a lot to everyone involved!
   `a ≡ b` will now be simplified to `a = b` upon introduction into the pure 
   context. This will break but simplify some existing proofs: 
   `iIntros (H%leibniz_equiv)` should be replaced by `iIntros (H)`. (by Ike Mulder)
+* Add `envs_to_prop` to transform the environment into a "pretty" proposition.
+* Generalize `env_to_prop_and_pers_sound` to work on any `env` instead of just
+  `Esnoc`.
 
 **Changes in `base_logic`:**
 

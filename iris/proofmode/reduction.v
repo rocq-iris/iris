@@ -47,7 +47,7 @@ Declare Reduction pm_eval := cbv [
   envs_simple_replace envs_replace envs_split
   envs_clear_spatial envs_clear_intuitionistic envs_incr_counter
   envs_split_go envs_split
-  env_to_prop_go env_to_prop env_to_prop_and_go env_to_prop_and
+  env_to_prop_go env_to_prop env_to_prop_and_go env_to_prop_and envs_to_prop
   (* PM list and option functions *)
   pm_app pm_option_bind pm_from_option pm_option_fun
 ].
