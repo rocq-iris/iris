@@ -85,6 +85,11 @@ Iris now depends on rocq-elpi (version 3).
   indexing. The laws of the BI interfaces have not been changed, so BIs cannot
   yet be instantiated with logics that actually use transfinite step-indexing.
   (by Simon Spies)
+* Add `BiLaterCredits`, `BiBUpdLaterCredits`, `BiFUpdLaterCredits` typeclasses,
+  which generalize later credits to arbitrary BI. (by Simcha van Collem)
+  + This also generalizes the `iNext n credit: H` tactic to arbitrary BI.
+  + Instances of these typeclasses are given for `iProp`, and for `monPred` when
+    later credits are available in its underlying BI.
 
 **Changes in `proofmode`:**
 
@@ -154,6 +159,8 @@ Iris now depends on rocq-elpi (version 3).
   (`⧖+ n`) and persistent (`⧖□ n`) time receipts. Time receipts will be used as
   permissions to eliminate multiple laters in the future physical step modality.
   (by Thomas Somers)
+* Remove the export of `stdpp.nat_cancel` from `lib.fancy_updates`. This was an
+  implementation detail and shouldn't have been exported. (by Simcha van Collem)
 
 **Changes in `program_logic`:**
 
