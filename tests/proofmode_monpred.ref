@@ -36,6 +36,32 @@
   
   I : biIndex
   PROP : bi
+  n, m : nat
+  BiLaterCredits0 : BiLaterCredits PROP
+  ============================
+  "Hlc1" : £ (S n)
+  "Hlc2" : £ m
+  --------------------------------------∗
+  £ (S n)
+2 goals
+  
+  I : biIndex
+  PROP : bi
+  n, m : nat
+  BiLaterCredits0 : BiLaterCredits PROP
+  ============================
+  "Hlc1" : £ (S n)
+  --------------------------------------∗
+  £ (S n)
+
+goal 2 is:
+ "Hlc2" : £ m
+ --------------------------------------∗
+ £ m
+1 goal
+  
+  I : biIndex
+  PROP : bi
   FU : BiFUpd PROP
   P, Q : monPred
   i : I
