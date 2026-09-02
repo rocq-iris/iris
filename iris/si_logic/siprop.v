@@ -20,37 +20,7 @@ ported halfway. We use finite ([nat]-based) step-indexing in the definition of
 [siProp], but define a (C)OFE structure for any [SI : sidx]. Hence, [siProp]
 remains compatible with the BI laws (we still have [later_exist_false]), which
 will change in the future to support the true Transfinite version (for which
-[later_exist_false] does not hold).
-
-The function [nat_to_sidx] is used to convert between the internal [nat]s and
-the [SI]s in the (C)OFE structure. It is just here temporarily, and will be
-removed once the Transfinite migration is complete. *)
-Fixpoint nat_to_sidx {SI : sidx} (n : nat) : SI :=
-  match n with
-  | 0 => 0ᵢ
-  | S n => Sᵢ (nat_to_sidx n)
-  end.
-
-Lemma nat_to_sidx_mono {SI : sidx} n m :
-  n ≤ m → (nat_to_sidx n ≤ nat_to_sidx m)%sidx.
-Proof. induction 1; simpl; [done|]. etrans; [done|apply SIdx.le_succ_diag_r]. Qed.
-
-Lemma nat_to_sidx_mono_inv {SI : sidx} n m :
-  (nat_to_sidx n ≤ nat_to_sidx m)%sidx → n ≤ m.
-Proof.
-  revert m. induction n as [|n IH]; [lia|]; intros [|m] Hnm; simpl in *.
-  - apply SIdx.le_0_r, SIdx.neq_succ_0 in Hnm as [].
-  - apply SIdx.succ_le_mono, IH in Hnm. lia.
-Qed.
-
-Global Instance nat_to_sidx_surj `{!SIdxFinite SI} : Surj (=) nat_to_sidx.
-Proof.
-  intros n. induction (SIdx.lt_wf n) as [n _ IH].
-  destruct (finite_index n) as [->|[n' ->]]; first by exists 0.
-  destruct (IH n') as [m <-]; first by apply SIdx.lt_succ_diag_r.
-  by exists (S m).
-Qed.
-
+[later_exist_false] does not hold). *)
 Section cofe.
   Context {SI : sidx}.
 

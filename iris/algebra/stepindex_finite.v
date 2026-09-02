@@ -33,6 +33,11 @@ Proof. intros [|n]; eauto. Qed.
 Section finite.
   Local Set Default Proof Using "Type*".
 
+  (** TODO: This lemma will be removed once [siProp] has been ported to support
+  any [sidx]. *)
+  Lemma nat_to_sidx_id (n : nat) : nat_to_sidx n = n.
+  Proof. induction n; by f_equal/=. Qed.
+
   Lemma dist_later_S {A : ofe} (n : nat) (a b : A) :
     a ≡{n}≡ b ↔ dist_later (S n) a b.
   Proof. apply dist_later_S. Qed.
