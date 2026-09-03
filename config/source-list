@@ -44,6 +44,7 @@ iris/algebra/lib/mono_nat.v
 iris/algebra/lib/mono_Z.v
 iris/algebra/lib/mono_list.v
 iris/algebra/lib/gset_bij.v
+iris/algebra/lib/time_receipts.v
 iris/si_logic/siprop.v
 iris/si_logic/bi.v
 iris/bi/notation.v
@@ -100,6 +101,7 @@ iris/base_logic/lib/ghost_map.v
 iris/base_logic/lib/later_credits.v
 iris/base_logic/lib/token.v
 iris/base_logic/lib/mono_list.v
+iris/base_logic/lib/time_receipts.v
 iris/program_logic/adequacy.v
 iris/program_logic/lifting.v
 iris/program_logic/weakestpre.v
