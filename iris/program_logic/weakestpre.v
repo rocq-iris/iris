@@ -79,15 +79,7 @@ Definition wp_pre `{!irisGS_gen hlc Λ Σ} (s : stuckness)
   end%I.
 
 Local Instance wp_pre_contractive `{!irisGS_gen hlc Λ Σ} s : Contractive (wp_pre s).
-Proof.
-  rewrite /wp_pre /= => n wp wp' Hwp E e1 Φ.
-  do 25 (f_contractive || f_equiv).
-  (* FIXME : simplify this proof once we have a good definition and a
-     proper instance for step_fupdN. *)
-  induction num_laters_per_step as [|k IH]; simpl.
-  - repeat (f_contractive || f_equiv); apply Hwp.
-  - by rewrite -IH.
-Qed.
+Proof. solve_contractive. Qed.
 
 Local Definition wp_def `{!irisGS_gen hlc Λ Σ} : Wp (iProp Σ) (expr Λ) (val Λ) stuckness :=
   λ s : stuckness, fixpoint (wp_pre s).
@@ -119,11 +111,8 @@ Proof.
   (* FIXME: figure out a way to properly automate this proof *)
   (* FIXME: reflexivity, as being called many times by f_equiv and f_contractive
   is very slow here *)
-  do 25 (f_contractive || f_equiv).
-  (* FIXME : simplify this proof once we have a good definition and a
-     proper instance for step_fupdN. *)
-  induction num_laters_per_step as [|k IHk]; simpl; last by rewrite IHk.
-  rewrite IH; [done..|]. intros v. eapply dist_lt; last done. apply HΦ.
+  do 29 (f_contractive || f_equiv).
+  apply IH; [done|]=> v. eapply dist_lt; [apply HΦ|done].
 Qed.
 Global Instance wp_proper s E e :
   Proper (pointwise_relation _ (≡) ==> (≡)) (wp (PROP:=iProp Σ) s E e).
@@ -133,14 +122,7 @@ Qed.
 Global Instance wp_contractive s E e n :
   TCEq (to_val e) None →
   Proper (pointwise_relation _ (dist_later n) ==> dist n) (wp (PROP:=iProp Σ) s E e).
-Proof.
-  intros He Φ Ψ HΦ. rewrite !wp_unfold /wp_pre He /=.
-  do 24 (f_contractive || f_equiv).
-  (* FIXME : simplify this proof once we have a good definition and a
-     proper instance for step_fupdN. *)
-  induction num_laters_per_step as [|k IHk]; simpl; last by rewrite IHk.
-  by do 4 f_equiv.
-Qed.
+Proof. intros He Φ Ψ HΦ. rewrite !wp_unfold /wp_pre He /=. solve_contractive. Qed.
 
 Lemma wp_value_fupd' s E Φ v : WP of_val v @ s; E {{ Φ }} ⊣⊢ |={E}=> Φ v.
 Proof. rewrite wp_unfold /wp_pre to_of_val. auto. Qed.
@@ -264,7 +246,7 @@ Proof.
   iIntros "!>" (e2 σ2 efs Hstep) "Hcred". iMod ("H" $! e2 σ2 efs with "[% //] Hcred") as "H".
   iIntros "!>!>". iMod "H". iMod "HP". iModIntro.
   revert n Hn. generalize (num_laters_per_step ns)=>n0 n Hn.
-  iInduction n as [|n IH] forall (n0 Hn).
+  iInduction n as [|n IH] forall (n0 Hn); simpl.
   - iApply (step_fupdN_wand with "H"). iIntros ">($ & Hwp & $)". iMod "HP".
     iModIntro. iApply (wp_strong_mono with "Hwp"); [done|set_solver|].
     iIntros (v) "HΦ". iApply ("HΦ" with "HP").
@@ -368,7 +350,7 @@ Lemma wp_step_fupd s E1 E2 e P Φ :
   (|={E1}[E2]▷=> P) -∗ WP e @ s; E2 {{ v, P ={E1}=∗ Φ v }} -∗ WP e @ s; E1 {{ Φ }}.
 Proof.
   iIntros (??) "HR H".
-  iApply (wp_step_fupdN_strong 1 _ E1 E2 with "[-]"); [done|..]. iSplit.
+  iApply (wp_step_fupdN_strong 1 _ E1 E2 with "[-]"); simpl; [done|..]. iSplit.
   - iIntros (????) "_". iMod (fupd_mask_subseteq ∅) as "_"; [set_solver+|].
     auto with lia.
   - iFrame "H". iMod "HR" as "$". auto.

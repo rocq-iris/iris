@@ -36,33 +36,6 @@ Notation "|={ E }=> Q" := (fupd E E Q) : bi_scope.
 Notation "P ={ E }=∗ Q" := (P -∗ |={E}=> Q)%I : bi_scope.
 Notation "P ={ E }=∗ Q" := (P -∗ |={E}=> Q) : stdpp_scope.
 
-(** * Step-taking fancy updates. *)
-(** These have two masks, but they are different than the two masks of a
-    mask-changing update: in [|={Eo}[Ei]▷=> Q], the first mask [Eo] ("outer
-    mask") holds at the beginning and the end; the second mask [Ei] ("inner
-    mask") holds around each ▷. This is also why we use a different notation
-    than for the two masks of a mask-changing updates. *)
-Notation "|={ Eo } [ Ei ]▷=> Q" := (|={Eo,Ei}=> ▷ |={Ei,Eo}=> Q)%I : bi_scope.
-Notation "P ={ Eo } [ Ei ]▷=∗ Q" := (P -∗ |={Eo}[Ei]▷=> Q)%I : bi_scope.
-Notation "P ={ Eo } [ Ei ]▷=∗ Q" := (P -∗ |={Eo}[Ei]▷=> Q) : stdpp_scope.
-
-Notation "|={ E }▷=> Q" := (|={E}[E]▷=> Q)%I : bi_scope.
-Notation "P ={ E }▷=∗ Q" := (P ={E}[E]▷=∗ Q)%I : bi_scope.
-Notation "P ={ E }▷=∗ Q" := (P ={E}[E]▷=∗ Q) : stdpp_scope.
-
-(** For the iterated version, in principle there are 4 masks: "outer" and
-    "inner" of [|={Eo}[Ei]▷=>], as well as "begin" and "end" masks [E1] and [E2]
-    that could potentially differ from [Eo]. The latter can be obtained from
-    this notation by adding normal mask-changing update modalities: [
-    |={E1,Eo}=> |={Eo}[Ei]▷=>^n |={Eo,E2}=> Q] *)
-Notation "|={ Eo } [ Ei ]▷=>^ n Q" := (Nat.iter n (λ P, |={Eo}[Ei]▷=> P) Q)%I : bi_scope.
-Notation "P ={ Eo } [ Ei ]▷=∗^ n Q" := (P -∗ |={Eo}[Ei]▷=>^n Q)%I : bi_scope.
-Notation "P ={ Eo } [ Ei ]▷=∗^ n Q" := (P -∗ |={Eo}[Ei]▷=>^n Q) : stdpp_scope.
-
-Notation "|={ E }▷=>^ n Q" := (|={E}[E]▷=>^n Q)%I : bi_scope.
-Notation "P ={ E }▷=∗^ n Q" := (P ={E}[E]▷=∗^n Q)%I : bi_scope.
-Notation "P ={ E }▷=∗^ n Q" := (P ={E}[E]▷=∗^n Q) : stdpp_scope.
-
 (** Bundled versions  *)
 (* Mixins allow us to create instances easily without having to use Program *)
 Record BiBUpdMixin (PROP : bi) `(BUpd PROP) := {
@@ -132,6 +105,46 @@ Class BiFUpdSbi (PROP : bi) `{!BiFUpd PROP, !Sbi PROP} := {
     (∀ x, |={E}=> <si_pure> Φi x) ⊢@{PROP} |={E}=> ∀ x, <si_pure> Φi x
 }.
 Global Hint Mode BiBUpdFUpd ! - - : typeclass_instances.
+
+(** * Step-taking fancy updates. *)
+(** These have two masks, but they are different than the two masks of a
+mask-changing update: in [|={Eo}[Ei]▷=> Q], the first mask [Eo] ("outer mask")
+holds at the beginning and the end; the second mask [Ei] ("inner mask") holds
+around the [▷]. This is also why we use a different notation than for the two
+masks of a mask-changing updates.
+
+Note that [step_fupd] is not a [Definition] as that would mean we have to
+duplicate all BI and proof mode [fupd] instances for [step_fupd]. *)
+Notation step_fupd Eo Ei Q := (|={Eo,Ei}=> ▷ |={Ei,Eo}=> Q)%I.
+
+Notation "|={ Eo } [ Ei ]▷=> Q" := (step_fupd Eo Ei Q) : bi_scope.
+Notation "P ={ Eo } [ Ei ]▷=∗ Q" := (P -∗ |={Eo}[Ei]▷=> Q)%I : bi_scope.
+Notation "P ={ Eo } [ Ei ]▷=∗ Q" := (P -∗ |={Eo}[Ei]▷=> Q) : stdpp_scope.
+
+Notation "|={ E }▷=> Q" := (|={E}[E]▷=> Q)%I : bi_scope.
+Notation "P ={ E }▷=∗ Q" := (P ={E}[E]▷=∗ Q)%I : bi_scope.
+Notation "P ={ E }▷=∗ Q" := (P ={E}[E]▷=∗ Q) : stdpp_scope.
+
+(** For the iterated version, in principle there are 4 masks: "outer" and
+"inner" of [|={Eo}[Ei]▷=>], as well as "begin" and "end" masks [E1] and [E2]
+that could potentially differ from [Eo]. The latter can be obtained from
+this notation by adding normal mask-changing update modalities:
+[|={E1,Eo}=> |={Eo}[Ei]▷=>^n |={Eo,E2}=> Q] *)
+Fixpoint step_fupdN `{!BiFUpd PROP} (Eo Ei : coPset) (n : nat) (P : PROP) : PROP :=
+  match n with
+  | 0 => P
+  | S n => |={Eo}[Ei]▷=> step_fupdN Eo Ei n P
+  end.
+Global Instance: Params (@step_fupdN) 5 := {}.
+Global Typeclasses Opaque step_fupdN.
+
+Notation "|={ Eo } [ Ei ]▷=>^ n Q" := (step_fupdN Eo Ei n Q) : bi_scope.
+Notation "P ={ Eo } [ Ei ]▷=∗^ n Q" := (P -∗ |={Eo}[Ei]▷=>^n Q)%I : bi_scope.
+Notation "P ={ Eo } [ Ei ]▷=∗^ n Q" := (P -∗ |={Eo}[Ei]▷=>^n Q) : stdpp_scope.
+
+Notation "|={ E }▷=>^ n Q" := (|={E}[E]▷=>^n Q)%I : bi_scope.
+Notation "P ={ E }▷=∗^ n Q" := (P ={E}[E]▷=∗^n Q)%I : bi_scope.
+Notation "P ={ E }▷=∗^ n Q" := (P ={E}[E]▷=∗^n Q) : stdpp_scope.
 
 Section bupd_laws.
   Context {PROP : bi} `{!BiBUpd PROP}.
@@ -527,11 +540,36 @@ Section fupd_derived.
     - by rewrite fupd_trans.
   Qed.
 
+  (* [step_fupdN] lemmas *)
+  Global Instance step_fupdN_ne Eo Ei n :
+    NonExpansive (step_fupdN (PROP:=PROP) Eo Ei n).
+  Proof. induction n; solve_proper. Qed.
+
+  Global Instance step_fupdN_proper Eo Ei n :
+    Proper ((≡) ==> (≡)) (step_fupdN (PROP:=PROP) Eo Ei n).
+  Proof. apply: ne_proper. Qed.
+
   Lemma step_fupdN_mono Eo Ei n P Q :
     (P ⊢ Q) → (|={Eo}[Ei]▷=>^n P) ⊢ (|={Eo}[Ei]▷=>^n Q).
-  Proof.
-    intros HPQ. induction n as [|n IH]=> //=. rewrite IH //.
-  Qed.
+  Proof. intros. induction n; simpl; repeat (done || f_equiv). Qed.
+  Global Instance step_fupdN_mono' Eo Ei n :
+    Proper ((⊢) ==> (⊢)) (step_fupdN (PROP:=PROP) Eo Ei n).
+  Proof. intros P Q. apply step_fupdN_mono. Qed.
+  Global Instance step_fupdN_flip_mono n Eo Ei :
+    Proper (flip (⊢) ==> flip (⊢)) (step_fupdN (PROP:=PROP) Eo Ei n).
+  Proof. intros P Q. apply step_fupdN_mono. Qed.
+
+  Lemma step_fupdN_0 Eo Ei P : (|={Eo}[Ei]▷=>^0 P) ⊣⊢ P.
+  Proof. done. Qed.
+  Lemma step_fupdN_succ_l Eo Ei n P :
+    (|={Eo}[Ei]▷=>^(S n) P) ⊣⊢ |={Eo}[Ei]▷=> |={Eo}[Ei]▷=>^n P.
+  Proof. done. Qed.
+  Lemma step_fupdN_succ_r Eo Ei n P :
+    (|={Eo}[Ei]▷=>^(S n) P) ⊣⊢ |={Eo}[Ei]▷=>^n |={Eo}[Ei]▷=> P.
+  Proof. induction n; simpl; by repeat f_equiv. Qed.
+  Lemma step_fupdN_add n m Eo Ei P :
+    (|={Eo}[Ei]▷=>^(n+m) P) ⊣⊢ (|={Eo}[Ei]▷=>^n |={Eo}[Ei]▷=>^m P).
+  Proof. induction n; simpl; repeat (done || f_equiv). Qed.
 
   Lemma step_fupdN_wand Eo Ei n P Q :
     (|={Eo}[Ei]▷=>^n P) -∗ (P -∗ Q) -∗ (|={Eo}[Ei]▷=>^n Q).
@@ -551,8 +589,7 @@ Section fupd_derived.
   Lemma step_fupdN_S_fupd n E P :
     (|={E}[∅]▷=>^(S n) P) ⊣⊢ (|={E}[∅]▷=>^(S n) |={E}=> P).
   Proof.
-    apply (anti_symm (⊢)); rewrite !Nat.iter_succ_r; apply step_fupdN_mono;
-      rewrite -step_fupd_fupd //.
+    apply (anti_symm (⊢)); rewrite !step_fupdN_succ_r -step_fupd_fupd //.
   Qed.
 
   Lemma step_fupdN_frame_l Eo Ei n R Q :
@@ -560,12 +597,6 @@ Section fupd_derived.
   Proof.
     induction n as [|n IH]; simpl; [done|].
     rewrite step_fupd_frame_l IH //=.
-  Qed.
-
-  Lemma step_fupdN_add n m Eo Ei P :
-    (|={Eo}[Ei]▷=>^(n+m) P) ⊣⊢ (|={Eo}[Ei]▷=>^n |={Eo}[Ei]▷=>^m P).
-  Proof.
-    induction n as [ | n IH]; simpl; [done | by rewrite IH].
   Qed.
 
   (** The sidecondition [Ei ⊆ Eo] is needed because for [n = 0],
@@ -676,14 +707,13 @@ Section fupd_derived.
       apply fupd_elim. by rewrite fupd_plain_mask -fupd_plain_later.
     Qed.
 
-    Lemma step_fupdN_plain Eo Ei n P `{!Plain P} : (|={Eo}[Ei]▷=>^n P) ⊢ |={Eo}=> ▷^n ◇ P.
+    Lemma step_fupdN_plain Eo Ei n P `{!Plain P} :
+      (|={Eo}[Ei]▷=>^n P) ⊢ |={Eo}=> ▷^n ◇ P.
     Proof.
-      induction n as [|n IH].
-      - by rewrite -fupd_intro -except_0_intro.
-      - rewrite Nat.iter_succ step_fupd_fupd IH !fupd_trans step_fupd_plain.
-        apply fupd_mono. destruct n as [|n]; simpl.
-        * by rewrite except_0_idemp.
-        * by rewrite except_0_later.
+      induction n as [|n IH]; simpl.
+      { by rewrite -fupd_intro -except_0_intro. }
+      rewrite step_fupd_fupd IH !fupd_trans /=.
+      by rewrite step_fupd_plain except_0_laterN except_0_idemp.
     Qed.
 
     Lemma step_fupd_plain_forall Eo Ei {A} (Φ : A → PROP) `{!∀ x, Plain (Φ x)} :

@@ -74,7 +74,7 @@ Proof.
   { inversion_clear 1; iIntros "? ? ?"; iExists 0=> /=.
     rewrite Nat.add_0_r right_id_L. iFrame. by iApply fupd_mask_subseteq. }
   iIntros (Hsteps) "Hσ Hcred He". inversion_clear Hsteps as [|?? [t1' σ1']].
-  rewrite -(assoc_L (++)) Nat.iter_add -{1}plus_Sn_m plus_n_Sm.
+  rewrite -(assoc_L (++)) step_fupdN_add -{1}plus_Sn_m plus_n_Sm.
   iDestruct "Hcred" as "[Hc1 Hc2]".
   iDestruct (wptp_step with "Hσ Hc1 He") as (nt') ">H"; first eauto; simplify_eq.
   iModIntro. iApply step_fupdN_S_fupd. iApply (step_fupdN_wand with "H").

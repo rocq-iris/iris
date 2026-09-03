@@ -67,6 +67,11 @@ Iris now depends on rocq-elpi (version 3).
 * Add commuting rules for monPred's `<subj>` modality with `<pers>`, `<absorb>`,
   `<affine>` and `□`. Add a rule to apply a `-∗` under the `<subj>` modality.
 * Rename `later_laterN` → `laterN_succ_l` and `laterN_later` → `laterN_succ_r`.
+* Add definition `step_fupdN` backing the notation `|={Eo}[Ei]▷=>^n Q`. Use the
+  new lemmas `step_fupd_succ_l` instead of `Nat.iter_succ`,
+  `step_fupdN_succ_r` instead of `Nat.iter_succ_r`, and `step_fupdN_add`
+  instead of `Nat.iter_add`.
+* Add `NonExpansive` and `Proper` instances for `≡` and `⊢` for `step_fupdN`.
 
 **Changes in `proofmode`:**
 
