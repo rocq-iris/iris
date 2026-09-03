@@ -19,6 +19,11 @@ Iris now depends on rocq-elpi (version 3).
 * Define a COFE structure on `chain A` (when using finite step-indexing) to
   obtain a closure operation on OFEs. (by Simcha van Collem)
 * Remove incorrect unit instance for `max_Z`. (by Markus de Medeiros)
+* Add a "time_receipt" resource algebra `time_receiptR` that has an authoritative
+  part with two kinds of fragments: exclusive (additive) fragments, and persistent
+  (`max`) fragments. See `base_logic.lib.time_receipts` (mentioned below) for
+  a logic-level wrapper that you probably want to use instead of directly dealing
+  with this RA. (by Thomas Somers)
 
 **Changes in `bi`:**
 
@@ -121,6 +126,10 @@ Iris now depends on rocq-elpi (version 3).
 * Strengthen lemma `proph_map_init` to provide the initial ownership of `ps`.
   (by Zichen Zhang)
 * Change the statement of lemma `proph_map_agree` to be curried. (by Zichen Zhang)
+* Add a logic-level library `base_logic.lib.time_receipts` for exclusive/additive
+  (`⧖+ n`) and persistent (`⧖□ n`) time receipts. Time receipts will be used as
+  permissions to eliminate multiple laters in the future physical step modality.
+  (by Thomas Somers)
 
 **Changes in `program_logic`:**
 

@@ -217,6 +217,20 @@ goal 2 is:
  "Hlc2" : £ m
  --------------------------------------∗
  £ m
+"lc_iCombine_lc"
+     : string
+1 goal
+  
+  hlc : has_lc
+  Σ : gFunctors
+  invGS_gen0 : invGS_gen hlc Σ
+  cinvG0 : cinvG Σ
+  na_invG0 : na_invG Σ
+  n : nat
+  ============================
+  "Hlc" : £ (S n)
+  --------------------------------------∗
+  £ (S n)
 "test_iCombine_pointsto_no_beta"
      : string
 1 goal
