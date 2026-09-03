@@ -111,8 +111,13 @@ Global Hint Mode BiBUpdFUpd ! - - : typeclass_instances.
 mask-changing update: in [|={Eo}[Ei]▷=> Q], the first mask [Eo] ("outer mask")
 holds at the beginning and the end; the second mask [Ei] ("inner mask") holds
 around the [▷]. This is also why we use a different notation than for the two
-masks of a mask-changing updates. *)
-Notation "|={ Eo } [ Ei ]▷=> Q" := (|={Eo,Ei}=> ▷ |={Ei,Eo}=> Q)%I : bi_scope.
+masks of a mask-changing updates.
+
+Note that [step_fupd] is not a [Definition] as that would mean we have to
+duplicate all BI and proof mode instances for [fupd] for [step_fupd]. *)
+Notation step_fupd Eo Ei Q := (|={Eo,Ei}=> ▷ |={Ei,Eo}=> Q)%I.
+
+Notation "|={ Eo } [ Ei ]▷=> Q" := (step_fupd Eo Ei Q) : bi_scope.
 Notation "P ={ Eo } [ Ei ]▷=∗ Q" := (P -∗ |={Eo}[Ei]▷=> Q)%I : bi_scope.
 Notation "P ={ Eo } [ Ei ]▷=∗ Q" := (P -∗ |={Eo}[Ei]▷=> Q) : stdpp_scope.
 
