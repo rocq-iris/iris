@@ -561,6 +561,8 @@ Section fupd_derived.
 
   Lemma step_fupdN_0 Eo Ei P : (|={Eo}[Ei]▷=>^0 P) ⊣⊢ P.
   Proof. done. Qed.
+  Lemma step_fupdN_1 Eo Ei P : (|={Eo}[Ei]▷=>^1 P) ⊣⊢ (|={Eo}[Ei]▷=> P).
+  Proof. done. Qed.
   Lemma step_fupdN_succ_l Eo Ei n P :
     (|={Eo}[Ei]▷=>^(S n) P) ⊣⊢ |={Eo}[Ei]▷=> |={Eo}[Ei]▷=>^n P.
   Proof. done. Qed.
