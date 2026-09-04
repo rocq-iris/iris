@@ -72,6 +72,7 @@ Iris now depends on rocq-elpi (version 3).
   `step_fupdN_succ_r` instead of `Nat.iter_succ_r`, and `step_fupdN_add`
   instead of `Nat.iter_add`.
 * Add `NonExpansive` and `Proper` instances for `≡` and `⊢` for `step_fupdN`.
+* Add lemma `laterN_1`.
 
 **Changes in `proofmode`:**
 

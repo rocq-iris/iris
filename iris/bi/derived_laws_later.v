@@ -193,6 +193,8 @@ Global Instance laterN_proper m :
 
 Lemma laterN_0 P : ▷^0 P ⊣⊢ P.
 Proof. done. Qed.
+Lemma laterN_1 P : ▷^1 P ⊣⊢ ▷ P.
+Proof. done. Qed.
 Lemma laterN_succ_l n P : ▷^(S n) P ⊣⊢ ▷ ▷^n P.
 Proof. done. Qed.
 Lemma laterN_succ_r n P : ▷^(S n) P ⊣⊢ ▷^n ▷ P.
