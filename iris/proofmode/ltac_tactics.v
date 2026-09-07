@@ -2043,7 +2043,10 @@ Tactic Notation "iAssert" open_constr(Q) "as" "%" simple_intropattern(pat) :=
 Local Ltac iRewriteFindPred :=
   match goal with
   | |- _ ⊣⊢ ?Φ ?x =>
-     generalize x;
+     (* This is almost the same as [generalize x] but better-behaved for terms
+     that are convertible but not syntactically equal. The parentheses around [x]
+     are needed to prevent [move:] from failing if [x] occurs in the context. *)
+     move: (x);
      match goal with |- (∀ y, @?Ψ y ⊣⊢ _) => unify Φ Ψ; reflexivity end
   end.
 
