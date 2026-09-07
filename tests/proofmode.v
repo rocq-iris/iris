@@ -80,6 +80,15 @@ Proof.
   iIntros "H". iRewrite -"H". Show.
 Abort.
 
+(* This verifies that [iRewrite] does not fail if the thing to rewrite occurs in
+the pure Rocq context. *)
+Lemma test_iRewrite_does_not_clear_context `{!Sbi PROP} {A : ofe} (x y : A) φ :
+  φ x →
+  x ≡ y ⊢@{PROP} x ≡ y.
+Proof.
+  iIntros (?) "H". iRewrite "H". Show.
+Abort.
+
 Check "test_iDestruct_and_emp".
 Lemma test_iDestruct_and_emp P Q `{!Persistent P, !Persistent Q} :
   P ∧ emp -∗ emp ∧ Q -∗ <affine> (P ∗ Q).
