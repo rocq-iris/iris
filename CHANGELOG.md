@@ -77,6 +77,9 @@ Iris now depends on rocq-elpi (version 3).
 **Changes in `proofmode`:**
 
 * Rename (internal) file `coq_tactics` → `rocq_tactics`.
+* Use ssreflect term selection to make `iRewrite` more robust in the presence of
+  syntactically slightly different, but convertible, (implicit) arguments. (by
+  Simcha van Collem)
 
 **Changes in `base_logic`:**
 
