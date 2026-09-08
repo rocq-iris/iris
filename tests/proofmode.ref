@@ -675,6 +675,48 @@ Tactic failure: iCombine: cannot find 'gives' clause for hypotheses
   |={E}=> P
 The command has indeed failed with message:
 Tactic failure: iNext: Missing BiFUpdLaterCredits instance.
+"test_iIntros_lc"
+     : string
+1 goal
+  
+  SI : sidx
+  PROP : bi
+  n, m : nat
+  BiLaterCredits0 : BiLaterCredits PROP
+  ============================
+  "Hlc1" : £ (S n)
+  "Hlc2" : £ m
+  --------------------------------------∗
+  £ (S n)
+"lc_iSplit_lc"
+     : string
+2 goals
+  
+  SI : sidx
+  PROP : bi
+  n, m : nat
+  BiLaterCredits0 : BiLaterCredits PROP
+  ============================
+  "Hlc1" : £ (S n)
+  --------------------------------------∗
+  £ (S n)
+
+goal 2 is:
+ "Hlc2" : £ m
+ --------------------------------------∗
+ £ m
+"lc_iCombine_lc"
+     : string
+1 goal
+  
+  SI : sidx
+  PROP : bi
+  n : nat
+  BiLaterCredits0 : BiLaterCredits PROP
+  ============================
+  "Hlc" : £ (S n)
+  --------------------------------------∗
+  £ (S n)
 "test_iInduction_multiple_IHs"
      : string
 1 goal

@@ -116,15 +116,6 @@ Section tests.
     iDestruct 1 as "[% ?]". auto.
   Qed.
 
-  (* These tests are copies of the ones in [proofmode_iris.v] to verify that
-     we've got the same behaviour for later credits. *)
-  Lemma test_iIntros_lc n m `{!BiLaterCredits PROP} :
-    £ (S n + m) ⊢@{monPred} £ (S n).
-  Proof. iIntros "[Hlc1 Hlc2]". Show. iExact "Hlc1". Qed.
-
-  Lemma lc_iSplit_lc n m `{!BiLaterCredits PROP} :
-    £ (S n) ⊢@{monPred} £ m -∗ £ (S n + m).
-  Proof. iIntros "Hlc1 Hlc2". iSplitL "Hlc1". Show. all: done. Qed.
 
   Context (FU : BiFUpd PROP).
 

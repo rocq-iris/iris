@@ -1174,7 +1174,7 @@ Lemma text_iNext_Next `{!Sbi PROP} {A B : ofe} (f : A -n> A) x y :
 Proof. iIntros "H". iNext. by iRewrite "H". Qed.
 
 Lemma test_iNext_lc_discard `{!BiLaterCredits PROP, !BiFUpd PROP}
-    `{!BiFUpdLaterCredits PROP} E (P : PROP) :
+    `{!BiFUpdLaterCredits PROP} E P :
   £ 1 -∗ ▷ P ={E}=∗ P.
 Proof.
   iIntros "Hcred HP". iNext credit: "Hcred".
@@ -1183,7 +1183,7 @@ Proof.
 Qed.
 
 Lemma test_iNext_lc_keep `{!BiLaterCredits PROP, !BiFUpd PROP}
-   `{!BiFUpdLaterCredits PROP} n E (P : PROP) :
+   `{!BiFUpdLaterCredits PROP} n E P :
   £ (S n) -∗ ▷ P ={E}=∗ P.
 Proof.
   iIntros "Hcred HP". iNext credit: "Hcred".
@@ -1192,7 +1192,7 @@ Proof.
 Qed.
 
 Lemma test_iNext_2 `{!BiLaterCredits PROP, !BiFUpd PROP}
-    `{!BiFUpdLaterCredits PROP} E (P : PROP) :
+    `{!BiFUpdLaterCredits PROP} E P :
   £ 2 -∗ ▷ ▷ P ={E}=∗ P.
 Proof.
   iIntros "Hcred HP". iNext 2 credit: "Hcred".
@@ -1206,6 +1206,25 @@ Lemma test_iNext_missing_instance `{!BiLaterCredits PROP, !BiFUpd PROP}
 Proof.
   iIntros "Hcred HP". Show. Fail iNext credit: "Hcred".
 Abort.
+
+(** Make sure that the splitting rule for [+] gets preferred over the one for
+[S]. See issue #470. *)
+Check "test_iIntros_lc".
+Lemma test_iIntros_lc n m `{!BiLaterCredits PROP} :
+  £ (S n + m) ⊢@{PROP} £ (S n).
+Proof. iIntros "[Hlc1 Hlc2]". Show. iExact "Hlc1". Qed.
+
+Check "lc_iSplit_lc".
+Lemma lc_iSplit_lc n m `{!BiLaterCredits PROP} :
+  £ (S n) ⊢@{PROP} £ m -∗ £ (S n + m).
+Proof. iIntros "Hlc1 Hlc2". iSplitL "Hlc1". Show. all: done. Qed.
+
+(** Make sure that combining [n] and [1] later credits results in [S n] rather
+than [n + 1] later credits. *)
+Check "lc_iCombine_lc".
+Lemma lc_iCombine_lc n `{!BiLaterCredits PROP} :
+  £ 1 ⊢@{PROP} £ n -∗ £ (S n).
+Proof. iIntros "Hlc1 Hlc2". iCombine "Hlc2 Hlc1" as "Hlc". Show. done. Qed.
 
 Lemma test_iFrame_persistent (P Q : PROP) :
   □ P -∗ Q -∗ <pers> (P ∗ P) ∗ (P ∗ Q ∨ Q).
