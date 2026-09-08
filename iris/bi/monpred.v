@@ -1219,6 +1219,9 @@ Section bi_facts.
   Proof. induction n as [|? IHn]; first done. rewrite /= monPred_at_later IHn //. Qed.
   Lemma monPred_at_except_0 i P : (◇ P) i ⊣⊢ ◇ P i.
   Proof. rewrite /bi_except_0. by unseal. Qed.
+  Lemma monPred_at_lc i n `{!BiLaterCredits PROP} :
+    (lc (PROP:=monPred) n) i ⊣⊢ £ n.
+  Proof. by unseal. Qed.
 
   Global Instance later_objective P `{!Objective P} : Objective (▷ P).
   Proof. intros ??. unseal. by rewrite objective_at. Qed.
@@ -1226,6 +1229,9 @@ Section bi_facts.
   Proof. induction n; apply _. Qed.
   Global Instance except0_objective P `{!Objective P} : Objective (◇ P).
   Proof. rewrite /bi_except_0. apply _. Qed.
+  Global Instance lc_objective n `{!BiLaterCredits PROP} :
+    Objective (I:=I) (PROP:=PROP) (£ n).
+  Proof. intros ??. by unseal. Qed.
 
   (** Sbi *)
   Section sbi.

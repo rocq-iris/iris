@@ -116,6 +116,20 @@ Section tests.
     iDestruct 1 as "[% ?]". auto.
   Qed.
 
+  (* This test combines various later credits lemmas/tactics to verify that they
+  also work for [monPred]. Note that these things are also already tested for
+  more rigorously in [proofmode.v]. *)
+  Lemma test_lc `{!BiLaterCredits PROP, !BiBUpd PROP, !BiFUpd PROP}
+      `{!BiBUpdFUpd PROP}
+      `{!BiBUpdLaterCredits PROP, !BiFUpdLaterCredits PROP} n E P :
+    £ (S n) -∗ <obj> (▷^(S n) P ={E}=∗ P).
+  Proof.
+    iIntros "[Hone Hc]".
+    iModIntro. (* We keep the later credits since they are [Objective] *)
+    iIntros "HP". iMod lc_zero as "Hzero".
+    iCombine "Hone Hzero" as "Hone".
+    iNext n credit: "Hc". iNext credit: "Hone". done.
+  Qed.
 
   Context (FU : BiFUpd PROP).
 
