@@ -12,7 +12,7 @@ Section modalities.
       persistently_mono, persistently_sep_2 with typeclass_instances.
   Qed.
   Definition modality_persistently :=
-    Modality (@bi_persistently _ PROP) modality_persistently_mixin.
+    Modality _ modality_persistently_mixin.
 
   Lemma modality_affinely_mixin :
     modality_mixin (@bi_affinely _ PROP) MIEnvId (MIEnvForall Affine).
@@ -21,7 +21,7 @@ Section modalities.
       affinely_sep_2 with typeclass_instances.
   Qed.
   Definition modality_affinely :=
-    Modality (@bi_affinely _ PROP) modality_affinely_mixin.
+    Modality _ modality_affinely_mixin.
 
   Lemma modality_intuitionistically_mixin :
     modality_mixin (@bi_intuitionistically _ PROP) MIEnvId MIEnvIsEmpty.
@@ -31,7 +31,7 @@ Section modalities.
       intuitionistically_sep_2 with typeclass_instances.
   Qed.
   Definition modality_intuitionistically :=
-    Modality (@bi_intuitionistically _ PROP) modality_intuitionistically_mixin.
+    Modality _ modality_intuitionistically_mixin.
 
   Lemma modality_embed_mixin `{!BiEmbed PROP PROP'} :
     modality_mixin (@embed PROP PROP' _)
@@ -56,12 +56,13 @@ Section modalities.
 
   Lemma modality_laterN_mixin n :
     modality_mixin (@bi_laterN _ PROP n)
-      (MIEnvTransform (MaybeIntoLaterN false n)) (MIEnvTransform (MaybeIntoLaterN false n)).
+      (MIEnvTransform (MaybeIntoLaterN false n))
+      (MIEnvTransform (MaybeIntoLaterN false n)).
   Proof.
     split; simpl; split_and?; eauto using equiv_entails_1_2, laterN_intro,
       laterN_mono, laterN_and, laterN_sep with typeclass_instances.
     rewrite /MaybeIntoLaterN=> P Q ->. by rewrite laterN_intuitionistically_2.
   Qed.
   Definition modality_laterN n :=
-    Modality (@bi_laterN _ PROP n) (modality_laterN_mixin n).
+    Modality _ (modality_laterN_mixin n).
 End modalities.
