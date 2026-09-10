@@ -5,7 +5,7 @@ From iris.proofmode Require Import ltac_tactics class_instances.
 Import bi.
 
 Section class_instances_updates.
-Context {PROP : bi}.
+Context {SI : sidx} {PROP : bi}.
 Implicit Types P Q R : PROP.
 
 Global Instance from_assumption_bupd `{!BiBUpd PROP} p P Q :
@@ -159,6 +159,7 @@ Global Instance elim_modal_bupd_plain
     `{!BiBUpd PROP, !Sbi PROP, !BiBUpdSbi PROP, !BiAffine PROP} p P Q :
   Plain P → ElimModal True p p (|==> P) P Q Q.
 Proof. intros. by rewrite /ElimModal bupd_elim wand_elim_r. Qed.
+
 Global Instance elim_modal_bupd_fupd
     `{!BiBUpd PROP, !BiFUpd PROP, !BiBUpdFUpd PROP} p E1 E2 P Q :
   ElimModal True p false (|==> P) P (|={E1,E2}=> Q) (|={E1,E2}=> Q) | 10.

@@ -6,8 +6,12 @@ From iris.bi Require Export bi.
 From iris.proofmode Require Import proofmode.
 Import bi.
 
+(** TODO: Remove [SIdxFinite] and [Proof Using] once [siProp] has been ported
+to support any [sidx]. *)
+Set Default Proof Using "Type*".
+
 Section fixpoint_laws.
-  Context {PROP: bi}.
+  Context `{!SIdxFinite SI} {PROP : bi}.
   Implicit Types P Q : PROP.
 
   Lemma fixpoint_plain `{!Sbi PROP} {A}

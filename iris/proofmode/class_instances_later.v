@@ -3,7 +3,7 @@ From iris.proofmode Require Import classes classes_make modality_instances.
 Import bi.
 
 Section class_instances_later.
-Context {PROP : bi}.
+Context {SI : sidx} {PROP : bi}.
 Implicit Types P Q R : PROP.
 
 (** FromAssumption *)

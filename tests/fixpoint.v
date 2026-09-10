@@ -1,8 +1,9 @@
 From iris.bi Require Import lib.fixpoint_mono.
 From iris.proofmode Require Import proofmode.
 
-Section fixpoint.
-  Context `{!Sbi PROP} {A : ofe} (F : (A → PROP) → (A → PROP)) `{!BiMonoPred F}.
+Section fixpoint_tests.
+  Context {SI : sidx} `{!Sbi PROP}.
+  Context {A : ofe} (F : (A → PROP) → (A → PROP)) `{!BiMonoPred F}.
 
   Definition L := bi_least_fixpoint F.
   Definition G := bi_greatest_fixpoint F.
@@ -24,4 +25,4 @@ Section fixpoint.
     iApply (greatest_fixpoint_paco F); first by solve_proper. Undo.
   Abort.
 
-End fixpoint.
+End fixpoint_tests.

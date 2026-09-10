@@ -3,7 +3,7 @@ From iris.proofmode Require Import rocq_tactics environments.
 
 Declare Scope proof_scope.
 Delimit Scope proof_scope with env.
-Global Arguments Envs _ _%_proof_scope _%_proof_scope _.
+Global Arguments Envs {_ _} _%_proof_scope _%_proof_scope _.
 Global Arguments Enil {_}.
 Global Arguments Esnoc {_} _%_proof_scope _%_string _%_I.
 

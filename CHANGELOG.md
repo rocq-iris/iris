@@ -93,6 +93,9 @@ Iris now depends on rocq-elpi (version 3).
 * Use ssreflect term selection to make `iRewrite` more robust in the presence of
   syntactically slightly different, but convertible, (implicit) arguments. (by
   Simcha van Collem)
+* Make the Iris Proof Mode (everything in the `proofmode` folder, with the
+  exception of `monPred`) parametric in the type of "step indices" to prepare
+  for the support of transfinite step indexing. (by Simon Spies)
 
 **Changes in `base_logic`:**
 

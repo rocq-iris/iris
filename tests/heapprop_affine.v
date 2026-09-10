@@ -1,6 +1,7 @@
 From stdpp Require Import gmap.
 From iris.bi Require Import interface.
 From iris.proofmode Require Import proofmode.
+From iris.algebra Require Import stepindex_finite.
 
 (** This file constructs a simple non step-indexed affine separation logic as
 predicates over heaps (modeled as maps from integer locations to integer values).

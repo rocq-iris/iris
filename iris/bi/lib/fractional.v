@@ -1,10 +1,10 @@
 From iris.bi Require Export bi.
 From iris.proofmode Require Import classes classes_make proofmode.
 
-Class Fractional {PROP : bi} (Φ : Qp → PROP) :=
+Class Fractional {SI : sidx} {PROP : bi} (Φ : Qp → PROP) :=
   fractional p q : Φ (p + q)%Qp ⊣⊢ Φ p ∗ Φ q.
-Global Arguments Fractional {_} _%_I : simpl never.
-Global Arguments fractional {_ _ _} _ _.
+Global Arguments Fractional {_ _} _%_I : simpl never.
+Global Arguments fractional {_ _ _ _} _ _.
 
 (** The [AsFractional] typeclass eta-expands a proposition [P] into [Φ q] such
 that [Φ] is a fractional predicate. This is needed because higher-order
@@ -18,12 +18,12 @@ fractional predicate.
 The equivalence in [as_fractional] should hold definitionally; various typeclass
 instances assume that [Φ q] will un-do the eta-expansion performed by
 [AsFractional]. *)
-Class AsFractional {PROP : bi} (P : PROP) (Φ : Qp → PROP) (q : Qp) := {
+Class AsFractional {SI : sidx} {PROP : bi} (P : PROP) (Φ : Qp → PROP) (q : Qp) := {
   as_fractional : P ⊣⊢ Φ q;
   as_fractional_fractional : Fractional Φ
 }.
-Global Arguments AsFractional {_} _%_I _%_I _%_Qp.
-Global Hint Mode AsFractional - ! - - : typeclass_instances.
+Global Arguments AsFractional {_ _} _%_I _%_I _%_Qp.
+Global Hint Mode AsFractional - - ! - - : typeclass_instances.
 
 (** The class [FrameFractionalQp] is used for fractional framing, it subtracts
 the fractional of the hypothesis from the goal: it computes [r := qP - qR].
@@ -33,13 +33,13 @@ Class FrameFractionalQp (qR qP r : Qp) :=
 Global Hint Mode FrameFractionalQp ! ! - : typeclass_instances.
 
 Section fractional.
-  Context {PROP : bi}.
+  Context {SI : sidx} {PROP : bi}.
   Implicit Types P Q : PROP.
   Implicit Types Φ : Qp → PROP.
   Implicit Types q : Qp.
 
   Global Instance Fractional_proper :
-    Proper (pointwise_relation _ (≡) ==> iff) (@Fractional PROP).
+    Proper (pointwise_relation _ (≡) ==> iff) (@Fractional SI PROP).
   Proof.
     rewrite /Fractional.
     intros Φ1 Φ2 Hequiv.
@@ -199,20 +199,20 @@ End fractional.
 (** Marked [tc_opaque] instead [Typeclasses Opaque] so that you can use
 [iDestruct] to eliminate and [iModIntro] to introduce [internal_fractional],
 while still preventing [iFrame] and [iNext] from unfolding. *)
-Definition internal_fractional {PROP : bi} (Φ : Qp → PROP) : PROP :=
+Definition internal_fractional {SI : sidx} {PROP : bi} (Φ : Qp → PROP) : PROP :=
   tc_opaque (□ ∀ p q, Φ (p + q)%Qp ∗-∗ Φ p ∗ Φ q)%I.
-Global Instance: Params (@internal_fractional) 1 := {}.
+Global Instance: Params (@internal_fractional) 2 := {}.
 
 Section internal_fractional.
-  Context {PROP : bi}.
+  Context {SI : sidx} {PROP : bi}.
   Implicit Types Φ Ψ : Qp → PROP.
   Implicit Types q : Qp.
 
   Global Instance internal_fractional_ne n :
-    Proper (pointwise_relation _ (dist n) ==> dist n) (@internal_fractional PROP).
+    Proper (pointwise_relation _ (dist n) ==> dist n) (@internal_fractional SI PROP).
   Proof. solve_proper. Qed.
   Global Instance internal_fractional_proper :
-    Proper (pointwise_relation _ (≡) ==> (≡)) (@internal_fractional PROP).
+    Proper (pointwise_relation _ (≡) ==> (≡)) (@internal_fractional SI PROP).
   Proof. solve_proper. Qed.
 
   Global Instance internal_fractional_affine Φ : Affine (internal_fractional Φ).

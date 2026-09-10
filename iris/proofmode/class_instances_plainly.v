@@ -3,7 +3,7 @@ From iris.proofmode Require Import modality_instances classes.
 Import bi.
 
 Section class_instances_plainly.
-Context `{!Sbi PROP}.
+Context {SI : sidx} `{!Sbi PROP}.
 Implicit Types P Q R : PROP.
 
 Global Instance from_assumption_plainly_l_true P Q :

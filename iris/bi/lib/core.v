@@ -5,15 +5,15 @@ Import bi.
 (** The "core" of an assertion is its maximal persistent part,
     i.e. the conjunction of all persistent assertions that are weaker
     than P (as in, implied by P). *)
-Definition coreP `{!Sbi PROP} (P : PROP) : PROP :=
+Definition coreP {SI : sidx} `{!Sbi PROP} (P : PROP) : PROP :=
   (* TODO: Looks like we want notation for affinely-plainly; that lets us avoid
   using conjunction/implication here. *)
   ∀ Q : PROP, <affine> ■ (Q -∗ <pers> Q) -∗ <affine> ■ (P -∗ Q) -∗ Q.
-Global Instance: Params (@coreP) 1 := {}.
+Global Instance: Params (@coreP) 2 := {}.
 Global Typeclasses Opaque coreP.
 
 Section core.
-  Context `{!Sbi PROP}.
+  Context {SI : sidx} `{!Sbi PROP}.
   Implicit Types P Q : PROP.
 
   Lemma coreP_intro P : P -∗ coreP P.

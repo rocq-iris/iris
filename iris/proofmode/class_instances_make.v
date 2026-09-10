@@ -4,15 +4,15 @@ From iris.proofmode Require Export classes_make.
 Import bi.
 
 Section class_instances_make.
-Context {PROP : bi}.
+Context {SI : sidx} {PROP : bi}.
 Implicit Types P Q R : PROP.
 
 (** Affine *)
 Global Instance bi_affine_quick_affine P : BiAffine PROP → QuickAffine P.
 Proof. rewrite /QuickAffine. apply _. Qed.
-Global Instance False_quick_affine : @QuickAffine PROP False.
+Global Instance False_quick_affine : @QuickAffine SI PROP False.
 Proof. rewrite /QuickAffine. apply _. Qed.
-Global Instance emp_quick_affine : @QuickAffine PROP emp.
+Global Instance emp_quick_affine : @QuickAffine SI PROP emp.
 Proof. rewrite /QuickAffine. apply _. Qed.
 Global Instance affinely_quick_affine P : QuickAffine (<affine> P).
 Proof. rewrite /QuickAffine. apply _. Qed.
@@ -22,7 +22,7 @@ Proof. rewrite /QuickAffine. apply _. Qed.
 (** Absorbing *)
 Global Instance bi_affine_quick_absorbing P : BiAffine PROP → QuickAbsorbing P.
 Proof. rewrite /QuickAbsorbing. apply _. Qed.
-Global Instance pure_quick_absorbing φ : @QuickAbsorbing PROP ⌜ φ ⌝.
+Global Instance pure_quick_absorbing φ : @QuickAbsorbing SI PROP ⌜ φ ⌝.
 Proof. rewrite /QuickAbsorbing. apply _. Qed.
 Global Instance absorbingly_quick_absorbing P : QuickAbsorbing (<absorb> P).
 Proof. rewrite /QuickAbsorbing. apply _. Qed.
@@ -101,7 +101,7 @@ Proof. by rewrite /MakeOr. Qed.
 Global Instance make_affinely_affine P :
   QuickAffine P → KnownMakeAffinely P P | 0.
 Proof. apply affine_affinely. Qed.
-Global Instance make_affinely_True : @KnownMakeAffinely PROP True emp | 1.
+Global Instance make_affinely_True : @KnownMakeAffinely SI PROP True emp | 1.
 Proof. by rewrite /KnownMakeAffinely /MakeAffinely affinely_True_emp. Qed.
 Global Instance make_affinely_default P : MakeAffinely P (<affine> P) | 100.
 Proof. by rewrite /MakeAffinely. Qed.
@@ -125,7 +125,7 @@ Proof. by rewrite /MakeAffinely. Qed.
 Global Instance make_absorbingly_absorbing P :
   QuickAbsorbing P → KnownMakeAbsorbingly P P | 0.
 Proof. apply absorbing_absorbingly. Qed.
-Global Instance make_absorbingly_emp : @KnownMakeAbsorbingly PROP emp True | 1.
+Global Instance make_absorbingly_emp : @KnownMakeAbsorbingly SI PROP emp True | 1.
 Proof.
   by rewrite /KnownMakeAbsorbingly /MakeAbsorbingly -absorbingly_emp_True.
 Qed.
@@ -134,13 +134,13 @@ Proof. by rewrite /MakeAbsorbingly. Qed.
 
 (** Persistently *)
 Global Instance make_persistently_emp :
-  @KnownMakePersistently PROP emp True | 0.
+  @KnownMakePersistently SI PROP emp True | 0.
 Proof.
   by rewrite /KnownMakePersistently /MakePersistently
      -persistently_True_emp persistently_pure.
 Qed.
 Global Instance make_persistently_True :
-  @KnownMakePersistently PROP True True | 0.
+  @KnownMakePersistently SI PROP True True | 0.
 Proof. by rewrite /KnownMakePersistently /MakePersistently persistently_pure. Qed.
 Global Instance make_persistently_default P :
   MakePersistently P (<pers> P) | 100.
@@ -148,7 +148,7 @@ Proof. by rewrite /MakePersistently. Qed.
 
 (** Intuitionistically *)
 Global Instance make_intuitionistically_emp :
-  @KnownMakeIntuitionistically PROP emp emp | 0.
+  @KnownMakeIntuitionistically SI PROP emp emp | 0.
 Proof.
   by rewrite /KnownMakeIntuitionistically /MakeIntuitionistically
     intuitionistically_emp.
@@ -157,13 +157,13 @@ Qed.
 so we have this instance with lower cost than the next. *)
 Global Instance make_intuitionistically_True_affine :
   BiAffine PROP →
-  @KnownMakeIntuitionistically PROP True True | 0.
+  @KnownMakeIntuitionistically SI PROP True True | 0.
 Proof.
   intros. rewrite /KnownMakeIntuitionistically /MakeIntuitionistically
     intuitionistically_True_emp True_emp //.
 Qed.
 Global Instance make_intuitionistically_True :
-  @KnownMakeIntuitionistically PROP True emp | 1.
+  @KnownMakeIntuitionistically SI PROP True emp | 1.
 Proof.
   by rewrite /KnownMakeIntuitionistically /MakeIntuitionistically
     intuitionistically_True_emp.
@@ -173,16 +173,16 @@ Global Instance make_intuitionistically_default P :
 Proof. by rewrite /MakeIntuitionistically. Qed.
 
 (** Later *)
-Global Instance make_laterN_true n : @KnownMakeLaterN PROP n True True | 0.
+Global Instance make_laterN_true n : @KnownMakeLaterN SI PROP n True True | 0.
 Proof. by rewrite /KnownMakeLaterN /MakeLaterN laterN_True. Qed.
 Global Instance make_laterN_emp `{!BiAffine PROP} n :
-  @KnownMakeLaterN PROP n emp emp | 0.
+  @KnownMakeLaterN SI PROP n emp emp | 0.
 Proof. by rewrite /KnownMakeLaterN /MakeLaterN laterN_emp. Qed.
 Global Instance make_laterN_default n P : MakeLaterN n P (▷^n P) | 100.
 Proof. by rewrite /MakeLaterN. Qed.
 
 (** Except-0 *)
-Global Instance make_except_0_True : @KnownMakeExcept0 PROP True True.
+Global Instance make_except_0_True : @KnownMakeExcept0 SI PROP True True.
 Proof. by rewrite /KnownMakeExcept0 /MakeExcept0 except_0_True. Qed.
 Global Instance make_except_0_default P : MakeExcept0 P (◇ P) | 100.
 Proof. by rewrite /MakeExcept0. Qed.

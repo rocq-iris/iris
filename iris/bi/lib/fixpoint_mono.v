@@ -4,42 +4,42 @@ Import bi.
 
 (** Least and greatest fixpoint of a monotone function, defined entirely inside
     the logic.  *)
-Class BiMonoPred {PROP : bi} {A : ofe} (F : (A → PROP) → (A → PROP)) := {
+Class BiMonoPred {SI : sidx} {PROP : bi} {A : ofe} (F : (A → PROP) → (A → PROP)) := {
   bi_mono_pred Φ Ψ :
     NonExpansive Φ →
     NonExpansive Ψ →
     □ (∀ x, Φ x -∗ Ψ x) -∗ ∀ x, F Φ x -∗ F Ψ x;
   bi_mono_pred_ne Φ : NonExpansive Φ → NonExpansive (F Φ)
 }.
-Global Arguments bi_mono_pred {_ _ _ _} _ _.
+Global Arguments bi_mono_pred {_ _ _ _ _} _ _.
 Local Existing Instance bi_mono_pred_ne.
 
-Definition bi_least_fixpoint {PROP : bi} {A : ofe}
+Definition bi_least_fixpoint {SI : sidx} {PROP : bi} {A : ofe}
     (F : (A → PROP) → (A → PROP)) (x : A) : PROP :=
   tc_opaque (∀ Φ : A -n> PROP, □ (∀ x, F Φ x -∗ Φ x) -∗ Φ x)%I.
 Global Arguments bi_least_fixpoint : simpl never.
 
-Definition bi_greatest_fixpoint {PROP : bi} {A : ofe}
+Definition bi_greatest_fixpoint {SI : sidx} {PROP : bi} {A : ofe}
     (F : (A → PROP) → (A → PROP)) (x : A) : PROP :=
   tc_opaque (∃ Φ : A -n> PROP, □ (∀ x, Φ x -∗ F Φ x) ∗ Φ x)%I.
 Global Arguments bi_greatest_fixpoint : simpl never.
 
 (* Both non-expansiveness lemmas do not seem to be interderivable.
   FIXME: is there some lemma that subsumes both? *)
-Lemma least_fixpoint_ne' {PROP : bi} {A : ofe} (F : (A → PROP) → (A → PROP)):
+Lemma least_fixpoint_ne' {SI : sidx} {PROP : bi} {A : ofe} (F : (A → PROP) → (A → PROP)):
   (∀ Φ, NonExpansive Φ → NonExpansive (F Φ)) → NonExpansive (bi_least_fixpoint F).
 Proof. solve_proper. Qed.
-Global Instance least_fixpoint_ne {PROP : bi} {A : ofe} n :
+Global Instance least_fixpoint_ne {SI : sidx} {PROP : bi} {A : ofe} n :
   Proper (pointwise_relation (A → PROP) (pointwise_relation A (dist n)) ==>
           dist n ==> dist n) bi_least_fixpoint.
 Proof. solve_proper. Qed.
-Global Instance least_fixpoint_proper {PROP : bi} {A : ofe} :
+Global Instance least_fixpoint_proper {SI : sidx} {PROP : bi} {A : ofe} :
   Proper (pointwise_relation (A → PROP) (pointwise_relation A (≡)) ==>
           (≡) ==> (≡)) bi_least_fixpoint.
 Proof. solve_proper. Qed.
 
 Section least.
-  Context {PROP : bi} {A : ofe} (F : (A → PROP) → (A → PROP)) `{!BiMonoPred F}.
+  Context {SI : sidx} {PROP : bi} {A : ofe} (F : (A → PROP) → (A → PROP)) `{!BiMonoPred F}.
 
   Lemma least_fixpoint_unfold_2 x : F (bi_least_fixpoint F) x ⊢ bi_least_fixpoint F x.
   Proof using Type*.
@@ -119,7 +119,7 @@ Section least.
   Qed.
 End least.
 
-Lemma least_fixpoint_strong_mono
+Lemma least_fixpoint_strong_mono {SI : sidx}
     {PROP : bi} {A : ofe} (F : (A → PROP) → (A → PROP)) `{!BiMonoPred F}
     (G : (A → PROP) → (A → PROP)) `{!BiMonoPred G} :
   □ (∀ Φ x, F Φ x -∗ G Φ x) -∗
@@ -146,9 +146,9 @@ induction principles:
   [least_fixpoint_strong_mono] can be useful to work with the hypothesis. *)
 
 Section least_ind.
-  Context {PROP : bi} {A : ofe} (F : (A → PROP) → (A → PROP)) `{!BiMonoPred F}.
+  Context {SI : sidx} {PROP : bi} {A : ofe} (F : (A → PROP) → (A → PROP)) `{!BiMonoPred F}.
 
-  Local Lemma Private_wf_pred_mono `{!NonExpansive Φ} :
+  Local Lemma Private_wf_pred_mono {Φ : A → PROP} `{!NonExpansive Φ} :
     BiMonoPred (λ (Ψ : A → PROP) (a : A), Φ a ∧ F Ψ a)%I.
   Proof using Type*.
     split; last solve_proper.
@@ -181,7 +181,7 @@ Section least_ind.
 End least_ind.
 
 
-Lemma greatest_fixpoint_ne_outer {PROP : bi} {A : ofe}
+Lemma greatest_fixpoint_ne_outer {SI : sidx} {PROP : bi} {A : ofe}
     (F1 : (A → PROP) → (A → PROP)) (F2 : (A → PROP) → (A → PROP)):
   (∀ Φ x n, F1 Φ x ≡{n}≡ F2 Φ x) → ∀ x1 x2 n,
   x1 ≡{n}≡ x2 → bi_greatest_fixpoint F1 x1 ≡{n}≡ bi_greatest_fixpoint F2 x2.
@@ -192,20 +192,20 @@ Qed.
 
 (* Both non-expansiveness lemmas do not seem to be interderivable.
   FIXME: is there some lemma that subsumes both? *)
-Lemma greatest_fixpoint_ne' {PROP : bi} {A : ofe} (F : (A → PROP) → (A → PROP)):
+Lemma greatest_fixpoint_ne' {SI : sidx} {PROP : bi} {A : ofe} (F : (A → PROP) → (A → PROP)):
   (∀ Φ, NonExpansive Φ → NonExpansive (F Φ)) → NonExpansive (bi_greatest_fixpoint F).
 Proof. solve_proper. Qed.
-Global Instance greatest_fixpoint_ne {PROP : bi} {A : ofe} n :
+Global Instance greatest_fixpoint_ne {SI : sidx} {PROP : bi} {A : ofe} n :
   Proper (pointwise_relation (A → PROP) (pointwise_relation A (dist n)) ==>
           dist n ==> dist n) bi_greatest_fixpoint.
 Proof. solve_proper. Qed.
-Global Instance greatest_fixpoint_proper {PROP : bi} {A : ofe} :
+Global Instance greatest_fixpoint_proper {SI : sidx} {PROP : bi} {A : ofe} :
   Proper (pointwise_relation (A → PROP) (pointwise_relation A (≡)) ==>
           (≡) ==> (≡)) bi_greatest_fixpoint.
 Proof. solve_proper. Qed.
 
 Section greatest.
-  Context {PROP : bi} {A : ofe} (F : (A → PROP) → (A → PROP)) `{!BiMonoPred F}.
+  Context {SI : sidx} {PROP : bi} {A : ofe} (F : (A → PROP) → (A → PROP)) `{!BiMonoPred F}.
 
   Lemma greatest_fixpoint_unfold_1 x :
     bi_greatest_fixpoint F x ⊢ F (bi_greatest_fixpoint F) x.
@@ -251,7 +251,7 @@ Section greatest.
 
 End greatest.
 
-Lemma greatest_fixpoint_strong_mono {PROP : bi} {A : ofe}
+Lemma greatest_fixpoint_strong_mono {SI : sidx} {PROP : bi} {A : ofe}
   (F : (A → PROP) → (A → PROP)) `{!BiMonoPred F}
   (G : (A → PROP) → (A → PROP)) `{!BiMonoPred G} :
   □ (∀ Φ x, F Φ x -∗ G Φ x) -∗
@@ -301,9 +301,9 @@ steps, before closing the coinduction by establishing the hypothesis [Φ]
 again. *)
 
 Section greatest_coind.
-  Context {PROP : bi} {A : ofe} (F : (A → PROP) → (A → PROP)) `{!BiMonoPred F}.
+  Context {SI : sidx} {PROP : bi} {A : ofe} (F : (A → PROP) → (A → PROP)) `{!BiMonoPred F}.
 
-  Local Lemma Private_paco_mono `{!NonExpansive Φ} :
+  Local Lemma Private_paco_mono {Φ : A → PROP} `{!NonExpansive Φ} :
     BiMonoPred (λ (Ψ : A → PROP) (a : A), Φ a ∨ F Ψ a)%I.
   Proof using Type*.
     split; last solve_proper.

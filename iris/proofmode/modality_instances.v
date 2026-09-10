@@ -1,10 +1,9 @@
-From iris.algebra Require Import stepindex_finite.
 From iris.bi Require Import bi.
 From iris.proofmode Require Export classes.
 Import bi.
 
 Section modalities.
-  Context {PROP : bi}.
+  Context {SI : sidx} {PROP : bi}.
 
   Lemma modality_persistently_mixin :
     modality_mixin (@bi_persistently _ PROP) MIEnvId MIEnvClear.
@@ -57,7 +56,8 @@ Section modalities.
 
   Lemma modality_laterN_mixin n :
     modality_mixin (@bi_laterN _ PROP n)
-      (MIEnvTransform (MaybeIntoLaterN false n)) (MIEnvTransform (MaybeIntoLaterN false n)).
+      (MIEnvTransform (MaybeIntoLaterN false n))
+      (MIEnvTransform (MaybeIntoLaterN false n)).
   Proof.
     split; simpl; split_and?; eauto using equiv_entails_1_2, laterN_intro,
       laterN_mono, laterN_and, laterN_sep with typeclass_instances.

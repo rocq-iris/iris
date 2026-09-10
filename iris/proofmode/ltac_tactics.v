@@ -67,7 +67,7 @@ Ltac iTypeOf H :=
   pm_eval (envs_lookup H Δ).
 
 Ltac iBiOfGoal :=
-  match goal with |- @envs_entails ?PROP _ _ => PROP end.
+  match goal with |- @envs_entails _ ?PROP _ _ => PROP end.
 
 Tactic Notation "iMatchHyp" tactic1(tac) :=
   match goal with
@@ -104,7 +104,7 @@ Tactic Notation "iStartProof" :=
      introduced. *)
 Tactic Notation "iStartProof" uconstr(PROP) :=
   lazymatch goal with
-  | |- @envs_entails ?PROP' _ _ =>
+  | |- @envs_entails ?SI ?PROP' _ _ =>
     (* This cannot be shared with the other [iStartProof], because
     type_term has a non-negligible performance impact. *)
     let x := type_term (eq_refl : @eq Type PROP PROP') in idtac
@@ -114,7 +114,7 @@ Tactic Notation "iStartProof" uconstr(PROP) :=
      this case, typing this expression will end up unifying PROP with
      [bi_car _], and hence trigger the canonical structures mechanism
      to find the corresponding bi. *)
-  | |- ?φ => notypeclasses refine ((λ P : PROP, @as_emp_valid_2 φ _ P) _ _ _);
+  | |- ?φ => notypeclasses refine ((λ P : PROP, @as_emp_valid_2 φ _ _ P) _ _ _);
                [tc_solve || fail "iStartProof: goal" φ "not a" PROP "assertion"
                |notypeclasses refine (tac_start _ _)]
   end.
@@ -825,7 +825,7 @@ Ltac iIntoEmpValid :=
   _iIntoEmpValid_go;
     [.. (* goals for premises *)
     |tc_solve ||
-     lazymatch goal with |- @AsEmpValid ?PROP _ ?φ _ =>
+     lazymatch goal with |- @AsEmpValid _ ?PROP _ ?φ _ =>
         fail "iPoseProof:" φ "not a" PROP "assertion" end].
 
 Tactic Notation "iPoseProofCoreLem" open_constr(lem) "as" tactic3(tac) :=
@@ -1049,7 +1049,7 @@ returns [false], then the conclusion can be moved in the intuitionistic context
 even if conditions 1 and 3 do not hold. Therefore, in that case, we prefer
 putting the conclusion to the intuitionistic context directly and not using
 [tac_specialize_intuitionistic_helper], which requires conditions 1 and 3. *)
-Fixpoint use_tac_specialize_intuitionistic_helper {M}
+Fixpoint use_tac_specialize_intuitionistic_helper {SI : sidx} {M}
     (Δ : envs M) (pats : list spec_pat) : bool :=
   match pats with
   | [] => false

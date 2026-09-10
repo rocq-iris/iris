@@ -20,6 +20,7 @@
      : string
 1 goal
   
+  SI : sidx
   A : Type
   Φ : A → siProp
   x : A
