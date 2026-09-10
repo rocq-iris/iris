@@ -6,7 +6,7 @@ From iris.heap_lang Require Import proofmode notation atomic_heap.
 Unset Mangle Names.
 
 Section general_bi_tests.
-  Context `{BiFUpd PROP} {TA TB : tele} (Eo Ei : coPset).
+  Context `{!BiFUpd PROP} {TA TB : tele} (Eo Ei : coPset).
 
   (** We can quantify over telescopes *inside* Iris and use them with atomic
   updates. *)

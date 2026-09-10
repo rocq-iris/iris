@@ -10,6 +10,16 @@ The tactic [sbi_unfold] turns it into
 
   ∀ n, x ≼{n} y ↔ x.1 ≼{n} y.1 ∧ x.2 ≼{n} y.2
 
+TODO: As part of the Transfinite transition, the tactic generates goals:
+
+  ∀ n : nat, x ≼{nat_to_sdix n} y ↔
+             x.1 ≼{nat_to_sdix n} y.1 ∧ x.2 ≼{nat_to_sdix n} y.2
+
+The [nat_to_sdix] coercion should not affect most uses of the tactic. Simply use
+[sbi_unfold=> n], and then apply your lemma with explicit step-indexing. See
+[iris.bi.algebra] for examples. Once the Transfinite transition is complete,
+the tactic will generate goals of the form [∀ n : SI].
+
 The tactic [sbi_unfold] works for goals of the shape [⊢ P], [P ⊢ Q], [P ⊣⊢ Q].
 Here, [P] and [Q] should be in the "plain" subset of propositions, i.e., [⌜ _ ⌝],
 [<si_pure>], [✓], [≡], [≼], closed under [∧], [∨], [→], [∀], [∃], [▷], and
@@ -50,16 +60,16 @@ End sbi_unfold_closure_indicator.
 Export sbi_unfold_closure_indicator (sbi_unfold_closure_indicator).
 Import sbi_unfold_closure_indicator (DownClosed, NotClosed).
 
-Class SbiUnfold `{!Sbi PROP} (clo : sbi_unfold_closure_indicator)
+Class SbiUnfold {SI : sidx} `{!Sbi PROP} (clo : sbi_unfold_closure_indicator)
     (P : PROP) (Pi : nat → Prop) := {
   sbi_unfold_closed n1 n2 : clo = DownClosed → Pi n1 → n2 ≤ n1 → Pi n2;
   (* If [closed] then [SiProp_downclose] is not needed, so use the smart
   constructor [SbiUnfold_closed] below. *)
   sbi_unfold_as_si_pure : P ⊣⊢ <si_pure> SiProp_downclose Pi;
 }.
-Global Hint Mode SbiUnfold + + + ! - : typeclass_instances.
+Global Hint Mode SbiUnfold - + + + ! - : typeclass_instances.
 
-Lemma SbiUnfold_closed `{Sbi PROP} clo (P : PROP) Pi
+Lemma SbiUnfold_closed {SI : sidx} `{!Sbi PROP} clo (P : PROP) Pi
     (Piclosed : ∀ n1 n2, Pi n1 → n2 ≤ n1 → Pi n2) :
   P ⊣⊢ <si_pure> SiProp Pi Piclosed → SbiUnfold clo P Pi.
 Proof.
@@ -76,7 +86,7 @@ Definition sbi_unfold_maybe_downclose (clo : sbi_unfold_closure_indicator)
     (Pi : nat → Prop) (n : nat) : Prop :=
   if clo is DownClosed then ∀ n', n' ≤ n → Pi n' else Pi n.
 
-Lemma SbiUnfold_downclose `{Sbi PROP} clo (P : PROP) Pi :
+Lemma SbiUnfold_downclose {SI : sidx} `{!Sbi PROP} clo (P : PROP) Pi :
   P ⊣⊢ <si_pure> SiProp_downclose Pi →
   SbiUnfold clo P (sbi_unfold_maybe_downclose clo Pi).
 Proof.
@@ -85,20 +95,20 @@ Proof.
   f_equiv. split=> n; rewrite /siProp_holds /=; naive_solver eauto with lia.
 Qed.
 
-Lemma sbi_unfold_closed_weaken `{Sbi PROP} clo (P : PROP) Pi :
+Lemma sbi_unfold_closed_weaken {SI : sidx} `{!Sbi PROP} clo (P : PROP) Pi :
   SbiUnfold DownClosed P Pi → SbiUnfold clo P Pi.
 Proof. intros [??]; split; naive_solver. Qed.
 
 (** This instance can be applied to any [P : siProp] so it has cost 100 to make
 sure it's only used if no other instance can be used. *)
-Global Instance sbi_unfold_siprop clo (P : siProp) :
+Global Instance sbi_unfold_siprop {SI : sidx} clo (P : siProp) :
   SbiUnfold clo P (siProp_holds P) | 100.
 Proof. apply: SbiUnfold_closed; [by eauto using siProp_closed|]. by split. Qed.
 
 Section sbi_unfold.
-  Context `{Sbi PROP}.
+  Context {SI : sidx} `{!Sbi PROP}.
   Implicit Types P Q : PROP.
-  Local Arguments siProp_holds !_.
+  Local Arguments siProp_holds _ !_.
   Local Notation SbiUnfold := (SbiUnfold (PROP:=PROP)).
 
   (** The top-level lemmas used by the tactic *)
@@ -132,24 +142,27 @@ Section sbi_unfold.
     apply: SbiUnfold_closed. rewrite -si_pure_pure. f_equiv. by siProp.unseal.
   Qed.
 
+  (** TODO: Remove [nat_to_sidx] in the lemmas below once [siProp] has been
+  ported to support any [sidx]. *)
   Global Instance sbi_unfold_internal_eq {A : ofe} clo (x y : A) :
-    SbiUnfold clo (x ≡ y) (λ n, x ≡{n}≡ y).
+    SbiUnfold clo (x ≡ y) (λ n, x ≡{nat_to_sidx n}≡ y).
   Proof.
-    apply: SbiUnfold_closed; [by eauto using dist_le|].
+    apply: SbiUnfold_closed; [by eauto using dist_le, nat_to_sidx_mono|].
     intros ?. rewrite /internal_eq. f_equiv. by siProp.unseal.
   Qed.
 
   Global Instance sbi_unfold_internal_cmra_valid {A : cmra} clo (x : A) :
-    SbiUnfold clo (✓ x) (λ n, ✓{n} x).
+    SbiUnfold clo (✓ x) (λ n, ✓{nat_to_sidx n} x).
   Proof.
-    apply: SbiUnfold_closed; [by eauto using cmra_validN_le|].
+    apply: SbiUnfold_closed; [by eauto using cmra_validN_le, nat_to_sidx_mono|].
     intros ?. rewrite /internal_cmra_valid. f_equiv. by siProp.unseal.
   Qed.
 
   Global Instance sbi_unfold_internal_included {A : cmra} clo (x y : A) :
-    SbiUnfold clo (x ≼ y) (λ n, x ≼{n} y).
+    SbiUnfold clo (x ≼ y) (λ n, x ≼{nat_to_sidx n} y).
   Proof.
-    apply: SbiUnfold_closed; [by eauto using cmra_includedN_le|].
+    apply: SbiUnfold_closed;
+      [by eauto using cmra_includedN_le, nat_to_sidx_mono|].
     intros ?. rewrite /internal_included /internal_eq -si_pure_exist.
     f_equiv. by siProp.unseal.
   Qed.
@@ -207,7 +220,7 @@ Section sbi_unfold.
     SbiUnfold clo (P -∗ Q) (sbi_unfold_maybe_downclose clo (λ n, Pi n → Qi n)).
   Proof.
     intros [? HP] [? HQ]. apply SbiUnfold_downclose.
-    rewrite HP HQ -si_pure_impl_wand. f_equiv. 
+    rewrite HP HQ -si_pure_impl_wand. f_equiv.
     split=> n /=; siProp.unseal; naive_solver eauto with lia.
   Qed.
 
@@ -275,7 +288,7 @@ the [match]. Actually generating [λ n, match x with Cj => Pij n end] is quite
 fiddly. *)
 
 (* A helper to help with HO-unification in the [Hint Extern] below. *)
-Local Lemma sbi_unfold_tceq `{Sbi PROP} clo (P : PROP) Pi Pi' :
+Local Lemma sbi_unfold_tceq {SI : sidx} `{!Sbi PROP} clo (P : PROP) Pi Pi' :
   SbiUnfold clo P Pi' → TCEq Pi Pi' → SbiUnfold clo P Pi.
 Proof. by intros ? ->. Qed.
 

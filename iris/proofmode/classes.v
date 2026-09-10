@@ -496,7 +496,7 @@ Proof. apply _. Qed.
 embeddings using [iModIntro].
 
 Input: the proposition [P], output: the proposition [Q] so that [P ⊢ ⎡Q⎤]. *)
-Class IntoEmbed {PROP PROP' : bi} `{BiEmbed PROP PROP'} (P : PROP') (Q : PROP) :=
+Class IntoEmbed {PROP PROP' : bi} `{!BiEmbed PROP PROP'} (P : PROP') (Q : PROP) :=
   into_embed : P ⊢ ⎡Q⎤.
 Global Arguments IntoEmbed {_ _ _} _%_I _%_I.
 Global Arguments into_embed {_ _ _} _%_I _%_I {_}.

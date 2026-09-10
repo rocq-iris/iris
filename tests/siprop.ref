@@ -2,6 +2,7 @@
      : string
 1 goal
   
+  SI : sidx
   P, Q : siProp
   Φ : nat → siProp
   ============================

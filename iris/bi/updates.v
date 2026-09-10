@@ -38,7 +38,7 @@ Notation "P ={ E }=∗ Q" := (P -∗ |={E}=> Q) : stdpp_scope.
 
 (** Bundled versions  *)
 (* Mixins allow us to create instances easily without having to use Program *)
-Record BiBUpdMixin (PROP : bi) `(BUpd PROP) := {
+Record BiBUpdMixin {SI : sidx} (PROP : bi) `(BUpd PROP) := {
   bi_bupd_mixin_bupd_ne : NonExpansive (bupd (PROP:=PROP));
   bi_bupd_mixin_bupd_intro (P : PROP) : P ⊢ |==> P;
   bi_bupd_mixin_bupd_mono (P Q : PROP) : (P ⊢ Q) → (|==> P) ⊢ |==> Q;
@@ -46,7 +46,7 @@ Record BiBUpdMixin (PROP : bi) `(BUpd PROP) := {
   bi_bupd_mixin_bupd_frame_r (P R : PROP) : (|==> P) ∗ R ⊢ |==> P ∗ R;
 }.
 
-Record BiFUpdMixin (PROP : bi) `(FUpd PROP) := {
+Record BiFUpdMixin {SI : sidx} (PROP : bi) `(FUpd PROP) := {
   bi_fupd_mixin_fupd_ne E1 E2 :
     NonExpansive (fupd (PROP:=PROP) E1 E2);
   bi_fupd_mixin_fupd_mask_subseteq E1 E2 :
@@ -63,32 +63,32 @@ Record BiFUpdMixin (PROP : bi) `(FUpd PROP) := {
     (|={E1,E2}=> P) ∗ R ⊢ |={E1,E2}=> P ∗ R;
 }.
 
-Class BiBUpd (PROP : bi) := {
+Class BiBUpd {SI : sidx} (PROP : bi) := {
   #[global] bi_bupd_bupd :: BUpd PROP;
   bi_bupd_mixin : BiBUpdMixin PROP bi_bupd_bupd;
 }.
-Global Hint Mode BiBUpd ! : typeclass_instances.
+Global Hint Mode BiBUpd - ! : typeclass_instances.
 Global Arguments bi_bupd_bupd : simpl never.
 
-Class BiFUpd (PROP : bi) := {
+Class BiFUpd {SI : sidx} (PROP : bi) := {
   #[global] bi_fupd_fupd :: FUpd PROP;
   bi_fupd_mixin : BiFUpdMixin PROP bi_fupd_fupd;
 }.
-Global Hint Mode BiFUpd ! : typeclass_instances.
+Global Hint Mode BiFUpd - ! : typeclass_instances.
 Global Arguments bi_fupd_fupd : simpl never.
 
-Class BiBUpdFUpd (PROP : bi) `{BiBUpd PROP, BiFUpd PROP} :=
+Class BiBUpdFUpd {SI : sidx} (PROP : bi) `{!BiBUpd PROP, !BiFUpd PROP} :=
   bupd_fupd E (P : PROP) : (|==> P) ⊢ |={E}=> P.
-Global Hint Mode BiBUpdFUpd ! - - : typeclass_instances.
+Global Hint Mode BiBUpdFUpd - ! - - : typeclass_instances.
 
-Class BiBUpdSbi (PROP : bi) `{!BiBUpd PROP, !Sbi PROP} :=
+Class BiBUpdSbi {SI : sidx} (PROP : bi) `{!BiBUpd PROP, !Sbi PROP} :=
   bupd_si_pure Pi : (|==> <si_pure> Pi) ⊢@{PROP} <si_pure> Pi.
-Global Hint Mode BiBUpdSbi ! - - : typeclass_instances.
+Global Hint Mode BiBUpdSbi - ! - - : typeclass_instances.
 
 (** These rules for the interaction between [<si_pure>] and the [|={E1,E2=>]
 modality only make sense for affine logics. For general BIs we do not know the
 canonical set of rules and linear models in which they might hold. *)
-Class BiFUpdSbi (PROP : bi) `{!BiFUpd PROP, !Sbi PROP} := {
+Class BiFUpdSbi {SI : sidx} (PROP : bi) `{!BiFUpd PROP, !Sbi PROP} := {
   (** This rule allows you to use the current context for proving a purely
   step-indexed proposition [Pi] *without* actually using up the context. You can
   then continue the proof in the second conjunct. The mask-changing version
@@ -104,7 +104,7 @@ Class BiFUpdSbi (PROP : bi) `{!BiFUpd PROP, !Sbi PROP} := {
   fupd_si_pure_forall_2 E {A} (Φi : A → siProp) :
     (∀ x, |={E}=> <si_pure> Φi x) ⊢@{PROP} |={E}=> ∀ x, <si_pure> Φi x
 }.
-Global Hint Mode BiBUpdFUpd ! - - : typeclass_instances.
+Global Hint Mode BiFUpdSbi - ! - - : typeclass_instances.
 
 (** * Step-taking fancy updates. *)
 (** These have two masks, but they are different than the two masks of a
@@ -130,12 +130,13 @@ Notation "P ={ E }▷=∗ Q" := (P ={E}[E]▷=∗ Q) : stdpp_scope.
 that could potentially differ from [Eo]. The latter can be obtained from
 this notation by adding normal mask-changing update modalities:
 [|={E1,Eo}=> |={Eo}[Ei]▷=>^n |={Eo,E2}=> Q] *)
-Fixpoint step_fupdN `{!BiFUpd PROP} (Eo Ei : coPset) (n : nat) (P : PROP) : PROP :=
+Fixpoint step_fupdN {SI : sidx} `{!BiFUpd PROP}
+    (Eo Ei : coPset) (n : nat) (P : PROP) : PROP :=
   match n with
   | 0 => P
   | S n => |={Eo}[Ei]▷=> step_fupdN Eo Ei n P
   end.
-Global Instance: Params (@step_fupdN) 5 := {}.
+Global Instance: Params (@step_fupdN) 6 := {}.
 Global Typeclasses Opaque step_fupdN.
 
 Notation "|={ Eo } [ Ei ]▷=>^ n Q" := (step_fupdN Eo Ei n Q) : bi_scope.
@@ -147,7 +148,7 @@ Notation "P ={ E }▷=∗^ n Q" := (P ={E}[E]▷=∗^n Q)%I : bi_scope.
 Notation "P ={ E }▷=∗^ n Q" := (P ={E}[E]▷=∗^n Q) : stdpp_scope.
 
 Section bupd_laws.
-  Context {PROP : bi} `{!BiBUpd PROP}.
+  Context {SI : sidx} {PROP : bi} `{!BiBUpd PROP}.
   Implicit Types P : PROP.
 
   Global Instance bupd_ne : NonExpansive (@bupd PROP _).
@@ -163,7 +164,7 @@ Section bupd_laws.
 End bupd_laws.
 
 Section fupd_laws.
-  Context {PROP : bi} `{!BiFUpd PROP}.
+  Context {SI : sidx} {PROP : bi} `{!BiFUpd PROP}.
   Implicit Types P : PROP.
 
   Global Instance fupd_ne E1 E2 : NonExpansive (@fupd PROP _ E1 E2).
@@ -188,7 +189,7 @@ Section fupd_laws.
 End fupd_laws.
 
 Section bupd_derived.
-  Context {PROP : bi} `{!BiBUpd PROP}.
+  Context {SI : sidx} {PROP : bi} `{!BiBUpd PROP}.
   Implicit Types P Q R : PROP.
 
   Global Instance bupd_proper :
@@ -297,7 +298,7 @@ Section bupd_derived.
 End bupd_derived.
 
 Section fupd_derived.
-  Context {PROP : bi} `{!BiFUpd PROP}.
+  Context {SI : sidx} {PROP : bi} `{!BiFUpd PROP}.
   Implicit Types P Q R : PROP.
 
   Global Instance fupd_proper E1 E2 :
