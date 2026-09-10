@@ -80,7 +80,6 @@ Iris now depends on rocq-elpi (version 3).
   of `Nat.iter_add`. Add the lemmas `step_fupdN_0` and `step_fupdN_1`, and add
   `NonExpansive` and `Proper` instances for `≡` and `⊢`.
 * Add lemma `laterN_1`.
-* Add `NonExpansive` and `Proper` instances for `≡` and `⊢` for `step_fupdN`.
 * Make everything in the `bi` folder (with the exception of `monPred`) parametric
   in the type of "step indices" to prepare for the support of transfinite step
   indexing. The laws of the BI interfaces have not been changed, so BIs cannot
