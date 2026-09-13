@@ -205,12 +205,12 @@ Section bi_mixin.
     bi_mixin_later_intro P : P ⊢ ▷ P;
 
     bi_mixin_later_forall_2 {A} (Φ : A → PROP) : (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a;
-    bi_mixin_later_false_exist {A} (Φ : A → PROP) :
+    bi_mixin_later_false_impl_exist {A} (Φ : A → PROP) :
       (▷ False → ∃ a, Φ a) ⊢ ∃ a, ▷ False → Φ a;
     bi_mixin_later_exist_false `{!SIdxFinite SI} {A} (Φ : A → PROP) :
       (▷ ∃ a, Φ a) ⊢ ▷ False ∨ (∃ a, ▷ Φ a);
 
-    bi_mixin_later_false_sep (P Q : PROP) :
+    bi_mixin_later_false_impl_sep (P Q : PROP) :
       (▷ False → P ∗ Q) ⊢ (▷ False → P) ∗ (▷ False → Q);
     bi_mixin_later_sep_1 `{!SIdxFinite SI} P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q;
     bi_mixin_later_sep_2 P Q : ▷ P ∗ ▷ Q ⊢ ▷ (P ∗ Q);
@@ -516,16 +516,16 @@ Proof. eapply bi_mixin_later_intro, bi_bi_later_mixin. Qed.
 
 Lemma later_forall_2 {A} (Φ : A → PROP) : (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a.
 Proof. eapply bi_mixin_later_forall_2, bi_bi_later_mixin. Qed.
-Lemma later_false_exist {A} (Φ : A → PROP) :
+Lemma later_false_impl_exist {A} (Φ : A → PROP) :
   (▷ False → ∃ a, Φ a) ⊢ ∃ a, ▷ False → Φ a.
-Proof. eapply bi_mixin_later_false_exist, bi_bi_later_mixin. Qed.
+Proof. eapply bi_mixin_later_false_impl_exist, bi_bi_later_mixin. Qed.
 Lemma later_exist_false `{!SIdxFinite SI} {A} (Φ : A → PROP) :
   (▷ ∃ a, Φ a) ⊢ ▷ False ∨ (∃ a, ▷ Φ a).
 Proof. eapply bi_mixin_later_exist_false; [apply bi_bi_later_mixin|done]. Qed.
 
-Lemma later_false_sep (P Q : PROP) :
+Lemma later_false_impl_sep (P Q : PROP) :
   (▷ False → P ∗ Q) ⊢ (▷ False → P) ∗ (▷ False → Q).
-Proof. eapply bi_mixin_later_false_sep, bi_bi_later_mixin. Qed.
+Proof. eapply bi_mixin_later_false_impl_sep, bi_bi_later_mixin. Qed.
 Lemma later_sep_1 `{!SIdxFinite SI} P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q.
 Proof. eapply bi_mixin_later_sep_1; [apply bi_bi_later_mixin|done]. Qed.
 Lemma later_sep_2 P Q : ▷ P ∗ ▷ Q ⊢ ▷ (P ∗ Q).

@@ -394,11 +394,11 @@ Section instances.
     - intros P. split=> i /=. by apply bi.later_intro.
     - intros A Ψ. split=> i. by apply bi.later_forall_2.
     - intros A Ψ. split=> i /=. rewrite (bi.forall_elim i) bi.pure_True // left_id.
-      rewrite bi.later_false_exist. f_equiv=> x. apply bi.forall_intro=> j.
+      rewrite bi.later_false_impl_exist. f_equiv=> x. apply bi.forall_intro=> j.
       apply bi.impl_intro_l, bi.pure_elim_l=> ?. f_equiv. by apply monPred_mono.
     - intros ? A Ψ. split=> i. by apply bi.later_exist_false.
     - intros P Q. split=> i /=. rewrite (bi.forall_elim i) bi.pure_True // left_id.
-      rewrite bi.later_false_sep.
+      rewrite bi.later_false_impl_sep.
       f_equiv; apply bi.forall_intro=> j;
         apply bi.impl_intro_l, bi.pure_elim_l=> ?;
         f_equiv; by apply monPred_mono.

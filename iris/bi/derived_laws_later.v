@@ -422,7 +422,7 @@ Proof. rewrite !and_alt only_0_forall. by f_equiv=> -[]. Qed.
 Lemma only_0_exist {A} (Φ : A → PROP) :
   <only0> (∃ x, Φ x) ⊣⊢ ∃ x, <only0> Φ x.
 Proof.
-  apply (anti_symm _); [apply later_false_exist|].
+  apply (anti_symm _); [apply later_false_impl_exist|].
   apply exist_elim=> x. by rewrite -(exist_intro x).
 Qed.
 
@@ -454,7 +454,7 @@ Proof. by apply (anti_symm _), only_0_intro. Qed.
 
 Lemma only_0_sep P Q :  <only0> (P ∗ Q) ⊣⊢ <only0> P ∗ <only0> Q.
 Proof.
-  apply (anti_symm _); [by apply later_false_sep|].
+  apply (anti_symm _); [by apply later_false_impl_sep|].
   apply impl_intro_l. rewrite persistent_and_affinely_sep_l.
   rewrite (persistent_sep_dup (<affine> ▷ False)%I).
   rewrite -!assoc (assoc _ _ (<only0> P)%I) (assoc _ (<affine> _)%I).
