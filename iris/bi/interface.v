@@ -210,7 +210,7 @@ Section bi_mixin.
     bi_mixin_later_exist_false `{!SIdxFinite SI} {A} (Φ : A → PROP) :
       (▷ ∃ a, Φ a) ⊢ ▷ False ∨ (∃ a, ▷ Φ a);
 
-    bi_mixin_later_false_impl_sep (P Q : PROP) :
+    bi_mixin_later_false_impl_sep P Q :
       (▷ False → P ∗ Q) ⊢ (▷ False → P) ∗ (▷ False → Q);
     bi_mixin_later_sep_1 `{!SIdxFinite SI} P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q;
     bi_mixin_later_sep_2 P Q : ▷ P ∗ ▷ Q ⊢ ▷ (P ∗ Q);
@@ -226,6 +226,109 @@ Section bi_mixin.
          the step-index is 0 ([▷ False] is true). *)
     bi_mixin_later_false_em P : ▷ P ⊢ ▷ False ∨ (▷ False → P);
   }.
+
+  Lemma bi_later_mixin_sidx_finite
+      (later_ne : NonExpansive bi_later)
+      (löb : ∀ P, (▷ P ⊢ P) → True ⊢ P)
+      (later_mono : ∀ P Q, (P ⊢ Q) → ▷ P ⊢ ▷ Q)
+      (later_intro : ∀ P, P ⊢ ▷ P)
+      (later_forall_2 : ∀ {A} (Φ : A → PROP), (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a)
+      (later_exist_false : ∀ {A} (Φ : A → PROP),
+        (▷ ∃ a, Φ a) ⊢ ▷ False ∨ (∃ a, ▷ Φ a))
+      (later_sep_1 : ∀ P Q, ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q)
+      (later_sep_2 : ∀ P Q, ▷ P ∗ ▷ Q ⊢ ▷ (P ∗ Q))
+      (later_persistently_1 : ∀ P, ▷ <pers> P ⊢ <pers> ▷ P)
+      (later_persistently_2 : ∀ P, <pers> ▷ P ⊢ ▷ <pers> P)
+      (later_false_em : ∀ P, ▷ P ⊢ ▷ False ∨ (▷ False → P))
+      (bi_mixin : BiMixin) :
+    BiLaterMixin.
+  Proof.
+    pose proof (bi_mixin_entails_po bi_mixin).
+    pose proof (and_elim_l := bi_mixin_and_elim_l bi_mixin).
+    pose proof (and_elim_r := bi_mixin_and_elim_r bi_mixin).
+    pose proof (and_intro := bi_mixin_and_intro bi_mixin).
+    pose proof (impl_intro_r := bi_mixin_impl_intro_r bi_mixin).
+    pose proof (impl_elim_l' := bi_mixin_impl_elim_l' bi_mixin).
+    assert (later_and_2 : ∀ P Q, ▷ P ∧ ▷ Q ⊢ ▷ (P ∧ Q)).
+    { intros P Q. trans (▷ ∀ b : bool, if b then P else Q)%I.
+      { etrans; [|apply later_forall_2].
+        apply (bi_mixin_forall_intro bi_mixin)=> -[]; auto. }
+      apply later_mono, and_intro.
+      - etrans; [apply (bi_mixin_forall_elim bi_mixin true)|]. done.
+      - etrans; [apply (bi_mixin_forall_elim bi_mixin false)|]. done. }
+    assert (and_comm : ∀ P Q, P ∧ Q ⊢ Q ∧ P) by auto.
+    assert (impl_impl : ∀ P Q, (P → P → Q) ⊢ P → Q).
+    { intros P Q. apply impl_intro_r.
+      trans ((P → Q) ∧ P)%I; [|by apply bi_mixin_impl_elim_l'].
+      apply and_intro; last by auto. by apply impl_elim_l'. }
+    split; auto.
+    - (* (▷ False → ∃ a, Φ a) ⊢ ∃ a, ▷ False → Φ a *)
+      intros A Φ. trans (True ∧ (▷ False → ∃ a, Φ a))%I.
+      { apply and_intro; [|done]. by apply (bi_mixin_pure_intro bi_mixin). }
+      apply impl_elim_l', löb, impl_intro_r.
+      trans (▷ (∃ a, ▷ False → Φ a) ∧ (▷ False → ∃ a, Φ a))%I.
+      { apply and_intro, and_elim_r.
+        trans (▷ ((▷ False → ∃ a, Φ a) → ∃ a, ▷ False → Φ a) ∧
+               ▷ (▷ False → ∃ a, Φ a))%I.
+        { apply and_intro; [by auto|]. etrans; [apply and_elim_r|]. auto. }
+        etrans; [apply later_and_2|]. by apply later_mono, impl_elim_l'. }
+      apply impl_elim_l'.
+      etrans; [apply later_exist_false|]; simpl. apply (bi_mixin_or_elim bi_mixin).
+      { apply impl_intro_r. etrans; [apply and_comm|].
+        etrans; [by apply impl_elim_l'|].
+        eapply (bi_mixin_exist_elim bi_mixin)=> a.
+        etrans; [|apply (bi_mixin_exist_intro bi_mixin a)]; simpl.
+        apply impl_intro_r. auto. }
+      apply (bi_mixin_exist_elim bi_mixin)=> a.
+      etrans; [apply later_false_em|]. apply (bi_mixin_or_elim bi_mixin).
+      { apply impl_intro_r. etrans; [apply and_comm|].
+        etrans; [by apply impl_elim_l'|].
+        eapply (bi_mixin_exist_elim bi_mixin)=> a'.
+        etrans; [|apply (bi_mixin_exist_intro bi_mixin a')]; simpl.
+        apply impl_intro_r. auto. }
+      apply impl_intro_r. etrans; [apply and_elim_l|].
+      etrans; [|apply (bi_mixin_exist_intro bi_mixin a)]. done.
+    - (* (▷ False → P ∗ Q) ⊢ (▷ False → P) ∗ (▷ False → Q) *)
+      intros P Q. trans (True ∧ (▷ False → P ∗ Q))%I.
+      { apply and_intro; [|done].
+        by apply (bi_mixin_pure_intro bi_mixin). }
+      apply impl_elim_l', löb, impl_intro_r.
+      trans (▷ ((▷ False → P) ∗ (▷ False → Q)) ∧ (▷ False → P ∗ Q))%I.
+      { apply and_intro, and_elim_r.
+        trans (▷ ((▷ False → P ∗ Q) → (▷ False → P) ∗ (▷ False → Q)) ∧
+               ▷ (▷ False → P ∗ Q))%I.
+        { apply and_intro; [by auto|]. etrans; [apply and_elim_r|]. auto. }
+        etrans; [apply later_and_2|]. apply later_mono.
+        by apply impl_elim_l'. }
+      apply impl_elim_l'. etrans; [apply later_sep_1|].
+      apply (bi_mixin_wand_elim_l' bi_mixin).
+      etrans; [apply later_false_em|]. apply (bi_mixin_or_elim bi_mixin).
+      { apply (bi_mixin_wand_intro_r bi_mixin), impl_intro_r.
+        trans (▷ False ∧ (▷ False → P ∗ Q))%I.
+        { apply and_intro, and_elim_r. etrans; [apply and_elim_l|].
+          etrans; [apply later_sep_2|]. apply later_mono.
+          apply (bi_mixin_wand_elim_l' bi_mixin).
+          by apply (bi_mixin_pure_elim' bi_mixin). }
+        etrans; [apply and_comm|]. etrans; [by apply impl_elim_l'|].
+        apply (bi_mixin_sep_mono bi_mixin); apply impl_intro_r; auto. }
+      apply (bi_mixin_wand_intro_r bi_mixin).
+      etrans; [apply (bi_mixin_sep_comm' bi_mixin)|].
+      apply (bi_mixin_wand_elim_l' bi_mixin).
+      etrans; [apply later_false_em|]. apply (bi_mixin_or_elim bi_mixin).
+      { apply (bi_mixin_wand_intro_r bi_mixin), impl_intro_r.
+        trans (▷ False ∧ (▷ False → P ∗ Q))%I.
+        { apply and_intro, and_elim_r. etrans; [apply and_elim_l|].
+          etrans; [apply (bi_mixin_sep_mono bi_mixin); [done|apply later_intro]|].
+          etrans; [apply later_sep_2|]. apply later_mono.
+          apply (bi_mixin_wand_elim_l' bi_mixin).
+          by apply (bi_mixin_pure_elim' bi_mixin). }
+        etrans; [apply and_comm|]. etrans; [by apply impl_elim_l'|].
+        apply (bi_mixin_sep_mono bi_mixin); apply impl_intro_r; auto. }
+      apply (bi_mixin_wand_intro_r bi_mixin), impl_intro_r.
+      etrans; [apply and_elim_l|].
+      etrans; [apply (bi_mixin_sep_comm' bi_mixin)|].
+      by apply (bi_mixin_sep_mono bi_mixin).
+  Qed.
 
   (** Defining [▷ P := True] is the "canonical" choice in a non-step indexed
   setting. Normally, one would define [▷ P := λ n, ∀ n', n' < n → P n']. By
