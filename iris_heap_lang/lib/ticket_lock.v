@@ -28,10 +28,10 @@ Local Definition release : val :=
 (** The CMRAs we need. *)
 Class tlockG Σ :=
   #[local] tlock_G ::
-    inG Σ (authR (prodUR (optionUR (exclR natO)) (gset_disjUR nat))).
+    inG Σ (authR (prodUR (optionUR (exclR unitO)) (gset_disjUR nat))).
 
 Definition tlockΣ : gFunctors :=
-  #[ GFunctor (authR (prodUR (optionUR (exclR natO)) (gset_disjUR nat))) ].
+  #[ GFunctor (authR (prodUR (optionUR (exclR unitO)) (gset_disjUR nat))) ].
 
 Global Instance subG_tlockΣ {Σ} : subG tlockΣ Σ → tlockG Σ.
 Proof. solve_inG. Qed.
@@ -43,8 +43,8 @@ Section proof.
   Local Definition lock_inv (γ : gname) (lo ln : loc) (R : iProp Σ) : iProp Σ :=
     ∃ o n : nat,
       lo ↦ #o ∗ ln ↦ #n ∗
-      own γ (● (Excl' o, GSet (set_seq 0 n))) ∗
-      ((own γ (◯ (Excl' o, GSet ∅)) ∗ R) ∨ own γ (◯ (ε, GSet {[ o ]}))).
+      own γ (● (Excl' (), GSet (set_seq 0 n))) ∗
+      ((own γ (◯ (Excl' (), GSet ∅)) ∗ R) ∨ own γ (◯ (ε, GSet {[ o ]}))).
 
   Local Definition is_lock (γ : gname) (lk : val) (R : iProp Σ) : iProp Σ :=
     ∃ lo ln : loc,
@@ -53,12 +53,11 @@ Section proof.
   Local Definition issued (γ : gname) (x : nat) : iProp Σ :=
     own γ (◯ (ε, GSet {[ x ]})).
 
-  Local Definition locked (γ : gname) : iProp Σ := ∃ o, own γ (◯ (Excl' o, GSet ∅)).
+  Local Definition locked (γ : gname) : iProp Σ := own γ (◯ (Excl' (), GSet ∅)).
 
   Local Lemma locked_exclusive (γ : gname) : locked γ -∗ locked γ -∗ False.
   Proof.
-    iIntros "[%σ1 H1] [%σ2 H2]".
-    iCombine "H1 H2" gives %[[] _]%auth_frag_op_valid_1.
+    iIntros "H1 H2". iCombine "H1 H2" gives %[[] _]%auth_frag_op_valid_1.
   Qed.
 
   Local Lemma is_lock_iff γ lk R1 R2 :
@@ -76,7 +75,7 @@ Section proof.
   Proof.
     iIntros (Φ) "_ HΦ". wp_lam.
     wp_alloc ln as "Hln". wp_alloc lo as "Hlo".
-    iMod (own_alloc (● (Excl' 0, GSet ∅) ⋅ ◯ (Excl' 0, GSet ∅))) as (γ) "[Hγ Hγ']".
+    iMod (own_alloc (● (Excl' (), GSet ∅) ⋅ ◯ (Excl' (), GSet ∅))) as (γ) "[Hγ Hγ']".
     { by apply auth_both_valid_discrete. }
     wp_pures. iApply "HΦ".
     iIntros "!> %R %E HR".
@@ -135,22 +134,13 @@ Section proof.
     {{{ is_lock γ lk R ∗ locked γ ∗ R }}} release lk {{{ RET #(); True }}}.
   Proof.
     iIntros (Φ) "(Hl & Hγ & HR) HΦ". iDestruct "Hl" as (lo ln ->) "#Hinv".
-    iDestruct "Hγ" as (o) "Hγo".
     wp_lam. wp_proj. wp_bind (! _)%E.
-    iInv N as (o' n) "(>Hlo & >Hln & >Hauth & Haown)".
-    wp_load.
-    iCombine "Hauth Hγo" gives
-      %[[<-%Excl_included%leibniz_equiv _]%prod_included _]%auth_both_valid_discrete.
-    iModIntro. iFrame. wp_pures.
+    iInv N as (o n) "(>Hlo & >Hln & >Hauth & Haown)".
+    wp_load. iModIntro. iFrame. wp_pures.
     iInv N as (o' n') "(>Hlo & >Hln & >Hauth & Haown)".
     iApply wp_fupd. wp_store.
-    iCombine "Hauth Hγo" gives
-      %[[<-%Excl_included%leibniz_equiv _]%prod_included _]%auth_both_valid_discrete.
-    iDestruct "Haown" as "[[Hγo' _]|Haown]".
-    { iCombine "Hγo Hγo'" gives %[[] ?]%auth_frag_op_valid_1. }
-    iMod (own_update_2 with "Hauth Hγo") as "[Hauth Hγo]".
-    { apply auth_update, prod_local_update_1.
-      by apply option_local_update, (exclusive_local_update _ (Excl (S o))). }
+    iDestruct "Haown" as "[[Hγ' _]|Haown]".
+    { iCombine "Hγ Hγ'" gives %[[] ?]%auth_frag_op_valid_1. }
     iModIntro. iSplitR "HΦ"; last by iApply "HΦ".
     iIntros "!> !>". iExists (S o), n'.
     rewrite Nat2Z.inj_succ -Z.add_1_r. auto with iFrame.
