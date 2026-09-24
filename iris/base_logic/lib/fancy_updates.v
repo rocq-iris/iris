@@ -1,6 +1,6 @@
-From stdpp Require Export coPset nat_cancel.
+From stdpp Require Export coPset.
 From iris.algebra Require Import gmap auth agree gset coPset.
-From iris.proofmode Require Import rocq_tactics proofmode reduction.
+From iris.proofmode Require Import proofmode modality_instances.
 From iris.base_logic.lib Require Export own.
 From iris.base_logic.lib Require Import wsat.
 From iris.base_logic Require Export later_credits.
@@ -65,7 +65,7 @@ Local Lemma uPred_fupd_unseal `{!invGS_gen hlc Σ} :
 Proof. rewrite -uPred_fupd_aux.(seal_eq) //. Qed.
 
 Lemma uPred_fupd_mixin `{!invGS_gen hlc Σ} :
-  BiFUpdMixin (uPredI (iResUR Σ)) uPred_fupd.
+  BiFUpdMixin (iPropI Σ) uPred_fupd.
 Proof.
   split.
   - rewrite uPred_fupd_unseal. solve_proper.
@@ -85,10 +85,10 @@ Proof.
     iIntros "!>". by iApply "HP".
   - rewrite uPred_fupd_unseal /uPred_fupd_def. by iIntros (????) "[HwP $]".
 Qed.
-Global Instance uPred_bi_fupd `{!invGS_gen hlc Σ} : BiFUpd (uPredI (iResUR Σ)) :=
+Global Instance uPred_bi_fupd `{!invGS_gen hlc Σ} : BiFUpd (iPropI Σ) :=
   {| bi_fupd_mixin := uPred_fupd_mixin |}.
 
-Global Instance uPred_bi_bupd_fupd `{!invGS_gen hlc Σ} : BiBUpdFUpd (uPredI (iResUR Σ)).
+Global Instance uPred_bi_bupd_fupd `{!invGS_gen hlc Σ} : BiBUpdFUpd (iPropI Σ).
 Proof. rewrite /BiBUpdFUpd uPred_fupd_unseal. by iIntros (E P) ">? [$ $] !>". Qed.
 
 (** If later credits are disabled, this lemma shows that [fupd] is just the
@@ -100,49 +100,22 @@ Proof.
   by rewrite later_credits.le_upd.le_upd_unfold_no_le.
 Qed.
 
+Global Instance uPred_bi_bupd_lc `{!lcGS hlc Σ} :
+  BiBUpdLaterCredits (iPropI Σ).
+Proof.
+  rewrite /BiBUpdLaterCredits later_credits.uPred_lc_unseal
+    /later_credits.uPred_lc_def.
+  destruct hlc; [|by auto]. iApply own_unit.
+Qed.
+
 (** Later credits: the laws for spending credits are only available when we opt
 into later credit support ([hlc = HasLc]). *)
-
-(** [lc_fupd_elim_later] allows to eliminate a later from a hypothesis at an update.
-This is typically used as [iMod (lc_fupd_elim_later with "Hcredit HP") as "HP".],
-where ["Hcredit"] is a credit available in the context and ["HP"] is the
-assumption from which a later should be stripped. *)
-Lemma lc_fupd_elim_later `{!invGS_gen HasLc Σ} E P :
-   £ 1 -∗ (▷ P) -∗ |={E}=> P.
+Global Instance uPred_bi_fupd_lc `{!invGS_gen HasLc Σ} :
+  BiFUpdLaterCredits (iPropI Σ).
 Proof.
+  rewrite /BiFUpdLaterCredits uPred_fupd_unseal /uPred_fupd_def=> E P.
   iIntros "Hf Hupd".
-  rewrite uPred_fupd_unseal /uPred_fupd_def.
   iIntros "[$ $]". by iApply (lc_le_upd_elim_later with "Hf").
-Qed.
-
-(** If the goal is a fancy update, this lemma can be used to make a later appear
-in front of it in exchange for a later credit. This is typically used as
-[iApply (lc_fupd_add_later with "Hcredit")], where ["Hcredit"] is a credit
-available in the context. *)
-Lemma lc_fupd_add_later `{!invGS_gen HasLc Σ} E1 E2 P :
-  £ 1 -∗ (▷ |={E1, E2}=> P) -∗ |={E1, E2}=> P.
-Proof.
-  iIntros "Hf Hupd". iApply (fupd_trans E1 E1).
-  iApply (lc_fupd_elim_later with "Hf Hupd").
-Qed.
-
-(** Similar to above, but here we are adding [n] laters. *)
-Lemma lc_fupd_add_laterN `{!invGS_gen HasLc Σ} E1 E2 P n :
-  £ n -∗ (▷^n |={E1, E2}=> P) -∗ |={E1, E2}=> P.
-Proof.
-  iIntros "Hf Hupd". iInduction n as [|n] "IH"; first done.
-  iDestruct "Hf" as "[H1 Hf]".
-  iApply (lc_fupd_add_later with "H1"); iNext.
-  iApply ("IH" with "[$] [$]").
-Qed.
-
-Lemma lc_fupd_add_step_fupdN `{!invGS_gen HasLc Σ} E1 E2 E3 P n :
-  £ n -∗ (|={E1}[E2]▷=>^n |={E1,E3}=> P) -∗ |={E1,E3}=> P.
-Proof.
-  iIntros "Hf Hupd". iInduction n as [|n] "IH"; simpl; first done.
-  iMod "Hupd". iDestruct "Hf" as "[H1 Hf]".
-  iApply (lc_fupd_add_later with "H1"); iNext.
-  iMod "Hupd". iApply ("IH" with "[$] [$]").
 Qed.
 
 (** * [fupd] soundness lemmas *)
@@ -385,7 +358,7 @@ End fupd_finally.
 opt out of the support for later credits. These rules are derived from the rules
 of the *finally* modality. *)
 Global Instance uPred_bi_fupd_sbi_no_lc `{!invGS_gen HasNoLc Σ} :
-  BiFUpdSbi (uPredI (iResUR Σ)).
+  BiFUpdSbi (iPropI Σ).
 Proof.
   split.
   - iIntros (E E' Pi R) "H".
@@ -467,56 +440,3 @@ Proof.
           /fancy_updates.uPred_fupd_def -assoc /=.
   iApply later_credits.le_upd.le_upd_unfold_no_le. by iApply ("HP" with "HwE").
 Qed.
-
-(** * Now the Rocq-level tactic [iNext credit:H] *)
-Lemma tac_lc_add_laterN_split `{!invGS_gen HasLc Σ} Δ Δ' Δ'' E i n m m' P :
-  envs_lookup i Δ = Some (false, £ m) →
-  (* Ensure that the goal [P] that be turned into a [fupd], i.e. the goal is a
-  WP or a (possibly mask-changing) fancy update *)
-  AddModal (|={E}=> P) P P →
-  NatCancel m n m' 0 →
-  envs_replace i false false (Esnoc Enil i (£ m')) Δ = Some Δ' →
-  MaybeIntoLaterNEnvs n Δ' Δ'' →
-  (m' = 0 ∧
-   match envs_lookup_delete false i Δ'' with
-   | Some (_, _, Δ''') => envs_entails Δ''' P
-   | None => False
-   end
-   ∨ envs_entails Δ'' P) →
-  envs_entails Δ P.
-Proof.
-  rewrite envs_entails_unseal /NatCancel /AddModal right_id.
-  intros Hi HP <- HΔ HΔ' HΔ''. rewrite -HP -wand_refl right_id.
-  rewrite envs_replace_sound //. simpl.
-  rewrite Nat.add_comm lc_split. rewrite right_id -assoc wand_elim_r.
-  rewrite into_laterN_env_sound.
-  destruct HΔ'' as [[-> HΔ'']|<-].
-  - destruct (envs_lookup_delete _ _) as [[[p Pi] Δ''']|] eqn:HΔ'''; [|done].
-    rewrite envs_lookup_delete_sound // HΔ''.
-    iIntros "[H£ [_ H]]".
-    iApply (lc_fupd_add_laterN with "H£"). by iIntros "!> !>".
-  - iIntros "[H£ H]". iApply (lc_fupd_add_laterN with "H£"). by iIntros "!> !>".
-Qed.
-
-Tactic Notation "iNext" open_constr(n) "credit:" constr(H) :=
-  iStartProof;
-  notypeclasses refine (tac_lc_add_laterN_split _ _ _ _ H n _ _ _ _ _ _ _ _ _);
-    [(* look up the later credit named H *)
-     pm_reflexivity ||
-     fail "iNext:" H "is not a later credit"
-    |(* AddModal *)
-     tc_solve ||
-     fail "iNext: The goal cannot be turned into a fancy update modality"
-    |(* NatCancel *)
-     tc_solve ||
-     fail "iNext:" H " does not contain" n "credits"
-    |(* envs_replace *)
-     pm_reflexivity
-    |(* MaybeIntoLaterNEnvs *)
-     tc_solve
-    |pm_reduce; pm_prettify; first
-       [left; split; [done|] (* credit is used up *)
-       |right (* credit has the residue *)
-       ]
-    ].
-Tactic Notation "iNext" "credit:" constr(H) := iNext 1 credit: H.

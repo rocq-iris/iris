@@ -58,6 +58,7 @@ iris/bi/internal_eq.v
 iris/bi/cmra.v
 iris/bi/big_op.v
 iris/bi/updates.v
+iris/bi/later_credits.v
 iris/bi/ascii.v
 iris/bi/bi.v
 iris/bi/sbi.v
@@ -131,6 +132,7 @@ iris/proofmode/classes.v
 iris/proofmode/classes_make.v
 iris/proofmode/class_instances.v
 iris/proofmode/class_instances_later.v
+iris/proofmode/class_instances_later_credits.v
 iris/proofmode/class_instances_updates.v
 iris/proofmode/class_instances_embedding.v
 iris/proofmode/class_instances_plainly.v

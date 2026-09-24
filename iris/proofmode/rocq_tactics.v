@@ -1,3 +1,4 @@
+From stdpp Require Import nat_cancel.
 From iris.bi Require Export bi telescopes.
 From iris.proofmode Require Export base environments classes classes_make
                                    modality_instances.
@@ -1299,4 +1300,31 @@ Proof.
     + intros P Q ->. by rewrite laterN_intuitionistically_2.
     + intros P Q. by rewrite laterN_and.
   - by rewrite Hs //= right_id.
+Qed.
+
+Lemma tac_lc_add_laterN_split {SI : sidx}
+    `{!BiLaterCredits PROP, !BiFUpd PROP, !BiFUpdLaterCredits PROP}
+    Δ Δ' Δ'' E i n m m' (P : PROP) :
+  envs_lookup i Δ = Some (false, £ m) →
+  (* Ensure that the goal [P] that be turned into a [fupd], i.e. the goal is a
+  WP or a (possibly mask-changing) fancy update *)
+  AddModal (|={E}=> P) P P →
+  NatCancel m n m' 0 →
+  (m' = 0 ∧
+   envs_delete true i false Δ = Δ' ∨
+   envs_simple_replace i false (Esnoc Enil i (£ m')) Δ = Some Δ') →
+  MaybeIntoLaterNEnvs n Δ' Δ'' →
+  envs_entails Δ'' P →
+  envs_entails Δ P.
+Proof.
+  rewrite envs_entails_unseal /NatCancel /AddModal right_id.
+  intros Hi HP <- HΔ HΔ' HΔ''. rewrite -HP -wand_refl right_id.
+  pose proof (lc_fupd_add_laterN E E P n) as <-%wand_entails%wand_elim_l'.
+  rewrite envs_lookup_sound //. simpl.
+  rewrite Nat.add_comm lc_split. rewrite -assoc.
+  apply sep_mono_r. rewrite -(fupd_intro E P) -HΔ'' -into_laterN_env_sound.
+  destruct HΔ as [[-> ->]|?].
+  - by rewrite sep_elim_r.
+  - rewrite envs_simple_replace_singleton_sound' //. simpl.
+    apply wand_elim_r.
 Qed.

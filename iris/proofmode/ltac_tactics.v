@@ -1433,6 +1433,31 @@ Tactic Notation "iAlways" := iModIntro.
 Tactic Notation "iNext" open_constr(n) := iModIntro (▷^n _)%I.
 Tactic Notation "iNext" := iModIntro (▷^_ _)%I.
 
+(** * Now the Rocq-level tactic [iNext credit:H] *)
+Tactic Notation "iNext" open_constr(n) "credit:" constr(H) :=
+  iStartProof;
+  notypeclasses refine (tac_lc_add_laterN_split _ _ _ _ H n _ _ _ _ _ _ _ _ _);
+    [(* BiFUpdLaterCredits *)
+     tc_solve ||
+     fail "iNext: Missing BiFUpdLaterCredits instance"
+    |(* look up the later credit named H *)
+     pm_reflexivity ||
+     fail "iNext:" H "is not a later credit"
+    |(* AddModal *)
+     tc_solve ||
+     fail "iNext: The goal cannot be turned into a fancy update modality"
+    |(* NatCancel *)
+     tc_solve ||
+     fail "iNext:" H " does not contain" n "credits"
+    |(* envs_delete or envs_replace *)
+     first [left; split; [done|] (* credit is used up *)
+           |right (* credit has the residue *) ];
+     pm_reflexivity
+    |(* MaybeIntoLaterNEnvs *)
+     tc_solve
+    |pm_reduce; pm_prettify].
+Tactic Notation "iNext" "credit:" constr(H) := iNext 1 credit: H.
+
 (** * Update modality *)
 Tactic Notation "iModCore" constr(H) "as" constr(H') :=
   notypeclasses refine (tac_modal_elim _ H H' _ _ _ _ _ _ _ _ _ _ _);

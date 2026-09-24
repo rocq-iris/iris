@@ -78,6 +78,9 @@ Reserved Notation "■? p P" (at level 20, p at level 9, P at level 20,
 Reserved Notation "'<obj>' P" (at level 20, right associativity).
 Reserved Notation "'<subj>' P" (at level 20, right associativity).
 
+(** Later credits *)
+Reserved Notation "'£'  n" (at level 1).
+
 (** * Update modalities *)
 Reserved Notation "|==> Q" (at level 20, Q at level 200, format "'[  ' |==>  '/' Q ']'").
 Reserved Notation "P ==∗ Q"

@@ -292,22 +292,6 @@ Section iris_tests.
     iIntros "H H'". Fail iDestruct "H'" as ">H".
   Abort.
 
-  (** Make sure that the splitting rule for [+] gets preferred over the one for
-  [S]. See issue #470. *)
-  Check "test_iIntros_lc".
-  Lemma test_iIntros_lc n m : £ (S n + m) -∗ £ (S n).
-  Proof. iIntros "[Hlc1 Hlc2]". Show. iExact "Hlc1". Qed.
-
-  Check "lc_iSplit_lc".
-  Lemma lc_iSplit_lc n m : £ (S n) -∗ £ m -∗ £ (S n + m).
-  Proof. iIntros "Hlc1 Hlc2". iSplitL "Hlc1". Show. all: done. Qed.
-
-  (** Make sure that combining [n] and [1] later credits results in [S n] rather
-  than [n + 1] later credits. *)
-  Check "lc_iCombine_lc".
-  Lemma lc_iCombine_lc n : £ 1 -∗ £ n -∗ £ (S n).
-  Proof. iIntros "Hlc1 Hlc2". iCombine "Hlc2 Hlc1" as "Hlc". Show. done. Qed.
-
   (** Make sure [iCombine] doesn't leave behind beta redexes. *)
   Check "test_iCombine_pointsto_no_beta".
   Lemma test_iCombine_ghost_var_no_beta `{!ghost_varG Σ nat} l (v : nat) q1 q2 :

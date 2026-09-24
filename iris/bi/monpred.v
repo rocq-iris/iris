@@ -274,6 +274,16 @@ Section monPred_defs.
     @fupd _ monPred_fupd = monPred_fupd_def.
   Proof. by rewrite -monPred_fupd_aux.(seal_eq). Qed.
 
+  Local Definition monPred_lc_def `{!BiLaterCredits PROP} (n : nat) : monPred :=
+    MonPred (λ _, £ n)%I _.
+  Local Definition monPred_lc_aux : seal (@monPred_lc_def).
+  Proof. by eexists. Qed.
+  Definition monPred_lc := monPred_lc_aux.(unseal).
+  Global Arguments monPred_lc {_} n.
+  Local Lemma monPred_lc_unseal `{!BiLaterCredits PROP} :
+    @lc _ monPred_lc = monPred_lc_def.
+  Proof. rewrite -monPred_lc_aux.(seal_eq) //. Qed.
+
   Local Definition monPred_si_pure_def `{!Sbi PROP} (Pi : siProp) : monPred :=
     MonPred (λ _, <si_pure> Pi)%I _.
   Local Definition monPred_si_pure_aux : seal (@monPred_si_pure_def).
@@ -533,6 +543,19 @@ Section instances.
   Global Instance monPred_bi_fupd `{!BiFUpd PROP} : BiFUpd monPredI :=
     {| bi_fupd_mixin := monPred_fupd_mixin |}.
 
+  Lemma monPred_lc_mixin `{!BiLaterCredits PROP} :
+    BiLaterCreditsMixin monPredI monPred_lc.
+  Proof.
+    split; rewrite /Timeless /Persistent /Affine /bi_except_0
+      !(monPred_defs.monPred_lc_unseal, monPred_unseal_bi).
+    - intros n m. split=> i /=. apply lc_split.
+    - intros n. split=> i /=. apply: timeless.
+    - split=> i /=. apply: persistent.
+    - intros n. split=> i /=. apply: affine.
+  Qed.
+  Global Instance monPred_bi_lc `{!BiLaterCredits PROP} : BiLaterCredits monPredI :=
+    {| bi_lc_mixin := monPred_lc_mixin |}.
+
   Local Lemma monPred_embed_unseal :
     embed = @monPred_defs.monPred_embed_def I PROP.
   Proof. by rewrite -monPred_defs.monPred_embed_unseal. Qed.
@@ -542,6 +565,9 @@ Section instances.
   Local Lemma monPred_fupd_unseal `{!BiFUpd PROP} :
     fupd = @monPred_defs.monPred_fupd_def I PROP _.
   Proof. by rewrite -monPred_defs.monPred_fupd_unseal. Qed.
+  Local Lemma monPred_lc_unseal `{!BiLaterCredits PROP} :
+    lc = @monPred_defs.monPred_lc_def I PROP _.
+  Proof. by rewrite -monPred_defs.monPred_lc_unseal. Qed.
   Local Lemma monPred_si_pure_unseal `{!Sbi PROP} :
     si_pure = @monPred_defs.monPred_si_pure_def I PROP _.
   Proof. by rewrite -monPred_defs.monPred_si_pure_unseal. Qed.
@@ -556,6 +582,7 @@ Section instances.
     @monPred_defs.monPred_objectively_unseal,
     @monPred_defs.monPred_subjectively_unseal,
     @monPred_embed_unseal, @monPred_bupd_unseal, @monPred_fupd_unseal,
+    @monPred_lc_unseal,
     @monPred_si_pure_unseal, @monPred_si_emp_valid_unseal,
     @monPred_defs.monPred_in_unseal).
   Ltac unseal := rewrite !monPred_unseal /=.
@@ -592,6 +619,22 @@ Section instances.
   Global Instance monPred_bi_bupd_fupd
       `{!BiBUpd PROP, !BiFUpd PROP, !BiBUpdFUpd PROP} : BiBUpdFUpd monPredI.
   Proof. intros E P. split=> i. unseal. apply bupd_fupd. Qed.
+
+  Global Instance monPred_bi_bupd_lc `{!BiBUpd PROP, !BiLaterCredits PROP}
+      `{!BiBUpdLaterCredits PROP} :
+    BiBUpdLaterCredits monPredI.
+  Proof. split=> i. unseal. apply lc_zero. Qed.
+
+  Global Instance monPred_bi_fupd_lc `{!BiFUpd PROP, !BiLaterCredits PROP}
+      `{!BiFUpdLaterCredits PROP} :
+    BiFUpdLaterCredits monPredI.
+  Proof.
+    split=> i. unseal. apply bi.forall_intro=> j.
+    rewrite bi.pure_impl_forall. apply bi.forall_intro=> ?.
+    apply bi.entails_wand', bi.forall_intro=> k.
+    rewrite bi.pure_impl_forall. apply bi.forall_intro=> ?.
+    apply bi.wand_entails'. apply lc_fupd_elim_later.
+  Qed.
 
   Global Instance monPred_bi_embed_bupd `{!BiBUpd PROP} :
     BiEmbedBUpd PROP monPredI.
@@ -1176,6 +1219,9 @@ Section bi_facts.
   Proof. induction n as [|? IHn]; first done. rewrite /= monPred_at_later IHn //. Qed.
   Lemma monPred_at_except_0 i P : (◇ P) i ⊣⊢ ◇ P i.
   Proof. rewrite /bi_except_0. by unseal. Qed.
+  Lemma monPred_at_lc i n `{!BiLaterCredits PROP} :
+    (lc (PROP:=monPred) n) i ⊣⊢ £ n.
+  Proof. by unseal. Qed.
 
   Global Instance later_objective P `{!Objective P} : Objective (▷ P).
   Proof. intros ??. unseal. by rewrite objective_at. Qed.
@@ -1183,6 +1229,9 @@ Section bi_facts.
   Proof. induction n; apply _. Qed.
   Global Instance except0_objective P `{!Objective P} : Objective (◇ P).
   Proof. rewrite /bi_except_0. apply _. Qed.
+  Global Instance lc_objective n `{!BiLaterCredits PROP} :
+    Objective (I:=I) (PROP:=PROP) (£ n).
+  Proof. intros ??. by unseal. Qed.
 
   (** Sbi *)
   Section sbi.
