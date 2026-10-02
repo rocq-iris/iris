@@ -30,11 +30,9 @@ Ltac solve_inG :=
   intros;
   (* Unfold the top-level xΣ. We need to support this to be a function. *)
   lazymatch goal with
-  | H : subG (?xΣ _ _ _ _) _ |- _ => try unfold xΣ in H
-  | H : subG (?xΣ _ _ _) _ |- _ => try unfold xΣ in H
-  | H : subG (?xΣ _ _) _ |- _ => try unfold xΣ in H
-  | H : subG (?xΣ _) _ |- _ => try unfold xΣ in H
-  | H : subG ?xΣ _ |- _ => try unfold xΣ in H
+  | H : subG ?xΣ _ |- _ =>
+      let hd := get_head xΣ in
+      try unfold hd in H
   end;
   (* Take apart subG for non-"atomic" lists *)
   repeat match goal with

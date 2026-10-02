@@ -361,6 +361,7 @@ Simcha van Collem, Tej Chajed, Yiqun Liu, and Zichen Zhang.
     `iris.bi.algebra`.
 * Rename `agree_validI` → `agree_op_invI` (to be consistent with `agree_op_invN`)
   and generalize to SBI.
+* Support arbitrary-arity functions for `solve_inG`. (by Simcha van Collem)
 
 **Changes in `heap_lang`:**
 
