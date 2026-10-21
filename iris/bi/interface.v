@@ -197,6 +197,11 @@ Section bi_mixin.
   [derived_laws_later].) *)
   Context (bi_later : PROP → PROP).
   Local Notation "▷ P" := (bi_later P) : bi_scope.
+  (** As we are defining *BI* here, we cannot use the derived modalities from
+  [derived_connectives] yet. We thus define temporary notations for just this
+  file. *)
+  Local Notation "◇ P" := (▷ False ∨ P)%I : bi_scope.
+  Local Notation "<only0> P" := (▷ False → P)%I : bi_scope.
 
   Record BiLaterMixin := {
     bi_mixin_later_ne : NonExpansive bi_later;
@@ -206,25 +211,28 @@ Section bi_mixin.
 
     bi_mixin_later_forall_2 {A} (Φ : A → PROP) : (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a;
     bi_mixin_later_false_impl_exist {A} (Φ : A → PROP) :
-      (▷ False → ∃ a, Φ a) ⊢ ∃ a, ▷ False → Φ a;
+      <only0> (∃ a, Φ a) ⊢ ∃ a, <only0> Φ a;
     bi_mixin_later_exist_false `{!SIdxFinite SI} {A} (Φ : A → PROP) :
-      (▷ ∃ a, Φ a) ⊢ ▷ False ∨ (∃ a, ▷ Φ a);
+      (▷ ∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a);
 
     bi_mixin_later_false_impl_sep P Q :
-      (▷ False → P ∗ Q) ⊢ (▷ False → P) ∗ (▷ False → Q);
+      <only0> (P ∗ Q) ⊢ <only0> P ∗ <only0> Q;
     bi_mixin_later_sep_1 `{!SIdxFinite SI} P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q;
     bi_mixin_later_sep_2 P Q : ▷ P ∗ ▷ Q ⊢ ▷ (P ∗ Q);
 
     bi_mixin_later_persistently_1 P : ▷ <pers> P ⊢ <pers> ▷ P;
     bi_mixin_later_persistently_2 P : <pers> ▷ P ⊢ ▷ <pers> P;
 
-    (* In a step-index model, this law allows case distinctions on whether
+    (* This law expands to [▷ P ⊢ ▷ False ∨ (▷ False → P)].
+       In a step-index model, this law allows case distinctions on whether
        the step-index is 0 (expressed as [▷ False] in the logic):
        * If it is 0, the left side is true, and we know nothing about [P].
+         Hence the "except-0" modality [◇].
        * If not, then it is [S n] for some [n], and [P] holds at [n]. By down-
          closure, it also holds at [0]. Thus, we get to use [P], but only if
-         the step-index is 0 ([▷ False] is true). *)
-    bi_mixin_later_false_em P : ▷ P ⊢ ▷ False ∨ (▷ False → P);
+         the step-index is 0 ([▷ False] is true).
+         Hence the "only-0" modality [<only0>]. *)
+    bi_mixin_later_false_em P : ▷ P ⊢ ◇ <only0> P;
   }.
 
   Lemma bi_later_mixin_sidx_finite
@@ -233,13 +241,12 @@ Section bi_mixin.
       (later_mono : ∀ P Q, (P ⊢ Q) → ▷ P ⊢ ▷ Q)
       (later_intro : ∀ P, P ⊢ ▷ P)
       (later_forall_2 : ∀ {A} (Φ : A → PROP), (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a)
-      (later_exist_false : ∀ {A} (Φ : A → PROP),
-        (▷ ∃ a, Φ a) ⊢ ▷ False ∨ (∃ a, ▷ Φ a))
+      (later_exist_false : ∀ {A} (Φ : A → PROP), (▷ ∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a))
       (later_sep_1 : ∀ P Q, ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q)
       (later_sep_2 : ∀ P Q, ▷ P ∗ ▷ Q ⊢ ▷ (P ∗ Q))
       (later_persistently_1 : ∀ P, ▷ <pers> P ⊢ <pers> ▷ P)
       (later_persistently_2 : ∀ P, <pers> ▷ P ⊢ ▷ <pers> P)
-      (later_false_em : ∀ P, ▷ P ⊢ ▷ False ∨ (▷ False → P))
+      (later_false_em : ∀ P, ▷ P ⊢ ◇ <only0> P)
       (bi_mixin : BiMixin) :
     BiLaterMixin.
   Proof.
@@ -262,14 +269,13 @@ Section bi_mixin.
       trans ((P → Q) ∧ P)%I; [|by apply bi_mixin_impl_elim_l'].
       apply and_intro; last by auto. by apply impl_elim_l'. }
     split; auto.
-    - (* (▷ False → ∃ a, Φ a) ⊢ ∃ a, ▷ False → Φ a *)
-      intros A Φ. trans (True ∧ (▷ False → ∃ a, Φ a))%I.
+    - (* <only0> (∃ a, Φ a) ⊢ ∃ a, <only0> Φ a *)
+      intros A Φ. trans (True ∧ <only0> ∃ a, Φ a)%I.
       { apply and_intro; [|done]. by apply (bi_mixin_pure_intro bi_mixin). }
       apply impl_elim_l', löb, impl_intro_r.
-      trans (▷ (∃ a, ▷ False → Φ a) ∧ (▷ False → ∃ a, Φ a))%I.
+      trans (▷ (∃ a, <only0> Φ a) ∧ <only0> (∃ a, Φ a))%I.
       { apply and_intro, and_elim_r.
-        trans (▷ ((▷ False → ∃ a, Φ a) → ∃ a, ▷ False → Φ a) ∧
-               ▷ (▷ False → ∃ a, Φ a))%I.
+        trans (▷ (<only0> (∃ a, Φ a) → ∃ a, <only0> Φ a) ∧ ▷ <only0> ∃ a, Φ a)%I.
         { apply and_intro; [by auto|]. etrans; [apply and_elim_r|]. auto. }
         etrans; [apply later_and_2|]. by apply later_mono, impl_elim_l'. }
       apply impl_elim_l'.
@@ -288,15 +294,14 @@ Section bi_mixin.
         apply impl_intro_r. auto. }
       apply impl_intro_r. etrans; [apply and_elim_l|].
       etrans; [|apply (bi_mixin_exist_intro bi_mixin a)]. done.
-    - (* (▷ False → P ∗ Q) ⊢ (▷ False → P) ∗ (▷ False → Q) *)
-      intros P Q. trans (True ∧ (▷ False → P ∗ Q))%I.
+    - (* <only0> (P ∗ Q) ⊢ <only0> P ∗ <only0> Q *)
+      intros P Q. trans (True ∧ <only0> (P ∗ Q))%I.
       { apply and_intro; [|done].
         by apply (bi_mixin_pure_intro bi_mixin). }
       apply impl_elim_l', löb, impl_intro_r.
-      trans (▷ ((▷ False → P) ∗ (▷ False → Q)) ∧ (▷ False → P ∗ Q))%I.
+      trans (▷ (<only0> P ∗ <only0> Q) ∧ <only0> (P ∗ Q))%I.
       { apply and_intro, and_elim_r.
-        trans (▷ ((▷ False → P ∗ Q) → (▷ False → P) ∗ (▷ False → Q)) ∧
-               ▷ (▷ False → P ∗ Q))%I.
+        trans (▷ (<only0> (P ∗ Q) → <only0> P ∗ <only0> Q) ∧ ▷ <only0> (P ∗ Q))%I.
         { apply and_intro; [by auto|]. etrans; [apply and_elim_r|]. auto. }
         etrans; [apply later_and_2|]. apply later_mono.
         by apply impl_elim_l'. }
@@ -304,7 +309,7 @@ Section bi_mixin.
       apply (bi_mixin_wand_elim_l' bi_mixin).
       etrans; [apply later_false_em|]. apply (bi_mixin_or_elim bi_mixin).
       { apply (bi_mixin_wand_intro_r bi_mixin), impl_intro_r.
-        trans (▷ False ∧ (▷ False → P ∗ Q))%I.
+        trans (▷ False ∧ <only0> (P ∗ Q))%I.
         { apply and_intro, and_elim_r. etrans; [apply and_elim_l|].
           etrans; [apply later_sep_2|]. apply later_mono.
           apply (bi_mixin_wand_elim_l' bi_mixin).
@@ -316,7 +321,7 @@ Section bi_mixin.
       apply (bi_mixin_wand_elim_l' bi_mixin).
       etrans; [apply later_false_em|]. apply (bi_mixin_or_elim bi_mixin).
       { apply (bi_mixin_wand_intro_r bi_mixin), impl_intro_r.
-        trans (▷ False ∧ (▷ False → P ∗ Q))%I.
+        trans (▷ False ∧ <only0> (P ∗ Q))%I.
         { apply and_intro, and_elim_r. etrans; [apply and_elim_l|].
           etrans; [apply (bi_mixin_sep_mono bi_mixin); [done|apply later_intro]|].
           etrans; [apply later_sep_2|]. apply later_mono.
