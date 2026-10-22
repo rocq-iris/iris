@@ -450,6 +450,8 @@ Section primitive.
   Notation "□ P" := (uPred_persistently P) : bi_scope.
   Notation "▷ P" := (uPred_later P) : bi_scope.
   Notation "|==> P" := (uPred_bupd P) : bi_scope.
+  Notation "◇ P" := (▷ False ∨ P)%I : bi_scope.
+  Notation "<only0> P" := (▷ False → P)%I : bi_scope.
 
   (** Entailment *)
   Lemma entails_po : PreOrder (⊢).
@@ -728,8 +730,8 @@ Section primitive.
   Lemma later_forall_2 {A} (Φ : A → uPred M) : (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a.
   Proof. unseal; by split=> -[|n] x. Qed.
 
-  Lemma later_exist_false {A} (Φ : A → uPred M) :
-    (▷ ∃ a, Φ a) ⊢ ▷ False ∨ (∃ a, ▷ Φ a).
+  Lemma later_exist_except_0 {A} (Φ : A → uPred M) :
+    (▷ ∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a).
   Proof. unseal; split=> -[|[|n]] x /=; eauto. Qed.
 
   Lemma later_sep_1 P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q.
@@ -748,7 +750,7 @@ Section primitive.
     exists x1, x2; eauto using dist_S.
   Qed.
 
-  Lemma later_false_em P : ▷ P ⊢ ▷ False ∨ (▷ False → P).
+  Lemma later_except_0_only_0 P : ▷ P ⊢ ◇ <only0> P.
   Proof.
     unseal; siProp_primitive.unseal; split=> -[|n] x ? /= HP; [by left|right].
     intros [|n'] x' ????; eauto using uPred_mono, cmra_included_includedN.

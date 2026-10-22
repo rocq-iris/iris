@@ -208,6 +208,8 @@ Section primitive.
   Notation "▷ P" := (siProp_later P) : bi_scope.
   Notation "x ≡ y" := (siProp_internal_eq x y) : bi_scope.
   Notation "✓ x" := (siProp_cmra_valid x) : bi_scope.
+  Notation "◇ P" := (▷ False ∨ P)%I : bi_scope.
+  Notation "<only0> P" := (▷ False → P)%I : bi_scope.
 
   (** Below there follow the primitive laws for [siProp]. There are no derived laws
   in this file. *)
@@ -334,8 +336,8 @@ Section primitive.
   Lemma later_forall_2 {A} (Φ : A → siProp) : (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a.
   Proof. unseal; split=> n HΦ n' ? x. by apply HΦ. Qed.
 
-  Lemma later_exist_false `{!SIdxFinite SI} {A} (Φ : A → siProp) :
-    (▷ ∃ a, Φ a) ⊢ ▷ False ∨ (∃ a, ▷ Φ a).
+  Lemma later_exist_except_0 `{!SIdxFinite SI} {A} (Φ : A → siProp) :
+    (▷ ∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a).
   Proof.
     unseal; split=> n HΦ; simpl in *. destruct (finite_index n) as [->|[m ->]].
     { left. intros n' []%SIdx.nlt_0_r. }
@@ -343,8 +345,8 @@ Section primitive.
     exists a. intros n' ?%SIdx.lt_succ_r. by eapply siProp_closed.
   Qed.
 
-  Lemma later_false_exist {A} (Φ : A → siProp) :
-    (▷ False → ∃ a, Φ a) ⊢ ∃ a, ▷ False → Φ a.
+  Lemma only_0_exist_1 {A} (Φ : A → siProp) :
+    <only0> (∃ a, Φ a) ⊢ ∃ a, <only0> Φ a.
   Proof.
     unseal; split=> n HΦ; simpl in *.
     destruct (HΦ 0ᵢ) as [a HΦa].
@@ -354,7 +356,7 @@ Section primitive.
     destruct (decide (n' = 0ᵢ)) as [->|[]%SIdx.neq_0_lt_0%Hn']. done.
   Qed.
 
-  Lemma later_false_em P : ▷ P ⊢ ▷ False ∨ (▷ False → P).
+  Lemma later_except_0_only_0 P : ▷ P ⊢ ◇ <only0> P.
   Proof.
     unseal; split=> n /= HP. destruct (decide (n = 0ᵢ)) as [->|].
     { left. intros n' []%SIdx.nlt_0_r. }

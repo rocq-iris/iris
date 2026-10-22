@@ -491,21 +491,6 @@ Section sbi_derived.
     by rewrite si_emp_valid_later IH.
   Qed.
 
-  Lemma si_emp_valid_except_0 P :
-    <si_emp_valid> ◇ P ⊣⊢@{siPropI} ◇ <si_emp_valid> P.
-  Proof.
-    apply (anti_symm _).
-    - trans (▷ <si_emp_valid> P ∧ <si_emp_valid> ◇ P)%I.
-      { apply bi.and_intro, reflexivity.
-        by rewrite -si_emp_valid_later bi.except_0_into_later. }
-      rewrite bi.later_false_em bi.and_or_r. apply bi.or_elim.
-      { rewrite bi.and_elim_l. apply bi.or_intro_l. }
-      apply bi.or_intro_r'. rewrite si_emp_valid_impl_si_pure -si_emp_valid_and.
-      f_equiv. rewrite si_pure_later si_pure_pure.
-      by rewrite bi.and_or_l bi.impl_elim_l bi.and_elim_r idemp.
-    - rewrite /bi_except_0 -si_emp_valid_or_2.
-      by rewrite si_emp_valid_later si_emp_valid_pure.
-  Qed.
   Lemma si_emp_valid_only_0 P : <si_emp_valid> <only0> P ⊣⊢ <only0> <si_emp_valid> P.
   Proof.
     rewrite /bi_only_0. apply (anti_symm _); last first.
@@ -513,6 +498,18 @@ Section sbi_derived.
     apply bi.impl_intro_l.
     rewrite -{1}(si_emp_valid_pure False) -si_emp_valid_later.
     by rewrite -si_emp_valid_and bi.impl_elim_r.
+  Qed.
+  Lemma si_emp_valid_except_0 P :
+    <si_emp_valid> ◇ P ⊣⊢@{siPropI} ◇ <si_emp_valid> P.
+  Proof.
+    apply (anti_symm _).
+    - rewrite -{2}(bi.except_0_and_only_0_self P).
+      rewrite si_emp_valid_and bi.except_0_and.
+      apply bi.and_intro, bi.except_0_intro.
+      rewrite si_emp_valid_only_0 -bi.later_except_0_only_0.
+      by rewrite -si_emp_valid_later bi.except_0_into_later.
+    - rewrite /bi_except_0 -si_emp_valid_or_2.
+      by rewrite si_emp_valid_later si_emp_valid_pure.
   Qed.
 
   Global Instance si_emp_valid_timeless P :

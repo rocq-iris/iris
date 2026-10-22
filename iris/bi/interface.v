@@ -199,7 +199,7 @@ Section bi_mixin.
   Local Notation "▷ P" := (bi_later P) : bi_scope.
   (** As we are defining *BI* here, we cannot use the derived modalities from
   [derived_connectives] yet. We thus define temporary notations for just this
-  file. *)
+  file. Laws that use these temporary notations are marked [_internal]. *)
   Local Notation "◇ P" := (▷ False ∨ P)%I : bi_scope.
   Local Notation "<only0> P" := (▷ False → P)%I : bi_scope.
 
@@ -210,12 +210,15 @@ Section bi_mixin.
     bi_mixin_later_intro P : P ⊢ ▷ P;
 
     bi_mixin_later_forall_2 {A} (Φ : A → PROP) : (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a;
-    bi_mixin_later_false_impl_exist {A} (Φ : A → PROP) :
+    (* marked [_internal] because the temporary only-0 notation is used *)
+    bi_mixin_only_0_exist_1_internal {A} (Φ : A → PROP) :
       <only0> (∃ a, Φ a) ⊢ ∃ a, <only0> Φ a;
-    bi_mixin_later_exist_false `{!SIdxFinite SI} {A} (Φ : A → PROP) :
+    (* marked [_internal] because the temporary except-0 notation is used *)
+    bi_mixin_later_exist_except_0_internal `{!SIdxFinite SI} {A} (Φ : A → PROP) :
       (▷ ∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a);
 
-    bi_mixin_later_false_impl_sep P Q :
+    (* marked [_internal] because the temporary only-0 notation is used *)
+    bi_mixin_only_0_sep_1_internal P Q :
       <only0> (P ∗ Q) ⊢ <only0> P ∗ <only0> Q;
     bi_mixin_later_sep_1 `{!SIdxFinite SI} P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q;
     bi_mixin_later_sep_2 P Q : ▷ P ∗ ▷ Q ⊢ ▷ (P ∗ Q);
@@ -232,7 +235,8 @@ Section bi_mixin.
          closure, it also holds at [0]. Thus, we get to use [P], but only if
          the step-index is 0 ([▷ False] is true).
          Hence the "only-0" modality [<only0>]. *)
-    bi_mixin_later_false_em P : ▷ P ⊢ ◇ <only0> P;
+    (* marked [_internal] because the temporary only-0 notation is used *)
+    bi_mixin_later_except_0_only_0_internal P : ▷ P ⊢ ◇ <only0> P;
   }.
 
   (** We provide smart constructors for BIs with finite step-indexing, where
@@ -666,6 +670,10 @@ Proof.
 Qed.
 
 (* Later *)
+(* Temporary [Notation], versions with [Definition] in [derived_laws]. *)
+Local Notation "◇ P" := (▷ False ∨ P)%I : bi_scope.
+Local Notation "<only0> P" := (▷ False → P)%I : bi_scope.
+
 Global Instance later_ne : NonExpansive (@bi_later _ PROP).
 Proof. eapply bi_mixin_later_ne, bi_bi_later_mixin. Qed.
 
@@ -676,16 +684,20 @@ Proof. eapply bi_mixin_later_intro, bi_bi_later_mixin. Qed.
 
 Lemma later_forall_2 {A} (Φ : A → PROP) : (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a.
 Proof. eapply bi_mixin_later_forall_2, bi_bi_later_mixin. Qed.
-Lemma later_false_impl_exist {A} (Φ : A → PROP) :
-  (▷ False → ∃ a, Φ a) ⊢ ∃ a, ▷ False → Φ a.
-Proof. eapply bi_mixin_later_false_impl_exist, bi_bi_later_mixin. Qed.
-Lemma later_exist_false `{!SIdxFinite SI} {A} (Φ : A → PROP) :
-  (▷ ∃ a, Φ a) ⊢ ▷ False ∨ (∃ a, ▷ Φ a).
-Proof. eapply bi_mixin_later_exist_false; [apply bi_bi_later_mixin|done]. Qed.
+(* marked [_internal] because the temporary only-0 notation is used *)
+Lemma only_0_exist_1_internal {A} (Φ : A → PROP) :
+   <only0> (∃ a, Φ a) ⊢ ∃ a, <only0> Φ a.
+Proof. eapply bi_mixin_only_0_exist_1_internal, bi_bi_later_mixin. Qed.
+(* marked [_internal] because the temporary except-0 notation is used *)
+Lemma later_exist_except_0_internal `{!SIdxFinite SI} {A} (Φ : A → PROP) :
+  (▷ ∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a).
+Proof.
+  eapply bi_mixin_later_exist_except_0_internal; [apply bi_bi_later_mixin|done].
+Qed.
 
-Lemma later_false_impl_sep (P Q : PROP) :
-  (▷ False → P ∗ Q) ⊢ (▷ False → P) ∗ (▷ False → Q).
-Proof. eapply bi_mixin_later_false_impl_sep, bi_bi_later_mixin. Qed.
+(* marked [_internal] because the temporary only-0 notation is used *)
+Lemma only_0_sep_1_internal P Q : <only0> (P ∗ Q) ⊢ <only0> P ∗ <only0> Q.
+Proof. eapply bi_mixin_only_0_sep_1_internal, bi_bi_later_mixin. Qed.
 Lemma later_sep_1 `{!SIdxFinite SI} P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q.
 Proof. eapply bi_mixin_later_sep_1; [apply bi_bi_later_mixin|done]. Qed.
 Lemma later_sep_2 P Q : ▷ P ∗ ▷ Q ⊢ ▷ (P ∗ Q).
@@ -696,7 +708,8 @@ Proof. eapply (bi_mixin_later_persistently_1 bi_entails), bi_bi_later_mixin. Qed
 Lemma later_persistently_2 P : <pers> ▷ P ⊢ ▷ <pers> P.
 Proof. eapply (bi_mixin_later_persistently_2 bi_entails), bi_bi_later_mixin. Qed.
 
-Lemma later_false_em P : ▷ P ⊢ ▷ False ∨ (▷ False → P).
-Proof. eapply bi_mixin_later_false_em, bi_bi_later_mixin. Qed.
+(* marked [_internal] because the temporary only-0 notation is used *)
+Lemma later_except_0_only_0_internal P : ▷ P ⊢ ◇ <only0> P.
+Proof. eapply bi_mixin_later_except_0_only_0_internal, bi_bi_later_mixin. Qed.
 End bi_laws.
 End bi.

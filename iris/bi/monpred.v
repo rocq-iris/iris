@@ -393,12 +393,13 @@ Section instances.
     - intros P Q [?]. split=> i. by apply bi.later_mono.
     - intros P. split=> i /=. by apply bi.later_intro.
     - intros A Ψ. split=> i. by apply bi.later_forall_2.
-    - intros A Ψ. split=> i /=. rewrite (bi.forall_elim i) bi.pure_True // left_id.
-      rewrite bi.later_false_impl_exist. f_equiv=> x. apply bi.forall_intro=> j.
+    - intros A Ψ. split=> i /=. change (▷ False → ?P)%I with (<only0> P)%I.
+      rewrite (bi.forall_elim i) bi.pure_True // left_id.
+      rewrite bi.only_0_exist. f_equiv=> x. apply bi.forall_intro=> j.
       apply bi.impl_intro_l, bi.pure_elim_l=> ?. f_equiv. by apply monPred_mono.
-    - intros ? A Ψ. split=> i. by apply bi.later_exist_false.
+    - intros ? A Ψ. split=> i. by apply bi.later_exist_except_0.
     - intros P Q. split=> i /=. rewrite (bi.forall_elim i) bi.pure_True // left_id.
-      rewrite bi.later_false_impl_sep.
+      change (▷ False → ?P)%I with (<only0> P)%I. rewrite bi.only_0_sep.
       f_equiv; apply bi.forall_intro=> j;
         apply bi.impl_intro_l, bi.pure_elim_l=> ?;
         f_equiv; by apply monPred_mono.
@@ -407,7 +408,7 @@ Section instances.
     - intros P. split=> i. by apply bi.later_persistently_1.
     - intros P. split=> i. by apply bi.later_persistently_2.
     - intros P. split=> i /=. rewrite -bi.forall_intro.
-      + apply bi.later_false_em.
+      + apply bi.later_except_0_only_0.
       + intros j. rewrite bi.pure_impl_forall. apply bi.forall_intro=> Hij.
         by rewrite Hij.
   Qed.
