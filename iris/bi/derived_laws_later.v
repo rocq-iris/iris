@@ -136,17 +136,15 @@ Proof. split; intros HLöb P; [by apply löb|]. by intros ->%entails_impl_True. 
 Their [Ψ] is called [Q] in our proof. *)
 Global Instance later_contractive_bi_löb : BiLaterContractive PROP → BiLöb PROP.
 Proof.
-  intros=> P.
-  pose (flöb_pre (P Q : PROP) := (▷ Q → P)%I).
-  assert (∀ P, Contractive (flöb_pre P)) by solve_contractive.
-  set (Q := fixpoint (flöb_pre P)).
+  intros=> P HP.
+  pose (flöb_pre (Q : PROP) := (▷ Q → P)%I).
+  assert (Contractive flöb_pre) by solve_contractive.
+  set (Q := fixpoint flöb_pre).
   assert (Q ⊣⊢ (▷ Q → P)) as HQ by (exact: fixpoint_unfold).
-  intros HP. rewrite -HP.
   assert (▷ Q ⊢ P) as HQP.
-  { rewrite -HP. rewrite -(idemp (∧) (▷ Q))%I {2}(later_intro (▷ Q)).
-    by rewrite {1}HQ {1}later_impl impl_elim_l. }
-  rewrite -HQP HQ -2!later_intro.
-  apply (entails_impl_True _ P). done.
+  { rewrite -HP. f_equiv. rewrite -(idemp (∧)%I Q) {2}(later_intro Q).
+    by rewrite {1}HQ impl_elim_l. }
+  rewrite -HQP -later_intro HQ. apply (entails_impl_True _ P). done.
 Qed.
 
 Lemma löb_wand_intuitionistically `{!BiLöb PROP} P : □ (□ ▷ P -∗ P) ⊢ P.

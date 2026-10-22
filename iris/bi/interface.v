@@ -235,7 +235,14 @@ Section bi_mixin.
     bi_mixin_later_false_em P : ▷ P ⊢ ◇ <only0> P;
   }.
 
-  Lemma bi_later_mixin_sidx_finite
+  (** We provide smart constructors for BIs with finite step-indexing, where
+  the the commuting laws of later [▷] with existentials [∃] and separating
+  conjunction [∗] hold unconditionally. In that case, we can derive the
+  [<only0>] laws from these commuting laws, using:
+
+  - Löb induction, [bi_later_mixin_sidx_finite_löb]
+  - Contractiveness of later, [bi_later_mixin_sidx_finite_contractive] *)
+  Lemma bi_later_mixin_sidx_finite_löb
       (later_ne : NonExpansive bi_later)
       (löb : ∀ P, (▷ P ⊢ P) → True ⊢ P)
       (later_mono : ∀ P Q, (P ⊢ Q) → ▷ P ⊢ ▷ Q)
@@ -333,6 +340,51 @@ Section bi_mixin.
       etrans; [apply and_elim_l|].
       etrans; [apply (bi_mixin_sep_comm' bi_mixin)|].
       by apply (bi_mixin_sep_mono bi_mixin).
+  Qed.
+
+  Lemma bi_later_mixin_sidx_finite_contractive
+      (later_contractive : Contractive bi_later)
+      (later_mono : ∀ P Q, (P ⊢ Q) → ▷ P ⊢ ▷ Q)
+      (later_intro : ∀ P, P ⊢ ▷ P)
+      (later_forall_2 : ∀ {A} (Φ : A → PROP), (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a)
+      (later_exist_false : ∀ {A} (Φ : A → PROP), (▷ ∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a))
+      (later_sep_1 : ∀ P Q, ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q)
+      (later_sep_2 : ∀ P Q, ▷ P ∗ ▷ Q ⊢ ▷ (P ∗ Q))
+      (later_persistently_1 : ∀ P, ▷ <pers> P ⊢ <pers> ▷ P)
+      (later_persistently_2 : ∀ P, <pers> ▷ P ⊢ ▷ <pers> P)
+      (later_false_em : ∀ P, ▷ P ⊢ ◇ <only0> P)
+      (bi_ofe_mixin : OfeMixin PROP)
+      (bi_cofe : Cofe (Ofe PROP bi_ofe_mixin))
+      (bi_mixin : BiMixin) :
+    BiLaterMixin.
+  Proof.
+    set (PROPO := Ofe PROP bi_ofe_mixin) in *.
+    assert (Inhabited PROP) by (constructor; exact True%I).
+    pose proof (bi_mixin_entails_po bi_mixin).
+    pose proof (and_elim_r := bi_mixin_and_elim_r bi_mixin).
+    pose proof (and_intro := bi_mixin_and_intro bi_mixin).
+    pose proof (impl_intro_r := bi_mixin_impl_intro_r bi_mixin).
+    pose proof (impl_elim_l' := bi_mixin_impl_elim_l' bi_mixin).
+    apply bi_later_mixin_sidx_finite_löb; [| |done..].
+    (* Adapted from [later_contractive_bi_löb] in [derived_laws_later], but
+    more manual because we don't have generalized rewriting and the derived
+    laws yet... *)
+    { by apply (@contractive_ne _ PROPO PROPO). }
+    intros P HP.
+    pose (flöb_pre (Q : PROPO) := (▷ Q → P)%I).
+    assert (Contractive flöb_pre).
+    { intros n Q1 Q2 ?.
+      apply (bi_mixin_impl_ne bi_mixin), (reflexivity (A:=PROPO)).
+      by apply later_contractive. }
+    set (Q := fixpoint flöb_pre).
+    assert (Q ≡ (▷ Q → P))%I as [HQ1 HQ2]%(bi_mixin_equiv_entails bi_mixin)
+      by (exact: fixpoint_unfold).
+    assert (▷ Q ⊢ P) as HQP.
+    { etrans; [|apply HP]. apply later_mono.
+      trans (Q ∧ ▷ Q)%I; [by apply and_intro, later_intro|].
+      by apply impl_elim_l'. }
+    etrans; [|apply HQP]. etrans; [|apply later_intro]. etrans; [|apply HQ2].
+    apply impl_intro_r. by etrans; [apply and_elim_r|].
   Qed.
 
   (** Defining [▷ P := True] is the "canonical" choice in a non-step indexed
