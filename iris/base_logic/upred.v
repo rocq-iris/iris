@@ -728,42 +728,10 @@ Section primitive.
   Lemma later_forall_2 {A} (Φ : A → uPred M) : (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a.
   Proof. unseal; by split=> -[|n] x. Qed.
 
-  (** FIXME: The rule [later_false_exist] is derivable from Löb and
-  [later_exist_false] with finite step-indexing, but not with Transfinite. To
-  ensure forwards compatibility with !1273, we prove the law directly in the
-  model instead of deriving it. *)
-  Lemma later_false_exist {A} (Φ : A → uPred M) :
-    (▷ False → ∃ a, Φ a) ⊢ ∃ a, ▷ False → Φ a.
-  Proof.
-    unseal; siProp_primitive.unseal; split=> -n x Hx HΦ /=.
-    destruct (HΦ 0 x) as [a Ha]; [done|lia| |done|].
-    { by eapply cmra_validN_le, SIdx.le_0_l. }
-    exists a. intros [|n'] x' ????; [|done].
-    eapply uPred_mono; [done|by apply cmra_included_includedN|done].
-  Qed.
   Lemma later_exist_false {A} (Φ : A → uPred M) :
     (▷ ∃ a, Φ a) ⊢ ▷ False ∨ (∃ a, ▷ Φ a).
   Proof. unseal; split=> -[|[|n]] x /=; eauto. Qed.
 
-  (** FIXME: The rule [later_false_sep] is derivable from Löb and
-  [later_sep_1] with finite step-indexing, but not with Transfinite. To
-  ensure forwards compatibility with !1273, we prove the law directly in the
-  model instead of deriving it. *)
-  Lemma later_false_sep P Q :
-    (▷ False → P ∗ Q) ⊢ (▷ False → P) ∗ (▷ False → Q).
-  Proof.
-    unseal; siProp_primitive.unseal; split=> -n x Hx HΦ /=.
-    destruct (HΦ 0 x) as (x1 & x2 & ? & ? & ?); [done|lia| |done|].
-    { by eapply cmra_validN_le, SIdx.le_0_l. }
-    destruct (cmra_extend 0 x x1 x2) as (y1&y2&Hx'&Hy1&Hy2); [|done|].
-    { by eapply cmra_validN_le, SIdx.le_0_l. }
-    exists y1, y2.
-    split_and!; [by eapply equiv_dist|intros [|n'] ?????; [|done]..].
-    - eapply uPred_mono; [done|..|done].
-      rewrite -Hy1. by apply cmra_included_includedN.
-    - eapply uPred_mono; [done|..|done].
-      rewrite -Hy2. by apply cmra_included_includedN.
-  Qed.
   Lemma later_sep_1 P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q.
   Proof.
     unseal; split=> n x ?.
