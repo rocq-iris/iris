@@ -6,6 +6,7 @@ From iris.bi Require Export bi.
 From iris.proofmode Require Import proofmode.
 Import bi.
 
+(** [Proof Using] is needed because of the dependency on [SIdxFinite]. *)
 Set Default Proof Using "Type*".
 
 Section fixpoint_laws.

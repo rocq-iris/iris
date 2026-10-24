@@ -210,23 +210,38 @@ Section bi_mixin.
     bi_mixin_later_intro P : P ⊢ ▷ P;
 
     bi_mixin_later_forall_2 {A} (Φ : A → PROP) : (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a;
-    (* marked [_internal] because the temporary only-0 notation is used *)
-    bi_mixin_only_0_exist_1_internal {A} (Φ : A → PROP) :
-      <only0> (∃ a, Φ a) ⊢ ∃ a, <only0> Φ a;
+    (** The commuting law for later [▷] with existentials [∃] only holds for
+    finite step-indexing, it is inconsistent in a transfinite setting. This
+    law is thus conditionally available for [SIdxFinite SI]. When instantiating
+    specifically for a BI with transfinite step-indexing (i.e., that is not
+    parametric in [SI]), then [SIdx.limit_finite] can be used to derive a
+    contradiction. *)
     (* marked [_internal] because the temporary except-0 notation is used *)
     bi_mixin_later_exist_except_0_internal `{!SIdxFinite SI} {A} (Φ : A → PROP) :
       (▷ ∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a);
+    (** The following law is a variant of the above that also works in a
+    transfinite setting. For finite step-indexing, this law is strictly weaker
+    than the above, it can be derived via Löb induction as shown by the smart
+    constructor below. *)
+    (* marked [_internal] because the temporary only-0 notation is used *)
+    bi_mixin_only_0_exist_1_internal {A} (Φ : A → PROP) :
+      <only0> (∃ a, Φ a) ⊢ ∃ a, <only0> Φ a;
 
+    (** Similarly to the commuting rule for later [▷] with existentials [∃],
+    the version for separating conjunction [∗] is also inconsistent in a
+    transfinite setting. *)
+    bi_mixin_later_sep_1 `{!SIdxFinite SI} P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q;
+    bi_mixin_later_sep_2 P Q : ▷ P ∗ ▷ Q ⊢ ▷ (P ∗ Q);
+    (** And a similar weaker version that holds in a transfinite setting, and is
+    derivable from the above for finite step-indexing. *)
     (* marked [_internal] because the temporary only-0 notation is used *)
     bi_mixin_only_0_sep_1_internal P Q :
       <only0> (P ∗ Q) ⊢ <only0> P ∗ <only0> Q;
-    bi_mixin_later_sep_1 `{!SIdxFinite SI} P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q;
-    bi_mixin_later_sep_2 P Q : ▷ P ∗ ▷ Q ⊢ ▷ (P ∗ Q);
 
     bi_mixin_later_persistently_1 P : ▷ <pers> P ⊢ <pers> ▷ P;
     bi_mixin_later_persistently_2 P : <pers> ▷ P ⊢ ▷ <pers> P;
 
-    (* This law expands to [▷ P ⊢ ▷ False ∨ (▷ False → P)].
+    (** This law expands to [▷ P ⊢ ▷ False ∨ (▷ False → P)].
        In a step-index model, this law allows case distinctions on whether
        the step-index is 0 (expressed as [▷ False] in the logic):
        * If it is 0, the left side is true, and we know nothing about [P].
@@ -239,10 +254,11 @@ Section bi_mixin.
     bi_mixin_later_except_0_only_0_internal P : ▷ P ⊢ ◇ <only0> P;
   }.
 
-  (** We provide smart constructors for BIs with finite step-indexing, where
-  the the commuting laws of later [▷] with existentials [∃] and separating
-  conjunction [∗] hold unconditionally. In that case, we can derive the
-  [<only0>] laws from these commuting laws, using:
+  (** We provide smart constructors for BIs with finite step-indexing, i.e, BIs
+  where the commuting laws of later [▷] with existentials [∃] and separating
+  conjunction [∗] hold without [SIdxFinite SI] condition. The unconditional
+  versions of these rules imply that step-indexing is finite, and allow us to
+  derive the [<only0>] laws from these commuting laws, using:
 
   - Löb induction, [bi_later_mixin_sidx_finite_löb]
   - Contractiveness of later, [bi_later_mixin_sidx_finite_contractive] *)
@@ -413,20 +429,20 @@ Section bi_mixin.
       apply (bi_mixin_persistently_emp_2 Hbip). }
     split; repeat intro; rewrite ?Hlater; try by apply (bi_mixin_pure_intro Hbi).
     - done.
+    - apply (bi_mixin_or_intro_l Hbi).
     - etrans; [eapply (bi_mixin_and_intro Hbi _ _ True);
         [done|by apply (bi_mixin_pure_intro Hbi)]|].
       etrans; [by apply (bi_mixin_impl_elim_l' Hbi)|].
       apply (bi_mixin_exist_elim Hbi)=> x.
       etrans; [|by apply (bi_mixin_exist_intro Hbi x)]; simpl.
       apply (bi_mixin_impl_intro_r Hbi), (bi_mixin_and_elim_l Hbi).
-    - apply (bi_mixin_or_intro_l Hbi).
+    - etrans; [|apply (bi_mixin_persistently_and_sep_elim Hbip)].
+      by apply (bi_mixin_and_intro Hbi).
     - etrans; [eapply (bi_mixin_and_intro Hbi _ _ True);
         [done|by apply (bi_mixin_pure_intro Hbi)]|].
       etrans; [by apply (bi_mixin_impl_elim_l' Hbi)|].
       apply (bi_mixin_sep_mono Hbi);
         apply (bi_mixin_impl_intro_r Hbi), (bi_mixin_and_elim_l Hbi).
-    - etrans; [|apply (bi_mixin_persistently_and_sep_elim Hbip)].
-      by apply (bi_mixin_and_intro Hbi).
     - done.
     - apply (bi_mixin_or_intro_l Hbi).
   Qed.

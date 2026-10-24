@@ -97,12 +97,8 @@ Proof.
   - exact: later_mono.
   - exact: later_intro.
   - exact: @later_forall_2.
-  - exact: @only_0_exist_1.
   - exact: @later_exist_except_0.
-  - (* <only0> (P ∗ Q) ⊢ <only0> P ∗ <only0> Q *)
-    intros P Q. apply and_intro; apply impl_intro_r.
-    + etrans; [|apply and_elim_l]. by apply impl_elim_l'.
-    + etrans; [|apply and_elim_r]. by apply impl_elim_l'.
+  - exact: @only_0_exist_1.
   - (* ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q *)
     intros _ P Q.
     apply and_intro; apply later_mono.
@@ -118,6 +114,10 @@ Proof.
     apply and_intro.
     + refine (forall_elim true).
     + refine (forall_elim false).
+  - (* <only0> (P ∗ Q) ⊢ <only0> P ∗ <only0> Q *)
+    intros P Q. apply and_intro; apply impl_intro_r.
+    + etrans; [|apply and_elim_l]. by apply impl_elim_l'.
+    + etrans; [|apply and_elim_r]. by apply impl_elim_l'.
   - (* ▷ <pers> P ⊢ <pers> ▷ P *)
     done.
   - (* <pers> ▷ P ⊢ ▷ <pers> P *)
