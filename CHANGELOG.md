@@ -171,6 +171,11 @@ Iris now depends on rocq-elpi (version 3).
 * Strengthen total WP adequacy to support later credits (`HasLc` mode): a fixed
   number can be allocated at the beginning, and they can be eliminated by any
   `fupd`.
+* Strengthen definition of WP by postponing the universal quantification deciding
+  how much of the observation list gets consumed until taking a primitive step.
+  Accordingly, change quantifiers in the lifting lemmata `wp_lift_...`. This
+  change is made in preparation for updated prophecy variable semantics.
+  (by Max Vistrup)
 
 **Changes in `heap_lang`:**
 

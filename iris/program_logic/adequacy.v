@@ -29,7 +29,7 @@ Proof.
   rewrite {1}wp_unfold /wp_pre. iIntros (?) "Hσ Hcred H".
   rewrite (val_stuck e1 σ1 κ e2 σ2 efs) //.
   iMod ("H" $! σ1 ns with "Hσ") as "(_ & H)". iModIntro.
-  iApply (step_fupdN_wand with "(H [//] Hcred)"). iIntros ">H".
+  iApply (step_fupdN_wand with "(H [//] [//] Hcred)"). iIntros ">H".
   by rewrite Nat.add_comm big_sepL2_replicate_r.
 Qed.
 
@@ -90,8 +90,7 @@ Proof.
   rewrite wp_unfold /wp_pre /not_stuck. iIntros "Hσ H".
   destruct (to_val e) as [v|] eqn:?.
   { iMod (fupd_mask_subseteq ∅); first set_solver. iModIntro. eauto. }
-  iSpecialize ("H" $! σ ns [] κs with "Hσ"). rewrite sep_elim_l.
-  iMod "H" as "%". iModIntro. eauto.
+  iMod ("H" $! σ ns κs nt with "Hσ") as (?) "_". iPureIntro. by right.
 Qed.
 
 Local Lemma wptp_postconditions Φs s es :
