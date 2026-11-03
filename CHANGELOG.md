@@ -25,6 +25,8 @@ Iris now depends on rocq-elpi (version 3).
   (`max`) fragments. See `base_logic.lib.time_receipts` (mentioned below) for
   a logic-level wrapper that you probably want to use instead of directly dealing
   with this RA. (by Thomas Somers)
+* Add `Proper` instances for `oFunctor_map`, `rFunctor_map`, `urFunctor_map`.
+  (by Simcha van Collem)
 
 **Changes in `si_logic`:**
 

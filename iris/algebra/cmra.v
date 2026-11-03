@@ -861,6 +861,11 @@ Declare Scope rFunctor_scope.
 Delimit Scope rFunctor_scope with RF.
 Bind Scope rFunctor_scope with rFunctor.
 
+Global Instance rFunctor_map_proper {SI : sidx}
+    `{!Cofe A1, !Cofe A2, !Cofe B1, !Cofe B2} F :
+  Proper ((≡) ==> (≡)) (@rFunctor_map SI F A1 _ A2 _ B1 _ B2 _).
+Proof. apply: ne_proper. Qed.
+
 Class rFunctorContractive {SI : sidx} (F : rFunctor) :=
   #[global] rFunctor_map_contractive `{!Cofe A1, !Cofe A2, !Cofe B1, !Cofe B2} ::
     Contractive (@rFunctor_map SI F A1 _ A2 _ B1 _ B2 _).
@@ -955,6 +960,11 @@ Global Instance: Params (@urFunctor_map) 10 := {}.
 Declare Scope urFunctor_scope.
 Delimit Scope urFunctor_scope with URF.
 Bind Scope urFunctor_scope with urFunctor.
+
+Global Instance urFunctor_map_proper {SI : sidx}
+    `{!Cofe A1, !Cofe A2, !Cofe B1, !Cofe B2} F :
+  Proper ((≡) ==> (≡)) (@urFunctor_map SI F A1 _ A2 _ B1 _ B2 _).
+Proof. apply: ne_proper. Qed.
 
 Class urFunctorContractive {SI : sidx} (F : urFunctor) :=
   #[global] urFunctor_map_contractive `{!Cofe A1, !Cofe A2, !Cofe B1, !Cofe B2} ::
