@@ -17,7 +17,7 @@ Definition read_coin : val :=
   end.
 
 Section proof.
-  Context `{!heapGS Σ}.
+  Context `{!heapGS_gen hlc Σ}.
 
   Definition val_to_bool (v : val) : bool := bool_decide (v = #true).
 

@@ -17,18 +17,18 @@ Definition heapΣ : gFunctors :=
 Global Instance subG_heapGpreS {Σ} : subG heapΣ Σ → heapGpreS Σ.
 Proof. solve_inG. Qed.
 
-(* TODO: The [wp_adequacy] lemma is insufficient for a state interpretation
+(* TODO: The [wp_adequacy_gen] lemma is insufficient for a state interpretation
 with a non-constant step index function. We thus use the more general
-[wp_strong_adequacy] lemma. The proof below replicates part of the proof of
-[wp_adequacy], and it hence would make sense to see if we can prove a version
-of [wp_adequacy] for a non-constant step version. *)
-Lemma heap_adequacy Σ `{!heapGpreS Σ} s e σ φ :
-  (∀ `{!heapGS Σ}, ⊢ inv_heap_inv -∗ WP e @ s; ⊤ {{ v, ⌜φ v⌝ }}) →
+[wp_strong_adequacy_gen] lemma. The proof below replicates part of the proof of
+[wp_adequacy_gen], and it hence would make sense to see if we can prove a version
+of [wp_adequacy_gen] for a non-constant step version. *)
+Lemma heap_adequacy_gen hlc Σ `{!heapGpreS Σ} s e σ φ :
+  (∀ `{!heapGS_gen hlc Σ}, ⊢ inv_heap_inv -∗ WP e @ s; ⊤ {{ v, ⌜φ v⌝ }}) →
   adequate s e σ (λ v _, φ v).
 Proof.
   intros Hwp.
   apply adequate_alt; intros t2 σ2 [n [κs ?]]%erased_steps_nsteps.
-  eapply (wp_strong_adequacy Σ _); [|done].
+  eapply (wp_strong_adequacy_gen hlc Σ _); [|done].
   iIntros (Hinv).
   iMod (gen_heap_init σ.(heap)) as (?) "[Hh _]".
   iMod (inv_heap_init loc (option val)) as (?) ">Hi".
@@ -47,3 +47,6 @@ Proof.
   iDestruct (big_sepL2_nil_inv_r with "H") as %->.
   iIntros (v2 t2'' [= -> <-]). by rewrite to_of_val.
 Qed.
+
+Definition heap_adequacy := heap_adequacy_gen HasLc.
+Global Arguments heap_adequacy _ {_}.

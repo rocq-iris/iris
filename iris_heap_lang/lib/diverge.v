@@ -18,7 +18,7 @@ explicit error handling when the full capacity has already been reached. *)
 Definition diverge : val :=
   rec: "diverge" "v" := "diverge" "v".
 
-Lemma wp_diverge `{!heapGS Σ} s E (Φ : val → iProp Σ) (v : val) :
+Lemma wp_diverge `{!heapGS_gen hlc Σ} s E (Φ : val → iProp Σ) (v : val) :
   ⊢ WP diverge v @ s;E {{ Φ }}.
 Proof.
   iLöb as "IH". wp_lam. iApply "IH".

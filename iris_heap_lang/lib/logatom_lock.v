@@ -23,7 +23,7 @@ Global Instance subG_alockΣ {Σ} : subG alockΣ Σ → alockG Σ.
 Proof. solve_inG. Qed.
 
 Section tada.
-  Context `{!heapGS Σ, !alockG Σ, !lock, !lockG Σ}.
+  Context `{!heapGS_gen hlc Σ, !alockG Σ, !lock, !lockG Σ}.
 
   Record tada_lock_name := TadaLockName {
     tada_lock_name_state : gname;
