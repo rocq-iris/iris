@@ -10,7 +10,7 @@ atomicity. *)
 (** First: logically atomic increment directly on top of the physical heap. *)
 
 Section increment_physical.
-  Context `{!heapGS Σ}.
+  Context `{!heapGS_gen hlc Σ}.
 
   Definition incr_phy : val :=
     rec: "incr" "l" :=
@@ -55,7 +55,7 @@ Section increment.
          then "oldv" (* return old value if success *)
          else "incr" "l".
 
-  Context `{!heapGS Σ, !atomic_heapGS Σ}.
+  Context `{!heapGS_gen hlc Σ, !atomic_heapGS Σ}.
 
   (** A proof of the incr specification that unfolds the definition of atomic
       accessors.  This is the style that most logically atomic proofs take. *)
@@ -165,7 +165,7 @@ Section increment_client.
   Local Existing Instance primitive_atomic_heap.
   Import atomic_heap.notation.
 
-  Context `{!heapGS Σ, !atomic_heapGS Σ, !spawnG Σ}.
+  Context `{!heapGS_gen hlc Σ, !atomic_heapGS Σ, !spawnG Σ}.
 
   Definition incr_client : val :=
     λ: "x",

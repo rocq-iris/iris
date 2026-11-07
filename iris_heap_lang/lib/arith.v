@@ -12,7 +12,7 @@ Definition minimum : val :=
 Definition maximum : val :=
   λ: "m" "n", if: "m" < "n" then "n" else "m".
 
-Lemma minimum_spec `{!heapGS Σ} s E (Φ : val → iProp Σ) (m n : Z) :
+Lemma minimum_spec `{!heapGS_gen hlc Σ} s E (Φ : val → iProp Σ) (m n : Z) :
   ▷ Φ #(m `min` n) -∗
   WP minimum #m #n @ s;E {{ Φ }}.
 Proof.
@@ -21,12 +21,12 @@ Proof.
   - rewrite Z.min_r; [ done | by lia ].
 Qed.
 
-Lemma minimum_spec_nat `{!heapGS Σ} s E (Φ : val → iProp Σ) (m n : nat) :
+Lemma minimum_spec_nat `{!heapGS_gen hlc Σ} s E (Φ : val → iProp Σ) (m n : nat) :
   ▷ Φ #(m `min` n)%nat -∗
   WP minimum #m #n @ s;E {{ Φ }}.
 Proof. iIntros "HΦ". iApply minimum_spec. by rewrite Nat2Z.inj_min. Qed.
 
-Lemma maximum_spec `{!heapGS Σ} s E (Φ : val → iProp Σ) (m n : Z) :
+Lemma maximum_spec `{!heapGS_gen hlc Σ} s E (Φ : val → iProp Σ) (m n : Z) :
   ▷ Φ #(m `max` n) -∗
   WP maximum #m #n @ s;E {{ Φ }}.
 Proof.
@@ -35,7 +35,7 @@ Proof.
   - rewrite Z.max_l; [ done | by lia ].
 Qed.
 
-Lemma maximum_spec_nat `{!heapGS Σ} s E (Φ : val → iProp Σ) (m n : nat) :
+Lemma maximum_spec_nat `{!heapGS_gen hlc Σ} s E (Φ : val → iProp Σ) (m n : nat) :
   ▷ Φ #(m `max` n)%nat -∗
   WP maximum #m #n @ s;E {{ Φ }}.
 Proof. iIntros "HΦ". iApply maximum_spec. by rewrite Nat2Z.inj_max. Qed.

@@ -11,7 +11,7 @@ Definition unwrap : val := λ: "o",
   end.
 
 Section proof.
-  Context `{!heapGS Σ}.
+  Context `{!heapGS_gen hlc Σ}.
 
   Lemma unwrap_spec Φ v : ▷ Φ v ⊢ WP unwrap (SOMEV v) {{ Φ }}.
   Proof. iIntros "HΦ". wp_lam. wp_pures. by iApply "HΦ". Qed.

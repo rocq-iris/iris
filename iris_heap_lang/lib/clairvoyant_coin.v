@@ -24,7 +24,7 @@ Definition toss_coin : val :=
   "c" <- "r";; resolve_proph: "p" to: "r";; #().
 
 Section proof.
-  Context `{!heapGS Σ}.
+  Context `{!heapGS_gen hlc Σ}.
 
   Definition prophecy_to_list_bool (vs : list (val * val)) : list bool :=
     (λ v, bool_decide (v = #true)) ∘ snd <$> vs.
