@@ -1191,6 +1191,11 @@ Declare Scope oFunctor_scope.
 Delimit Scope oFunctor_scope with OF.
 Bind Scope oFunctor_scope with oFunctor.
 
+Global Instance oFunctor_map_proper {SI : sidx}
+    `{!Cofe A1, !Cofe A2, !Cofe B1, !Cofe B2} F :
+  Proper ((≡) ==> (≡)) (@oFunctor_map SI F A1 _ A2 _ B1 _ B2 _).
+Proof. apply: ne_proper. Qed.
+
 Class oFunctorContractive {SI : sidx} (F : oFunctor) :=
   #[global] oFunctor_map_contractive `{!Cofe A1, !Cofe A2, !Cofe B1, !Cofe B2} ::
     Contractive (@oFunctor_map SI F A1 _ A2 _ B1 _ B2 _).
