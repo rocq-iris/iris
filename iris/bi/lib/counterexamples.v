@@ -456,13 +456,6 @@ Module later_credits_plain. Section later_credits_plain.
       by iApply si_pure_si_emp_valid_elim.
   Qed.
 
-  Lemma laterN_False : ⊢@{PROP} ∃ n, ▷^n False.
-  Proof.
-    iLöb as "IH".
-    iDestruct "IH" as (n) "Hn".
-    by iExists (S n).
-  Qed.
-
   (* Now we can just apply [lc_fupd_elim_later_keep] [n] times to the
   result of [laterN_False] (because [▷^n False] is plain) to get [False]. *)
   Lemma contradiction : False.
@@ -470,7 +463,7 @@ Module later_credits_plain. Section later_credits_plain.
     apply (pure_soundness (PROP:=PROP)).
     apply (lc_soundness _ ⊤).
     iIntros "Hlc".
-    iDestruct laterN_False as (n) "-# Hfalse".
+    iDestruct bi.laterN_False as (n) "-# Hfalse".
     iDestruct (bi.affinely_elim with "Hfalse") as "Hfalse".
     iInduction n as [|n IH]; simpl; first by iFrame.
     iMod (lc_fupd_elim_later_keep with "Hlc Hfalse") as "[Hlc Hfalse]".

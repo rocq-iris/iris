@@ -1,6 +1,7 @@
 From iris.base_logic.lib Require Import gen_inv_heap invariants.
 From iris.program_logic Require Export weakestpre total_weakestpre.
 From iris.heap_lang Require Import lang proofmode notation adequacy total_adequacy.
+From iris.heap_lang.lib Require Import diverge.
 
 (* For printing tests we want stable names. *)
 Unset Mangle Names.
@@ -155,6 +156,16 @@ Section tests.
     wp_alloc l1 as "H1".
     wp_alloc l2 as "H2".
     wp_pures. by eauto.
+  Qed.
+
+  (* An alternative proof of [wp_diverge] in [iris_heap_lang/lib/diverge.v].
+  This proof uses [bi.laterN_False] and [iInduction] instead of [iLöb]. *)
+  Lemma wp_diverge_induction s E Φ (v : val) :
+    ⊢ WP diverge v @ s;E {{ Φ }}.
+  Proof.
+    iDestruct bi.laterN_False as (n) "?".
+    iInduction n as [|n] "IH"; first done.
+    wp_rec. by iApply "IH".
   Qed.
 
   (* Make sure [wp_bind] works even when it changes nothing. *)
