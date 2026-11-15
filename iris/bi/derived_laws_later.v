@@ -177,6 +177,16 @@ See [lib/counterexamples.v] for a fully worked-out proof of that fact. *)
 Lemma not_not_later_False `{!BiLöb PROP} : ⊢@{PROP} ¬ ¬ ▷ False.
 Proof. apply entails_impl, löb. Qed.
 
+(** This lemma shows that the (finite) step-index eventually runs out.
+See [lib/counterexamples.v] and [tests/heap_lang.v] for applications of this
+lemma. *)
+Lemma laterN_False `{!BiLöb PROP} : ⊢@{PROP} ∃ n, ▷^n False.
+Proof.
+  rewrite -(löb (∃ n : nat, ▷^n False)%I) later_exist.
+  apply entails_impl, exist_elim=> n.
+  by rewrite -(exist_intro (S n)).
+Qed.
+
 (* The left-to-right of [later_emp] is equivalent to the BI being affine. *)
 Lemma bi_affine_alt_later_emp `{!BiLöb PROP} : BiAffine PROP ↔ (▷ emp ⊢ emp).
 Proof.

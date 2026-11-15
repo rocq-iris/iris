@@ -93,6 +93,8 @@ Iris now depends on rocq-elpi (version 3).
   + This also generalizes the `iNext n credit: H` tactic to arbitrary BI.
   + Instances of these typeclasses are given for `iProp`, and for `monPred` when
     later credits are available in its underlying BI.
+* Move lemma `laterN_False` from `lib/counterexamples.v` to
+  `derived_laws_later.v`. (by Zichen Zhang)
 
 **Changes in `proofmode`:**
 
