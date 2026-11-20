@@ -522,7 +522,7 @@ Qed.
 (** This lemma shows that our characterization of timeless propositions (via
 the except-0 modality) is equivalent to the characterization via the only-0
 modality. See the comment above the definition of [Timeless] in
-[iris.bi.interface] for more details. *)
+[iris.bi.derived_connectives] for more details. *)
 Lemma timeless_alt `{!BiLöb PROP} P : Timeless P ↔ (▷ P ⊢ ◇ P).
 Proof.
   split; intros HP; [by rewrite timeless_except_0|].

@@ -139,8 +139,8 @@ This influences which rules fancy updates satisfy: either fancy updates can be u
 
 \[ \pvs[\mask_1][\mask_2] \prop \eqdef
   \begin{cases}
-    W * \ownGhost{\gname_{\textdom{En}}}{\mask_1} \wand \creditUpd\diamond (W * \ownGhost{\gname_{\textdom{En}}}{\mask_2} * \prop) & \text{if } \LaterCreditsFlag = \textsf{true}\\
-    W * \ownGhost{\gname_{\textdom{En}}}{\mask_1} \wand \upd\diamond (W * \ownGhost{\gname_{\textdom{En}}}{\mask_2} * \prop) & \text{if } \LaterCreditsFlag = \textsf{false}\\
+    W * \ownGhost{\gname_{\textdom{En}}}{\mask_1} \wand \creditUpd\exceptZ (W * \ownGhost{\gname_{\textdom{En}}}{\mask_2} * \prop) & \text{if } \LaterCreditsFlag = \textsf{true}\\
+    W * \ownGhost{\gname_{\textdom{En}}}{\mask_1} \wand \upd\exceptZ (W * \ownGhost{\gname_{\textdom{En}}}{\mask_2} * \prop) & \text{if } \LaterCreditsFlag = \textsf{false}\\
   \end{cases}
   \]
 Here, $\mask_1$ and $\mask_2$ are the \emph{masks} of the view update, defining which invariants have to be (at least!) available before and after the update.
