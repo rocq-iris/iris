@@ -171,28 +171,28 @@ Proof. rewrite /IntoExcept0=> ->. by rewrite embed_except_0. Qed.
 
 Global Instance elim_modal_embed_bupd_goal
     `{!BiBUpd PROP, !BiBUpd PROP', !BiEmbedBUpd PROP PROP'}
-    p p' φ (P P' : PROP') (Q Q' : PROP) :
-  ElimModal φ p p' P P' (|==> ⎡Q⎤)%I (|==> ⎡Q'⎤)%I →
-  ElimModal φ p p' P P' ⎡|==> Q⎤ ⎡|==> Q'⎤.
+    Mctx p p' φ (P P' : PROP') (Q Q' : PROP) :
+  ElimModal φ p p' Mctx P P' (|==> ⎡Q⎤)%I (|==> ⎡Q'⎤)%I →
+  ElimModal φ p p' Mctx P P' ⎡|==> Q⎤ ⎡|==> Q'⎤.
 Proof. by rewrite /ElimModal !embed_bupd. Qed.
 Global Instance elim_modal_embed_bupd_hyp
     `{!BiBUpd PROP, !BiBUpd PROP', !BiEmbedBUpd PROP PROP'}
-    p p' φ (P : PROP) (P' Q Q' : PROP') :
-  ElimModal φ p p' (|==> ⎡P⎤)%I P' Q Q' →
-  ElimModal φ p p' ⎡|==> P⎤ P' Q Q'.
+    Mctx p p' φ (P : PROP) (P' Q Q' : PROP') :
+  ElimModal φ p p' Mctx (|==> ⎡P⎤)%I P' Q Q' →
+  ElimModal φ p p' Mctx ⎡|==> P⎤ P' Q Q'.
 Proof. by rewrite /ElimModal !embed_bupd. Qed.
 
 Global Instance elim_modal_embed_fupd_goal
     `{!BiFUpd PROP, !BiFUpd PROP', !BiEmbedFUpd PROP PROP'}
-    p p' φ E1 E2 E3 (P P' : PROP') (Q Q' : PROP) :
-  ElimModal φ p p' P P' (|={E1,E3}=> ⎡Q⎤)%I (|={E2,E3}=> ⎡Q'⎤)%I →
-  ElimModal φ p p' P P' ⎡|={E1,E3}=> Q⎤ ⎡|={E2,E3}=> Q'⎤.
+    Mctx p p' φ E1 E2 E3 (P P' : PROP') (Q Q' : PROP) :
+  ElimModal φ p p' Mctx P P' (|={E1,E3}=> ⎡Q⎤)%I (|={E2,E3}=> ⎡Q'⎤)%I →
+  ElimModal φ p p' Mctx P P' ⎡|={E1,E3}=> Q⎤ ⎡|={E2,E3}=> Q'⎤.
 Proof. by rewrite /ElimModal !embed_fupd. Qed.
 Global Instance elim_modal_embed_fupd_hyp
     `{!BiFUpd PROP, !BiFUpd PROP', !BiEmbedFUpd PROP PROP'}
-    p p' φ E1 E2 (P : PROP) (P' Q Q' : PROP') :
-  ElimModal φ p p' (|={E1,E2}=> ⎡P⎤)%I P' Q Q' →
-  ElimModal φ p p' ⎡|={E1,E2}=> P⎤ P' Q Q'.
+    Mctx p p' φ E1 E2 (P : PROP) (P' Q Q' : PROP') :
+  ElimModal φ p p' Mctx (|={E1,E2}=> ⎡P⎤)%I P' Q Q' →
+  ElimModal φ p p' Mctx ⎡|={E1,E2}=> P⎤ P' Q Q'.
 Proof. by rewrite /ElimModal embed_fupd. Qed.
 
 Global Instance add_modal_embed_bupd_goal

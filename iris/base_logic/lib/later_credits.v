@@ -243,7 +243,7 @@ Module le_upd.
     (** Proof mode class instances internally needed for people defining their
     [fupd] with [le_upd]. *)
     Global Instance elim_bupd_le_upd p P Q :
-      ElimModal True p false (|==> P) P (|==£> Q) (|==£> Q).
+      ElimModal True p false modality_id (|==> P) P (|==£> Q) (|==£> Q).
     Proof.
       rewrite /ElimModal bi.intuitionistically_if_elim //=.
       rewrite bupd_le_upd. iIntros "_ [HP HPQ]".
@@ -268,7 +268,7 @@ Module le_upd.
     Proof. by rewrite /FromModal /= -le_upd_intro. Qed.
 
     Global Instance elim_modal_le_upd p P Q :
-      ElimModal True p false (|==£> P) P (|==£> Q) (|==£> Q).
+      ElimModal True p false modality_id (|==£> P) P (|==£> Q) (|==£> Q).
     Proof.
       by rewrite /ElimModal
         intuitionistically_if_elim le_upd_frame_r wand_elim_r le_upd_trans.

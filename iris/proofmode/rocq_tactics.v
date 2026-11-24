@@ -939,22 +939,6 @@ Proof.
   rewrite envs_replace_singleton_sound' //; simpl. by rewrite wand_elim_r.
 Qed.
 
-(** * Modalities *)
-Lemma tac_modal_elim Δ i j p p' φ P' P Q Q' :
-  envs_lookup i Δ = Some (p, P) →
-  ElimModal φ p p' P P' Q Q' →
-  φ →
-  match envs_replace i p p' (Esnoc Enil j P') Δ with
-  | None => False
-  | Some Δ' => envs_entails Δ' Q'
-  end →
-  envs_entails Δ Q.
-Proof.
-  destruct (envs_replace _ _ _ _ _) as [Δ'|] eqn:?; last done.
-  rewrite envs_entails_unseal => ??? HΔ. rewrite envs_replace_singleton_sound //=.
-  rewrite HΔ. by eapply elim_modal.
-Qed.
-
 (** * Accumulate hypotheses *)
 Lemma tac_accu Δ P :
   env_to_prop (env_spatial Δ) = P →
@@ -1223,16 +1207,12 @@ Section tac_modal_intro.
     - intros j. destruct (ident_beq _ _); naive_solver.
   Qed.
 
-  (** The actual introduction tactic *)
-  Lemma tac_modal_intro {A} φ (sel : A) Γp Γs n Γp' Γs' Q Q' fi :
-    FromModal φ M sel Q' Q →
+  Lemma tac_modal_intro_aux Γp Γs n Γp' Γs' fi :
     IntoModalIntuitionisticEnv M Γp Γp' (modality_intuitionistic_action M) →
     IntoModalSpatialEnv M Γs Γs' (modality_spatial_action M) fi →
-    (if fi then Absorbing Q' else TCTrue) →
-    φ →
-    envs_entails (Envs Γp' Γs' n) Q → envs_entails (Envs Γp Γs n) Q'.
+    of_envs (Envs Γp Γs n) ⊢ <absorb>?fi M (of_envs (Envs Γp' Γs' n)).
   Proof.
-    rewrite envs_entails_unseal /FromModal !of_envs_eq => HQ' HΓp HΓs ? Hφ HQ.
+    rewrite !of_envs_eq => HΓp HΓs.
     apply pure_elim_l=> -[???]. assert (envs_wf (Envs Γp' Γs' n)) as Hwf.
     { split; simpl in *.
       - destruct HΓp as [| |????? []| |]; eauto using Enil_wf.
@@ -1242,10 +1222,7 @@ Section tac_modal_intro.
         assert (∀ i, Γs !! i = None → Γs' !! i = None).
         { destruct HΓs as [| |?????? []| |]; eauto. }
         naive_solver. }
-    trans (<absorb>?fi Q')%I; last first.
-    { destruct fi; last done. apply: absorbing. }
-    simpl. rewrite -(HQ' Hφ). rewrite -HQ pure_True // left_id. clear HQ' HQ.
-    rewrite !persistent_and_affinely_sep_l.
+    rewrite /= pure_True // left_id. rewrite !persistent_and_affinely_sep_l.
     rewrite -modality_sep absorbingly_if_sep. f_equiv.
     - rewrite -absorbingly_if_intro.
       remember (modality_intuitionistic_action M).
@@ -1269,7 +1246,49 @@ Section tac_modal_intro.
         rewrite absorbingly_emp_True. apply True_intro.
       + rewrite {1}(modality_spatial_id M ([∗] Γs)) //.
   Qed.
+
+  (** The actual introduction tactic *)
+  Lemma tac_modal_intro {A} φ (sel : A) Γp Γs n Γp' Γs' Q Q' fi :
+    FromModal φ M sel Q' Q →
+    IntoModalIntuitionisticEnv M Γp Γp' (modality_intuitionistic_action M) →
+    IntoModalSpatialEnv M Γs Γs' (modality_spatial_action M) fi →
+    (if fi then Absorbing Q' else TCTrue) →
+    φ →
+    envs_entails (Envs Γp' Γs' n) Q → envs_entails (Envs Γp Γs n) Q'.
+  Proof.
+    rewrite envs_entails_unseal /FromModal=> HQ' HΓp HΓs ? Hφ HQ.
+    rewrite tac_modal_intro_aux /= HQ HQ' //.
+    destruct fi; last done. apply: absorbing.
+  Qed.
 End tac_modal_intro.
+
+(** * Elimination of modalities.
+Eliminating a modality described by [P] in goal [Q] with
+[ElimModal φ p p' M P P' Q Q'] yields a subgoal [M (□?p P' -∗ Q')],
+where [M] and [P'] are immediately introduced.
+To introduce [M], we must discard all resources that cannot be put under [M],
+following modality introduction requirements, thus [M (□?p' P' -∗ Q')]
+must be [Absorbing].
+In case nothing was removed ([fi = false]), we have no such obligation. *)
+Lemma tac_modal_elim {SI : sidx} {PROP : bi} (Δ : envs PROP)
+    Γp Γs n Γp' Γs' i j p p' φ Mctx P' P Q Q' fi :
+  envs_lookup_delete true i Δ = Some (p, P, Envs Γp Γs n) →
+  ElimModal φ p p' Mctx P P' Q Q' →
+  φ →
+  IntoModalIntuitionisticEnv Mctx Γp Γp' (modality_intuitionistic_action Mctx) →
+  IntoModalSpatialEnv Mctx Γs Γs' (modality_spatial_action Mctx) fi →
+  (if fi then Absorbing (Mctx (□?p' P' -∗ Q')%I) else TCTrue) →
+  match envs_app p' (Esnoc Enil j P') (Envs Γp' Γs' n) with
+  | Some Δ' => envs_entails Δ' Q'
+  | None => False
+  end →
+  envs_entails Δ Q.
+Proof.
+  rewrite envs_entails_unseal /ElimModal=> ? HQ ???? HQ'.
+  destruct (envs_app _ _ _) as [Δ'|] eqn:?; last done.
+  rewrite envs_lookup_delete_sound // -HQ //. f_equiv.
+  rewrite tac_modal_intro_aux envs_app_singleton_sound // HQ'. by destruct fi.
+Qed.
 
 (** The class [MaybeIntoLaterNEnvs] is used by tactics that need to introduce
 laters, e.g., the symbolic execution tactics. *)

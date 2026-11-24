@@ -142,7 +142,7 @@ Use [iApply fupd_mask_intro] to introduce mask-changing update modalities")
 Proof. by intros []. Qed.
 
 Global Instance elim_modal_bupd `{!BiBUpd PROP} p P Q :
-  ElimModal True p false (|==> P) P (|==> Q) (|==> Q).
+  ElimModal True p false modality_id (|==> P) P (|==> Q) (|==> Q).
 Proof.
   by rewrite /ElimModal
     intuitionistically_if_elim bupd_frame_r wand_elim_r bupd_trans.
@@ -150,25 +150,25 @@ Qed.
 
 Global Instance elim_modal_bupd_plain_goal
     `{!BiBUpd PROP, !Sbi PROP, !BiBUpdSbi PROP, !BiAffine PROP} p P Q :
-  Plain Q → ElimModal True p false (|==> P) P Q Q.
+  Plain Q → ElimModal True p false modality_id (|==> P) P Q Q.
 Proof.
   intros. by rewrite /ElimModal intuitionistically_if_elim
     bupd_frame_r wand_elim_r bupd_elim.
 Qed.
 Global Instance elim_modal_bupd_plain
     `{!BiBUpd PROP, !Sbi PROP, !BiBUpdSbi PROP, !BiAffine PROP} p P Q :
-  Plain P → ElimModal True p p (|==> P) P Q Q.
+  Plain P → ElimModal True p p modality_id (|==> P) P Q Q.
 Proof. intros. by rewrite /ElimModal bupd_elim wand_elim_r. Qed.
 
 Global Instance elim_modal_bupd_fupd
     `{!BiBUpd PROP, !BiFUpd PROP, !BiBUpdFUpd PROP} p E1 E2 P Q :
-  ElimModal True p false (|==> P) P (|={E1,E2}=> Q) (|={E1,E2}=> Q) | 10.
+  ElimModal True p false modality_id (|==> P) P (|={E1,E2}=> Q) (|={E1,E2}=> Q) | 10.
 Proof.
   by rewrite /ElimModal intuitionistically_if_elim
     (bupd_fupd E1) fupd_frame_r wand_elim_r fupd_trans.
 Qed.
 Global Instance elim_modal_fupd_fupd `{!BiFUpd PROP} p E1 E2 E3 P Q :
-  ElimModal True p false (|={E1,E2}=> P) P (|={E1,E3}=> Q) (|={E2,E3}=> Q).
+  ElimModal True p false modality_id (|={E1,E2}=> P) P (|={E1,E3}=> Q) (|={E2,E3}=> Q).
 Proof.
   by rewrite /ElimModal intuitionistically_if_elim
     fupd_frame_r wand_elim_r fupd_trans.
@@ -177,7 +177,7 @@ Global Instance elim_modal_fupd_fupd_wrong_mask `{!BiFUpd PROP} p E0 E1 E2 E3 P 
   ElimModal
     (pm_error "Goal and eliminated modality must have the same mask.
 Use [iMod (fupd_mask_subseteq E2)] to adjust the mask of your goal to [E2]")
-    p false
+    p false modality_id
     (|={E1,E2}=> P) False (|={E0,E3}=> Q) False | 100.
 Proof. intros []. Qed.
 

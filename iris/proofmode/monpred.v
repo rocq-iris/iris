@@ -445,21 +445,35 @@ Proof.
   by rewrite {1}(objective_objectively P) monPred_objectively_unfold.
 Qed.
 
-Global Instance elim_modal_at_bupd_goal `{!BiBUpd PROP} φ p p' 𝓟 𝓟' Q Q' i :
-  ElimModal φ p p' 𝓟 𝓟' (|==> Q i) (|==> Q' i) →
-  ElimModal φ p p' 𝓟 𝓟' ((|==> Q) i) ((|==> Q') i).
+Global Instance elim_modal_at_bupd_goal `{!BiBUpd PROP} Mctx φ p p' 𝓟 𝓟' Q Q' i :
+  ElimModal φ p p' Mctx 𝓟 𝓟' (|==> Q i) (|==> Q' i) →
+  ElimModal φ p p' Mctx 𝓟 𝓟' ((|==> Q) i) ((|==> Q') i).
 Proof. by rewrite /ElimModal !monPred_at_bupd. Qed.
-Global Instance elim_modal_at_bupd_hyp `{!BiBUpd PROP} φ p p' P 𝓟 𝓟' 𝓠 𝓠' i:
+Global Instance elim_modal_at_bupd_hyp `{!BiBUpd PROP} Mctx φ p p' P 𝓟 𝓟' 𝓠 𝓠' i :
   MakeMonPredAt i P 𝓟 →
-  ElimModal φ p p' (|==> 𝓟) 𝓟' 𝓠 𝓠' →
-  ElimModal φ p p' ((|==> P) i) 𝓟' 𝓠 𝓠'.
+  ElimModal φ p p' Mctx (|==> 𝓟) 𝓟' 𝓠 𝓠' →
+  ElimModal φ p p' Mctx ((|==> P) i) 𝓟' 𝓠 𝓠'.
 Proof. by rewrite /MakeMonPredAt /ElimModal monPred_at_bupd=><-. Qed.
-Global Instance elim_modal_at φ p p' 𝓟 𝓟' P P' V:
-  ElimModal φ p p' ⎡𝓟⎤ ⎡𝓟'⎤ P P' → ElimModal φ p p' 𝓟 𝓟' (P V) (P' V).
+(** Specialized to [modality_id] instead of an arbitrary [Mctx]. The premise
+lives in [monPred PROP] and the conclusion lives in [PROP], so the types do not
+match. *)
+Global Instance elim_modal_at φ p p' 𝓟 𝓟' P P' V :
+  ElimModal φ p p' modality_id ⎡𝓟⎤ ⎡𝓟'⎤ P P' →
+  ElimModal φ p p' modality_id 𝓟 𝓟' (P V) (P' V).
 Proof.
   rewrite /ElimModal -!embed_intuitionistically_if.
   iIntros (HH Hφ) "[? HP]". iApply HH; [done|]. iFrame. iIntros (? <-) "?".
   by iApply "HP".
+Qed.
+
+Global Instance elim_modal_subjectively p q P Q :
+  TCIf (BiPersistentlyExist PROP) (TCEq q p) (TCEq q false) →
+  ElimModal True p q modality_objectively (<subj> P) P (<subj> Q) (<subj> Q).
+Proof.
+  iIntros (Hq _) "[HP HQ]". iApply (monPred_subjectively_wand with "[HP] HQ").
+  destruct Hq as [? ->%TCEq_eq| ->%TCEq_eq]; simpl.
+  - by iApply monPred_subjectively_intuitionistically_if.
+  - by iApply bi.intuitionistically_if_elim.
 Qed.
 
 Global Instance add_modal_at_bupd_goal `{!BiBUpd PROP} φ 𝓟 𝓟' Q i :
@@ -570,14 +584,16 @@ Implicit Types 𝓟 𝓠 𝓡 : PROP.
 Implicit Types φ : Prop.
 Implicit Types i j : I.
 
-Global Instance elim_modal_at_fupd_goal `{!BiFUpd PROP} φ p p' E1 E2 E3 𝓟 𝓟' Q Q' i :
-  ElimModal φ p p' 𝓟 𝓟' (|={E1,E3}=> Q i) (|={E2,E3}=> Q' i) →
-  ElimModal φ p p' 𝓟 𝓟' ((|={E1,E3}=> Q) i) ((|={E2,E3}=> Q') i).
+Global Instance elim_modal_at_fupd_goal `{!BiFUpd PROP}
+    Mctx φ p p' E1 E2 E3 𝓟 𝓟' Q Q' i :
+  ElimModal φ p p' Mctx 𝓟 𝓟' (|={E1,E3}=> Q i) (|={E2,E3}=> Q' i) →
+  ElimModal φ p p' Mctx 𝓟 𝓟' ((|={E1,E3}=> Q) i) ((|={E2,E3}=> Q') i).
 Proof. by rewrite /ElimModal !monPred_at_fupd. Qed.
-Global Instance elim_modal_at_fupd_hyp `{!BiFUpd PROP} φ p p' E1 E2 P 𝓟 𝓟' 𝓠 𝓠' i :
+Global Instance elim_modal_at_fupd_hyp `{!BiFUpd PROP}
+    Mctx φ p p' E1 E2 P 𝓟 𝓟' 𝓠 𝓠' i :
   MakeMonPredAt i P 𝓟 →
-  ElimModal φ p p' (|={E1,E2}=> 𝓟) 𝓟' 𝓠 𝓠' →
-  ElimModal φ p p' ((|={E1,E2}=> P) i) 𝓟' 𝓠 𝓠'.
+  ElimModal φ p p' Mctx (|={E1,E2}=> 𝓟) 𝓟' 𝓠 𝓠' →
+  ElimModal φ p p' Mctx ((|={E1,E2}=> P) i) 𝓟' 𝓠 𝓠'.
 Proof. by rewrite /MakeMonPredAt /ElimModal monPred_at_fupd=><-. Qed.
 
 Global Instance elim_acc_at_None `{!BiFUpd PROP} {X} φ E1 E2 E3 E4 α α' β β' P P'x i :

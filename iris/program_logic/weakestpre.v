@@ -254,7 +254,7 @@ Proof.
   iMod ("H" $! e2 σ2 efs κ κs' with "[% //] [% //] Hcred") as "H".
   iIntros "!>!>". iMod "H". iMod "HP". iModIntro.
   revert n Hn. generalize (num_laters_per_step ns)=>n0 n Hn.
-  iInduction n as [|n IH] forall (n0 Hn); simpl.
+  iInduction n as [|n IH] forall (n0 Hn) "HP H"; simpl.
   - iApply (step_fupdN_wand with "H"). iIntros ">($ & Hwp & $)". iMod "HP".
     iModIntro. iApply (wp_strong_mono with "Hwp"); [done|set_solver|].
     iIntros (v) "HΦ". iApply ("HΦ" with "HP").
@@ -424,14 +424,16 @@ Section proofmode_classes.
   Proof. by rewrite /IsExcept0 -{2}fupd_wp -except_0_fupd -fupd_intro. Qed.
 
   Global Instance elim_modal_bupd_wp p s E e P Φ :
-    ElimModal True p false (|==> P) P (WP e @ s; E {{ Φ }}) (WP e @ s; E {{ Φ }}).
+    ElimModal True p false modality_id
+      (|==> P) P (WP e @ s; E {{ Φ }}) (WP e @ s; E {{ Φ }}).
   Proof.
     by rewrite /ElimModal intuitionistically_if_elim
       (bupd_fupd E) fupd_frame_r wand_elim_r fupd_wp.
   Qed.
 
   Global Instance elim_modal_fupd_wp p s E e P Φ :
-    ElimModal True p false (|={E}=> P) P (WP e @ s; E {{ Φ }}) (WP e @ s; E {{ Φ }}).
+    ElimModal True p false modality_id
+      (|={E}=> P) P (WP e @ s; E {{ Φ }}) (WP e @ s; E {{ Φ }}).
   Proof.
     by rewrite /ElimModal intuitionistically_if_elim
       fupd_frame_r wand_elim_r fupd_wp.
@@ -444,12 +446,12 @@ Section proofmode_classes.
     ElimModal
       (pm_error "Goal and eliminated modality must have the same mask.
 Use [iApply fupd_wp; iMod (fupd_mask_subseteq E2)] to adjust the mask of your goal to [E2]")
-      p false
+      p false modality_id
       (|={E2}=> P) False (WP e @ s; E1 {{ Φ }}) False | 100.
   Proof. intros []. Qed.
 
   Global Instance elim_modal_fupd_wp_atomic p s E1 E2 e P Φ :
-    ElimModal (Atomic (stuckness_to_atomicity s) e) p false
+    ElimModal (Atomic (stuckness_to_atomicity s) e) p false modality_id
             (|={E1,E2}=> P) P
             (WP e @ s; E1 {{ Φ }}) (WP e @ s; E2 {{ v, |={E2,E1}=> Φ v }})%I | 100.
   Proof.
@@ -461,7 +463,7 @@ Use [iApply fupd_wp; iMod (fupd_mask_subseteq E2)] to adjust the mask of your go
     ElimModal
       (pm_error "Goal and eliminated modality must have the same mask.
 Use [iMod (fupd_mask_subseteq E2)] to adjust the mask of your goal to [E2]")
-      p false
+      p false modality_id
       (|={E2,E2'}=> P) False
       (WP e @ s; E1 {{ Φ }}) False | 200.
   Proof. intros []. Qed.

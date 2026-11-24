@@ -332,14 +332,16 @@ Section proofmode_classes.
   Proof. by rewrite /IsExcept0 -{2}fupd_twp -except_0_fupd -fupd_intro. Qed.
 
   Global Instance elim_modal_bupd_twp p s E e P Φ :
-    ElimModal True p false (|==> P) P (WP e @ s; E [{ Φ }]) (WP e @ s; E [{ Φ }]).
+    ElimModal True p false modality_id
+      (|==> P) P (WP e @ s; E [{ Φ }]) (WP e @ s; E [{ Φ }]).
   Proof.
     by rewrite /ElimModal intuitionistically_if_elim
       (bupd_fupd E) fupd_frame_r wand_elim_r fupd_twp.
   Qed.
 
   Global Instance elim_modal_fupd_twp p s E e P Φ :
-    ElimModal True p false (|={E}=> P) P (WP e @ s; E [{ Φ }]) (WP e @ s; E [{ Φ }]).
+    ElimModal True p false modality_id
+      (|={E}=> P) P (WP e @ s; E [{ Φ }]) (WP e @ s; E [{ Φ }]).
   Proof.
     by rewrite /ElimModal intuitionistically_if_elim
       fupd_frame_r wand_elim_r fupd_twp.
@@ -352,12 +354,12 @@ Section proofmode_classes.
     ElimModal
       (pm_error "Goal and eliminated modality must have the same mask.
 Use [iApply fupd_twp; iMod (fupd_mask_subseteq E2)] to adjust the mask of your goal to [E2]")
-      p false
+      p false modality_id
       (|={E2}=> P) False (WP e @ s; E1 [{ Φ }]) False | 100.
   Proof. intros []. Qed.
 
   Global Instance elim_modal_fupd_twp_atomic p s E1 E2 e P Φ :
-    ElimModal (Atomic (stuckness_to_atomicity s) e) p false
+    ElimModal (Atomic (stuckness_to_atomicity s) e) p false modality_id
             (|={E1,E2}=> P) P
             (WP e @ s; E1 [{ Φ }]) (WP e @ s; E2 [{ v, |={E2,E1}=> Φ v }])%I | 100.
   Proof.
@@ -369,7 +371,7 @@ Use [iApply fupd_twp; iMod (fupd_mask_subseteq E2)] to adjust the mask of your g
     ElimModal
       (pm_error "Goal and eliminated modality must have the same mask.
   Use [iMod (fupd_mask_subseteq E2)] to adjust the mask of your goal to [E2]")
-      p false
+      p false modality_id
       (|={E2,E2'}=> P) False
       (WP e @ s; E1 [{ Φ }]) False | 200.
   Proof. intros []. Qed.

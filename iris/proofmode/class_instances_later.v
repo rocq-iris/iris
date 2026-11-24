@@ -270,7 +270,7 @@ Global Instance elim_modal_timeless p p' P P' Q :
   TCIf (BiPersistentlyExist PROP) (TCEq p p') (TCEq p' false) →
   IntoExcept0 P P' →
   IsExcept0 Q →
-  ElimModal True p p' P P' Q Q.
+  ElimModal True p p' modality_id P P' Q Q.
 Proof.
   intros Hp ?? _. rewrite (except_0_intro (_ -∗ _)) (into_except_0 P).
   destruct Hp as [? ->%TCEq_eq| ->%TCEq_eq]; simpl.

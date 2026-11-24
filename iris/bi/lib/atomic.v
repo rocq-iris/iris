@@ -254,8 +254,8 @@ Section lemmas.
 
   (* This lets you eliminate atomic updates with iMod. *)
   Global Instance elim_mod_aupd φ Eo Ei E α β Φ Q Q' :
-    (∀ R, ElimModal φ false false (|={E,Ei}=> R) R Q Q') →
-    ElimModal (φ ∧ Eo ⊆ E) false false
+    (∀ R, ElimModal φ false false modality_id (|={E,Ei}=> R) R Q Q') →
+    ElimModal (φ ∧ Eo ⊆ E) false false modality_id
               (atomic_update Eo Ei α β Φ)
               (∃.. x, α x ∗
                        (α x ={Ei,E}=∗ atomic_update Eo Ei α β Φ) ∧
@@ -324,8 +324,8 @@ Section lemmas.
   accessors can eliminate as well.  This is a forwarding instance needed because
   atomic_acc is becoming opaque. *)
   Global Instance elim_modal_acc p q φ P P' Eo Ei α Pas β Φ :
-    (∀ Q, ElimModal φ p q P P' (|={Eo,Ei}=> Q) (|={Eo,Ei}=> Q)) →
-    ElimModal φ p q P P'
+    (∀ Q, ElimModal φ p q modality_id P P' (|={Eo,Ei}=> Q) (|={Eo,Ei}=> Q)) →
+    ElimModal φ p q modality_id P P'
               (atomic_acc Eo Ei α Pas β Φ)
               (atomic_acc Eo Ei α Pas β Φ).
   Proof. intros Helim. apply Helim. Qed.

@@ -2785,3 +2785,108 @@ Section FrameDisjUnion.
     solve [iFrame].
   Qed.
 End FrameDisjUnion.
+
+Section iMod_tests.
+  Context {SI : sidx} {PROP : bi}.
+  Implicit Types P Q : PROP.
+
+  (** In the three tests below, we can only eliminate [M] in the context, when
+  [Mctx] can be introduced in the goal. The modality [Mctx] can only be introduced
+  when both the intuitionistic and spatial context are empty. We first test
+  that when both contexts are empty, [iMod] succeeds. We then test that if
+  either context is non-empty, [iMod] gives the right error. *)
+  Lemma test_iMod_MIEnvIsEmpty_succ
+      (M : modality PROP PROP) (Mctx : PROP → PROP)
+      {modality_Mctx_mixin : modality_mixin Mctx MIEnvIsEmpty MIEnvIsEmpty}
+      `{!∀ p P Q,
+        ElimModal True p false (Modality Mctx modality_Mctx_mixin) (M P) P (M Q) (M Q)}
+      (P Q : PROP) :
+    (P ⊢ M Q) → M P ⊢ M Q.
+  Proof. iIntros (HPQ) "HP". iMod "HP". by iApply HPQ. Qed.
+
+  Check "test_iMod_intuitionistic_MIEnvIsEmpty_fail".
+  Lemma test_iMod_MIEnvIsEmpty_fail
+      (M : modality PROP PROP) (Mctx : PROP → PROP)
+      {modality_Mctx_mixin : modality_mixin Mctx MIEnvIsEmpty MIEnvIsEmpty}
+      `{!∀ p P Q,
+        ElimModal True p false (Modality Mctx modality_Mctx_mixin) (M P) P (M Q) (M Q)}
+      (P Q : PROP) :
+    □ (P -∗ M Q) ∗ M P ⊢ M Q.
+  Proof. iIntros "[#HPQ HP]". Fail iMod "HP". Abort.
+
+  Check "test_iMod_spatial_MIEnvIsEmpty_fail".
+  Lemma test_iMod_spatial_MIEnvIsEmpty_fail
+      (M : modality PROP PROP) (Mctx : PROP → PROP)
+      {modality_Mctx_mixin : modality_mixin Mctx MIEnvIsEmpty MIEnvIsEmpty}
+      `{!∀ p P Q,
+        ElimModal True p false (Modality Mctx modality_Mctx_mixin) (M P) P (M Q) (M Q)}
+      (P Q : PROP) :
+    (P -∗ M Q) ∗ M P ⊢ M Q.
+  Proof. iIntros "[HPQ HP]". Fail iMod "HP". Abort.
+
+  (** In the three tests below, we can only eliminate [M] in the context, when
+  [Mctx] can be introduced in the goal. The modality [Mctx] can only be introduced
+  when the intuitionistic and spatial context is [Timeless]. We first test
+  that when both contexts are [Timeless], [iMod] succeeds. We then test that if
+  either context is not [Timeless], [iMod] gives the right error. *)
+  Lemma test_iMod_MIEnvForall_succ
+      (M : modality PROP PROP) (Mctx : PROP → PROP)
+      {modality_Mctx_mixin : modality_mixin Mctx
+                            (MIEnvForall Timeless) (MIEnvForall Timeless)}
+      `{!∀ p P Q,
+        ElimModal True p false (Modality Mctx modality_Mctx_mixin) (M P) P (M Q) (M Q)}
+      (P Q R1 R2 : PROP) `{!Timeless R1, !Timeless R2} :
+    (P ∗ R1 ∗ R2 ⊢ M Q) → M P ∗ □ R1 ∗ R2 ⊢ M Q.
+  Proof. iIntros (HPQ) "(HP & #HR1 & HR2)". iMod "HP". iApply HPQ. by iFrame. Qed.
+
+  Check "test_iMod_intuitionistic_MIEnvForall_fail".
+  Lemma test_iMod_intuitionistic_MIEnvForall_fail
+      (M : modality PROP PROP) (Mctx : PROP → PROP)
+      {modality_Mctx_mixin : modality_mixin Mctx
+                            (MIEnvForall Timeless) (MIEnvForall Timeless)}
+      `{!∀ p P Q,
+        ElimModal True p false (Modality Mctx modality_Mctx_mixin) (M P) P (M Q) (M Q)}
+      (P Q R1 R2 : PROP) `{!Timeless R2} :
+    (P ∗ R1 ∗ R2 ⊢ M Q) → M P ∗ □ R1 ∗ R2 ⊢ M Q.
+  Proof. iIntros (HPQ) "(HP & #HR1 & HR2)". Fail iMod "HP". Abort.
+
+  Check "test_iMod_spatial_MIEnvForall_fail".
+  Lemma test_iMod_spatial_MIEnvForall_fail
+      (M : modality PROP PROP) (Mctx : PROP → PROP)
+      {modality_Mctx_mixin : modality_mixin Mctx
+                            (MIEnvForall Timeless) (MIEnvForall Timeless)}
+      `{!∀ p P Q,
+        ElimModal True p false (Modality Mctx modality_Mctx_mixin) (M P) P (M Q) (M Q)}
+      (P Q R1 R2 : PROP) `{!Timeless R1} :
+    (P ∗ R1 ∗ R2 ⊢ M Q) → M P ∗ □ R1 ∗ R2 ⊢ M Q.
+  Proof. iIntros (HPQ) "(HP & #HR1 & HR2)". Fail iMod "HP". Abort.
+
+  Class C (P Q : PROP) := c : P ⊢ Q.
+  Instance C_id P : C P P.
+  Proof. rewrite /C. done. Qed.
+  Lemma test_iMod_MIEnvTransform_succ
+      (M : modality PROP PROP) (Mctx : PROP → PROP)
+      {modality_Mctx_mixin : modality_mixin Mctx
+                            (MIEnvTransform C) (MIEnvTransform C)}
+      `{!∀ p P Q,
+        ElimModal True p false (Modality Mctx modality_Mctx_mixin) (M P) P (M Q) (M Q)}
+      (P Q R1 R2 : PROP) `{!Timeless R1, !Timeless R2} :
+    (P ∗ R1 ∗ R2 ⊢ M Q) → M P ∗ □ R1 ∗ R2 ⊢ M Q.
+  Proof.
+    iIntros (HPQ) "(HP & #HR1 & HR2)".
+    iMod "HP". iApply HPQ. by iFrame.
+  Qed.
+
+  Check "test_iMod_MIEnvTransform_fail".
+  Lemma test_iMod_MIEnvTransform_fail
+      (M : modality PROP PROP) (Mctx : PROP → PROP)
+      (C : PROP → PROP → Prop)
+      {modality_Mctx_mixin : modality_mixin Mctx
+                            (MIEnvTransform C) (MIEnvTransform C)}
+      `{!∀ p P Q,
+        ElimModal True p false (Modality Mctx modality_Mctx_mixin) (M P) P (M Q) (M Q)}
+      (P Q R1 R2 : PROP) `{!Timeless R1, !Timeless R2} :
+    (P ∗ R1 ∗ R2 ⊢ M Q) → M P ∗ □ R1 ∗ R2 ⊢ M Q.
+  Proof. iIntros (HPQ) "(HP & #HR1 & HR2)". Fail iMod "HP". Abort.
+
+End iMod_tests.
