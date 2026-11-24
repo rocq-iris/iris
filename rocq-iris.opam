@@ -30,7 +30,7 @@ depends: [
   "rocq-core" { (>= "9.0" & < "9.4~") | (= "dev") }
   "rocq-stdlib" { (>= "9.0") | (= "dev") }
   "rocq-stdpp" { (= "dev.2026-11-18.1.b4dc05b6") | (= "dev") }
-  "rocq-elpi" { (>= "3") }
+  "rocq-elpi" { (>= "3" & < "3.7") | (= "dev") } (* 3.7 breaks building with Rocq 9.0 *)
 ]
 conflicts: [
   "coq-iris"
