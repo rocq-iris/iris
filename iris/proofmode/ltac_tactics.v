@@ -1460,13 +1460,27 @@ Tactic Notation "iNext" "credit:" constr(H) := iNext 1 credit: H.
 
 (** * Update modality *)
 Tactic Notation "iModCore" constr(H) "as" constr(H') :=
-  notypeclasses refine (tac_modal_elim _ H H' _ _ _ _ _ _ _ _ _ _ _);
+  notypeclasses refine (tac_modal_elim _ _ _ _ _ _ H H' _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _);
     [pm_reflexivity || fail "iMod:" H "not found"
     |tc_solve ||
-     let P := match goal with |- ElimModal _ _ _ ?P _ _ _ => P end in
-     let Q := match goal with |- ElimModal _ _ _ _ _ ?Q _ => Q end in
+     let P := match goal with |- ElimModal _ _ _ _ ?P _ _ _ => P end in
+     let Q := match goal with |- ElimModal _ _ _ _ _ _ ?Q _ => Q end in
      fail "iMod: cannot eliminate modality" P "in" Q
     |iSolveSideCondition
+    |tc_solve ||
+     let s := lazymatch goal with |- IntoModalIntuitionisticEnv _ _ _ ?s => s end in
+     lazymatch eval hnf in s with
+     | MIEnvForall ?C => fail "iMod: intuitionistic context does not satisfy" C
+     | MIEnvIsEmpty => fail "iMod: intuitionistic context is non-empty"
+     end
+    |tc_solve ||
+     let s := lazymatch goal with |- IntoModalSpatialEnv _ _ _ ?s _ => s end in
+     lazymatch eval hnf in s with
+     | MIEnvForall ?C => fail "iMod: spatial context does not satisfy" C
+     | MIEnvIsEmpty => fail "iMod: spatial context is non-empty"
+     end
+    |pm_reduce; tc_solve ||
+     fail "iMod: cannot filter spatial context when goal is not absorbing"
     |pm_reduce;
      lazymatch goal with
      | |- False =>

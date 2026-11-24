@@ -78,7 +78,8 @@ Module savedprop. Section savedprop.
 
   Global Instance bupd_mono' : Proper ((⊢) ==> (⊢)) bupd.
   Proof. intros P Q ?. by apply bupd_mono. Qed.
-  Global Instance elim_modal_bupd p P Q : ElimModal True p false (|==> P) P (|==> Q) (|==> Q).
+  Global Instance elim_modal_bupd p P Q :
+    ElimModal True p false modality_id (|==> P) P (|==> Q) (|==> Q).
   Proof.
     by rewrite /ElimModal bi.intuitionistically_if_elim
       bupd_frame_r bi.wand_elim_r bupd_trans.
@@ -164,14 +165,14 @@ Module inv. Section inv.
   Proof. by rewrite comm fupd_frame_l comm. Qed.
 
   Global Instance elim_fupd_fupd p E P Q :
-    ElimModal True p false (fupd E P) P (fupd E Q) (fupd E Q).
+    ElimModal True p false modality_id (fupd E P) P (fupd E Q) (fupd E Q).
   Proof.
     by rewrite /ElimModal bi.intuitionistically_if_elim
       fupd_frame_r bi.wand_elim_r fupd_fupd.
   Qed.
 
   Global Instance elim_fupd0_fupd1 p P Q :
-    ElimModal True p false (fupd M0 P) P (fupd M1 Q) (fupd M1 Q).
+    ElimModal True p false modality_id (fupd M0 P) P (fupd M1 Q) (fupd M1 Q).
   Proof.
     by rewrite /ElimModal bi.intuitionistically_if_elim
       fupd_frame_r bi.wand_elim_r fupd_mask_mono fupd_fupd.
@@ -408,7 +409,8 @@ Module linear. Section linear.
   Proof. by rewrite comm fupd_frame_l comm. Qed.
 
   Global Instance elim_fupd_fupd p E1 E2 E3 P Q :
-    ElimModal True p false (fupd E1 E2 P) P (fupd E1 E3 Q) (fupd E2 E3 Q).
+    ElimModal True p false modality_id
+      (fupd E1 E2 P) P (fupd E1 E3 Q) (fupd E2 E3 Q).
   Proof.
     by rewrite /ElimModal bi.intuitionistically_if_elim
       fupd_frame_r bi.wand_elim_r fupd_fupd.

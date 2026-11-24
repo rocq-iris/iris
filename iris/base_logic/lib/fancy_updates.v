@@ -322,13 +322,14 @@ Section fupd_finally.
   Qed.
 
   Global Instance elim_modal_bupd_fupd_finally p E P Q :
-    ElimModal True p false (|==> P) P (|={E|}■=> Q) (|={E|}■=> Q).
+    ElimModal True p false modality_id (|==> P) P (|={E|}■=> Q) (|={E|}■=> Q).
   Proof.
     rewrite /ElimModal intuitionistically_if_elim /= bupd_frame_r wand_elim_r.
     by rewrite (bupd_fupd E) fupd_fupd_finally.
   Qed.
   Global Instance elim_modal_fupd_fupd_finally p E1 E2 P Q :
-    ElimModal True p false (|={E1,E2}=> P) P (|={E1|}■=> Q) (|={E2|}■=> Q).
+    ElimModal True p false modality_id
+      (|={E1,E2}=> P) P (|={E1|}■=> Q) (|={E2|}■=> Q).
   Proof.
     rewrite /ElimModal intuitionistically_if_elim /= fupd_frame_r wand_elim_r.
     by rewrite fupd_fupd_finally.

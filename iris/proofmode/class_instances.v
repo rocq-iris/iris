@@ -1100,28 +1100,32 @@ Global Instance from_forall_persistently `{!BiPersistentlyForall PROP}
 Proof. rewrite /FromForall=> <-. by rewrite persistently_forall. Qed.
 
 (** ElimModal *)
+(** The wand instances are specialized to [modality_id]. They do not hold for
+arbitrary [Mctx] since [R ⊢ Mctx R] might not hold, for example, we do not have
+[R ⊢ <obj> R]. *)
 Global Instance elim_modal_wand φ p p' P P' Q Q' R :
-  ElimModal φ p p' P P' Q Q' → ElimModal φ p p' P P' (R -∗ Q) (R -∗ Q').
+  ElimModal φ p p' modality_id P P' Q Q' →
+  ElimModal φ p p' modality_id P P' (R -∗ Q) (R -∗ Q').
 Proof.
   rewrite /ElimModal=> H Hφ. apply wand_intro_r.
   rewrite wand_curry -assoc (comm _ (□?p' _)%I) -wand_curry wand_elim_l; auto.
 Qed.
 Global Instance elim_modal_wandM φ p p' P P' Q Q' mR :
-  ElimModal φ p p' P P' Q Q' →
-  ElimModal φ p p' P P' (mR -∗? Q) (mR -∗? Q').
+  ElimModal φ p p' modality_id P P' Q Q' →
+  ElimModal φ p p' modality_id P P' (mR -∗? Q) (mR -∗? Q').
 Proof. rewrite /ElimModal !wandM_sound. exact: elim_modal_wand. Qed.
-Global Instance elim_modal_forall {A} φ p p' P P' (Φ Ψ : A → PROP) :
-  (∀ x, ElimModal φ p p' P P' (Φ x) (Ψ x)) →
-  ElimModal φ p p' P P' (∀ x, Φ x) (∀ x, Ψ x).
+Global Instance elim_modal_forall Mctx {A} φ p p' P P' (Φ Ψ : A → PROP) :
+  (∀ x, ElimModal φ p p' Mctx P P' (Φ x) (Ψ x)) →
+  ElimModal φ p p' Mctx P P' (∀ x, Φ x) (∀ x, Ψ x).
 Proof.
   rewrite /ElimModal=> H ?. apply forall_intro=> a. rewrite (forall_elim a); auto.
 Qed.
-Global Instance elim_modal_tforall {TT : tele} φ p p' P P' (Φ Ψ : TT → PROP) :
-  (∀ x, ElimModal φ p p' P P' (Φ x) (Ψ x)) →
-  ElimModal φ p p' P P' (∀.. x, Φ x) (∀.. x, Ψ x).
+Global Instance elim_modal_tforall {TT : tele} Mctx φ p p' P P' (Φ Ψ : TT → PROP) :
+  (∀ x, ElimModal φ p p' Mctx P P' (Φ x) (Ψ x)) →
+  ElimModal φ p p' Mctx P P' (∀.. x, Φ x) (∀.. x, Ψ x).
 Proof. rewrite /ElimModal !bi_tforall_forall. apply elim_modal_forall. Qed.
 Global Instance elim_modal_absorbingly_here p P Q :
-  Absorbing Q → ElimModal True p false (<absorb> P) P Q Q.
+  Absorbing Q → ElimModal True p false modality_id (<absorb> P) P Q Q.
 Proof.
   rewrite /ElimModal=> ? _. by rewrite intuitionistically_if_elim
     absorbingly_sep_l wand_elim_r absorbing_absorbingly.
@@ -1166,7 +1170,7 @@ goal to the user. *)
 Global Instance elim_inv_acc_with_close {X : Type}
     φ1 φ2 Pinv Pin (M1 M2 : PROP → PROP) α β mγ Q Q' :
   IntoAcc Pinv φ1 Pin M1 M2 α β mγ →
-  (∀ R, ElimModal φ2 false false (M1 R) R Q Q') →
+  (∀ R, ElimModal φ2 false false modality_id (M1 R) R Q Q') →
   ElimInv (X:=X) (φ1 ∧ φ2) Pinv Pin
           α
           (Some (λ x, β x -∗ M2 (pm_default emp (mγ x))))%I

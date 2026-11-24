@@ -105,6 +105,16 @@ Iris now depends on rocq-elpi (version 3).
 * Make the Iris Proof Mode (everything in the `proofmode` folder, with the
   exception of `monPred`) parametric in the type of "step indices" to prepare
   for the support of transfinite step indexing. (by Simon Spies)
+* Extended `ElimModal` to enable updating the proof context during modality
+  elimination, implement with the help of another modality `Mctx`.
+  This permits `iMod` on modalities that require updating the context when
+  eliminated. One such modality is `<subj>` where upon elimination, any resources not
+  guarded by modalities `<subj>` or `<obj>` must be discarded, corresponding to
+  modality introduction of `Mctx := <obj>`.
+  To achieve this, `ElimModal` typeclass instances for a modality `M`
+  may pick an `Mctx` and satisfy `Mctx (P -∗ Q) -∗ M P -∗ M Q`
+  (previously: `(P -∗ Q) -∗ M P -∗ M Q`, which is
+  recoverable by choosing `Mctx := modality_id`).
 
 **Changes in `base_logic`:**
 

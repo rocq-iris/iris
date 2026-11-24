@@ -96,6 +96,82 @@ Section tests.
     □ P -∗ ⎡◇ 𝓟⎤ -∗ ⎡◇ 𝓠⎤ -∗ ⎡ ◇ (𝓟 ∗ 𝓠) ⎤.
   Proof. iIntros "#H1 H2 H3". iModIntro ⎡ _ ⎤%I. by iSplitL "H2". Qed.
 
+  Check "test_iMod_subjectively".
+  Lemma test_iMod_subjectively P Q R R' `{!Affine P, !Affine R, !Objective R'} :
+    <subj> P -∗ <subj> Q -∗ R -∗ R' -∗ <subj> (Q ∗ R').
+  Proof.
+    iIntros "HP HQ HR HR'".
+    iMod "HP". (* removes [R] because it is not objective, which succeeds
+    because [R] is affine. *)
+    Show.
+    iMod "HQ". (* removes [P] because it is not objective, which succeeds
+    because [P] is affine. *)
+    Show.
+    iModIntro. iFrame.
+  Qed.
+
+  Check "test_iMod_subjectively_absorbing".
+  Lemma test_iMod_subjectively_absorbing P Q R R' `{!Objective R'} :
+    <subj> P -∗ <subj> Q -∗ R -∗ R' -∗ <subj> (Q ∗ R' ∗ True).
+  Proof.
+    iIntros "HP HQ HR HR'".
+    iMod "HP". (* removes [R] because it is not objective, which succeeds
+    because the goal is absorbing (due to [∗ True]). *)
+    Show.
+    iMod "HQ". (* removes [P] because it is not objective, which succeeds
+    because the goal is absorbing (due to [∗ True]). *)
+    iModIntro. iFrame.
+  Qed.
+
+  Check "test_iMod_subjectively_absorbing_fail".
+  Lemma test_iMod_subjectively_absorbing_fail P Q R R' `{!Objective R'} :
+    <subj> P -∗ <subj> Q -∗ R -∗ R' -∗ <subj> (Q ∗ R').
+  Proof.
+    iIntros "HP HQ HR HR'".
+    Fail iMod "HP". (* needs to remove [R] because it is not objective, which
+    fails because the neither [R] is affine nor the goal is absorbing. *)
+  Abort.
+
+  Check "test_iMod_subjectively_BiPersistentlyExist".
+  Lemma test_iMod_subjectively_BiPersistentlyExist `{!BiPersistentlyExist PROP}
+      P R' `{!Objective R'} :
+    □ <subj> P -∗ R' -∗ <subj> R'.
+  Proof.
+    iIntros "#HP HR'".
+    iMod "HP". (* should keep [HP] in the intuitionistic context. *)
+    Show.
+    done.
+  Qed.
+
+  Check "test_iMod_subjectively_not_BiPersistentlyExist".
+  Lemma test_iMod_subjectively_not_BiPersistentlyExist
+      P R' `{!Affine P, !Objective R'} :
+    □ <subj> P -∗ R' -∗ <subj> R'.
+  Proof.
+    iIntros "#HP HR'".
+    iMod "HP". (* should move [HP] to the spatial context due to the absense
+    of [BiPersistentlyExist]. *)
+    Show.
+    done.
+  Qed.
+
+  (** Same as [test_iMod_subjectively] above, but now with the modality below a
+  [∀] in the goal. This test relies on the instance [elim_modal_forall] being
+  generic in [Mctx]. *)
+  Check "test_iMod_forall_subjectively".
+  Lemma test_iMod_forall_subjectively P Q R R' `{!Affine P, !Affine R, !Objective R'} :
+    <subj> P -∗ <subj> Q -∗ R -∗ R' -∗ ∀ x : nat, <subj> (⌜ x = x ⌝ ∗ Q ∗ R').
+  Proof.
+    iIntros "HP HQ HR HR'".
+    iMod "HP". (* removes [R] because it is not objective, which succeeds
+    because [R] is affine. *)
+    Show.
+    iMod "HQ". (* removes [P] because it is not objective, which succeeds
+    because [P] is affine. *)
+    Show.
+    iIntros. iModIntro. iFrame. done.
+  Qed.
+
   Lemma test_into_wand_embed 𝓟 𝓠 :
     (𝓟 -∗ ◇ 𝓠) →
     ⎡𝓟⎤ ⊢@{monPredI} ◇ ⎡𝓠⎤.

@@ -1640,3 +1640,23 @@ Tactic failure: iInduction: cannot import IH
       P t)
    l)
 into proof mode context (IntoIH instance missing).
+"test_iMod_intuitionistic_MIEnvIsEmpty_fail"
+     : string
+The command has indeed failed with message:
+Tactic failure: iMod: intuitionistic context is non-empty.
+"test_iMod_spatial_MIEnvIsEmpty_fail"
+     : string
+The command has indeed failed with message:
+Tactic failure: iMod: spatial context is non-empty.
+"test_iMod_intuitionistic_MIEnvForall_fail"
+     : string
+The command has indeed failed with message:
+Tactic failure: iMod: intuitionistic context does not satisfy Timeless.
+"test_iMod_spatial_MIEnvForall_fail"
+     : string
+The command has indeed failed with message:
+Tactic failure: iMod: spatial context does not satisfy Timeless.
+"test_iMod_MIEnvTransform_fail"
+     : string
+The command has indeed failed with message:
+Tactic failure: iMod: cannot filter spatial context when goal is not absorbing.

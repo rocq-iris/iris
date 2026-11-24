@@ -324,9 +324,12 @@ Global Arguments CombineSepGives {_ _} _%_I _%_I _%_I : simpl never.
 Global Arguments combine_sep_gives {_ _} _%_I _%_I _%_I {_}.
 Global Hint Mode CombineSepGives - + ! ! - : typeclass_instances.
 
-(** The [ElimModal φ p p' P P' Q Q'] class is used by the [iMod] tactic.
+(** The [ElimModal φ p p' Mctx P P' Q Q'] class is used by the [iMod] tactic.
 
 The inputs are [p], [P] and [Q], and the outputs are [φ], [p'], [P'] and [Q'].
+The modality being eliminated is implicitly present in those propositions.
+The helper modality [Mctx] updates the remaining proof context via its modality
+introduction laws, clarified below.
 
 The class is used to transform a hypothesis [P] into a hypothesis [P'], given
 a goal [Q], which is simultaneously transformed into [Q']. The Booleans [p]
@@ -336,19 +339,34 @@ express a side-condition that [iMod] will generate (if not [True]).
 
 An example instance is:
 
-  ElimModal True p false (|={E1,E2}=> P) P (|={E1,E3}=> Q) (|={E2,E3}=> Q).
+  ElimModal True p false modality_id (|={E1,E2}=> P) P (|={E1,E3}=> Q) (|={E2,E3}=> Q).
 
 This instance expresses that to eliminate [|={E1,E2}=> P] the goal is
 transformed from [|={E1,E3}=> Q] into [|={E2,E3}=> Q], and the resulting
 hypothesis is moved into the spatial context (regardless of where it was
 originally). A corresponding [ElimModal] instance for the Iris 1/2-style update
-modality, would have a side-condition [φ] on the masks. *)
-Class ElimModal {SI : sidx} {PROP : bi}
-    (φ : Prop) (p p' : bool) (P P' : PROP) (Q Q' : PROP) :=
-  elim_modal : φ → □?p P ∗ (□?p' P' -∗ Q') ⊢ Q.
-Global Arguments ElimModal {_ _} _ _ _ _%_I _%_I _%_I _%_I : simpl never.
-Global Arguments elim_modal {_ _} _ _ _ _%_I _%_I _%_I _%_I {_}.
-Global Hint Mode ElimModal - + - ! - ! - ! - : typeclass_instances.
+modality, would have a side-condition [φ] on the masks.
+Choosing [Mctx] as [modality_id] leaves the proof context unchanged.
+
+In certain cases, modality elimination requires updating the proof context,
+which is done in terms of the introduction laws of another modality [Mctx].
+An example of this is the [<subj>] modality, for which elimination requires
+removing all resources not guarded by either [<subj>] or [<obj>].
+This behavior is reflected in the introduction laws of [<obj>].
+The [ElimModal] instance for [<subj>] is:
+
+  ElimModal True p q modality_objectively (<subj> P) P (<subj> Q) (<subj> Q).
+
+The intuition is that modality elimination of [<subj>] takes a goal
+[(<subj> P) ∗ R ⊢ <subj> Q], turns it into [R ⊢ <obj> (P -∗ <subj> Q)],
+and then introduces [<obj>], removing any incompatible resources from [R].
+*)
+Class ElimModal {SI : sidx} {PROP : bi} (φ : Prop) (p p' : bool)
+    (M : modality PROP PROP) (P P' : PROP) (Q Q' : PROP) :=
+  elim_modal : φ → □?p P ∗ M (□?p' P' -∗ Q') ⊢ Q.
+Global Arguments ElimModal {_ _} _ _ _ _ _%_I _%_I _%_I _%_I : simpl never.
+Global Arguments elim_modal {_ _} _ _ _ _ _%_I _%_I _%_I _%_I {_}.
+Global Hint Mode ElimModal - + - ! - - ! - ! - : typeclass_instances.
 
 (* Used by the specialization pattern [ > ] in [iSpecialize] and [iAssert] to
 add a modality to the goal corresponding to a premise/asserted proposition. *)
@@ -706,8 +724,9 @@ Global Instance from_modal_tc_opaque {SI : sidx} {PROP1 PROP2 : bi} {A}
     φ M (sel : A) (P : PROP2) (Q : PROP1) :
   FromModal φ M sel P Q → FromModal φ M sel (tc_opaque P) Q := id.
 Global Instance elim_modal_tc_opaque {SI : sidx} {PROP : bi}
-    φ p p' (P P' Q Q' : PROP) :
-  ElimModal φ p p' P P' Q Q' → ElimModal φ p p' (tc_opaque P) P' Q Q' := id.
+    φ p p' Mctx (P P' Q Q' : PROP) :
+  ElimModal φ p p' Mctx P P' Q Q' →
+  ElimModal φ p p' Mctx (tc_opaque P) P' Q Q' := id.
 Global Instance into_inv_tc_opaque {SI : sidx} {PROP : bi} (P : PROP) N :
   IntoInv P N → IntoInv (tc_opaque P) N := id.
 Global Instance elim_inv_tc_opaque {SI : sidx} {PROP : bi} {X}
