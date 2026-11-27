@@ -240,6 +240,11 @@ s/\bcoq_tactics\b/rocq_tactics/g
 # later succ
 s/\blater_laterN\b/laterN_succ_l/g
 s/\blaterN_later\b/laterN_succ_r/g
+# Transfinite BIs
+# Might need further manual adjustment: new lemmas also fold the only-0 and 
+# except-0 modalities
+s/\bbi.later_exist_false\b/bi.later_exist_except_0/g
+s/\bbi.later_false_em\b/bi.later_except_0_only_0`
 EOF
 ```
 
