@@ -295,6 +295,9 @@ Proof. by intros ->. Qed.
 Lemma except_0_idemp P : ◇ ◇ P ⊣⊢ ◇ P.
 Proof. apply (anti_symm _); rewrite /bi_except_0; auto. Qed.
 
+Lemma later_except_0_only_0 P : ▷ P ⊢ ◇ <only0> P.
+Proof. apply later_except_0_only_0_internal. Qed.
+
 Lemma except_0_True : ◇ True ⊣⊢ True.
 Proof. rewrite /bi_except_0. apply (anti_symm _); auto. Qed.
 Lemma except_0_emp `{!BiAffine PROP} : ◇ emp ⊣⊢ emp.
@@ -319,7 +322,7 @@ Proof.
   trans (▷ (∀ a : A, Φ a) ∧ (∀ a : A, ◇ Φ a))%I.
   { apply and_intro, reflexivity. rewrite later_forall. apply forall_mono=> a.
     apply or_elim; auto using later_intro. }
-  rewrite later_except_0_only_0_internal and_or_r. apply or_elim.
+  rewrite later_except_0_only_0 /bi_only_0 and_or_r. apply or_elim.
   { rewrite and_elim_l. apply or_intro_l. }
   apply or_intro_r', forall_intro=> a. rewrite !(forall_elim a).
   by rewrite and_or_l impl_elim_l and_elim_r idemp.
@@ -403,9 +406,6 @@ Proof.
   - apply and_intro; [apply only_0_intro|apply except_0_intro].
 Qed.
 
-Lemma later_except_0_only_0 P : ▷ P ⊢ ◇ <only0> P.
-Proof. apply later_except_0_only_0_internal. Qed.
-
 Lemma only_0_forall {A} (Φ : A → PROP) : <only0> (∀ a, Φ a) ⊣⊢ ∀ a, <only0> Φ a.
 Proof.
   apply (anti_symm _).
@@ -417,10 +417,14 @@ Qed.
 Lemma only_0_and P Q : <only0> (P ∧ Q) ⊣⊢ <only0> P ∧ <only0> Q.
 Proof. rewrite !and_alt only_0_forall. by f_equiv=> -[]. Qed.
 
+Lemma only_0_exist_1 {A} (Φ : A → PROP) :
+  <only0> (∃ x, Φ x) ⊢ ∃ x, <only0> Φ x.
+Proof. apply only_0_exist_1_internal. Qed.
+
 Lemma only_0_exist {A} (Φ : A → PROP) :
   <only0> (∃ x, Φ x) ⊣⊢ ∃ x, <only0> Φ x.
 Proof.
-  apply (anti_symm _); [apply only_0_exist_1_internal|].
+  apply (anti_symm _); [apply only_0_exist_1|].
   apply exist_elim=> x. by rewrite -(exist_intro x).
 Qed.
 
@@ -450,9 +454,12 @@ Lemma only_0_emp `{!Timeless (PROP:=PROP) emp} :
   <only0> emp ⊣⊢@{PROP} emp.
 Proof. by apply (anti_symm _), only_0_intro. Qed.
 
-Lemma only_0_sep P Q :  <only0> (P ∗ Q) ⊣⊢ <only0> P ∗ <only0> Q.
+Lemma only_0_sep_1 P Q : <only0> (P ∗ Q) ⊢ <only0> P ∗ <only0> Q.
+Proof. apply only_0_sep_1_internal. Qed.
+
+Lemma only_0_sep P Q : <only0> (P ∗ Q) ⊣⊢ <only0> P ∗ <only0> Q.
 Proof.
-  apply (anti_symm _); [by apply only_0_sep_1_internal|].
+  apply (anti_symm _); [by apply only_0_sep_1|].
   apply impl_intro_l. rewrite persistent_and_affinely_sep_l.
   rewrite (persistent_sep_dup (<affine> ▷ False)%I).
   rewrite -!assoc (assoc _ _ (<only0> P)%I) (assoc _ (<affine> _)%I).
