@@ -432,7 +432,7 @@ Global Instance maybe_frame_default {SI : sidx} {PROP : bi} (R P : PROP) :
 Proof. intros. rewrite /MaybeFrame' /=. apply: sep_elim_r. Qed.
 
 (* We never want to backtrack on instances of [MaybeFrame']. We provide
-a notation for [MaybeFrame'] wrapped in the [TCNoBackTrack] construct.
+an abbreviation for [MaybeFrame'] wrapped in the [TCNoBackTrack] construct.
 For more details, see also iris!989 and the [frame_and] and [frame_or_spatial]
 instances in [class_instances_frame.v] *)
 Abbreviation MaybeFrame p R P Q progress :=

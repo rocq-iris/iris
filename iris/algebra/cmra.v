@@ -92,7 +92,7 @@ Structure cmra {SI : sidx} := Cmra' {
   cmra_mixin : CmraMixin cmra_car;
 }.
 Global Arguments Cmra' {_} _ {_ _ _ _ _ _} _ _.
-(* Given [m : CmraMixin A], the notation [Cmra A m] provides a smart
+(* Given [m : CmraMixin A], the abbreviation [Cmra A m] provides a smart
 constructor, which uses [ofe_mixin_of A] to infer the canonical OFE mixin of
 the type [A], so that it does not have to be given manually. *)
 Abbreviation Cmra A m := (Cmra' A (ofe_mixin_of A%type) m) (only parsing).

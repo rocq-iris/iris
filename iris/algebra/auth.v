@@ -54,7 +54,7 @@ Proof.
 Qed.
 
 (** * Definition and operations on the authoritative camera *)
-(** The type [auth] is not defined as a [Definition], but as a [Notation].
+(** The type [auth] is not defined as a [Definition], but as an [Abbreviation].
 This way, one can use [auth A] with [A : Type] instead of [A : ucmra], and let
 canonical structure search determine the corresponding camera instance. *)
 Abbreviation auth A := (view (A:=A) (B:=A) auth_view_rel_raw).
