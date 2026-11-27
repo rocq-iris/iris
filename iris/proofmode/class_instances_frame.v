@@ -298,6 +298,7 @@ We want to infer these as follows. On a goal [Frame p R (∃ a, Φ a) _]:
 Inductive GatherEvarsEq {A} (x : A) : A → Prop := 
   GatherEvarsEq_refl : GatherEvarsEq x x.
 Existing Class GatherEvarsEq.
+Scheme Rewriting for GatherEvarsEq.
 (** The goal [GatherEvarsEq a (?g c)] with [a : A] and [g : ?C → A] is solved
 in the way described above. This is done by tactic [solve_gather_evars_eq],
 given at the end of this section, with an accompanying [Hint Extern]. *)
@@ -334,6 +335,7 @@ Inductive TCCbnTele {A} (x : A) : A → Prop :=
   TCCbnTele_refl : TCCbnTele x x.
 Existing Class TCCbnTele.
 Global Hint Mode TCCbnTele ! - - : typeclass_instances.
+Scheme Rewriting for TCCbnTele.
 
 (* We include a dependency on [FrameInstantiateExistEnabled] so as to disable
 this instance when framing beneath [∀], [-∗] and [→] *)

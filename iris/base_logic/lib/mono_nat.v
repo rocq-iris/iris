@@ -45,7 +45,7 @@ Notation "γ ↪◯MN n" := (mono_nat_lb_own γ n)
 
 (* Compatibility alias. Do not use for new code.
 This will eventually be deprecated and removed. *)
-Notation mono_nat_auth_own_frac γ q n :=
+Abbreviation mono_nat_auth_own_frac γ q n :=
   (mono_nat_auth_own γ (DfracOwn q) n) (only parsing).
 
 Local Ltac unseal := rewrite

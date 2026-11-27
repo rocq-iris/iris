@@ -57,7 +57,7 @@ Qed.
 (** The type [auth] is not defined as a [Definition], but as a [Notation].
 This way, one can use [auth A] with [A : Type] instead of [A : ucmra], and let
 canonical structure search determine the corresponding camera instance. *)
-Notation auth A := (view (A:=A) (B:=A) auth_view_rel_raw).
+Abbreviation auth A := (view (A:=A) (B:=A) auth_view_rel_raw).
 Definition authO {SI : sidx} (A : ucmra) : ofe :=
   viewO (A:=A) (B:=A) auth_view_rel.
 Definition authR {SI : sidx} (A : ucmra) : cmra :=

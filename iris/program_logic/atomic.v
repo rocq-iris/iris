@@ -258,7 +258,7 @@ Notation "'<<{' α '}>>' e @ E '<<{' β '|' 'RET' v '}>>'" :=
 (** Theory *)
 Section lemmas.
   Context `{!irisGS_gen hlc Λ Σ} {TA TB TP : tele}.
-  Notation iProp := (iProp Σ).
+  Abbreviation iProp := (iProp Σ).
   Implicit Types (α : TA → iProp) (β : TA → TB → iProp) (POST : TA → TB → TP → option iProp) (f : TA → TB → TP → val Λ).
 
   (* Atomic triples imply sequential triples. *)

@@ -47,7 +47,7 @@ Class irisGS_gen (hlc : has_lc) (Λ : language) (Σ : gFunctors) := IrisG {
 Global Opaque iris_invGS.
 Global Arguments IrisG {hlc Λ Σ}.
 
-Notation irisGS := (irisGS_gen HasLc).
+Abbreviation irisGS := (irisGS_gen HasLc).
 
 (** The predicate we take the fixpoint of in order to define the WP. *)
 (** In the step case, we both provide [S (num_laters_per_step ns)]

@@ -81,7 +81,7 @@ Global Hint Mode BiEmbedSbi - ! - - - - : typeclass_instances.
 
 Section embed_laws.
   Context {SI : sidx} {PROP1 PROP2 : bi} `{!BiEmbed PROP1 PROP2}.
-  Local Notation embed := (embed (A:=bi_car PROP1) (B:=bi_car PROP2)).
+  Local Abbreviation embed := (embed (A:=bi_car PROP1) (B:=bi_car PROP2)).
   Local Notation "⎡ P ⎤" := (embed P) : bi_scope.
   Implicit Types P : PROP1.
 
@@ -109,7 +109,7 @@ End embed_laws.
 
 Section embed.
   Context {SI : sidx} {PROP1 PROP2 : bi} `{!BiEmbed PROP1 PROP2}.
-  Local Notation embed := (embed (A:=bi_car PROP1) (B:=bi_car PROP2)).
+  Local Abbreviation embed := (embed (A:=bi_car PROP1) (B:=bi_car PROP2)).
   Local Notation "⎡ P ⎤" := (embed P) : bi_scope.
   Implicit Types P Q R : PROP1.
 

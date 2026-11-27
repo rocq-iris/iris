@@ -7,9 +7,9 @@ From iris.algebra Require Export cmra.
 From iris.algebra Require Import proofmode_classes.
 
 (** Since the standard (0,1] fractional camera is used more often, we define
-[frac] through a [Notation] instead of a [Definition]. That way, Rocq infers the
+[frac] through a [Abbreviation] instead of a [Definition]. That way, Rocq infers the
 [frac] camera by default when using the [Qp] type. *)
-Notation frac := Qp (only parsing).
+Abbreviation frac := Qp (only parsing).
 
 Section frac.
   Context {SI : sidx}.

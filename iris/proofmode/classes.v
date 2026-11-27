@@ -435,7 +435,7 @@ Proof. intros. rewrite /MaybeFrame' /=. apply: sep_elim_r. Qed.
 a notation for [MaybeFrame'] wrapped in the [TCNoBackTrack] construct.
 For more details, see also iris!989 and the [frame_and] and [frame_or_spatial]
 instances in [class_instances_frame.v] *)
-Notation MaybeFrame p R P Q progress :=
+Abbreviation MaybeFrame p R P Q progress :=
   (TCNoBackTrack (MaybeFrame' p R P Q progress)).
 
 (* The [iFrame] tactic is able to instantiate witnesses for existential
@@ -459,7 +459,7 @@ since we made [FrameInstantiateExistDisabled] one of its premises. *)
 Class FrameInstantiateExistDisabled : Prop := frame_instantiate_exist_disabled {}.
 (* The strong instance also has a new premise: an instance of
 the [FrameInstantiateExistEnabled] type class, defined using stdpp's [TCUnless]. *)
-Notation FrameInstantiateExistEnabled := (TCUnless FrameInstantiateExistDisabled).
+Abbreviation FrameInstantiateExistEnabled := (TCUnless FrameInstantiateExistDisabled).
 (* Since [TCUnless P] will only find an instance if no instance of [P] can be
 found, the addition of [FrameInstantiateExistDisabled] to the context disables
 the instantiation of existential quantifiers. *)

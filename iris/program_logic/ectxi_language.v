@@ -84,7 +84,7 @@ Global Arguments base_step {_} _ _ _ _ _ _.
 Section ectxi_language.
   Context {Λ : ectxiLanguage}.
   Implicit Types (e : expr Λ) (Ki : ectx_item Λ).
-  Notation ectx := (list (ectx_item Λ)).
+  Abbreviation ectx := (list (ectx_item Λ)).
 
   (* Only project stuff out of the mixin that is not also in ectxLanguage *)
   Global Instance fill_item_inj Ki : Inj (=) (=) (fill_item Ki).

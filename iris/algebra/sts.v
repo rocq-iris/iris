@@ -45,8 +45,8 @@ Structure stsT := Sts {
 Global Arguments Sts {_ _} _ _.
 Global Arguments prim_step {_} _ _.
 Global Arguments tok {_} _.
-Notation states sts := (propset (state sts)).
-Notation tokens sts := (propset (token sts)).
+Abbreviation states sts := (propset (state sts)).
+Abbreviation tokens sts := (propset (token sts)).
 
 (** * Theory and definitions *)
 Section sts.
@@ -57,13 +57,13 @@ Inductive step : relation (state sts * tokens sts) :=
   | Step s1 s2 T1 T2 :
      prim_step s1 s2 → tok s1 ## T1 → tok s2 ## T2 →
      tok s1 ∪ T1 ≡ tok s2 ∪ T2 → step (s1,T1) (s2,T2).
-Notation steps := (rtc step).
+Abbreviation steps := (rtc step).
 Inductive frame_step (T : tokens sts) (s1 s2 : state sts) : Prop :=
   (* Possible alternative definition: (tok s2) ## T) ∧ s \rightarrow s'.
      This is not equivalent, but it might be good enough? *)
   | Frame_step T1 T2 :
      T1 ## tok s1 ∪ T → step (s1,T1) (s2,T2) → frame_step T s1 s2.
-Notation frame_steps T := (rtc (frame_step T)).
+Abbreviation frame_steps T := (rtc (frame_step T)).
 
 (** ** Closure under frame steps *)
 Record closed (S : states sts) (T : tokens sts) : Prop := Closed {
@@ -194,8 +194,8 @@ Proof. (* Notice that the other direction does not hold. *)
 Qed.
 End sts.
 
-Notation steps := (rtc step).
-Notation frame_steps T := (rtc (frame_step T)).
+Abbreviation steps := (rtc step).
+Abbreviation frame_steps T := (rtc (frame_step T)).
 
 (* The type of bounds we can give to the state of an STS. On paper, this is the
    type that we equip with an RA structure. In Rocq we have to do some work to
@@ -207,8 +207,8 @@ Global Arguments auth {_} _ _.
 Global Arguments frag {_} _ _.
 End sts.
 
-Notation stsT := sts.stsT.
-Notation Sts := sts.Sts.
+Abbreviation stsT := sts.stsT.
+Abbreviation Sts := sts.Sts.
 
 (** * STSs form an RA *)
 Section sts_res.
@@ -632,7 +632,7 @@ Structure stsT := Sts {
 }.
 Global Arguments Sts {_} _.
 Global Arguments prim_step {_} _ _.
-Notation states sts := (propset (state sts)).
+Abbreviation states sts := (propset (state sts)).
 
 Definition stsT_token := Empty_set.
 Definition stsT_tok {sts : stsT} (_ : state sts) : propset stsT_token := ∅.
@@ -646,7 +646,7 @@ Section sts.
   Implicit Types s : state sts.
   Implicit Types S : states sts.
 
-  Notation prim_steps := (rtc prim_step).
+  Abbreviation prim_steps := (rtc prim_step).
 
   Lemma sts_step s1 s2 : prim_step s1 s2 → sts.step (s1, ∅) (s2, ∅).
   Proof. intros. split; set_solver. Qed.
@@ -669,8 +669,8 @@ Section sts.
 End sts.
 End sts_notok.
 
-Notation sts_notokT := sts_notok.stsT.
-Notation Sts_NoTok := sts_notok.Sts.
+Abbreviation sts_notokT := sts_notok.stsT.
+Abbreviation Sts_NoTok := sts_notok.Sts.
 
 Section sts_notokRA.
   Context {SI : sidx} {sts : sts_notokT}.

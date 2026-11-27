@@ -52,7 +52,7 @@ Notation "γ ↪◯MAP[ k ] dq v" := (ghost_map_elem γ k dq v)
 
 (* Compatibility aliases. Do not use for new code.
 These will eventually be deprecated and removed. *)
-Notation ghost_map_auth_frac γ q m := (ghost_map_auth γ (DfracOwn q) m) (only parsing).
+Abbreviation ghost_map_auth_frac γ q m := (ghost_map_auth γ (DfracOwn q) m) (only parsing).
 Notation "k ↪[ γ ] dq v" := (ghost_map_elem γ k dq v)
   (at level 20, γ at level 50, dq custom dfrac at level 1,
    only parsing) : bi_scope.

@@ -241,7 +241,7 @@ Module inv. Section inv.
     Qed.
 
     (** And now we tie a bad knot. *)
-    Notation not_fupd P := (□ (P -∗ fupd M1 False))%I.
+    Abbreviation not_fupd P := (□ (P -∗ fupd M1 False))%I.
     Definition A i : PROP := ∃ P, not_fupd P ∗ saved i P.
     Global Instance A_persistent i : Persistent (A i) := _.
 

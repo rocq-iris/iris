@@ -3,7 +3,7 @@ From iris.base_logic.lib Require Export own.
 From iris.base_logic.lib Require Import ghost_map.
 Import uPred.
 
-Local Notation proph_map P V := (gmap P (list V)).
+Local Abbreviation proph_map P V := (gmap P (list V)).
 Definition proph_val_list (P V : Type) := list (P * V).
 
 (** The CMRA we need. *)

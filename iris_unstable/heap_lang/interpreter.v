@@ -428,7 +428,7 @@ Section interpreter.
   Qed.
 
   (* define a shorthand for readability below *)
-  Local Notation error := interp_error.
+  Local Abbreviation error := interp_error.
 
   Fixpoint interpret (fuel:nat) (e: expr) {struct fuel} : InterpretM val :=
     match fuel with

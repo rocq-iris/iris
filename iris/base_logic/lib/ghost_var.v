@@ -34,7 +34,7 @@ Notation "γ ↪VAR dq n" := (ghost_var γ dq n)
 
 (* Compatibility alias. Do not use for new code.
 This will eventually be deprecated and removed. *)
-Notation ghost_var_frac γ q n := (ghost_var γ (DfracOwn q) n) (only parsing).
+Abbreviation ghost_var_frac γ q n := (ghost_var γ (DfracOwn q) n) (only parsing).
 
 Section lemmas.
   Context `{!ghost_varG Σ A}.

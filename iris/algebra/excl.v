@@ -12,9 +12,9 @@ Global Arguments ExclInvalid {_}.
 Global Instance: Params (@Excl) 1 := {}.
 Global Instance: Params (@ExclInvalid) 1 := {}.
 
-Notation excl' A := (option (excl A)).
-Notation Excl' x := (Some (Excl x)).
-Notation ExclInvalid' := (Some ExclInvalid).
+Abbreviation excl' A := (option (excl A)).
+Abbreviation Excl' x := (Some (Excl x)).
+Abbreviation ExclInvalid' := (Some ExclInvalid).
 
 Global Instance maybe_Excl {A} : Maybe (@Excl A) := λ x,
   match x with Excl a => Some a | _ => None end.

@@ -20,7 +20,7 @@ Class heapGS_gen hlc Σ := HeapGS {
 }.
 Local Existing Instance heapGS_step_cnt.
 
-Notation heapGS := (heapGS_gen HasLc).
+Abbreviation heapGS := (heapGS_gen HasLc).
 
 Section steps.
   Context `{!heapGS_gen hlc Σ}.
@@ -106,7 +106,7 @@ End definitions.
 Global Instance: Params (@inv_pointsto_own) 4 := {}.
 Global Instance: Params (@inv_pointsto) 3 := {}.
 
-Notation inv_heap_inv := (inv_heap_inv loc (option val)).
+Abbreviation inv_heap_inv := (inv_heap_inv loc (option val)).
 Notation "l '↦_' I □" := (inv_pointsto l I%stdpp%type)
   (at level 20, I at level 9, format "l  '↦_' I  '□'") : bi_scope.
 Notation "l ↦_ I v" := (inv_pointsto_own l v I%stdpp%type)

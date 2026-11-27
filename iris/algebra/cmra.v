@@ -95,7 +95,7 @@ Global Arguments Cmra' {_} _ {_ _ _ _ _ _} _ _.
 (* Given [m : CmraMixin A], the notation [Cmra A m] provides a smart
 constructor, which uses [ofe_mixin_of A] to infer the canonical OFE mixin of
 the type [A], so that it does not have to be given manually. *)
-Notation Cmra A m := (Cmra' A (ofe_mixin_of A%type) m) (only parsing).
+Abbreviation Cmra A m := (Cmra' A (ofe_mixin_of A%type) m) (only parsing).
 
 Global Arguments cmra_car : simpl never.
 Global Arguments cmra_equiv : simpl never.
@@ -130,7 +130,7 @@ Global Strategy expand [cmra_ofeO cmra_equiv cmra_dist cmra_pcore cmra_op
 
 Definition cmra_mixin_of' {SI : sidx} A {Ac : cmra}
   (f : Ac → A) : CmraMixin Ac := cmra_mixin Ac.
-Notation cmra_mixin_of A :=
+Abbreviation cmra_mixin_of A :=
   ltac:(let H := eval hnf in (cmra_mixin_of' A id) in exact H) (only parsing).
 
 (** Lifting properties from the mixin *)
@@ -233,7 +233,7 @@ Structure ucmra {SI : sidx} := Ucmra' {
   ucmra_mixin : UcmraMixin ucmra_car;
 }.
 Global Arguments Ucmra' {_} _ {_ _ _ _ _ _ _} _ _ _.
-Notation Ucmra A m :=
+Abbreviation Ucmra A m :=
   (Ucmra' A (ofe_mixin_of A%type) (cmra_mixin_of A%type) m) (only parsing).
 Global Arguments ucmra_car : simpl never.
 Global Arguments ucmra_equiv : simpl never.
@@ -1049,7 +1049,7 @@ Proof. by destruct H2. Qed.
 
 Section cmra_transport.
   Context {SI : sidx} {A B : cmra} (H : A = B).
-  Notation T := (cmra_transport H).
+  Abbreviation T := (cmra_transport H).
   Global Instance cmra_transport_ne : NonExpansive T.
   Proof. by intros ???; destruct H. Qed.
   Global Instance cmra_transport_proper : Proper ((≡) ==> (≡)) T.
@@ -1109,7 +1109,7 @@ End discrete.
 (** A smart constructor for the discrete RA over a carrier [A]. It uses
 [ofe_discrete_equivalence_of A] to make sure the same [Equivalence] proof is
 used as when constructing the OFE. *)
-Notation discreteR A ra_mix :=
+Abbreviation discreteR A ra_mix :=
   (Cmra A (discrete_cmra_mixin (discrete_ofe_equivalence_of A%type) ra_mix))
   (only parsing).
 
