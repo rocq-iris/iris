@@ -1,7 +1,8 @@
 From iris.bi Require Import interface derived_connectives updates.
 
 (* We cannot yet fix that warning here as then we got conflicts with the
-built-in notation due to different levels in Rocq 9.2. *)
+built-in notation due to different levels in Rocq 9.2. Can be dropped
+once we require Rocq 9.3. *)
 Set Warnings "-at-level-200-changed".
 
 Notation "P |- Q" := (P ⊢ Q)
