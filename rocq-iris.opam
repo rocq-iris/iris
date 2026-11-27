@@ -27,10 +27,10 @@ tags: [
 ]
 
 depends: [
-  "rocq-core" { (>= "9.0" & < "9.4~") | (= "dev") }
+  "rocq-core" { (>= "9.1" & < "9.4~") | (= "dev") }
   "rocq-stdlib" { (>= "9.0") | (= "dev") }
   "rocq-stdpp" { (= "dev.2026-11-26.1.c0ee51da") | (= "dev") }
-  "rocq-elpi" { (>= "3") | (= "dev") } (* 3.7 breaks building with Rocq 9.0 *)
+  "rocq-elpi" { (>= "3") | (= "dev") }
 ]
 conflicts: [
   "coq-iris"
