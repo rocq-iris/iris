@@ -212,10 +212,18 @@ Section bi_mixin.
     bi_mixin_later_forall_2 {A} (Φ : A → PROP) : (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a;
     (** The commuting law for later [▷] with existentials [∃] only holds for
     finite step-indexing, it is inconsistent in a transfinite setting. This
-    law is thus conditionally available for [SIdxFinite SI]. When instantiating
-    specifically for a BI with transfinite step-indexing (i.e., that is not
-    parametric in [SI]), then [SIdx.limit_finite] can be used to derive a
-    contradiction. *)
+    law is thus conditionally available for [SIdxFinite SI].
+
+    Instead of making this law parametric on the [SIdxFinite], we could have
+    removed the law from the BI interface and used a separate type class (say,
+    [BiFinite]). The current approach reduces the number of classes by one, and
+    ensures that every finite BI satisfies the commuting laws. The current
+    approach also avoids us from having to add both [SIdxFinite] and [BiFinite]
+    to some lemmas.
+
+    When instantiating the interface specifically for a BI with transfinite
+    step-indexing (i.e., a BI that is not parametric in [SI]), then the lemma
+    [SIdx.limit_finite can be used to derive a contradiction. *)
     (* marked [_internal] because the temporary except-0 notation is used *)
     bi_mixin_later_exist_except_0_internal `{!SIdxFinite SI} {A} (Φ : A → PROP) :
       (▷ ∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a);
