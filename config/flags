@@ -15,12 +15,6 @@
 -w
 -redundant-canonical-projection
 
-# Needs Rocq 9.2 at least for Scheme Rewrite; it is unclear whether the warning
-# is also used for other schemes. This warns even for types from dependencies,
-# so std++ needs to be on Rocq 9.2+ before we can remove the warning.
--w
--missing-scheme
-
 # The ltac_expr case of this is very annoying to deal with so we are hoping for
 # better alternatives (https://github.com/rocq-prover/rocq/issues/21896).
 -w
