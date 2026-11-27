@@ -105,6 +105,7 @@ Iris now depends on rocq-elpi (version 3).
     later credits are available in its underlying BI.
 * Move lemma `laterN_False` from `lib/counterexamples.v` to
   `derived_laws_later.v`. (by Zichen Zhang)
+* Add support for the only-0 and except-0 modalities in `sbi_unfold`.
 
 **Changes in `proofmode`:**
 
