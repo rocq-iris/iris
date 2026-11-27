@@ -95,6 +95,9 @@ Iris now depends on rocq-elpi (version 3).
     for many `BiLöb` premises in the transfinite setting. The lemma `timeless_alt`
     already provided this characterization; it now provides the old definition as
     the characterization.
+  + Rename `bi.later_exist_false` → `bi.later_exist_except_0` and
+    `bi.later_false_em` → `bi.later_except_0_only_0`, and fold the except-0
+    and only-0 definitions.
 * Add `BiLaterCredits`, `BiBUpdLaterCredits`, `BiFUpdLaterCredits` typeclasses,
   which generalize later credits to arbitrary BI. (by Simcha van Collem)
   + This also generalizes the `iNext n credit: H` tactic to arbitrary BI.
