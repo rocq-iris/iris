@@ -109,7 +109,7 @@ Section sbi_unfold.
   Context {SI : sidx} `{!Sbi PROP}.
   Implicit Types P Q : PROP.
   Local Arguments siProp_holds _ !_.
-  Local Notation SbiUnfold := (SbiUnfold (PROP:=PROP)).
+  Local Abbreviation SbiUnfold := (SbiUnfold (PROP:=PROP)).
 
   (** The top-level lemmas used by the tactic *)
   Lemma sbi_unfold_entails `{!SbiUnfold DownClosed P Pi, !SbiUnfold NotClosed Q Qi} :

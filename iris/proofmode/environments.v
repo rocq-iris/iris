@@ -77,9 +77,9 @@ Inductive env_Forall2 {A B} (P : A → B → Prop) : env A → env B → Prop :=
   | env_Forall2_snoc Γ1 Γ2 i x y :
      env_Forall2 P Γ1 Γ2 → P x y → env_Forall2 P (Esnoc Γ1 i x) (Esnoc Γ2 i y).
 
-(** Defined as a [Notation] so that [env_and_persistently] is "refolded" after
+(** Defined as a [Abbreviation] so that [env_and_persistently] is "refolded" after
 a [simpl]. *)
-Notation env_and_persistently Γ := ([∧ list] P ∈ env_to_list Γ, <pers> P)%I.
+Abbreviation env_and_persistently Γ := ([∧ list] P ∈ env_to_list Γ, <pers> P)%I.
 
 Fixpoint env_to_prop_go {SI : sidx} {PROP : bi}
     (acc : PROP) (Γ : env PROP) : PROP :=

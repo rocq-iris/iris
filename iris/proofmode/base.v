@@ -211,4 +211,4 @@ Definition pm_option_fun {A B} (f : option (A → B)) (x : A) : option B :=
 Global Arguments pm_option_fun {_ _} !_ _ /.
 
 (* Can't write [id] here as that would not reduce. *)
-Notation pm_default := (pm_from_option (λ x, x)).
+Abbreviation pm_default := (pm_from_option (λ x, x)).

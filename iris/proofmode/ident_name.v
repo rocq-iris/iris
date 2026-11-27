@@ -12,7 +12,7 @@ Ltac to_ident_name id :=
 
 (** to_ident_name is a Gallina-level version of [to_ident_name] for constructing
     [ident_name] literals. *)
-Notation to_ident_name id := (λ id:unit, id) (only parsing).
+Abbreviation to_ident_name id := (λ id:unit, id) (only parsing).
 
 (** The idea of [AsIdentName] is to convert the binder in [f] to an [ident_name]
 representing the name of the binder. If [f] is not a lambda, this typeclass can

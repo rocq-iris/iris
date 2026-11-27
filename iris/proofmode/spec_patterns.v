@@ -34,7 +34,7 @@ Module spec_pat.
 Inductive stack_item :=
   | StPat : spec_pat → stack_item
   | StIdent : string → stack_item.
-Notation stack := (list stack_item).
+Abbreviation stack := (list stack_item).
 
 Fixpoint close (k : stack) (ps : list spec_pat) : option (list spec_pat) :=
   match k with

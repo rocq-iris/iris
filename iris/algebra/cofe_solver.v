@@ -24,14 +24,14 @@ Module solver. Section solver.
 Context (F : oFunctor) `{Fcontr : !oFunctorContractive F}.
 Context `{Fcofe : ∀ (T : ofe) `{!Cofe T}, Cofe (oFunctor_apply F T)}.
 Context `{Finh : Inhabited (oFunctor_apply F unitO)}.
-Notation map := (oFunctor_map F).
+Abbreviation map := (oFunctor_map F).
 
 Fixpoint A' (k : nat) : { C : ofe & Cofe C } :=
   match k with
   | 0 => existT (P:=Cofe) unitO _
   | S k => existT (P:=Cofe) (@oFunctor_apply _ F (projT1 (A' k)) (projT2 (A' k))) _
   end.
-Notation A k := (projT1 (A' k)).
+Abbreviation A k := (projT1 (A' k)).
 Local Instance A_cofe k : Cofe (A k) := projT2 (A' k).
 
 Fixpoint f (k : nat) : A k -n> A (S k) :=

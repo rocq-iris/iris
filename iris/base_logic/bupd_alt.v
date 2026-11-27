@@ -29,7 +29,7 @@ Local Coercion uPred_holds : uPred >-> Funclass.
 Section bupd_alt.
   Context {PROP : bi} `{!Sbi PROP}.
   Implicit Types P Q R : PROP.
-  Notation bupd_alt := (@bupd_alt PROP _).
+  Abbreviation bupd_alt := (@bupd_alt PROP _).
 
   Global Instance bupd_alt_ne : NonExpansive bupd_alt.
   Proof. solve_proper. Qed.

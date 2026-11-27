@@ -122,7 +122,7 @@ Existing Class atomic_heapGS.
 Global Hint Mode atomic_heapGS + + : typeclass_instances.
 Global Hint Extern 0 (atomic_heapGS _) => progress simpl : typeclass_instances.
 
-Local Notation CAS e1 e2 e3 := (Snd (cmpxchg e1 e2 e3)).
+Local Abbreviation CAS e1 e2 e3 := (Snd (cmpxchg e1 e2 e3)).
 
 Definition faa_atomic `{!atomic_heap} : val :=
   rec: "faa" "l" "n" :=
@@ -138,8 +138,8 @@ Module notation.
   Notation "! e" := (load e) : expr_scope.
   Notation "e1 <- e2" := (store e1 e2) : expr_scope.
 
-  Notation CAS e1 e2 e3 := (Snd (cmpxchg e1 e2 e3)).
-  Notation FAA e1 e2 := (faa_atomic e1 e2).
+  Abbreviation CAS e1 e2 e3 := (Snd (cmpxchg e1 e2 e3)).
+  Abbreviation FAA e1 e2 := (faa_atomic e1 e2).
 End notation.
 
 Section derived.

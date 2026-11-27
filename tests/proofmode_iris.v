@@ -389,8 +389,8 @@ End TWP_tests.
 Section monpred_tests.
   Context `{!invGS_gen hlc Σ}.
   Context {I : biIndex}.
-  Local Notation monPred := (monPred I (iPropI Σ)).
-  Local Notation monPredI := (monPredI I (iPropI Σ)).
+  Local Abbreviation monPred := (monPred I (iPropI Σ)).
+  Local Abbreviation monPredI := (monPredI I (iPropI Σ)).
   Implicit Types P Q R : monPred.
   Implicit Types 𝓟 𝓠 𝓡 : iProp Σ.
 

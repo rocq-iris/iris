@@ -5,7 +5,7 @@ From iris.bi Require Import embedding monpred.
 Section tests_unseal.
   Context {I : biIndex} (M : ucmra).
 
-  Local Notation monPred := (monPred I (uPredI M)).
+  Local Abbreviation monPred := (monPred I (uPredI M)).
 
   Check "monPred_unseal_test_1".
   Lemma monPred_unseal_test_1 P Q (R : monPred) :

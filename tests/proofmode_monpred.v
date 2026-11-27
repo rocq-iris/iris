@@ -6,8 +6,8 @@ Unset Mangle Names.
 
 Section tests.
   Context {I : biIndex} {PROP : bi}.
-  Local Notation monPred := (monPred I PROP).
-  Local Notation monPredI := (monPredI I PROP).
+  Local Abbreviation monPred := (monPred I PROP).
+  Local Abbreviation monPredI := (monPredI I PROP).
   Implicit Types P Q R : monPred.
   Implicit Types 𝓟 𝓠 𝓡 : PROP.
   Implicit Types i j : I.
@@ -273,8 +273,8 @@ End tests.
 Section tests_iprop.
   Context {I : biIndex} `{!invGS_gen hlc Σ}.
 
-  Local Notation monPred := (monPred I (iPropI Σ)).
-  Local Notation monPredI := (monPredI I (iPropI Σ)).
+  Local Abbreviation monPred := (monPred I (iPropI Σ)).
+  Local Abbreviation monPredI := (monPredI I (iPropI Σ)).
   Implicit Types P Q R : monPred.
   Implicit Types 𝓟 𝓠 𝓡 : iProp Σ.
 

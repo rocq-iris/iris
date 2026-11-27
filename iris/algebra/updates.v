@@ -162,7 +162,7 @@ End updates.
 (** * Transport *)
 Section cmra_transport.
   Context {SI : sidx} {A B : cmra} (H : A = B).
-  Notation T := (cmra_transport H).
+  Abbreviation T := (cmra_transport H).
   Lemma cmra_transport_updateP (P : A → Prop) (Q : B → Prop) x :
     x ~~>: P → (∀ y, P y → Q (T y)) → T x ~~>: Q.
   Proof. destruct H; eauto using cmra_updateP_weaken. Qed.

@@ -45,9 +45,9 @@ End modalities.
 
 Section bi.
 Context {I : biIndex} {PROP : bi}.
-Local Notation monPredI := (monPredI I PROP).
-Local Notation monPred := (monPred I PROP).
-Local Notation MakeMonPredAt := (@MakeMonPredAt I PROP).
+Local Abbreviation monPredI := (monPredI I PROP).
+Local Abbreviation monPred := (monPred I PROP).
+Local Abbreviation MakeMonPredAt := (@MakeMonPredAt I PROP).
 Implicit Types P Q R : monPred.
 Implicit Types 𝓟 𝓠 𝓡 : PROP.
 Implicit Types φ : Prop.
@@ -578,7 +578,7 @@ Global Hint Extern 2 (IntoWand _ _ (monPred_at _ _) (monPred_at ?P _) ?Q) =>
 
 Section modal.
 Context {I : biIndex} {PROP : bi}.
-Local Notation monPred := (monPred I PROP).
+Local Abbreviation monPred := (monPred I PROP).
 Implicit Types P Q R : monPred.
 Implicit Types 𝓟 𝓠 𝓡 : PROP.
 Implicit Types φ : Prop.

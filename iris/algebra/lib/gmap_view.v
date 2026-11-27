@@ -131,7 +131,7 @@ Local Existing Instance gmap_view_rel_discrete.
 
 (** [gmap_view] is a notation to give canonical structure search the chance
 to infer the right instances (see [auth]). *)
-Notation gmap_view K V := (view (gmap_view_rel_raw K V)).
+Abbreviation gmap_view K V := (view (gmap_view_rel_raw K V)).
 Definition gmap_viewO {SI : sidx} (K : Type) `{Countable K} (V : cmra) : ofe :=
   viewO (gmap_view_rel K V).
 Definition gmap_viewR {SI : sidx} (K : Type) `{Countable K} (V : cmra) : cmra :=

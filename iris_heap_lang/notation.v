@@ -12,20 +12,20 @@ Coercion Val : val >-> expr.
 Coercion Var : string >-> expr.
 
 (** Define some derived forms. *)
-Notation Lam x e := (Rec BAnon x e) (only parsing).
-Notation Let x e1 e2 := (App (Lam x e2) e1) (only parsing).
-Notation Seq e1 e2 := (Let BAnon e1 e2) (only parsing).
-Notation LamV x e := (RecV BAnon x e) (only parsing).
-Notation LetCtx x e2 := (AppRCtx (LamV x e2)) (only parsing).
-Notation SeqCtx e2 := (LetCtx BAnon e2) (only parsing).
-Notation Match e0 x1 e1 x2 e2 := (Case e0 (Lam x1 e1) (Lam x2 e2)) (only parsing).
-Notation Alloc e := (AllocN (Val $ LitV $ LitInt 1) e) (only parsing).
+Abbreviation Lam x e := (Rec BAnon x e) (only parsing).
+Abbreviation Let x e1 e2 := (App (Lam x e2) e1) (only parsing).
+Abbreviation Seq e1 e2 := (Let BAnon e1 e2) (only parsing).
+Abbreviation LamV x e := (RecV BAnon x e) (only parsing).
+Abbreviation LetCtx x e2 := (AppRCtx (LamV x e2)) (only parsing).
+Abbreviation SeqCtx e2 := (LetCtx BAnon e2) (only parsing).
+Abbreviation Match e0 x1 e1 x2 e2 := (Case e0 (Lam x1 e1) (Lam x2 e2)) (only parsing).
+Abbreviation Alloc e := (AllocN (Val $ LitV $ LitInt 1) e) (only parsing).
 (** Compare-and-set (CAS) returns just a boolean indicating success or failure. *)
-Notation CAS l e1 e2 := (Snd (CmpXchg l e1 e2)) (only parsing).
+Abbreviation CAS l e1 e2 := (Snd (CmpXchg l e1 e2)) (only parsing).
 
 (* Skip should be atomic, we sometimes open invariants around
    it. Hence, we need to explicitly use LamV instead of e.g., Seq. *)
-Notation Skip := (App (Val $ LamV BAnon (Val $ LitV LitUnit)) (Val $ LitV LitUnit)).
+Abbreviation Skip := (App (Val $ LamV BAnon (Val $ LitV LitUnit)) (Val $ LitV LitUnit)).
 
 (* No scope for the values, does not conflict and scope is often not inferred
 properly. *)
@@ -141,10 +141,10 @@ Notation "e1 || e2" :=
   (If e1%E (LitV (LitBool true)) e2%E) (only parsing) : expr_scope.
 
 (** Notations for option *)
-Notation NONE := (InjL (LitV LitUnit)) (only parsing).
-Notation NONEV := (InjLV (LitV LitUnit)) (only parsing).
-Notation SOME x := (InjR x) (only parsing).
-Notation SOMEV x := (InjRV x) (only parsing).
+Abbreviation NONE := (InjL (LitV LitUnit)) (only parsing).
+Abbreviation NONEV := (InjLV (LitV LitUnit)) (only parsing).
+Abbreviation SOME x := (InjR x) (only parsing).
+Abbreviation SOMEV x := (InjRV x) (only parsing).
 
 Notation "'match:' e0 'with' 'NONE' => e1 | 'SOME' x => e2 'end'" :=
   (Match e0 BAnon e1 x%binder e2)
@@ -153,6 +153,6 @@ Notation "'match:' e0 'with' 'SOME' x => e2 | 'NONE' => e1 'end'" :=
   (Match e0 BAnon e1 x%binder e2)
   (e0, e1, x, e2 at level 200, only parsing) : expr_scope.
 
-Notation ResolveProph e1 e2 := (Resolve Skip e1 e2) (only parsing).
+Abbreviation ResolveProph e1 e2 := (Resolve Skip e1 e2) (only parsing).
 (* Level 99 so that it works to the left of a `;;` which is at level 100. *)
 Notation "'resolve_proph:' p 'to:' v" := (ResolveProph p v) (at level 99) : expr_scope.

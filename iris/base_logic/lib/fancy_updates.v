@@ -44,7 +44,7 @@ Class invGS_gen (hlc : has_lc) (Σ : gFunctors) : Set := InvG {
 Global Hint Mode invGS_gen - - : typeclass_instances.
 Global Hint Mode invGpreS - : typeclass_instances.
 
-Notation invGS := (invGS_gen HasLc).
+Abbreviation invGS := (invGS_gen HasLc).
 
 Definition invΣ : gFunctors := #[wsatΣ; lcΣ].
 Global Instance subG_invΣ {Σ} : subG invΣ Σ → invGpreS Σ.

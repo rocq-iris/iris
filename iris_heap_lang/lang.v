@@ -136,7 +136,7 @@ wrapped operation is a CmpXchg). The second value is the one that the prophecy
 variable was actually resolved to. *)
 Definition observation : Set := proph_id * (val * val).
 
-Notation of_val := Val (only parsing).
+Abbreviation of_val := Val (only parsing).
 
 Definition to_val (e : expr) : option val :=
   match e with

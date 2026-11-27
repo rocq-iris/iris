@@ -13,7 +13,7 @@ Unset Mangle Names.
 (** The proofs from Section 3.1 *)
 Section demo.
   Context {M : ucmra}.
-  Notation iProp := (uPred M).
+  Abbreviation iProp := (uPred M).
 
   (* The version in Rocq *)
   Lemma and_exist A (P R: Prop) (Ψ: A → Prop) :
@@ -59,7 +59,7 @@ proving client code. A version of [list_reverse] in that style can be found in
 the file [theories/tests/list_reverse.v]. *)
 Section list_reverse.
   Context `{!heapGS Σ}.
-  Notation iProp := (iProp Σ).
+  Abbreviation iProp := (iProp Σ).
   Implicit Types l : loc.
 
   Fixpoint is_list (hd : val) (xs : list val) : iProp :=

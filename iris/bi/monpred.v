@@ -119,7 +119,7 @@ Module Export monPred_defs.
 Section monPred_defs.
   Context {I : biIndex} {PROP : bi}.
   Implicit Types i : I.
-  Notation monPred := (monPred I PROP).
+  Abbreviation monPred := (monPred I PROP).
   Implicit Types P Q : monPred.
 
   Inductive monPred_entails (P1 P2 : monPred) : Prop :=
@@ -691,10 +691,10 @@ Global Instance: Params (@Objective) 2 := {}.
 (** Primitive facts that cannot be deduced from the BI structure. *)
 Section bi_facts.
   Context {I : biIndex} {PROP : bi}.
-  Local Notation monPred := (monPred I PROP).
-  Local Notation monPredI := (monPredI I PROP).
-  Local Notation monPred_at := (@monPred_at I PROP).
-  Local Notation BiIndexBottom := (@BiIndexBottom I).
+  Local Abbreviation monPred := (monPred I PROP).
+  Local Abbreviation monPredI := (monPredI I PROP).
+  Local Abbreviation monPred_at := (@monPred_at I PROP).
+  Local Abbreviation BiIndexBottom := (@BiIndexBottom I).
   Implicit Types i : I.
   Implicit Types P Q : monPred.
 

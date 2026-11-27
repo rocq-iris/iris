@@ -142,8 +142,8 @@ End saved_anything.
 (** Provide specialized versions of this for convenience. **)
 
 (* Saved propositions. *)
-Notation savedPropG Σ := (savedAnythingG Σ (▶ ∙)).
-Notation savedPropΣ := (savedAnythingΣ (▶ ∙)).
+Abbreviation savedPropG Σ := (savedAnythingG Σ (▶ ∙)).
+Abbreviation savedPropΣ := (savedAnythingΣ (▶ ∙)).
 
 Definition saved_prop_own `{!savedPropG Σ} (γ : gname) (dq : dfrac) (P: iProp Σ) :=
   saved_anything_own (F := ▶ ∙) γ dq (Next P).
@@ -226,8 +226,8 @@ Section saved_prop.
 End saved_prop.
 
 (* Saved predicates. *)
-Notation savedPredG Σ A := (savedAnythingG Σ (A -d> ▶ ∙)).
-Notation savedPredΣ A := (savedAnythingΣ (A -d> ▶ ∙)).
+Abbreviation savedPredG Σ A := (savedAnythingG Σ (A -d> ▶ ∙)).
+Abbreviation savedPredΣ A := (savedAnythingΣ (A -d> ▶ ∙)).
 
 Definition saved_pred_own `{!savedPredG Σ A}
     (γ : gname) (dq : dfrac) (Φ : A → iProp Σ) :=

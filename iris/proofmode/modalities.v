@@ -60,7 +60,7 @@ Global Arguments MIEnvTransform {_ _ _} _.
 Global Arguments MIEnvClear {_ _ _}.
 Global Arguments MIEnvId {_ _}.
 
-Notation MIEnvFilter C := (MIEnvTransform (TCDiag C)).
+Abbreviation MIEnvFilter C := (MIEnvTransform (TCDiag C)).
 
 Definition modality_intuitionistic_action_spec {SI : sidx} {PROP1 PROP2}
     (s : modality_action PROP1 PROP2) : (PROP1 → PROP2) → Prop :=

@@ -26,11 +26,11 @@ Notation "(.≡{ n }≡ y )" := (λ x, x ≡{n}≡ y) (only parsing).
 
 Global Hint Extern 0 (_ ≡{_}≡ _) => reflexivity : core.
 Global Hint Extern 0 (_ ≡{_}≡ _) => symmetry; assumption : core.
-Notation NonExpansive f := (∀ n, Proper (dist n ==> dist n) f).
-Notation NonExpansive2 f := (∀ n, Proper (dist n ==> dist n ==> dist n) f).
-Notation NonExpansive3 f :=
+Abbreviation NonExpansive f := (∀ n, Proper (dist n ==> dist n) f).
+Abbreviation NonExpansive2 f := (∀ n, Proper (dist n ==> dist n ==> dist n) f).
+Abbreviation NonExpansive3 f :=
   (∀ n, Proper (dist n ==> dist n ==> dist n ==> dist n) f).
-Notation NonExpansive4 f :=
+Abbreviation NonExpansive4 f :=
   (∀ n, Proper (dist n ==> dist n ==> dist n ==> dist n ==> dist n) f).
 
 Tactic Notation "ofe_subst" ident(x) :=
@@ -93,7 +93,7 @@ hides the [id] and normalizes the mixin to head normal form. The latter is to
 ensure that we do not end up with redundant canonical projections to the mixin,
 i.e. them all being of the shape [ofe_mixin_of' A id]. *)
 Definition ofe_mixin_of' {SI : sidx} A {Ac : ofe} (f : Ac → A) : OfeMixin Ac := ofe_mixin Ac.
-Notation ofe_mixin_of A :=
+Abbreviation ofe_mixin_of A :=
   ltac:(let H := eval hnf in (ofe_mixin_of' A id) in exact H) (only parsing).
 
 (** Lifting properties from the mixin *)
@@ -192,9 +192,9 @@ on OFEs. We show this in [chain.v]. *)
 (e.g., [ofe_mor_compl] without having to repeat the type. The notation [BCompl]
 will be used as the type for [bcompl], completing [bchain] with an arbitrary
 bound [n]. *)
-Notation Compl A := (chain A%type → A).
-Notation BCompl A := (∀ n, bchain A%type n → A).
-Notation LBCompl A := (∀ n, SIdx.limit n → bchain A%type n → A).
+Abbreviation Compl A := (chain A%type → A).
+Abbreviation BCompl A := (∀ n, bchain A%type n → A).
+Abbreviation LBCompl A := (∀ n, SIdx.limit n → bchain A%type n → A).
 
 Class Cofe {SI : sidx} (A : ofe) := {
   compl : Compl A;
@@ -390,7 +390,7 @@ Lemma ne_dist_later {SI : sidx} {A B : ofe} (f : A → B) :
   NonExpansive f → ∀ n, Proper (dist_later n ==> dist_later n) f.
 Proof. intros Hf ??? [H]; split; intros ??; by eapply Hf, H. Qed.
 
-Notation Contractive f := (∀ n, Proper (dist_later n ==> dist n) f).
+Abbreviation Contractive f := (∀ n, Proper (dist_later n ==> dist n) f).
 
 Global Instance const_contractive {SI : sidx} {A B : ofe} (x : A) :
   Contractive (@const A B x).
@@ -1502,13 +1502,13 @@ have two options:
 
 (** The combinator [discreteO A] lifts an existing [Equiv A] instance into a
 discrete OFE. *)
-Notation discreteO A := (Ofe A (discrete_ofe_mixin _)).
+Abbreviation discreteO A := (Ofe A (discrete_ofe_mixin _)).
 
 (** The combinator [leibnizO A] lifts Leibniz equality [=] into a discrete OFE.
 The implementation forces the [Equivalence] proof to be [eq_equivalence] so that
 Rocq does not accidentally use another one, like [ofe_equivalence], in the case of
 aliases. See also https://gitlab.mpi-sws.org/iris/iris/issues/299 *)
-Notation leibnizO A := (Ofe A (@discrete_ofe_mixin _ _ equivL eq_equivalence)).
+Abbreviation leibnizO A := (Ofe A (@discrete_ofe_mixin _ _ equivL eq_equivalence)).
 
 (** In order to define a discrete CMRA with carrier [A] (in the file [cmra.v])
 we need to determine the [Equivalence A] proof that was used to construct the
@@ -1518,7 +1518,7 @@ via [ofe_equivalence]).
 We obtain the proof of [Equivalence A] by inferring the canonical OFE mixin
 using [ofe_mixin_of A], and then check whether it is indeed a discrete OFE. This
 will fail if no OFE, or an OFE other than the discrete OFE, was registered. *)
-Notation discrete_ofe_equivalence_of A := ltac:(
+Abbreviation discrete_ofe_equivalence_of A := ltac:(
   match constr:(ofe_mixin_of A) with
   | discrete_ofe_mixin ?H => exact H
   end) (only parsing).

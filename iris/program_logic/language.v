@@ -227,7 +227,7 @@ Section language.
       prim_step e1 σ1 κ e2' σ2 efs → κ = [] ∧ σ2 = σ1 ∧ e2' = e2 ∧ efs = []
   }.
 
-  Notation pure_steps_tp := (Forall2 (rtc pure_step)).
+  Abbreviation pure_steps_tp := (Forall2 (rtc pure_step)).
 
   (* TODO: Exclude the case of [n=0], either here, or in [wp_pure] to avoid it
   succeeding when it did not actually do anything. *)
@@ -331,4 +331,4 @@ Global Hint Mode PureExec + - - ! - : typeclass_instances.
 
 Global Arguments step_atomic {Λ ρ1 κ ρ2}.
 
-Notation pure_steps_tp := (Forall2 (rtc pure_step)).
+Abbreviation pure_steps_tp := (Forall2 (rtc pure_step)).

@@ -39,7 +39,7 @@ Inductive stack_item :=
   | StIntuitionistic : stack_item
   | StSpatial : stack_item
   | StModalElim : stack_item.
-Notation stack := (list stack_item).
+Abbreviation stack := (list stack_item).
 
 Fixpoint close_list (k : stack)
     (ps : list intro_pat) (pss : list (list intro_pat)) : option stack :=
