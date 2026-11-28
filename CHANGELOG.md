@@ -20,7 +20,7 @@ Iris now depends on rocq-elpi (version 3).
 * Define a COFE structure on `chain A` (when using finite step-indexing) to
   obtain a closure operation on OFEs. (by Simcha van Collem)
 * Remove incorrect unit instance for `max_Z`. (by Markus de Medeiros)
-* Add a "time_receipt" resource algebra `time_receiptR` that has an authoritative
+* Add a `time_receipt` resource algebra `time_receiptR` that has an authoritative
   part with two kinds of fragments: exclusive (additive) fragments, and persistent
   (`max`) fragments. See `base_logic.lib.time_receipts` (mentioned below) for
   a logic-level wrapper that you probably want to use instead of directly dealing
@@ -72,7 +72,7 @@ Iris now depends on rocq-elpi (version 3).
   step-index 0. (based on joint work with David Läwen)
 * Update the lemma `timeless_alt` (which provides an alternative
   characterization of timeless propositions) to use the `<only0>` modality.
-* Add commuting rules for monPred's `<subj>` modality with `<pers>`, `<absorb>`,
+* Add commuting rules for `monPred`'s `<subj>` modality with `<pers>`, `<absorb>`,
   `<affine>` and `□`. Add a rule to apply a `-∗` under the `<subj>` modality.
 * Rename `later_laterN` → `laterN_succ_l` and `laterN_later` → `laterN_succ_r`.
 * Add definition `step_fupdN` backing the notation `|={Eo}[Ei]▷=>^n Q`. Use the
