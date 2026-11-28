@@ -106,6 +106,9 @@ Iris now depends on rocq-elpi (version 3).
 * Move lemma `laterN_False` from `lib/counterexamples.v` to
   `derived_laws_later.v`. (by Zichen Zhang)
 * Add support for the only-0 and except-0 modalities in `sbi_unfold`.
+* Add lemma `cmra_only_0_opI`.
+* Add lemmas `cmra_only_0_extendI` and `cmra_later_opI`. Rename existing lemma
+  `cmra_later_opI` → `cmra_later_extendI_total`.
 
 **Changes in `proofmode`:**
 
@@ -246,6 +249,8 @@ s/\blaterN_later\b/laterN_succ_r/g
 # except-0 modalities
 s/\bbi.later_exist_false\b/bi.later_exist_except_0/g
 s/\bbi.later_false_em\b/bi.later_except_0_only_0`
+# cmra_later_opI
+s/\bcmra_later_opI\b/cmra_later_extendI_total/g
 EOF
 ```
 

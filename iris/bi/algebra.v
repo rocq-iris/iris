@@ -18,16 +18,58 @@ Section algebra.
   Lemma cmra_validI_op_l {A : cmra} (x y : A) : ✓ (x ⋅ y) ⊢ ✓ x.
   Proof. sbi_unfold=> n. apply cmra_validN_op_l. Qed.
 
-  Lemma cmra_later_opI `{!SIdxFinite SI, !CmraTotal A} (x y1 y2 : A) :
+  (** An internalized version of [cmra_extend] for step-index 0. In the model
+  this rule expands to:
+
+      ✓{0} x → x ≡{0}≡ y1 ⋅ y2 →
+      ∃ z1 z2, x ≡{n}≡ z1 ⋅ z2 ∧ z1 ≡{0}≡ y1 ∧ z2 ≡{0}≡ y2
+
+  This does not exactly match [cmra_extend]. To do that, we'd need the [<always>]
+  modality for step-indexing (which says [P] holds for each step index). The
+  rule would then become:
+
+    ✓ x ∧ x ≡ y1 ⋅ y2 ⊢ ∃ z1 z2, <always> (x ≡ z1 ⋅ z2) ∧ z1 ≡ y1 ∧ z2 ≡ y2
+
+  *)
+  Lemma cmra_only_0_extendI `{A : cmra} (x y1 y2 : A) :
+    <only0> (✓ x ∧ x ≡ y1 ⋅ y2) ⊢ ∃ z1 z2,
+      x ≡ z1 ⋅ z2 ∧ <only0> (z1 ≡ y1) ∧ <only0> (z2 ≡ y2).
+  Proof.
+    sbi_unfold=> n [??].
+    destruct (cmra_extend 0ᵢ x y1 y2) as (z1 & z2 & ? & ? & ?); [done..|].
+    exists z1, z2. split_and!; [by apply equiv_dist|done..].
+  Qed.
+
+  (** Another internalized version of [cmra_extend] for finite step indexing. In
+  the model this rule expands to:
+
+      ✓{n} x → x ≡{n}≡ y1 ⋅ y2 →
+      ∃ z1 z2, x ≡{S n} z1 ⋅ z2 ∧ z1 ≡{n} y1 ∧ z2 ≡{n}≡ y2
+
+  That is, compared to [cmra_extend] we have [≡{S n}≡] instead of [≡].
+
+  Note that this version is also specialized to finite step indexing. In the
+  transfinite setting, this rule would not hold as the later modality appears
+  below the existentials, so we cannot commute out the [∀ n', n' < n → ...]. *)
+  Lemma cmra_later_extendI `{!SIdxFinite SI} {A : cmra} (x y1 y2 : A) :
+    ▷ (✓ x ∧ x ≡ y1 ⋅ y2) ⊢ ◇ ∃ z1 z2, x ≡ z1 ⋅ z2 ∧ ▷ (z1 ≡ y1) ∧ ▷ (z2 ≡ y2).
+  Proof.
+    sbi_unfold=> n. destruct (finite_index n) as [->|[m ->]]; [by eauto|].
+    move=> /(_ _ (SIdx.lt_succ_diag_r m)) [??]. right.
+    destruct (cmra_extend m x y1 y2) as (z1 & z2 & ? & ? & ?); [done..|].
+    exists z1, z2. split_and!;
+      [by apply equiv_dist|intros ? ?%SIdx.lt_succ_r; by eapply dist_le..].
+  Qed.
+
+  (** If the camera is total, we can omit the except-0 modality. At step index
+  0, we can simply instantiate the existentials with [x] and [core x]. *)
+  Lemma cmra_later_extendI_total `{!SIdxFinite SI, !CmraTotal A} (x y1 y2 : A) :
     ▷ (✓ x ∧ x ≡ y1 ⋅ y2) ⊢ ∃ z1 z2, x ≡ z1 ⋅ z2 ∧ ▷ (z1 ≡ y1) ∧ ▷ (z2 ≡ y2).
   Proof.
-    sbi_unfold=> n. destruct (finite_index n) as [->|[m ->]].
-    - intros _. exists x, (core x).
-      split_and!; [by rewrite cmra_core_r|intros ? []%SIdx.nlt_0_r..].
-    - move=> /(_ _ (SIdx.lt_succ_diag_r m)) [??].
-      destruct (cmra_extend m x y1 y2) as (z1 & z2 & ? & ? & ?); [done..|].
-      exists z1, z2. split_and!;
-        [by apply equiv_dist|intros ? ?%SIdx.lt_succ_r; by eapply dist_le..].
+    rewrite cmra_later_extendI. apply bi.or_elim; [|done].
+    rewrite -(bi.exist_intro x) -(bi.exist_intro (core x)) cmra_core_r.
+    repeat apply bi.and_intro;
+      [apply internal_eq_refl|f_equiv; apply bi.False_elim..].
   Qed.
 
   Lemma cmra_morphism_validI {A B : cmra} (f : A → B) `{!CmraMorphism f} x :
