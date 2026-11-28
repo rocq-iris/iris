@@ -49,8 +49,7 @@ Section cmra_valid.
   (* FIXME: Remove in favor of cmra_validN_op_r *)
   Lemma internal_cmra_valid_weaken {A : cmra} (a b : A) : ✓ (a ⋅ b) ⊢ ✓ a.
   Proof. by apply si_pure_mono, siProp_primitive.cmra_valid_weaken. Qed.
-  (** TODO: Remove [SIdxFinite] once we use [SI] instead of [nat] for [siProp]. *)
-  Lemma internal_cmra_valid_entails `{!SIdxFinite SI} {A B : cmra} (a : A) (b : B) :
+  Lemma internal_cmra_valid_entails {A B : cmra} (a : A) (b : B) :
     (✓ a ⊢ ✓ b) ↔ ∀ n, ✓{n} a → ✓{n} b.
   Proof. rewrite si_pure_entails. apply siProp_primitive.valid_entails. Qed.
 

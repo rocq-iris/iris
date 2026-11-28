@@ -197,6 +197,11 @@ Section bi_mixin.
   [derived_laws_later].) *)
   Context (bi_later : PROP → PROP).
   Local Notation "▷ P" := (bi_later P) : bi_scope.
+  (** As we are defining *BI* here, we cannot use the derived modalities from
+  [derived_connectives] yet. We thus define temporary notations for just this
+  file. Laws that use these temporary notations are marked [_internal]. *)
+  Local Notation "◇ P" := (▷ False ∨ P)%I : bi_scope.
+  Local Notation "<only0> P" := (▷ False → P)%I : bi_scope.
 
   Record BiLaterMixin := {
     bi_mixin_later_ne : NonExpansive bi_later;
@@ -205,21 +210,210 @@ Section bi_mixin.
     bi_mixin_later_intro P : P ⊢ ▷ P;
 
     bi_mixin_later_forall_2 {A} (Φ : A → PROP) : (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a;
-    bi_mixin_later_exist_false {A} (Φ : A → PROP) :
-      (▷ ∃ a, Φ a) ⊢ ▷ False ∨ (∃ a, ▷ Φ a);
-    bi_mixin_later_sep_1 P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q;
+    (** The commuting law for later [▷] with existentials [∃] only holds for
+    finite step-indexing, it is inconsistent in a transfinite setting. This
+    law is thus conditionally available for [SIdxFinite SI].
+
+    Instead of making this law parametric on the [SIdxFinite], we could have
+    removed the law from the BI interface and used a separate type class (say,
+    [BiFinite]). The current approach reduces the number of classes by one, and
+    ensures that every finite BI satisfies the commuting laws. The current
+    approach also avoids us from having to add both [SIdxFinite] and [BiFinite]
+    to some lemmas.
+
+    When instantiating the interface specifically for a BI with transfinite
+    step-indexing (i.e., a BI that is not parametric in [SI]), then the lemma
+    [SIdx.limit_finite can be used to derive a contradiction. *)
+    (* marked [_internal] because the temporary except-0 notation is used *)
+    bi_mixin_later_exist_except_0_internal `{!SIdxFinite SI} {A} (Φ : A → PROP) :
+      (▷ ∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a);
+    (** The following law is a variant of the above that also works in a
+    transfinite setting. For finite step-indexing, this law is strictly weaker
+    than the above, it can be derived via Löb induction as shown by the smart
+    constructor below. *)
+    (* marked [_internal] because the temporary only-0 notation is used *)
+    bi_mixin_only_0_exist_1_internal {A} (Φ : A → PROP) :
+      <only0> (∃ a, Φ a) ⊢ ∃ a, <only0> Φ a;
+
+    (** Similarly to the commuting rule for later [▷] with existentials [∃],
+    the version for separating conjunction [∗] is also inconsistent in a
+    transfinite setting. *)
+    bi_mixin_later_sep_1 `{!SIdxFinite SI} P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q;
     bi_mixin_later_sep_2 P Q : ▷ P ∗ ▷ Q ⊢ ▷ (P ∗ Q);
+    (** And a similar weaker version that holds in a transfinite setting, and is
+    derivable from the above for finite step-indexing. *)
+    (* marked [_internal] because the temporary only-0 notation is used *)
+    bi_mixin_only_0_sep_1_internal P Q :
+      <only0> (P ∗ Q) ⊢ <only0> P ∗ <only0> Q;
+
     bi_mixin_later_persistently_1 P : ▷ <pers> P ⊢ <pers> ▷ P;
     bi_mixin_later_persistently_2 P : <pers> ▷ P ⊢ ▷ <pers> P;
 
-    (* In a step-index model, this law allows case distinctions on whether
+    (** This law expands to [▷ P ⊢ ▷ False ∨ (▷ False → P)].
+       In a step-index model, this law allows case distinctions on whether
        the step-index is 0 (expressed as [▷ False] in the logic):
        * If it is 0, the left side is true, and we know nothing about [P].
+         Hence the "except-0" modality [◇].
        * If not, then it is [S n] for some [n], and [P] holds at [n]. By down-
          closure, it also holds at [0]. Thus, we get to use [P], but only if
-         the step-index is 0 ([▷ False] is true). *)
-    bi_mixin_later_false_em P : ▷ P ⊢ ▷ False ∨ (▷ False → P);
+         the step-index is 0 ([▷ False] is true).
+         Hence the "only-0" modality [<only0>]. *)
+    (* marked [_internal] because the temporary only-0 notation is used *)
+    bi_mixin_later_except_0_only_0_internal P : ▷ P ⊢ ◇ <only0> P;
   }.
+
+  (** We provide smart constructors for BIs with finite step-indexing, i.e, BIs
+  where the commuting laws of later [▷] with existentials [∃] and separating
+  conjunction [∗] hold without [SIdxFinite SI] condition. The unconditional
+  versions of these rules imply that step-indexing is finite, and allow us to
+  derive the [<only0>] laws from these commuting laws, using:
+
+  - Löb induction, [bi_later_mixin_sidx_finite_löb]
+  - Contractiveness of later, [bi_later_mixin_sidx_finite_contractive] *)
+  Lemma bi_later_mixin_sidx_finite_löb
+      (later_ne : NonExpansive bi_later)
+      (löb : ∀ P, (▷ P ⊢ P) → True ⊢ P)
+      (later_mono : ∀ P Q, (P ⊢ Q) → ▷ P ⊢ ▷ Q)
+      (later_intro : ∀ P, P ⊢ ▷ P)
+      (later_forall_2 : ∀ {A} (Φ : A → PROP), (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a)
+      (later_exist_false : ∀ {A} (Φ : A → PROP), (▷ ∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a))
+      (later_sep_1 : ∀ P Q, ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q)
+      (later_sep_2 : ∀ P Q, ▷ P ∗ ▷ Q ⊢ ▷ (P ∗ Q))
+      (later_persistently_1 : ∀ P, ▷ <pers> P ⊢ <pers> ▷ P)
+      (later_persistently_2 : ∀ P, <pers> ▷ P ⊢ ▷ <pers> P)
+      (later_false_em : ∀ P, ▷ P ⊢ ◇ <only0> P)
+      (bi_mixin : BiMixin) :
+    BiLaterMixin.
+  Proof.
+    pose proof (bi_mixin_entails_po bi_mixin).
+    pose proof (and_elim_l := bi_mixin_and_elim_l bi_mixin).
+    pose proof (and_elim_r := bi_mixin_and_elim_r bi_mixin).
+    pose proof (and_intro := bi_mixin_and_intro bi_mixin).
+    pose proof (impl_intro_r := bi_mixin_impl_intro_r bi_mixin).
+    pose proof (impl_elim_l' := bi_mixin_impl_elim_l' bi_mixin).
+    assert (later_and_2 : ∀ P Q, ▷ P ∧ ▷ Q ⊢ ▷ (P ∧ Q)).
+    { intros P Q. trans (▷ ∀ b : bool, if b then P else Q)%I.
+      { etrans; [|apply later_forall_2].
+        apply (bi_mixin_forall_intro bi_mixin)=> -[]; auto. }
+      apply later_mono, and_intro.
+      - etrans; [apply (bi_mixin_forall_elim bi_mixin true)|]. done.
+      - etrans; [apply (bi_mixin_forall_elim bi_mixin false)|]. done. }
+    assert (and_comm : ∀ P Q, P ∧ Q ⊢ Q ∧ P) by auto.
+    assert (impl_impl : ∀ P Q, (P → P → Q) ⊢ P → Q).
+    { intros P Q. apply impl_intro_r.
+      trans ((P → Q) ∧ P)%I; [|by apply bi_mixin_impl_elim_l'].
+      apply and_intro; last by auto. by apply impl_elim_l'. }
+    split; auto.
+    - (* <only0> (∃ a, Φ a) ⊢ ∃ a, <only0> Φ a *)
+      intros A Φ. trans (True ∧ <only0> ∃ a, Φ a)%I.
+      { apply and_intro; [|done]. by apply (bi_mixin_pure_intro bi_mixin). }
+      apply impl_elim_l', löb, impl_intro_r.
+      trans (▷ (∃ a, <only0> Φ a) ∧ <only0> (∃ a, Φ a))%I.
+      { apply and_intro, and_elim_r.
+        trans (▷ (<only0> (∃ a, Φ a) → ∃ a, <only0> Φ a) ∧ ▷ <only0> ∃ a, Φ a)%I.
+        { apply and_intro; [by auto|]. etrans; [apply and_elim_r|]. auto. }
+        etrans; [apply later_and_2|]. by apply later_mono, impl_elim_l'. }
+      apply impl_elim_l'.
+      etrans; [apply later_exist_false|]; simpl. apply (bi_mixin_or_elim bi_mixin).
+      { apply impl_intro_r. etrans; [apply and_comm|].
+        etrans; [by apply impl_elim_l'|].
+        eapply (bi_mixin_exist_elim bi_mixin)=> a.
+        etrans; [|apply (bi_mixin_exist_intro bi_mixin a)]; simpl.
+        apply impl_intro_r. auto. }
+      apply (bi_mixin_exist_elim bi_mixin)=> a.
+      etrans; [apply later_false_em|]. apply (bi_mixin_or_elim bi_mixin).
+      { apply impl_intro_r. etrans; [apply and_comm|].
+        etrans; [by apply impl_elim_l'|].
+        eapply (bi_mixin_exist_elim bi_mixin)=> a'.
+        etrans; [|apply (bi_mixin_exist_intro bi_mixin a')]; simpl.
+        apply impl_intro_r. auto. }
+      apply impl_intro_r. etrans; [apply and_elim_l|].
+      etrans; [|apply (bi_mixin_exist_intro bi_mixin a)]. done.
+    - (* <only0> (P ∗ Q) ⊢ <only0> P ∗ <only0> Q *)
+      intros P Q. trans (True ∧ <only0> (P ∗ Q))%I.
+      { apply and_intro; [|done].
+        by apply (bi_mixin_pure_intro bi_mixin). }
+      apply impl_elim_l', löb, impl_intro_r.
+      trans (▷ (<only0> P ∗ <only0> Q) ∧ <only0> (P ∗ Q))%I.
+      { apply and_intro, and_elim_r.
+        trans (▷ (<only0> (P ∗ Q) → <only0> P ∗ <only0> Q) ∧ ▷ <only0> (P ∗ Q))%I.
+        { apply and_intro; [by auto|]. etrans; [apply and_elim_r|]. auto. }
+        etrans; [apply later_and_2|]. apply later_mono.
+        by apply impl_elim_l'. }
+      apply impl_elim_l'. etrans; [apply later_sep_1|].
+      apply (bi_mixin_wand_elim_l' bi_mixin).
+      etrans; [apply later_false_em|]. apply (bi_mixin_or_elim bi_mixin).
+      { apply (bi_mixin_wand_intro_r bi_mixin), impl_intro_r.
+        trans (▷ False ∧ <only0> (P ∗ Q))%I.
+        { apply and_intro, and_elim_r. etrans; [apply and_elim_l|].
+          etrans; [apply later_sep_2|]. apply later_mono.
+          apply (bi_mixin_wand_elim_l' bi_mixin).
+          by apply (bi_mixin_pure_elim' bi_mixin). }
+        etrans; [apply and_comm|]. etrans; [by apply impl_elim_l'|].
+        apply (bi_mixin_sep_mono bi_mixin); apply impl_intro_r; auto. }
+      apply (bi_mixin_wand_intro_r bi_mixin).
+      etrans; [apply (bi_mixin_sep_comm' bi_mixin)|].
+      apply (bi_mixin_wand_elim_l' bi_mixin).
+      etrans; [apply later_false_em|]. apply (bi_mixin_or_elim bi_mixin).
+      { apply (bi_mixin_wand_intro_r bi_mixin), impl_intro_r.
+        trans (▷ False ∧ <only0> (P ∗ Q))%I.
+        { apply and_intro, and_elim_r. etrans; [apply and_elim_l|].
+          etrans; [apply (bi_mixin_sep_mono bi_mixin); [done|apply later_intro]|].
+          etrans; [apply later_sep_2|]. apply later_mono.
+          apply (bi_mixin_wand_elim_l' bi_mixin).
+          by apply (bi_mixin_pure_elim' bi_mixin). }
+        etrans; [apply and_comm|]. etrans; [by apply impl_elim_l'|].
+        apply (bi_mixin_sep_mono bi_mixin); apply impl_intro_r; auto. }
+      apply (bi_mixin_wand_intro_r bi_mixin), impl_intro_r.
+      etrans; [apply and_elim_l|].
+      etrans; [apply (bi_mixin_sep_comm' bi_mixin)|].
+      by apply (bi_mixin_sep_mono bi_mixin).
+  Qed.
+
+  Lemma bi_later_mixin_sidx_finite_contractive
+      (later_contractive : Contractive bi_later)
+      (later_mono : ∀ P Q, (P ⊢ Q) → ▷ P ⊢ ▷ Q)
+      (later_intro : ∀ P, P ⊢ ▷ P)
+      (later_forall_2 : ∀ {A} (Φ : A → PROP), (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a)
+      (later_exist_false : ∀ {A} (Φ : A → PROP), (▷ ∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a))
+      (later_sep_1 : ∀ P Q, ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q)
+      (later_sep_2 : ∀ P Q, ▷ P ∗ ▷ Q ⊢ ▷ (P ∗ Q))
+      (later_persistently_1 : ∀ P, ▷ <pers> P ⊢ <pers> ▷ P)
+      (later_persistently_2 : ∀ P, <pers> ▷ P ⊢ ▷ <pers> P)
+      (later_false_em : ∀ P, ▷ P ⊢ ◇ <only0> P)
+      (bi_ofe_mixin : OfeMixin PROP)
+      (bi_cofe : Cofe (Ofe PROP bi_ofe_mixin))
+      (bi_mixin : BiMixin) :
+    BiLaterMixin.
+  Proof.
+    set (PROPO := Ofe PROP bi_ofe_mixin) in *.
+    assert (Inhabited PROP) by (constructor; exact True%I).
+    pose proof (bi_mixin_entails_po bi_mixin).
+    pose proof (and_elim_r := bi_mixin_and_elim_r bi_mixin).
+    pose proof (and_intro := bi_mixin_and_intro bi_mixin).
+    pose proof (impl_intro_r := bi_mixin_impl_intro_r bi_mixin).
+    pose proof (impl_elim_l' := bi_mixin_impl_elim_l' bi_mixin).
+    apply bi_later_mixin_sidx_finite_löb; [| |done..].
+    (* Adapted from [later_contractive_bi_löb] in [derived_laws_later], but
+    more manual because we don't have generalized rewriting and the derived
+    laws yet... *)
+    { by apply (@contractive_ne _ PROPO PROPO). }
+    intros P HP.
+    pose (flöb_pre (Q : PROPO) := (▷ Q → P)%I).
+    assert (Contractive flöb_pre).
+    { intros n Q1 Q2 ?.
+      apply (bi_mixin_impl_ne bi_mixin), (reflexivity (A:=PROPO)).
+      by apply later_contractive. }
+    set (Q := fixpoint flöb_pre).
+    assert (Q ≡ (▷ Q → P))%I as [HQ1 HQ2]%(bi_mixin_equiv_entails bi_mixin)
+      by (exact: fixpoint_unfold).
+    assert (▷ Q ⊢ P) as HQP.
+    { etrans; [|apply HP]. apply later_mono.
+      trans (Q ∧ ▷ Q)%I; [by apply and_intro, later_intro|].
+      by apply impl_elim_l'. }
+    etrans; [|apply HQP]. etrans; [|apply later_intro]. etrans; [|apply HQ2].
+    apply impl_intro_r. by etrans; [apply and_elim_r|].
+  Qed.
 
   (** Defining [▷ P := True] is the "canonical" choice in a non-step indexed
   setting. Normally, one would define [▷ P := λ n, ∀ n', n' < n → P n']. By
@@ -244,8 +438,19 @@ Section bi_mixin.
     split; repeat intro; rewrite ?Hlater; try by apply (bi_mixin_pure_intro Hbi).
     - done.
     - apply (bi_mixin_or_intro_l Hbi).
+    - etrans; [eapply (bi_mixin_and_intro Hbi _ _ True);
+        [done|by apply (bi_mixin_pure_intro Hbi)]|].
+      etrans; [by apply (bi_mixin_impl_elim_l' Hbi)|].
+      apply (bi_mixin_exist_elim Hbi)=> x.
+      etrans; [|by apply (bi_mixin_exist_intro Hbi x)]; simpl.
+      apply (bi_mixin_impl_intro_r Hbi), (bi_mixin_and_elim_l Hbi).
     - etrans; [|apply (bi_mixin_persistently_and_sep_elim Hbip)].
       by apply (bi_mixin_and_intro Hbi).
+    - etrans; [eapply (bi_mixin_and_intro Hbi _ _ True);
+        [done|by apply (bi_mixin_pure_intro Hbi)]|].
+      etrans; [by apply (bi_mixin_impl_elim_l' Hbi)|].
+      apply (bi_mixin_sep_mono Hbi);
+        apply (bi_mixin_impl_intro_r Hbi), (bi_mixin_and_elim_l Hbi).
     - done.
     - apply (bi_mixin_or_intro_l Hbi).
   Qed.
@@ -489,6 +694,10 @@ Proof.
 Qed.
 
 (* Later *)
+(* Temporary [Notation], versions with [Definition] in [derived_laws]. *)
+Local Notation "◇ P" := (▷ False ∨ P)%I : bi_scope.
+Local Notation "<only0> P" := (▷ False → P)%I : bi_scope.
+
 Global Instance later_ne : NonExpansive (@bi_later _ PROP).
 Proof. eapply bi_mixin_later_ne, bi_bi_later_mixin. Qed.
 
@@ -499,19 +708,32 @@ Proof. eapply bi_mixin_later_intro, bi_bi_later_mixin. Qed.
 
 Lemma later_forall_2 {A} (Φ : A → PROP) : (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a.
 Proof. eapply bi_mixin_later_forall_2, bi_bi_later_mixin. Qed.
-Lemma later_exist_false {A} (Φ : A → PROP) :
-  (▷ ∃ a, Φ a) ⊢ ▷ False ∨ (∃ a, ▷ Φ a).
-Proof. eapply bi_mixin_later_exist_false, bi_bi_later_mixin. Qed.
-Lemma later_sep_1 P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q.
-Proof. eapply bi_mixin_later_sep_1, bi_bi_later_mixin. Qed.
+(* marked [_internal] because the temporary only-0 notation is used *)
+Lemma only_0_exist_1_internal {A} (Φ : A → PROP) :
+   <only0> (∃ a, Φ a) ⊢ ∃ a, <only0> Φ a.
+Proof. eapply bi_mixin_only_0_exist_1_internal, bi_bi_later_mixin. Qed.
+(* marked [_internal] because the temporary except-0 notation is used *)
+Lemma later_exist_except_0_internal `{!SIdxFinite SI} {A} (Φ : A → PROP) :
+  (▷ ∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a).
+Proof.
+  eapply bi_mixin_later_exist_except_0_internal; [apply bi_bi_later_mixin|done].
+Qed.
+
+(* marked [_internal] because the temporary only-0 notation is used *)
+Lemma only_0_sep_1_internal P Q : <only0> (P ∗ Q) ⊢ <only0> P ∗ <only0> Q.
+Proof. eapply bi_mixin_only_0_sep_1_internal, bi_bi_later_mixin. Qed.
+Lemma later_sep_1 `{!SIdxFinite SI} P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q.
+Proof. eapply bi_mixin_later_sep_1; [apply bi_bi_later_mixin|done]. Qed.
 Lemma later_sep_2 P Q : ▷ P ∗ ▷ Q ⊢ ▷ (P ∗ Q).
 Proof. eapply bi_mixin_later_sep_2, bi_bi_later_mixin. Qed.
+
 Lemma later_persistently_1 P : ▷ <pers> P ⊢ <pers> ▷ P.
 Proof. eapply (bi_mixin_later_persistently_1 bi_entails), bi_bi_later_mixin. Qed.
 Lemma later_persistently_2 P : <pers> ▷ P ⊢ ▷ <pers> P.
 Proof. eapply (bi_mixin_later_persistently_2 bi_entails), bi_bi_later_mixin. Qed.
 
-Lemma later_false_em P : ▷ P ⊢ ▷ False ∨ (▷ False → P).
-Proof. eapply bi_mixin_later_false_em, bi_bi_later_mixin. Qed.
+(* marked [_internal] because the temporary only-0 notation is used *)
+Lemma later_except_0_only_0_internal P : ▷ P ⊢ ◇ <only0> P.
+Proof. eapply bi_mixin_later_except_0_only_0_internal, bi_bi_later_mixin. Qed.
 End bi_laws.
 End bi.

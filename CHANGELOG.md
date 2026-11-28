@@ -30,10 +30,8 @@ Iris now depends on rocq-elpi (version 3).
 
 **Changes in `si_logic`:**
 
-* Make the `siProp` parametric in the type of "step indices" to prepare for the
-  support of transfinite step indexing. Internally, `siProp` still uses finite
-  step indexing (i.e., `nat`), so transfinite step indices are not actually
-  properly supported. This is only an intermediate step.
+* Make the `siProp` parametric in the type of "step indices" to support
+  transfinite step indexing.
 
 **Changes in `bi`:**
 
@@ -83,11 +81,23 @@ Iris now depends on rocq-elpi (version 3).
   of `Nat.iter_add`. Add the lemmas `step_fupdN_0` and `step_fupdN_1`, and add
   `NonExpansive` and `Proper` instances for `≡` and `⊢`.
 * Add lemma `laterN_1`.
-* Make everything in the `bi` folder (with the exception of `monPred`) parametric
-  in the type of "step indices" to prepare for the support of transfinite step
-  indexing. The laws of the BI interfaces have not been changed, so BIs cannot
-  yet be instantiated with logics that actually use transfinite step-indexing.
-  (by Simon Spies)
+* Make everything in the `bi` folder parametric in the type of "step indices" to
+  support transfinite step indexing. (based on joint work with Simon Spies)
+  + Add the primitive laws `<only0> (∃ x, P x) ⊢ ∃ x, <only0> P x` and
+    `<only0> (P ∗ Q) ⊢ <only0> P ∗ <only0> Q` to the BI interface, and make
+    the commuting laws for `▷` with `∃/∗` conditional on `SIdxFinite` (these
+    commuting laws do not hold in the transfinite setting). In the setting of
+    finite step indexing, the smart constructors `bi_later_mixin_sidx_finite_löb`
+    and `bi_later_mixin_sidx_finite_contractive` can be used to derive the new
+    `<only0>` laws from the `▷` commuting rules.
+  + Change the definition of `Timeless P` to `<only0> P ⊢ P`. This makes the
+    class more consistent with `Affine`, `Persistent`, etc. It also avoids the need
+    for many `BiLöb` premises in the transfinite setting. The lemma `timeless_alt`
+    already provided this characterization; it now provides the old definition as
+    the characterization.
+  + Rename `bi.later_exist_false` → `bi.later_exist_except_0` and
+    `bi.later_false_em` → `bi.later_except_0_only_0`, and fold the except-0
+    and only-0 definitions.
 * Add `BiLaterCredits`, `BiBUpdLaterCredits`, `BiFUpdLaterCredits` typeclasses,
   which generalize later credits to arbitrary BI. (by Simcha van Collem)
   + This also generalizes the `iNext n credit: H` tactic to arbitrary BI.
@@ -230,6 +240,11 @@ s/\bcoq_tactics\b/rocq_tactics/g
 # later succ
 s/\blater_laterN\b/laterN_succ_l/g
 s/\blaterN_later\b/laterN_succ_r/g
+# Transfinite BIs
+# Might need further manual adjustment: new lemmas also fold the only-0 and 
+# except-0 modalities
+s/\bbi.later_exist_false\b/bi.later_exist_except_0/g
+s/\bbi.later_false_em\b/bi.later_except_0_only_0`
 EOF
 ```
 

@@ -1039,6 +1039,7 @@ Tactic failure: iSplitL: (P ↔ P)%I not a separating conjunction.
   
   SI : sidx
   PROP : bi
+  SIdxFinite0 : SIdxFinite SI
   BiPersistentlyExist0 : BiPersistentlyExist PROP
   BiAffine0 : BiAffine PROP
   P, Q : PROP
@@ -1159,14 +1160,12 @@ Tactic failure: iExistDestruct: cannot destruct (P ∗ ∃ _ : nat, True)%I.
 "test_iExistDestruct_later_error_1"
      : string
 The command has indeed failed with message:
-Tactic failure: iExistDestruct: cannot destruct (▷ ∃ x : A, Φ x)%I
-because no `Inhabited` instance for A could be found.
+Tactic failure: iExistDestruct: cannot destruct (▷ ∃ x : A, Φ x)%I.
 "test_iExistDestruct_later_error_2"
      : string
 The command has indeed failed with message:
 Tactic failure: iExistDestruct: cannot destruct
-(▷ ∃ (x : A) (y : B), Φ x y)%I because no `Inhabited` instance for A
-could be found.
+(▷ ∃ (x : A) (y : B), Φ x y)%I.
 "test_iExistDestruct_later_error_3"
      : string
 The command has indeed failed with message:

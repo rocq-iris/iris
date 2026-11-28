@@ -1243,7 +1243,7 @@ Proof.
   iIntros "#H HP". iDestruct ("H" with "HP") as "#[%x H2]". eauto with iFrame.
 Qed.
 
-Lemma test_iLöb `{!BiLöb PROP} P : ⊢ ∃ n, ▷^n P.
+Lemma test_iLöb `{!SIdxFinite SI, !BiLöb PROP} P : ⊢ ∃ n, ▷^n P.
 Proof.
   iLöb as "IH". iDestruct "IH" as (n) "IH".
   by iExists (S n).
@@ -1948,7 +1948,7 @@ Proof.
 Qed.
 
 Lemma test_iModIntro_make_laterable
-    `{!BiPersistentlyExist PROP, !BiAffine PROP} (P Q : PROP) :
+    `{!SIdxFinite SI, !BiPersistentlyExist PROP, !BiAffine PROP} (P Q : PROP) :
   Laterable Q →
   P -∗ Q -∗ make_laterable (▷ P ∗ Q).
 Proof.

@@ -450,6 +450,8 @@ Section primitive.
   Notation "□ P" := (uPred_persistently P) : bi_scope.
   Notation "▷ P" := (uPred_later P) : bi_scope.
   Notation "|==> P" := (uPred_bupd P) : bi_scope.
+  Notation "◇ P" := (▷ False ∨ P)%I : bi_scope.
+  Notation "<only0> P" := (▷ False → P)%I : bi_scope.
 
   (** Entailment *)
   Lemma entails_po : PreOrder (⊢).
@@ -475,14 +477,11 @@ Section primitive.
 
   (** Non-expansiveness and setoid morphisms *)
   Lemma si_pure_ne : NonExpansive (@uPred_si_pure M).
-  Proof.
-    intros n Pi Pi' HPi. unseal; split; intros. apply HPi.
-    by rewrite nat_to_sidx_id.
-  Qed.
+  Proof. intros n Pi Pi' HPi. unseal; split; intros. by apply HPi. Qed.
 
   Lemma si_emp_valid_ne : NonExpansive (@uPred_si_emp_valid M).
   Proof.
-    intros n P P' HP. unseal; split=> n'. rewrite nat_to_sidx_id.
+    intros n P P' HP. unseal; split=> n'.
     intros. apply HP; auto using ucmra_unit_validN.
   Qed.
 
@@ -575,11 +574,18 @@ Section primitive.
    (∀ x, <si_pure> Φi x) ⊢ <si_pure> siProp_forall Φi.
   Proof. by unseal; siProp_primitive.unseal. Qed.
   Lemma si_pure_later Pi : <si_pure> siProp_later Pi ⊣⊢ ▷ <si_pure> Pi.
-  Proof. by unseal; siProp_primitive.unseal. Qed.
+  Proof.
+    unseal; siProp_primitive.unseal. split=> -[|n] x ? /=; [split; lia|].
+    split=> HPi; [apply HPi; lia|]. intros n' ?.
+    by eapply siProp_closed, SIdx.lt_succ_r.
+  Qed.
 
   Lemma si_emp_valid_later_1 P :
     siProp_entails (<si_emp_valid> ▷ P) (siProp_later (<si_emp_valid> P)).
-  Proof. by unseal; siProp_primitive.unseal. Qed.
+  Proof.
+    unseal; siProp_primitive.unseal. split=> -[|n] /=; [lia|].
+    intros ? n' ?. by eapply uPred_mono, SIdx.lt_succ_r.
+  Qed.
   Lemma si_emp_valid_exist_1 {A} (Φ : A → uPred M) :
     siProp_entails (<si_emp_valid> ∃ x, Φ x)
                    (siProp_exist (λ x, <si_emp_valid> Φ x)).
@@ -608,7 +614,7 @@ Section primitive.
                    (siProp_internal_eq P Q).
   Proof.
     unseal; siProp_primitive.unseal. split=> n /=.
-    setoid_rewrite (left_id ε op). rewrite nat_to_sidx_id. split; naive_solver.
+    setoid_rewrite (left_id ε op). split; naive_solver.
   Qed.
 
   (** Introduction and elimination rules *)
@@ -720,11 +726,14 @@ Section primitive.
     unseal; split=> -[|n] /= x ? HP; first done.
     apply uPred_mono with (S n) x; eauto using cmra_validN_S.
   Qed.
+
   Lemma later_forall_2 {A} (Φ : A → uPred M) : (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a.
   Proof. unseal; by split=> -[|n] x. Qed.
-  Lemma later_exist_false {A} (Φ : A → uPred M) :
-    (▷ ∃ a, Φ a) ⊢ ▷ False ∨ (∃ a, ▷ Φ a).
+
+  Lemma later_exist_except_0 {A} (Φ : A → uPred M) :
+    (▷ ∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a).
   Proof. unseal; split=> -[|[|n]] x /=; eauto. Qed.
+
   Lemma later_sep_1 P Q : ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q.
   Proof.
     unseal; split=> n x ?.
@@ -741,7 +750,7 @@ Section primitive.
     exists x1, x2; eauto using dist_S.
   Qed.
 
-  Lemma later_false_em P : ▷ P ⊢ ▷ False ∨ (▷ False → P).
+  Lemma later_except_0_only_0 P : ▷ P ⊢ ◇ <only0> P.
   Proof.
     unseal; siProp_primitive.unseal; split=> -[|n] x ? /= HP; [by left|right].
     intros [|n'] x' ????; eauto using uPred_mono, cmra_included_includedN.
@@ -806,7 +815,7 @@ Section primitive.
     split=> -[|n] x /= ? Hax; first by eauto using ucmra_unit_leastN.
     destruct Hax as [y ?].
     destruct (cmra_extend n x a y) as (a'&y'&Hx&?&?); auto using cmra_validN_S.
-    exists a'. rewrite Hx nat_to_sidx_id. eauto using cmra_includedN_l.
+    exists a'. rewrite Hx. eauto using cmra_includedN_l.
   Qed.
 
   Lemma bupd_ownM_updateP x (Φ : M → Prop) :
@@ -825,13 +834,13 @@ Section primitive.
   Proof.
     unseal; siProp_primitive.unseal.
     split=> n y /= Hval Hf. exists y. split; [done|]. intros a.
-    rewrite nat_to_sidx_id. destruct (Hf a) as [xf ?]; eauto.
+    destruct (Hf a) as [xf ?]; eauto.
   Qed.
 
   Lemma ownM_valid (a : M) : uPred_ownM a ⊢ <si_pure> siProp_cmra_valid a.
   Proof.
     unseal; siProp_primitive.unseal. split=> n x Hv [a' ?].
-    ofe_subst. rewrite nat_to_sidx_id. eauto using cmra_validN_op_l.
+    ofe_subst. eauto using cmra_validN_op_l.
   Qed.
 End primitive.
 End uPred_primitive.

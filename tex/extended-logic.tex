@@ -195,51 +195,83 @@ Persistence is preserved by conjunction, disjunction, separating conjunction as 
 
 
 
-\subsection{Timeless Propositions and Except-0}
+\subsection{Timeless Propositions, Except-0, and Only-0}
 \label{sec:timeless-props}
 
 One of the troubles of working in a step-indexed logic is the ``later'' modality $\later$.
-It turns out that we can somewhat mitigate this trouble by working below the following \emph{except-0} modality:
-\[ \diamond \prop \eqdef \later\FALSE \lor \prop \]
-Except-0 satisfies the usual laws of a ``monadic'' modality (similar to, \eg the update modalities):
+It turns out that we can somewhat mitigate this trouble by working with ``timeless'' propositions---propositions that do not depend on the step-index.
+
+To define this class of propositions, we first introduce two modalities: the \emph{except-0} modality $\exceptZ$, which says that a proposition holds at all step-indices except 0, and the  \emph{only-0} modality $\onlyZ$, which says that a proposition holds at step-index 0 (and makes no statement about whether it holds at other step-indices):
+\begin{mathpar}
+{ \exceptZ \prop \eqdef \later \FALSE \lor \prop }
+
+{ \onlyZ \prop \eqdef \later \FALSE \to \prop }
+\end{mathpar}
+
+Both modalities satisfy the usual laws of a ``monadic'' modality (similar to, \eg the update modalities):
 \begin{mathpar}
   \inferH{ex0-mono}
   {\prop \proves \propB}
-  {\diamond\prop \proves \diamond\propB}
+  {\exceptZ\prop \proves \exceptZ\propB}
 
   \axiomH{ex0-intro}
-  {\prop \proves \diamond\prop}
+  {\prop \proves \exceptZ\prop}
 
   \axiomH{ex0-idem}
-  {\diamond\diamond\prop \proves \diamond\prop}
-
+  {\exceptZ\exceptZ\prop \proves \exceptZ\prop}
+\\
 \begin{array}[c]{rMcMl}
-  \diamond{(\prop * \propB)} &\provesIff& \diamond\prop * \diamond\propB \\
-  \diamond{(\prop \land \propB)} &\provesIff& \diamond\prop \land \diamond\propB \\
-  \diamond{(\prop \lor \propB)} &\provesIff& \diamond\prop \lor \diamond\propB
+  \exceptZ{(\prop * \propB)} &\provesIff& \exceptZ\prop * \exceptZ\propB \\
+  \exceptZ{(\prop \land \propB)} &\provesIff& \exceptZ\prop \land \exceptZ\propB \\
+  \exceptZ{(\prop \lor \propB)} &\provesIff& \exceptZ\prop \lor \exceptZ\propB
 \end{array}
 
 \begin{array}[c]{rMcMl}
-  \diamond{\All x. \prop} &\provesIff& \All x. \diamond{\prop}   \\
-  \diamond{\Exists x. \prop} &\provesIff& \Exists x. \diamond{\prop} \\
-  \diamond\always{\prop} &\provesIff& \always\diamond{\prop} \\
-  \diamond\later\prop &\proves& \later{\prop}
+  \exceptZ{\All x. \prop} &\provesIff& \All x. \exceptZ{\prop}   \\
+  \exceptZ{\Exists x. \prop} &\provesIff& \Exists x. \exceptZ{\prop} \\
+  \exceptZ\always{\prop} &\provesIff& \always\exceptZ{\prop} \\
+  \exceptZ\later\prop &\proves& \later{\prop}
+\end{array}
+\\
+  \inferH{only0-mono}
+  {\prop \proves \propB}
+  {\onlyZ\prop \proves \onlyZ\propB}
+
+  \axiomH{only0-intro}
+  {\prop \proves \onlyZ\prop}
+
+  \axiomH{only0-idem}
+  {\onlyZ\onlyZ\prop \proves \onlyZ\prop}
+\\
+\begin{array}[c]{rMcMl}
+  \onlyZ{(\prop * \propB)} &\provesIff& \onlyZ\prop * \onlyZ\propB \\
+  \onlyZ{(\prop \land \propB)} &\provesIff& \onlyZ\prop \land \onlyZ\propB \\
+  \onlyZ{(\prop \lor \propB)} &\provesIff& \onlyZ\prop \lor \onlyZ\propB
+\end{array}
+
+\begin{array}[c]{rMcMl}
+  \onlyZ{\All x. \prop} &\provesIff& \All x. \onlyZ{\prop}   \\
+  \onlyZ{\Exists x. \prop} &\provesIff& \Exists x. \onlyZ{\prop} \\
+  \onlyZ\always{\prop} &\provesIff& \always\onlyZ{\prop} \\
+  \onlyZ\later\prop &\provesIff& \TRUE
 \end{array}
 \end{mathpar}
 In particular, from \ruleref{ex0-mono} and \ruleref{ex0-idem} we can derive a ``bind''-like elimination rule:
 \begin{mathpar}
   \inferH{ex0-elim}
-  {\prop \proves \diamond\propB}
-  {\diamond\prop \proves \diamond\propB}
+  {\prop \proves \exceptZ\propB}
+  {\exceptZ\prop \proves \exceptZ\propB}
 \end{mathpar}
 
-This modality is useful because there is a class of propositions which we call \emph{timeless} propositions, for which we have
-\[ \timeless{\prop} \eqdef \later\prop \proves \diamond\prop  \]
+We use these modalities to define the class of  \emph{timeless} propositions as follows:
+\[ \timeless{\prop} \eqdef \onlyZ\prop \proves \prop  \]
+It can be proven that this is equivalent to the following characterization:
+\[ \timeless{\prop} \iff \later\prop \proves \exceptZ\prop  \]
 In other words, when working below the except-0 modality, we can \emph{strip
   away} the later from timeless propositions (using \ruleref{ex0-elim}):
 \begin{mathpar}
-  \inferH{ex0-timeless-strip}{\timeless{\prop} \and \prop \proves \diamond\propB}
-  {\later\prop \proves \diamond\propB}
+  \inferH{ex0-timeless-strip}{\timeless{\prop} \and \prop \proves \exceptZ\propB}
+  {\later\prop \proves \exceptZ\propB}
 \end{mathpar}
 
  In fact, it turns out that we can strip away later from timeless propositions even when working under the later modality:

@@ -17,15 +17,19 @@ Section algebra.
   Proof. sbi_unfold=> n. apply cmra_validN_op_r. Qed.
   Lemma cmra_validI_op_l {A : cmra} (x y : A) : ✓ (x ⋅ y) ⊢ ✓ x.
   Proof. sbi_unfold=> n. apply cmra_validN_op_l. Qed.
-  Lemma cmra_later_opI `{!CmraTotal A} (x y1 y2 : A) :
+
+  Lemma cmra_later_opI `{!SIdxFinite SI, !CmraTotal A} (x y1 y2 : A) :
     ▷ (✓ x ∧ x ≡ y1 ⋅ y2) ⊢ ∃ z1 z2, x ≡ z1 ⋅ z2 ∧ ▷ (z1 ≡ y1) ∧ ▷ (z2 ≡ y2).
   Proof.
-    sbi_unfold=> -[|n].
-    - intros _. exists x, (core x). by rewrite cmra_core_r.
-    - intros [??].
-      destruct (cmra_extend (nat_to_sidx n) x y1 y2) as (z1 & z2 & ? & ? & ?); [done..|].
-      exists z1, z2. auto using equiv_dist.
+    sbi_unfold=> n. destruct (finite_index n) as [->|[m ->]].
+    - intros _. exists x, (core x).
+      split_and!; [by rewrite cmra_core_r|intros ? []%SIdx.nlt_0_r..].
+    - move=> /(_ _ (SIdx.lt_succ_diag_r m)) [??].
+      destruct (cmra_extend m x y1 y2) as (z1 & z2 & ? & ? & ?); [done..|].
+      exists z1, z2. split_and!;
+        [by apply equiv_dist|intros ? ?%SIdx.lt_succ_r; by eapply dist_le..].
   Qed.
+
   Lemma cmra_morphism_validI {A B : cmra} (f : A → B) `{!CmraMorphism f} x :
     ✓ x ⊢ ✓ (f x).
   Proof. sbi_unfold=> n. by apply cmra_morphism_validN. Qed.
@@ -231,22 +235,20 @@ Section algebra.
     Implicit Types b : B.
     Implicit Types x y : view rel.
 
-    (** TODO: Remove [nat_to_sidx] in the lemmas below once [siProp] has been
-    ported to support any [sidx]. *)
     Lemma view_both_dfrac_validI_1 (relI : siProp) dq a b :
-      (∀ n, rel (nat_to_sidx n) a b → siProp_holds relI n) →
+      (∀ n, rel n a b → siProp_holds relI n) →
       ✓ (●V{dq} a ⋅ ◯V b : view rel) ⊢ ⌜✓dq⌝ ∧ <si_pure> relI.
     Proof.
       intros. sbi_unfold=> n. rewrite view_both_dfrac_validN. naive_solver.
     Qed.
     Lemma view_both_dfrac_validI_2 (relI : siProp) dq a b :
-      (∀ n, siProp_holds relI n → rel (nat_to_sidx n) a b) →
+      (∀ n, siProp_holds relI n → rel n a b) →
       ⌜✓dq⌝ ∧ <si_pure> relI ⊢ ✓ (●V{dq} a ⋅ ◯V b : view rel).
     Proof.
       intros. sbi_unfold=> n. rewrite view_both_dfrac_validN. naive_solver.
     Qed.
     Lemma view_both_dfrac_validI (relI : siProp) dq a b :
-      (∀ n, rel (nat_to_sidx n) a b ↔ siProp_holds relI n) →
+      (∀ n, rel n a b ↔ siProp_holds relI n) →
       ✓ (●V{dq} a ⋅ ◯V b : view rel) ⊣⊢ ⌜✓dq⌝ ∧ <si_pure> relI.
     Proof.
       intros. apply (anti_symm _);
@@ -254,18 +256,18 @@ Section algebra.
     Qed.
 
     Lemma view_both_validI_1 (relI : siProp) a b :
-      (∀ n, rel (nat_to_sidx n) a b → siProp_holds relI n) →
+      (∀ n, rel n a b → siProp_holds relI n) →
       ✓ (●V a ⋅ ◯V b : view rel) ⊢ <si_pure> relI.
     Proof. intros. by rewrite view_both_dfrac_validI_1 // bi.and_elim_r. Qed.
     Lemma view_both_validI_2 (relI : siProp) a b :
-      (∀ n, siProp_holds relI n → rel (nat_to_sidx n) a b) →
+      (∀ n, siProp_holds relI n → rel n a b) →
       <si_pure> relI ⊢ ✓ (●V a ⋅ ◯V b : view rel).
     Proof.
       intros. rewrite -view_both_dfrac_validI_2 //.
       apply bi.and_intro; [|done]. by apply bi.pure_intro.
     Qed.
     Lemma view_both_validI (relI : siProp) a b :
-      (∀ n, rel (nat_to_sidx n) a b ↔ siProp_holds relI n) →
+      (∀ n, rel n a b ↔ siProp_holds relI n) →
       ✓ (●V a ⋅ ◯V b : view rel) ⊣⊢ <si_pure> relI.
     Proof.
       intros. apply (anti_symm _);
@@ -273,18 +275,18 @@ Section algebra.
     Qed.
 
     Lemma view_auth_dfrac_validI (relI : siProp) dq a :
-      (∀ n, siProp_holds relI n ↔ rel (nat_to_sidx n) a ε) →
+      (∀ n, siProp_holds relI n ↔ rel n a ε) →
       ✓ (●V{dq} a : view rel) ⊣⊢ ⌜✓dq⌝ ∧ <si_pure> relI.
     Proof.
       intros. rewrite -(right_id ε op (●V{dq} a)). by apply view_both_dfrac_validI.
     Qed.
     Lemma view_auth_validI (relI : siProp) a :
-      (∀ n, siProp_holds relI n ↔ rel (nat_to_sidx n) a ε) →
+      (∀ n, siProp_holds relI n ↔ rel n a ε) →
       ✓ (●V a : view rel) ⊣⊢ <si_pure> relI.
     Proof. intros. rewrite -(right_id ε op (●V a)). by apply view_both_validI. Qed.
 
     Lemma view_frag_validI (relI : siProp) b :
-      (∀ n, siProp_holds relI n ↔ ∃ a, rel (nat_to_sidx n) a b) →
+      (∀ n, siProp_holds relI n ↔ ∃ a, rel n a b) →
       ✓ (◯V b : view rel) ⊣⊢ <si_pure> relI.
     Proof. intros Hrel. sbi_unfold=> n. by rewrite Hrel. Qed.
   End view.

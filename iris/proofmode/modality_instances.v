@@ -60,7 +60,7 @@ Section modalities.
       (MIEnvTransform (MaybeIntoLaterN false n)).
   Proof.
     split; simpl; split_and?; eauto using equiv_entails_1_2, laterN_intro,
-      laterN_mono, laterN_and, laterN_sep with typeclass_instances.
+      laterN_mono, laterN_and, laterN_sep_2 with typeclass_instances.
     rewrite /MaybeIntoLaterN=> P Q ->. by rewrite laterN_intuitionistically_2.
   Qed.
   Definition modality_laterN n :=

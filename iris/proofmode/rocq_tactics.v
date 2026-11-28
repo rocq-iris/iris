@@ -1312,7 +1312,7 @@ Lemma into_laterN_env_sound {SI : sidx} {PROP : bi} n (Δ1 Δ2 : envs PROP) :
 Proof.
   intros [[Hp ??] [Hs ??]]; rewrite !of_envs_eq.
   rewrite ![(env_and_persistently _ ∧ _)%I]persistent_and_affinely_sep_l.
-  rewrite !laterN_and !laterN_sep.
+  rewrite !laterN_and -!laterN_sep_2.
   rewrite -{1}laterN_intro. apply and_mono, sep_mono.
   - apply pure_mono; destruct 1; constructor; naive_solver.
   - apply Hp; rewrite /= /MaybeIntoLaterN.

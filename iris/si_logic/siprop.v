@@ -1,11 +1,12 @@
 From iris.algebra Require Export cmra.
 From iris.bi Require Import notation.
+Local Open Scope sidx_scope.
 
 (** The type [siProp] defines "plain" step-indexed propositions, on which we
 define the usual connectives of higher-order logic, and prove that these satisfy
 the usual laws of higher-order logic. *)
 Record siProp {SI : sidx} := SiProp {
-  siProp_holds : nat → Prop; (* see below for why this is still [nat] *)
+  siProp_holds : SI → Prop;
   siProp_closed n1 n2 : siProp_holds n1 → n2 ≤ n1 → siProp_holds n2
 }.
 Local Coercion siProp_holds : siProp >-> Funclass.
@@ -15,12 +16,6 @@ Add Printing Constructor siProp.
 
 Bind Scope bi_scope with siProp.
 
-(** TODO: As part of the migration to Transfinite step-indexing, this file is
-ported halfway. We use finite ([nat]-based) step-indexing in the definition of
-[siProp], but define a (C)OFE structure for any [SI : sidx]. Hence, [siProp]
-remains compatible with the BI laws (we still have [later_exist_false]), which
-will change in the future to support the true Transfinite version (for which
-[later_exist_false] does not hold). *)
 Section cofe.
   Context {SI : sidx}.
 
@@ -28,63 +23,63 @@ Section cofe.
     { siProp_in_equiv : ∀ n, P n ↔ Q n }.
   Local Instance siProp_equiv : Equiv siProp := siProp_equiv'.
   Inductive siProp_dist' (n : SI) (P Q : siProp) : Prop :=
-    { siProp_in_dist : ∀ n', (nat_to_sidx n' ≤ n)%sidx → P n' ↔ Q n' }.
+    { siProp_in_dist : ∀ n', n' ≤ n → P n' ↔ Q n' }.
   Local Instance siProp_dist : Dist siProp := siProp_dist'.
   Definition siProp_ofe_mixin : OfeMixin siProp.
   Proof.
     constructor.
     - intros P Q; split.
       + by intros HPQ n; split=> i ?; apply HPQ.
-      + intros HPQ; split=> n. apply HPQ with (nat_to_sidx n); auto.
+      + intros HPQ; split=> n. apply HPQ with n; auto.
     - intros n; split.
       + by intros P; split=> i.
       + by intros P Q HPQ; split=> i ?; symmetry; apply HPQ.
       + intros P Q Q' HP HQ; split=> i ?.
-        by trans (Q i);[apply HP|apply HQ].
+        by trans (Q i); [apply HP|apply HQ].
     - intros n m P Q HPQ ?. split=> i ?. apply HPQ. by etrans.
   Qed.
   Canonical Structure siPropO : ofe := Ofe siProp siProp_ofe_mixin.
 
   Program Definition siProp_compl : Compl siPropO := λ c,
-    {| siProp_holds n := c (nat_to_sidx n) n |}.
+    {| siProp_holds n := c n n |}.
   Next Obligation.
     intros c n1 n2 ??; simpl in *.
-    apply (chain_cauchy c (nat_to_sidx n2) (nat_to_sidx n1));
-      eauto using siProp_closed, nat_to_sidx_mono.
+    apply (chain_cauchy c n2 n1); eauto using siProp_closed.
   Qed.
 
   Program Definition siProp_lbcompl : LBCompl siPropO := λ n Hn c,
-    {| siProp_holds n := c (nat_to_sidx n) _ n |}.
+    {| siProp_holds n' := ∀ n'' (Hn'' : n'' < n), n'' ≤ n' → c n'' Hn'' n'' |}.
   Next Obligation.
-    intros n ? c n'.
-    induction n'; simpl; eauto using SIdx.limit_lt_0, SIdx.limit_gt_S.
-  Qed.
-  Next Obligation.
-    intros n ? c n1 n2 ??; simpl in *.
-    eapply (bchain_cauchy _ c (nat_to_sidx n2) (nat_to_sidx n1));
-      eauto using siProp_closed, nat_to_sidx_mono.
+    intros n ? c n1 n2 Hc ? n'' ??; simpl in *. apply Hc. by etrans.
   Qed.
 
   Global Program Instance siProp_cofe : Cofe siPropO :=
     {| compl := siProp_compl; lbcompl := siProp_lbcompl |}.
   Next Obligation.
     intros n c; split=> n' ?. symmetry.
-    apply (chain_cauchy c (nat_to_sidx n')); auto.
+    apply (chain_cauchy c n'); auto.
   Qed.
   Next Obligation.
-    intros n ? c m ?; split=> n' ?. symmetry.
-    apply (bchain_cauchy _ c (nat_to_sidx n')); auto.
+    intros n ? c m Hm; split=> n' Hn'. split.
+    - intros Hc. by eapply (bchain_cauchy _ c n'),
+        (Hc n' (SIdx.le_lt_trans _ _ _ Hn' Hm)).
+    - intros Hc n'' ??. eapply (bchain_cauchy _ c n'' m); [by etrans|done|].
+      eapply siProp_closed; [apply Hc|]. by etrans.
   Qed.
   Next Obligation.
-    intros n ? c1 c2 m Hc; split=> n' ? /=. etrans; [by apply Hc|].
-    apply (bchain_cauchy _ c2); auto.
+    intros n ? c1 c2 m Hc; split=> n' ? /=.
+    apply forall_proper=> n''. do 2 (apply forall_proper=> ?).
+    apply Hc. by etrans.
   Qed.
 End cofe.
 
 (** [SiProp_downclose] takes a nat-based predicate and turns it into an [siProp]
 by closing it off. It is used for [siProp_impl] and [SbiUnfold]. *)
-Definition SiProp_downclose {SI : sidx} (Pi : nat → Prop) : siProp :=
-  SiProp (λ n, ∀ n', n' ≤ n → Pi n') ltac:(simpl; eauto using Nat.le_trans).
+Program Definition SiProp_downclose {SI : sidx} (Pi : SI → Prop) : siProp :=
+  {| siProp_holds n := ∀ n', n' ≤ n → Pi n' |}.
+Next Obligation.
+  intros ? Pi n1 n2 HPi ? n' ?; simpl in *. apply HPi. by etrans.
+Qed.
 
 (** logical entailement *)
 Inductive siProp_entails {SI : sidx} (P Q : siProp) : Prop :=
@@ -151,8 +146,10 @@ Local Definition siProp_exist_unseal :
   @siProp_exist = @siProp_exist_def := seal_eq siProp_exist_aux.
 
 Local Program Definition siProp_later_def {SI : sidx} (P : siProp) : siProp :=
-  {| siProp_holds n := match n return _ with 0 => True | S n' => P n' end |}.
-Next Obligation. intros ? P [|n1] [|n2]; eauto using siProp_closed with lia. Qed.
+  {| siProp_holds n := ∀ n', n' < n → P n' |}.
+Next Obligation.
+  intros ? P n1 n2 HP ? n' ?; simpl in *. by eapply HP, SIdx.lt_le_trans.
+Qed.
 Local Definition siProp_later_aux : seal (@siProp_later_def). Proof. by eexists. Qed.
 Definition siProp_later := unseal siProp_later_aux.
 Global Arguments siProp_later {SI}.
@@ -161,11 +158,10 @@ Local Definition siProp_later_unseal :
 
 Local Program Definition siProp_internal_eq_def
     {SI : sidx} {A : ofe} (a1 a2 : A) : siProp :=
-  {| siProp_holds n := a1 ≡{nat_to_sidx n}≡ a2 |}.
-Next Obligation.
-  intros ?? a1 a2 n1 n2 ? Hn. by eapply dist_le, nat_to_sidx_mono, Hn.
-Qed.
-Local Definition siProp_internal_eq_aux : seal (@siProp_internal_eq_def). Proof. by eexists. Qed.
+  {| siProp_holds n := a1 ≡{n}≡ a2 |}.
+Next Obligation. intros ?? a1 a2 n1 n2 ? Hn. by eapply dist_le, Hn. Qed.
+Local Definition siProp_internal_eq_aux : seal (@siProp_internal_eq_def).
+Proof. by eexists. Qed.
 Definition siProp_internal_eq := unseal siProp_internal_eq_aux.
 Global Arguments siProp_internal_eq {SI A}.
 Local Definition siProp_internal_eq_unseal :
@@ -173,10 +169,8 @@ Local Definition siProp_internal_eq_unseal :
 
 Local Program Definition siProp_cmra_valid_def
     {SI : sidx} {A : cmra} (a : A) : siProp :=
-  {| siProp_holds n := ✓{nat_to_sidx n} a |}.
-Next Obligation.
-  intros ?? a n1 n2 ? Hn. by eapply cmra_validN_le, nat_to_sidx_mono, Hn.
-Qed.
+  {| siProp_holds n := ✓{n} a |}.
+Next Obligation. intros ?? a n1 n2 ? Hn. by eapply cmra_validN_le, Hn. Qed.
 Local Definition siProp_cmra_valid_aux : seal (@siProp_cmra_valid_def).
 Proof. by eexists. Qed.
 Definition siProp_cmra_valid := siProp_cmra_valid_aux.(unseal).
@@ -214,6 +208,8 @@ Section primitive.
   Notation "▷ P" := (siProp_later P) : bi_scope.
   Notation "x ≡ y" := (siProp_internal_eq x y) : bi_scope.
   Notation "✓ x" := (siProp_cmra_valid x) : bi_scope.
+  Notation "◇ P" := (▷ False ∨ P)%I : bi_scope.
+  Notation "<only0> P" := (▷ False → P)%I : bi_scope.
 
   (** Below there follow the primitive laws for [siProp]. There are no derived laws
   in this file. *)
@@ -250,8 +246,8 @@ Section primitive.
   Lemma impl_ne : NonExpansive2 siProp_impl.
   Proof.
     intros n P P' HP Q Q' HQ; split=> n' ?.
-    unseal; split; intros HPQ n'' ??; apply HQ, HPQ, HP; auto;
-      (etrans; [by apply nat_to_sidx_mono|done]).
+    unseal; split; intros HPQ n'' ??;
+      apply HQ, HPQ, HP; first [by auto|by etrans].
   Qed.
   Lemma forall_ne A n :
     Proper (pointwise_relation _ (dist n) ==> dist n) (@siProp_forall _ A).
@@ -266,8 +262,9 @@ Section primitive.
   Qed.
   Lemma later_contractive : Contractive siProp_later.
   Proof.
-    unseal; intros n P Q HPQ; split=> -[|n'] //= /SIdx.le_succ_l ?.
-    eapply HPQ with (nat_to_sidx n'); auto.
+    unseal; intros n P Q HPQ; split=> -n' ?.
+    apply forall_proper=> n''. apply forall_proper=> ?.
+    eapply HPQ; last done. by eapply SIdx.lt_le_trans.
   Qed.
   Lemma internal_eq_ne (A : ofe) : NonExpansive2 (@siProp_internal_eq SI A).
   Proof.
@@ -332,19 +329,40 @@ Section primitive.
 
   (** Later *)
   Lemma later_mono P Q : (P ⊢ Q) → ▷ P ⊢ ▷ Q.
-  Proof. unseal=> HP; split=>-[|n]; [done|apply HP; eauto using cmra_validN_S]. Qed.
+  Proof. unseal=> HPQ; split=> n HP n' ?. by apply HPQ, HP. Qed.
   Lemma later_intro P : P ⊢ ▷ P.
-  Proof. unseal; split=> -[|n] /= HP; eauto using siProp_closed. Qed.
+  Proof. unseal; split=> n HP n' ?. by eapply siProp_closed, SIdx.lt_le_incl. Qed.
 
   Lemma later_forall_2 {A} (Φ : A → siProp) : (∀ a, ▷ Φ a) ⊢ ▷ ∀ a, Φ a.
-  Proof. unseal; by split=> -[|n]. Qed.
-  Lemma later_exist_false {A} (Φ : A → siProp) :
-    (▷ ∃ a, Φ a) ⊢ ▷ False ∨ (∃ a, ▷ Φ a).
-  Proof. unseal; split=> -[|[|n]] /=; eauto. Qed.
-  Lemma later_false_em P : ▷ P ⊢ ▷ False ∨ (▷ False → P).
+  Proof. unseal; split=> n HΦ n' ? x. by apply HΦ. Qed.
+
+  Lemma later_exist_except_0 `{!SIdxFinite SI} {A} (Φ : A → siProp) :
+    (▷ ∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a).
   Proof.
-    unseal; split=> -[|n] /= HP; [by left|right].
-    intros [|n'] ?; eauto using siProp_closed with lia.
+    unseal; split=> n HΦ; simpl in *. destruct (finite_index n) as [->|[m ->]].
+    { left. intros n' []%SIdx.nlt_0_r. }
+    right. destruct (HΦ m) as [a HΦa]; first by apply SIdx.lt_succ_diag_r.
+    exists a. intros n' ?%SIdx.lt_succ_r. by eapply siProp_closed.
+  Qed.
+
+  Lemma only_0_exist_1 {A} (Φ : A → siProp) :
+    <only0> (∃ a, Φ a) ⊢ ∃ a, <only0> Φ a.
+  Proof.
+    unseal; split=> n HΦ; simpl in *.
+    destruct (HΦ 0ᵢ) as [a HΦa].
+    { apply SIdx.le_0_l. }
+    { intros n' []%SIdx.nlt_0_r. }
+    exists a. intros n' ? Hn'.
+    destruct (decide (n' = 0ᵢ)) as [->|[]%SIdx.neq_0_lt_0%Hn']. done.
+  Qed.
+
+  Lemma later_except_0_only_0 P : ▷ P ⊢ ◇ <only0> P.
+  Proof.
+    unseal; split=> n /= HP. destruct (decide (n = 0ᵢ)) as [->|].
+    { left. intros n' []%SIdx.nlt_0_r. }
+    right. intros n' ? Hn'.
+    destruct (decide (n' = 0ᵢ)) as [->|[]%SIdx.neq_0_lt_0%Hn'].
+    by apply HP, SIdx.neq_0_lt_0.
   Qed.
 
   (** Equality *)
@@ -353,16 +371,11 @@ Section primitive.
   Lemma internal_eq_rewrite {A : ofe} a b (Ψ : A → siProp) :
     NonExpansive Ψ → a ≡ b ⊢ Ψ a → Ψ b.
   Proof.
-    intros Hnonexp. unseal; split=> n Hab n' ? HΨ.
-    eapply Hnonexp with (nat_to_sidx n) a; auto using nat_to_sidx_mono.
+    intros Hnonexp. unseal; split=> n Hab n' ? HΨ. apply Hnonexp with n a; auto.
   Qed.
 
   Lemma prop_ext_2 P Q : ((P → Q) ∧ (Q → P)) ⊢ P ≡ Q.
-  Proof.
-    unseal; split=> n /= HPQ. split=> n' Hn.
-    move: HPQ=> [] /(_ n') ? /(_ n').
-    apply nat_to_sidx_mono_inv in Hn. naive_solver.
-  Qed.
+  Proof. unseal; split=> n /= HPQ. split=> n' Hn. naive_solver. Qed.
 
   Lemma fun_extI {A} {B : A → ofe} (g1 g2 : discrete_fun B) :
     (∀ i, g1 i ≡ g2 i) ⊢ g1 ≡ g2.
@@ -372,63 +385,42 @@ Section primitive.
   Proof. by unseal. Qed.
 
   Lemma later_equivI_1 {A : ofe} (x y : A) : Next x ≡ Next y ⊢ ▷ (x ≡ y).
-  Proof.
-    unseal. split. intros [|n]; simpl; [done|].
-    intros Heq; apply Heq; auto using SIdx.lt_succ_diag_r.
-  Qed.
+  Proof. unseal. split=> n Heq n' ?; simpl in *. by apply Heq. Qed.
   Lemma later_equivI_2 {A : ofe} (x y : A) : ▷ (x ≡ y) ⊢ Next x ≡ Next y.
-  Proof.
-    unseal. split. intros n ?; split; intros m Hlt; simpl in *.
-    destruct n as [|n]; first by apply SIdx.nlt_0_r in Hlt.
-    by eapply dist_le, SIdx.lt_succ_r.
-  Qed.
+  Proof. unseal. split=> n Heq; split=> m ?; simpl in *; eauto. Qed.
 
   Lemma discrete_eq_1 {A : ofe} (a b : A) :
     TCOr (Discrete a) (Discrete b) →
     a ≡ b ⊢ ⌜a ≡ b⌝.
-  Proof. unseal=> ?. split=> n. by apply (discrete_iff (nat_to_sidx n)). Qed.
+  Proof. unseal=> ?. split=> n. by apply (discrete_iff n). Qed.
 
-  (** TODO: Remove [SIdxFinite] once we use [SI] instead of [nat]. *)
-  Lemma internal_eq_entails `{!SIdxFinite SI} {A B : ofe} (a1 a2 : A) (b1 b2 : B) :
+  Lemma internal_eq_entails {A B : ofe} (a1 a2 : A) (b1 b2 : B) :
     (a1 ≡ a2 ⊢ b1 ≡ b2) ↔ (∀ n, a1 ≡{n}≡ a2 → b1 ≡{n}≡ b2).
-  Proof.
-    unseal. split.
-    - intros [Heq] n. destruct (surj nat_to_sidx n) as [m <-]. apply Heq.
-    - intros Heq. split=> n. apply (Heq (nat_to_sidx n)).
-  Qed.
+  Proof. unseal. split; intros Heq; [|split=> n]; apply Heq. Qed.
 
   (** Validity *)
   Lemma cmra_valid_intro {A : cmra} P (a : A) : ✓ a → P ⊢ (✓ a).
   Proof. unseal=> ?; split=> n ? /=; by apply cmra_valid_validN. Qed.
   Lemma cmra_valid_elim {A : cmra} (a : A) : ✓ a ⊢ ⌜ ✓{0ᵢ} a ⌝.
   Proof.
-    unseal; split=> n ?; by apply cmra_validN_le with (nat_to_sidx n), SIdx.le_0_l.
+    unseal; split=> n ?; by apply cmra_validN_le with n, SIdx.le_0_l.
   Qed.
   Lemma cmra_valid_weaken {A : cmra} (a b : A) : ✓ (a ⋅ b) ⊢ ✓ a.
   Proof. unseal; split=> n; apply cmra_validN_op_l. Qed.
-  (** TODO: Remove [SIdxFinite] once we use [SI] instead of [nat]. *)
-  Lemma valid_entails `{!SIdxFinite SI} {A B : cmra} (a : A) (b : B) :
+  Lemma valid_entails {A B : cmra} (a : A) (b : B) :
     (✓ a ⊢ ✓ b) ↔ ∀ n, ✓{n} a → ✓{n} b.
-  Proof.
-    unseal. split.
-    - intros [Hv] n. destruct (surj nat_to_sidx n) as [m <-]. apply Hv.
-    - intros Hv. split=> n. apply (Hv (nat_to_sidx n)).
-  Qed.
+  Proof. unseal. split; intros Hv; [|split=> n]; apply Hv. Qed.
 
   (** Consistency/soundness statements *)
   Lemma pure_soundness φ : (True ⊢ ⌜ φ ⌝) → φ.
-  Proof. unseal=> -[H]. by apply (H 0). Qed.
-  (** TODO: Remove [SIdxFinite] once we use [SI] instead of [nat]. *)
-  Lemma internal_eq_soundness `{!SIdxFinite SI} {A : ofe} (x y : A) :
+  Proof. unseal=> -[H]. by apply (H 0ᵢ). Qed.
+  Lemma internal_eq_soundness {A : ofe} (x y : A) :
     (True ⊢ x ≡ y) → x ≡ y.
-  Proof.
-    unseal=> -[H]. apply equiv_dist=> n.
-    destruct (surj nat_to_sidx n) as [m <-]. by apply (H m).
-  Qed.
+  Proof. unseal=> -[H]. apply equiv_dist=> n. by apply (H n). Qed.
   Lemma later_soundness P : (True ⊢ ▷ P) → (True ⊢ P).
   Proof.
     unseal=> -[HP]; split=> n _. apply siProp_closed with n; last done.
-    by apply (HP (S n)).
+    apply (HP (Sᵢ n)); [done|]. eapply SIdx.lt_succ_diag_r.
   Qed.
 End primitive.
 End siProp_primitive.

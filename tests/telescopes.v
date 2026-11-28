@@ -156,7 +156,7 @@ Restart. Proof.
 Abort.
 
 Check "test2_test".
-Lemma test2_test {PROP : bi}  :
+Lemma test2_test `{!SIdxFinite SI} {PROP : bi}  :
   TEST2 {{ ∃ a b : nat, <affine> ⌜a = b⌝ }} ⊢@{PROP} ▷ False.
 Proof.
   iIntros "H". iModIntro. Show.

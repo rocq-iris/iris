@@ -393,13 +393,22 @@ Section instances.
     - intros P Q [?]. split=> i. by apply bi.later_mono.
     - intros P. split=> i /=. by apply bi.later_intro.
     - intros A Ψ. split=> i. by apply bi.later_forall_2.
-    - intros A Ψ. split=> i. by apply bi.later_exist_false.
+    - intros ? A Ψ. split=> i. by apply bi.later_exist_except_0.
+    - intros A Ψ. split=> i /=. change (▷ False → ?P)%I with (<only0> P)%I.
+      rewrite (bi.forall_elim i) bi.pure_True // left_id.
+      rewrite bi.only_0_exist. f_equiv=> x. apply bi.forall_intro=> j.
+      apply bi.impl_intro_l, bi.pure_elim_l=> ?. f_equiv. by apply monPred_mono.
     - intros P Q. split=> i. by apply bi.later_sep_1.
     - intros P Q. split=> i. by apply bi.later_sep_2.
+    - intros P Q. split=> i /=. rewrite (bi.forall_elim i) bi.pure_True // left_id.
+      change (▷ False → ?P)%I with (<only0> P)%I. rewrite bi.only_0_sep.
+      f_equiv; apply bi.forall_intro=> j;
+        apply bi.impl_intro_l, bi.pure_elim_l=> ?;
+        f_equiv; by apply monPred_mono.
     - intros P. split=> i. by apply bi.later_persistently_1.
     - intros P. split=> i. by apply bi.later_persistently_2.
     - intros P. split=> i /=. rewrite -bi.forall_intro.
-      + apply bi.later_false_em.
+      + apply bi.later_except_0_only_0.
       + intros j. rewrite bi.pure_impl_forall. apply bi.forall_intro=> Hij.
         by rewrite Hij.
   Qed.
@@ -549,7 +558,8 @@ Section instances.
     split; rewrite /Timeless /Persistent /Affine /bi_except_0
       !(monPred_defs.monPred_lc_unseal, monPred_unseal_bi).
     - intros n m. split=> i /=. apply lc_split.
-    - intros n. split=> i /=. apply: timeless.
+    - intros n. split=> i /=. rewrite !monPred_unseal_bi /=.
+      rewrite (bi.forall_elim i) bi.pure_True // left_id. apply: timeless.
     - split=> i /=. apply: persistent.
     - intros n. split=> i /=. apply: affine.
   Qed.
@@ -1198,21 +1208,6 @@ Section bi_facts.
   Proof. intros ??. by rewrite !monPred_at_bupd objective_at. Qed.
 
   (** Later *)
-  Global Instance monPred_at_timeless P i : Timeless P → Timeless (P i).
-  Proof. move => [] /(_ i). rewrite /Timeless /bi_except_0. by unseal. Qed.
-  Global Instance monPred_in_timeless i0 : Timeless (@monPred_in I PROP i0).
-  Proof. split => ? /=. rewrite /bi_except_0. unseal. apply timeless, _. Qed.
-  Global Instance monPred_objectively_timeless P : Timeless P → Timeless (<obj> P).
-  Proof.
-    move=>[]. rewrite /Timeless /bi_except_0. unseal=>Hti. split=> ? /=.
-    by apply timeless, bi.forall_timeless.
-  Qed.
-  Global Instance monPred_subjectively_timeless P : Timeless P → Timeless (<subj> P).
-  Proof.
-    move=>[]. rewrite /Timeless /bi_except_0. unseal=>Hti. split=> ? /=.
-    by apply timeless, bi.exist_timeless.
-  Qed.
-
   Lemma monPred_at_later i P : (▷ P) i ⊣⊢ ▷ P i.
   Proof. by unseal. Qed.
   Lemma monPred_at_laterN n i P : (▷^n P) i ⊣⊢ ▷^n P i.
@@ -1222,6 +1217,36 @@ Section bi_facts.
   Lemma monPred_at_lc i n `{!BiLaterCredits PROP} :
     (lc (PROP:=monPred) n) i ⊣⊢ £ n.
   Proof. by unseal. Qed.
+  Lemma monPred_at_only_0 i P : (<only0> P) i ⊣⊢ <only0> P i.
+  Proof.
+    rewrite /bi_only_0. unseal. apply (anti_symm _).
+    - by rewrite (bi.forall_elim i) bi.pure_True // left_id.
+    - apply bi.forall_intro=> j. apply bi.impl_intro_l, bi.pure_elim_l=> ?.
+      f_equiv. by apply monPred_mono.
+  Qed.
+
+  Global Instance monPred_at_timeless P i : Timeless P → Timeless (P i).
+  Proof. move => [] /(_ i). by rewrite /Timeless monPred_at_only_0. Qed.
+  Global Instance monPred_in_timeless i0 : Timeless (@monPred_in I PROP i0).
+  Proof.
+    split=> i. by rewrite monPred_at_only_0 monPred_at_in bi.only_0_pure.
+  Qed.
+
+  Global Instance monPred_objectively_timeless P : Timeless P → Timeless (<obj> P).
+  Proof.
+    rewrite /Timeless=> -[HP]. split=> i.
+    rewrite monPred_at_only_0 monPred_at_objectively.
+    apply bi.forall_intro=> j. rewrite (bi.forall_elim j).
+    specialize (HP j). by rewrite monPred_at_only_0 in HP.
+  Qed.
+  Global Instance monPred_subjectively_timeless P :
+    Timeless P → Timeless (<subj> P).
+  Proof.
+    rewrite /Timeless=> -[HP]. split=> i.
+    rewrite monPred_at_only_0 monPred_at_subjectively bi.only_0_exist.
+    f_equiv=> j. specialize (HP j). by rewrite monPred_at_only_0 in HP.
+  Qed.
+
 
   Global Instance later_objective P `{!Objective P} : Objective (▷ P).
   Proof. intros ??. unseal. by rewrite objective_at. Qed.

@@ -46,24 +46,28 @@ Proof.
 Qed.
 Lemma later_exist_2 {A} (Φ : A → PROP) : (∃ a, ▷ Φ a) ⊢ ▷ (∃ a, Φ a).
 Proof. apply exist_elim; eauto using exist_intro. Qed.
-Lemma later_exist_except_0 {A} (Φ : A → PROP) : ▷ (∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a).
-Proof. apply later_exist_false. Qed.
-Lemma later_exist `{Inhabited A} (Φ : A → PROP) : ▷ (∃ a, Φ a) ⊣⊢ (∃ a, ▷ Φ a).
+Lemma later_exist_except_0 `{!SIdxFinite SI} {A} (Φ : A → PROP) :
+  ▷ (∃ a, Φ a) ⊢ ◇ (∃ a, ▷ Φ a).
+Proof. apply later_exist_except_0_internal. Qed.
+Lemma later_exist `{!SIdxFinite SI, !Inhabited A} (Φ : A → PROP) :
+  ▷ (∃ a, Φ a) ⊣⊢ (∃ a, ▷ Φ a).
 Proof.
   apply: anti_symm; [|apply later_exist_2].
-  rewrite later_exist_false. apply or_elim; last done.
+  rewrite later_exist_except_0. apply or_elim; last done.
   rewrite -(exist_intro inhabitant); auto.
 Qed.
 Lemma later_and P Q : ▷ (P ∧ Q) ⊣⊢ ▷ P ∧ ▷ Q.
 Proof. rewrite !and_alt later_forall. by apply forall_proper=> -[]. Qed.
-Lemma later_or P Q : ▷ (P ∨ Q) ⊣⊢ ▷ P ∨ ▷ Q.
+Lemma later_or_2 P Q : ▷ P ∨ ▷ Q ⊢ ▷ (P ∨ Q).
+Proof. rewrite !or_alt -later_exist_2. by f_equiv=> -[]. Qed.
+Lemma later_or `{!SIdxFinite SI} P Q : ▷ (P ∨ Q) ⊣⊢ ▷ P ∨ ▷ Q.
 Proof. rewrite !or_alt later_exist. by apply exist_proper=> -[]. Qed.
 Lemma later_impl P Q : ▷ (P → Q) ⊢ ▷ P → ▷ Q.
 Proof. apply impl_intro_l. by rewrite -later_and impl_elim_r. Qed.
-Lemma later_sep P Q : ▷ (P ∗ Q) ⊣⊢ ▷ P ∗ ▷ Q.
+Lemma later_sep `{!SIdxFinite SI} P Q : ▷ (P ∗ Q) ⊣⊢ ▷ P ∗ ▷ Q.
 Proof. apply (anti_symm _); auto using later_sep_1, later_sep_2. Qed.
 Lemma later_wand P Q : ▷ (P -∗ Q) ⊢ ▷ P -∗ ▷ Q.
-Proof. apply wand_intro_l. by rewrite -later_sep wand_elim_r. Qed.
+Proof. apply wand_intro_l. by rewrite later_sep_2 wand_elim_r. Qed.
 Lemma later_iff P Q : ▷ (P ↔ Q) ⊢ ▷ P ↔ ▷ Q.
 Proof. by rewrite /bi_iff later_and !later_impl. Qed.
 Lemma later_wand_iff P Q : ▷ (P ∗-∗ Q) ⊢ ▷ P ∗-∗ ▷ Q.
@@ -76,7 +80,9 @@ Lemma later_intuitionistically_2 P : □ ▷ P ⊢ ▷ □ P.
 Proof. by rewrite /bi_intuitionistically -later_persistently later_affinely_2. Qed.
 Lemma later_intuitionistically_if_2 p P : □?p ▷ P ⊢ ▷ □?p P.
 Proof. destruct p; simpl; auto using later_intuitionistically_2. Qed.
-Lemma later_absorbingly P : ▷ <absorb> P ⊣⊢ <absorb> ▷ P.
+Lemma later_absorbingly_2 P : <absorb> ▷ P ⊢ ▷ <absorb> P.
+Proof. by rewrite /bi_absorbingly -later_sep_2 later_True. Qed.
+Lemma later_absorbingly `{!SIdxFinite SI} P : ▷ <absorb> P ⊣⊢ <absorb> ▷ P.
 Proof. by rewrite /bi_absorbingly later_sep later_True. Qed.
 
 Lemma later_affinely `{!BiAffine PROP} P : ▷ <affine> P ⊣⊢ <affine> ▷ P.
@@ -89,7 +95,7 @@ Proof. destruct p; simpl; auto using later_intuitionistically. Qed.
 Global Instance later_persistent P : Persistent P → Persistent (▷ P).
 Proof. intros. by rewrite /Persistent -later_persistently {1}(persistent P). Qed.
 Global Instance later_absorbing P : Absorbing P → Absorbing (▷ P).
-Proof. intros ?. by rewrite /Absorbing -later_absorbingly absorbing. Qed.
+Proof. intros ?. by rewrite /Absorbing later_absorbingly_2 absorbing. Qed.
 
 (** * Alternatives to Löb induction *)
 (** We prove relations between the following statements:
@@ -130,17 +136,15 @@ Proof. split; intros HLöb P; [by apply löb|]. by intros ->%entails_impl_True. 
 Their [Ψ] is called [Q] in our proof. *)
 Global Instance later_contractive_bi_löb : BiLaterContractive PROP → BiLöb PROP.
 Proof.
-  intros=> P.
-  pose (flöb_pre (P Q : PROP) := (▷ Q → P)%I).
-  assert (∀ P, Contractive (flöb_pre P)) by solve_contractive.
-  set (Q := fixpoint (flöb_pre P)).
+  intros=> P HP.
+  pose (flöb_pre (Q : PROP) := (▷ Q → P)%I).
+  assert (Contractive flöb_pre) by solve_contractive.
+  set (Q := fixpoint flöb_pre).
   assert (Q ⊣⊢ (▷ Q → P)) as HQ by (exact: fixpoint_unfold).
-  intros HP. rewrite -HP.
   assert (▷ Q ⊢ P) as HQP.
-  { rewrite -HP. rewrite -(idemp (∧) (▷ Q))%I {2}(later_intro (▷ Q)).
-    by rewrite {1}HQ {1}later_impl impl_elim_l. }
-  rewrite -HQP HQ -2!later_intro.
-  apply (entails_impl_True _ P). done.
+  { rewrite -HP. f_equiv. rewrite -(idemp (∧)%I Q) {2}(later_intro Q).
+    by rewrite {1}HQ impl_elim_l. }
+  rewrite -HQP -later_intro HQ. apply (entails_impl_True _ P). done.
 Qed.
 
 Lemma löb_wand_intuitionistically `{!BiLöb PROP} P : □ (□ ▷ P -∗ P) ⊢ P.
@@ -180,7 +184,7 @@ Proof. apply entails_impl, löb. Qed.
 (** This lemma shows that the (finite) step-index eventually runs out.
 See [lib/counterexamples.v] and [tests/heap_lang.v] for applications of this
 lemma. *)
-Lemma laterN_False `{!BiLöb PROP} : ⊢@{PROP} ∃ n, ▷^n False.
+Lemma laterN_False `{!SIdxFinite SI, !BiLöb PROP} : ⊢@{PROP} ∃ n, ▷^n False.
 Proof.
   rewrite -(löb (∃ n : nat, ▷^n False)%I) later_exist.
   apply entails_impl, exist_elim=> n.
@@ -236,19 +240,23 @@ Lemma laterN_forall {A} n (Φ : A → PROP) : (▷^n ∀ a, Φ a) ⊣⊢ (∀ a,
 Proof. induction n as [|n IH]; simpl; rewrite -?later_forall ?IH; auto. Qed.
 Lemma laterN_exist_2 {A} n (Φ : A → PROP) : (∃ a, ▷^n Φ a) ⊢ ▷^n (∃ a, Φ a).
 Proof. apply exist_elim; eauto using exist_intro, laterN_mono. Qed.
-Lemma laterN_exist {A} `{!Inhabited A} n (Φ : A → PROP) :
+Lemma laterN_exist `{!SIdxFinite SI, !Inhabited A} n (Φ : A → PROP) :
   (▷^n ∃ a, Φ a) ⊣⊢ ∃ a, ▷^n Φ a.
 Proof. induction n as [|n IH]; simpl; rewrite -?later_exist ?IH; auto. Qed.
 Lemma laterN_and n P Q : ▷^n (P ∧ Q) ⊣⊢ ▷^n P ∧ ▷^n Q.
 Proof. induction n as [|n IH]; simpl; rewrite -?later_and ?IH; auto. Qed.
-Lemma laterN_or n P Q : ▷^n (P ∨ Q) ⊣⊢ ▷^n P ∨ ▷^n Q.
+Lemma laterN_or_2 n P Q : ▷^n P ∨ ▷^n Q ⊢ ▷^n (P ∨ Q).
+Proof. induction n as [|n IH]; simpl; rewrite ?later_or_2 ?IH; auto. Qed.
+Lemma laterN_or `{!SIdxFinite SI} n P Q : ▷^n (P ∨ Q) ⊣⊢ ▷^n P ∨ ▷^n Q.
 Proof. induction n as [|n IH]; simpl; rewrite -?later_or ?IH; auto. Qed.
 Lemma laterN_impl n P Q : ▷^n (P → Q) ⊢ ▷^n P → ▷^n Q.
 Proof. apply impl_intro_l. by rewrite -laterN_and impl_elim_r. Qed.
-Lemma laterN_sep n P Q : ▷^n (P ∗ Q) ⊣⊢ ▷^n P ∗ ▷^n Q.
+Lemma laterN_sep_2 n P Q : ▷^n P ∗ ▷^n Q ⊢ ▷^n (P ∗ Q).
+Proof. induction n as [|n IH]; simpl; rewrite ?later_sep_2 ?IH; auto. Qed.
+Lemma laterN_sep `{!SIdxFinite SI} n P Q : ▷^n (P ∗ Q) ⊣⊢ ▷^n P ∗ ▷^n Q.
 Proof. induction n as [|n IH]; simpl; rewrite -?later_sep ?IH; auto. Qed.
 Lemma laterN_wand n P Q : ▷^n (P -∗ Q) ⊢ ▷^n P -∗ ▷^n Q.
-Proof. apply wand_intro_l. by rewrite -laterN_sep wand_elim_r. Qed.
+Proof. apply wand_intro_l. by rewrite laterN_sep_2 wand_elim_r. Qed.
 Lemma laterN_iff n P Q : ▷^n (P ↔ Q) ⊢ ▷^n P ↔ ▷^n Q.
 Proof. by rewrite /bi_iff laterN_and !laterN_impl. Qed.
 Lemma laterN_persistently n P : ▷^n <pers> P ⊣⊢ <pers> ▷^n P.
@@ -259,7 +267,9 @@ Lemma laterN_intuitionistically_2 n P : □ ▷^n P ⊢ ▷^n □ P.
 Proof. by rewrite /bi_intuitionistically -laterN_persistently laterN_affinely_2. Qed.
 Lemma laterN_intuitionistically_if_2 n p P : □?p ▷^n P ⊢ ▷^n □?p P.
 Proof. destruct p; simpl; auto using laterN_intuitionistically_2. Qed.
-Lemma laterN_absorbingly n P : ▷^n <absorb> P ⊣⊢ <absorb> ▷^n P.
+Lemma laterN_absorbingly_2 n P : <absorb> ▷^n P ⊢ ▷^n <absorb> P.
+Proof. by rewrite /bi_absorbingly -laterN_sep_2 laterN_True. Qed.
+Lemma laterN_absorbingly `{!SIdxFinite SI} n P : ▷^n <absorb> P ⊣⊢ <absorb> ▷^n P.
 Proof. by rewrite /bi_absorbingly laterN_sep laterN_True. Qed.
 
 Global Instance laterN_persistent n P : Persistent P → Persistent (▷^n P).
@@ -285,6 +295,9 @@ Proof. by intros ->. Qed.
 Lemma except_0_idemp P : ◇ ◇ P ⊣⊢ ◇ P.
 Proof. apply (anti_symm _); rewrite /bi_except_0; auto. Qed.
 
+Lemma later_except_0_only_0 P : ▷ P ⊢ ◇ <only0> P.
+Proof. apply later_except_0_only_0_internal. Qed.
+
 Lemma except_0_True : ◇ True ⊣⊢ True.
 Proof. rewrite /bi_except_0. apply (anti_symm _); auto. Qed.
 Lemma except_0_emp `{!BiAffine PROP} : ◇ emp ⊣⊢ emp.
@@ -297,9 +310,10 @@ Lemma except_0_sep P Q : ◇ (P ∗ Q) ⊣⊢ ◇ P ∗ ◇ Q.
 Proof.
   rewrite /bi_except_0. apply (anti_symm _).
   - apply or_elim; last by auto using sep_mono.
-    by rewrite -!or_intro_l -persistently_pure -later_sep -persistently_sep_dup.
+    rewrite -!or_intro_l -persistently_pure.
+    by rewrite !later_persistently -persistently_sep_dup.
   - rewrite sep_or_r !sep_or_l {1}(later_intro P) {1}(later_intro Q).
-    rewrite -!later_sep !left_absorb right_absorb. auto.
+    rewrite !later_sep_2 !left_absorb right_absorb. auto.
 Qed.
 Lemma except_0_forall {A} (Φ : A → PROP) : ◇ (∀ a, Φ a) ⊣⊢ ∀ a, ◇ Φ a.
 Proof.
@@ -308,7 +322,7 @@ Proof.
   trans (▷ (∀ a : A, Φ a) ∧ (∀ a : A, ◇ Φ a))%I.
   { apply and_intro, reflexivity. rewrite later_forall. apply forall_mono=> a.
     apply or_elim; auto using later_intro. }
-  rewrite later_false_em and_or_r. apply or_elim.
+  rewrite later_except_0_only_0 /bi_only_0 and_or_r. apply or_elim.
   { rewrite and_elim_l. apply or_intro_l. }
   apply or_intro_r', forall_intro=> a. rewrite !(forall_elim a).
   by rewrite and_or_l impl_elim_l and_elim_r idemp.
@@ -323,7 +337,7 @@ Proof.
   - apply exist_mono=> a. apply except_0_intro.
 Qed.
 Lemma except_0_later P : ◇ ▷ P ⊢ ▷ P.
-Proof. by rewrite /bi_except_0 -later_or False_or. Qed.
+Proof. by rewrite /bi_except_0 later_or_2 False_or. Qed.
 Lemma except_0_laterN n P : ◇ ▷^n P ⊢ ▷^n ◇ P.
 Proof. by destruct n as [|n]; rewrite //= ?except_0_later -except_0_intro. Qed.
 Lemma except_0_into_later P : ◇ P ⊢ ▷ P.
@@ -354,12 +368,6 @@ Lemma except_0_frame_l P Q : P ∗ ◇ Q ⊢ ◇ (P ∗ Q).
 Proof. by rewrite {1}(except_0_intro P) except_0_sep. Qed.
 Lemma except_0_frame_r P Q : ◇ P ∗ Q ⊢ ◇ (P ∗ Q).
 Proof. by rewrite {1}(except_0_intro Q) except_0_sep. Qed.
-
-Lemma later_affinely_1 `{!Timeless (PROP:=PROP) emp} P : ▷ <affine> P ⊢ ◇ <affine> ▷ P.
-Proof.
-  rewrite /bi_affinely later_and (timeless emp) except_0_and.
-  by apply and_mono, except_0_intro.
-Qed.
 
 Global Instance except_0_persistent P : Persistent P → Persistent (◇ P).
 Proof. rewrite /bi_except_0; apply _. Qed.
@@ -398,28 +406,6 @@ Proof.
   - apply and_intro; [apply only_0_intro|apply except_0_intro].
 Qed.
 
-Lemma later_except_0_only_0 P : ▷ P ⊢ ◇ <only0> P.
-Proof. apply later_false_em. Qed.
-
-(** This lemma shows that our characterization of timeless propositions (via
-the except-0 modality) is equivalent to the characterization via the only-0
-modality. See the comment above the definition of [Timeless] in
-[iris.bi.interface] for more details. *)
-Lemma timeless_alt `{!BiLöb PROP} P : Timeless P ↔ (<only0> P ⊢ P).
-Proof.
-  rewrite /Timeless. split; intros HP.
-  - etrans; [|apply löb]. apply impl_intro_r.
-    by rewrite HP except_0_and_only_0_self.
-  - by rewrite later_except_0_only_0 HP.
-Qed.
-
-Lemma timeless_only_0 `{!BiLöb PROP} P : Timeless P → <only0> P ⊣⊢ P.
-Proof.
-  intros. apply (anti_symm _); [by apply timeless_alt|apply only_0_intro].
-Qed.
-Lemma only_0_elim_timeless `{!BiLöb PROP} P : Timeless P → <only0> P ⊢ P.
-Proof. intros. by rewrite timeless_only_0. Qed.
-
 Lemma only_0_forall {A} (Φ : A → PROP) : <only0> (∀ a, Φ a) ⊣⊢ ∀ a, <only0> Φ a.
 Proof.
   apply (anti_symm _).
@@ -431,22 +417,21 @@ Qed.
 Lemma only_0_and P Q : <only0> (P ∧ Q) ⊣⊢ <only0> P ∧ <only0> Q.
 Proof. rewrite !and_alt only_0_forall. by f_equiv=> -[]. Qed.
 
-Lemma only_0_exist `{!BiLöb PROP} {A} (Φ : A → PROP) :
+Lemma only_0_exist_1 {A} (Φ : A → PROP) :
+  <only0> (∃ x, Φ x) ⊢ ∃ x, <only0> Φ x.
+Proof. apply only_0_exist_1_internal. Qed.
+
+Lemma only_0_exist {A} (Φ : A → PROP) :
   <only0> (∃ x, Φ x) ⊣⊢ ∃ x, <only0> Φ x.
 Proof.
-  apply (anti_symm _); last first.
-  { apply exist_elim=> x. by rewrite -(exist_intro x). }
-  etrans; [|apply löb]. apply impl_intro_r.
-  rewrite later_exist_except_0. setoid_rewrite later_except_0_only_0.
-  rewrite except_0_exist_2 except_0_idemp except_0_and_only_0.
-  apply or_elim; f_equiv=> x; [apply only_0_intro|].
-  by rewrite only_0_idemp.
+  apply (anti_symm _); [apply only_0_exist_1|].
+  apply exist_elim=> x. by rewrite -(exist_intro x).
 Qed.
 
-Lemma only_0_or `{!BiLöb PROP} P Q : <only0> (P ∨ Q) ⊣⊢ <only0> P ∨ <only0> Q.
+Lemma only_0_or P Q : <only0> (P ∨ Q) ⊣⊢ <only0> P ∨ <only0> Q.
 Proof. rewrite !or_alt only_0_exist. by f_equiv=> -[]. Qed.
 
-Lemma only_0_pure `{!BiLöb PROP} φ : <only0> ⌜ φ ⌝ ⊣⊢@{PROP} ⌜ φ ⌝.
+Lemma only_0_pure φ : <only0> ⌜ φ ⌝ ⊣⊢@{PROP} ⌜ φ ⌝.
 Proof.
   rewrite pure_alt only_0_exist. f_equiv=> ?.
   apply (anti_symm _); auto using only_0_intro.
@@ -465,22 +450,21 @@ Qed.
 Lemma only_0_iff P Q : <only0> (P ↔ Q) ⊣⊢ (<only0> P ↔ <only0> Q).
 Proof. by rewrite /bi_iff !only_0_and !only_0_impl. Qed.
 
-Lemma only_0_emp `{!BiLöb PROP, !Timeless (PROP:=PROP) emp} :
+Lemma only_0_emp `{!Timeless (PROP:=PROP) emp} :
   <only0> emp ⊣⊢@{PROP} emp.
-Proof. apply: timeless_only_0. Qed.
+Proof. by apply (anti_symm _), only_0_intro. Qed.
 
-Lemma only_0_sep `{!BiLöb PROP} P Q : <only0> (P ∗ Q) ⊣⊢ <only0> P ∗ <only0> Q.
+Lemma only_0_sep_1 P Q : <only0> (P ∗ Q) ⊢ <only0> P ∗ <only0> Q.
+Proof. apply only_0_sep_1_internal. Qed.
+
+Lemma only_0_sep P Q : <only0> (P ∗ Q) ⊣⊢ <only0> P ∗ <only0> Q.
 Proof.
-  apply (anti_symm _); last first.
-  { apply impl_intro_l. rewrite persistent_and_affinely_sep_l.
-    rewrite (persistent_sep_dup (<affine> ▷ False)%I).
-    rewrite -!assoc (assoc _ _ (<only0> P)%I) (assoc _ (<affine> _)%I).
-    rewrite (comm _ (<affine> _)%I) -assoc -!persistent_and_affinely_sep_l.
-    by rewrite /bi_only_0 !impl_elim_r. }
-  etrans; [|apply löb]. apply impl_intro_r.
-  rewrite later_sep !later_except_0_only_0 !only_0_idemp -except_0_sep.
-  rewrite except_0_and_only_0.
-  apply or_elim; [|done]. by rewrite -!only_0_intro.
+  apply (anti_symm _); [by apply only_0_sep_1|].
+  apply impl_intro_l. rewrite persistent_and_affinely_sep_l.
+  rewrite (persistent_sep_dup (<affine> ▷ False)%I).
+  rewrite -!assoc (assoc _ _ (<only0> P)%I) (assoc _ (<affine> _)%I).
+  rewrite (comm _ (<affine> _)%I) -assoc -!persistent_and_affinely_sep_l.
+  by rewrite /bi_only_0 !impl_elim_r.
 Qed.
 
 Lemma only_0_wand_r P Q : <only0> (P -∗ Q) ⊣⊢ (P -∗ <only0> Q).
@@ -489,34 +473,31 @@ Proof.
   by rewrite !impl_wand_intuitionistically !wand_curry (comm _ P).
 Qed.
 
-Lemma only_0_wand `{!BiLöb PROP} P Q : <only0> (P -∗ Q) ⊣⊢ (<only0> P -∗ <only0> Q).
+Lemma only_0_wand P Q : <only0> (P -∗ Q) ⊣⊢ (<only0> P -∗ <only0> Q).
 Proof.
   apply (anti_symm _).
   - apply wand_intro_l. by rewrite -only_0_sep wand_elim_r.
   - by rewrite -only_0_wand_r -(only_0_intro P).
 Qed.
 
-Lemma only_0_wand_iff `{!BiLöb PROP} P Q : <only0> (P ∗-∗ Q) ⊣⊢ (<only0> P ∗-∗ <only0> Q).
+Lemma only_0_wand_iff P Q : <only0> (P ∗-∗ Q) ⊣⊢ (<only0> P ∗-∗ <only0> Q).
 Proof. by rewrite /bi_wand_iff !only_0_and !only_0_wand. Qed.
 
-(** See [sbi] for the other direction, for which we need
+Lemma only_0_absorbingly P : <only0> <absorb> P ⊣⊢ <absorb> <only0> P.
+Proof. by rewrite /bi_absorbingly only_0_sep only_0_pure. Qed.
+
+Lemma only_0_affinely `{!Timeless (PROP:=PROP) emp} P :
+  <only0> <affine> P ⊣⊢ <affine> <only0> P.
+Proof. by rewrite /bi_affinely only_0_and only_0_emp. Qed.
+
+(** See [sbi] for the other direction of the two lemmas below, for which we need
 [persistently_impl_si_pure]. *)
 Lemma only_0_persistently_2 P : <pers> <only0> P ⊢ <only0> <pers> P.
 Proof.
   apply impl_intro_l. rewrite -(persistent_persistently (▷ False)).
   by rewrite -persistently_and /bi_only_0 impl_elim_r.
 Qed.
-
-Lemma only_0_absorbingly `{!BiLöb PROP} P : <only0> <absorb> P ⊣⊢ <absorb> <only0> P.
-Proof. by rewrite /bi_absorbingly only_0_sep only_0_pure. Qed.
-
-Lemma only_0_affinely `{!BiLöb PROP, !Timeless (PROP:=PROP) emp} P :
-  <only0> <affine> P ⊣⊢ <affine> <only0> P.
-Proof. by rewrite /bi_affinely only_0_and only_0_emp. Qed.
-
-(** See [sbi] for the other direction, for which we need
-[persistently_impl_si_pure]. *)
-Lemma only_0_intuitionistically_2 `{!BiLöb PROP, !Timeless (PROP:=PROP) emp} P :
+Lemma only_0_intuitionistically_2 `{!Timeless (PROP:=PROP) emp} P :
   □ <only0> P ⊢ <only0> □ P.
 Proof.
   by rewrite /bi_intuitionistically only_0_affinely only_0_persistently_2.
@@ -529,85 +510,95 @@ Proof.
   apply later_mono, False_elim.
 Qed.
 
-Lemma only_0_except_0 `{!BiLöb PROP} P : <only0> ◇ P ⊣⊢ True.
+Lemma only_0_except_0 P : <only0> ◇ P ⊣⊢ True.
 Proof. by rewrite /bi_except_0 only_0_or only_0_later left_absorb. Qed.
 
 Global Instance only_0_absorbing P : Absorbing P → Absorbing (<only0> P).
 Proof. rewrite /bi_only_0; apply _. Qed.
 
 (* Timeless instances *)
+Lemma timeless_only_0 P : Timeless P → <only0> P ⊣⊢ P.
+Proof. intros. apply (anti_symm _); [by apply timeless|apply only_0_intro]. Qed.
+Lemma timeless_except_0 P : Timeless P → ▷ P ⊣⊢ ◇ P.
+Proof.
+  intros. apply (anti_symm _).
+  - by rewrite later_except_0_only_0 timeless.
+  - apply or_elim, later_intro. apply later_mono, False_elim.
+Qed.
+
+(** This lemma shows that our characterization of timeless propositions (via
+the except-0 modality) is equivalent to the characterization via the only-0
+modality. See the comment above the definition of [Timeless] in
+[iris.bi.derived_connectives] for more details. *)
+Lemma timeless_alt `{!BiLöb PROP} P : Timeless P ↔ (▷ P ⊢ ◇ P).
+Proof.
+  split; intros HP; [by rewrite timeless_except_0|].
+  rewrite /Timeless. etrans; [|apply löb]. apply impl_intro_r.
+  by rewrite HP except_0_and_only_0_self.
+Qed.
+
 Global Instance Timeless_proper : Proper ((≡) ==> iff) (@Timeless _ PROP).
 Proof. solve_proper. Qed.
 
 Global Instance pure_timeless φ : Timeless (PROP:=PROP) ⌜φ⌝.
-Proof.
-  rewrite /Timeless /bi_except_0 pure_alt later_exist_false.
-  apply or_elim, exist_elim; [auto|]=> Hφ. rewrite -(exist_intro Hφ). auto.
-Qed.
+Proof. by rewrite /Timeless only_0_pure. Qed.
 Global Instance emp_timeless `{!BiAffine PROP} : Timeless (PROP:=PROP) emp.
 Proof. rewrite -True_emp. apply _. Qed.
 
 Global Instance and_timeless P Q : Timeless P → Timeless Q → Timeless (P ∧ Q).
-Proof. intros; rewrite /Timeless except_0_and later_and; auto. Qed.
+Proof. rewrite /Timeless=> ??. rewrite only_0_and. by f_equiv. Qed.
 Global Instance or_timeless P Q : Timeless P → Timeless Q → Timeless (P ∨ Q).
-Proof. intros; rewrite /Timeless except_0_or later_or; auto. Qed.
+Proof. rewrite /Timeless=> ??. rewrite only_0_or. by f_equiv. Qed.
 
-Global Instance impl_timeless `{!BiLöb PROP} P Q : Timeless Q → Timeless (P → Q).
+Global Instance impl_timeless P Q : Timeless Q → Timeless (P → Q).
 Proof.
-  rewrite !timeless_alt=> HQ. rewrite only_0_impl HQ.
+  rewrite /Timeless=> HQ. rewrite only_0_impl HQ.
   apply impl_mono; [apply only_0_intro|done].
 Qed.
-Global Instance sep_timeless P Q: Timeless P → Timeless Q → Timeless (P ∗ Q).
-Proof.
-  intros; rewrite /Timeless except_0_sep later_sep; auto using sep_mono.
-Qed.
+Global Instance sep_timeless P Q : Timeless P → Timeless Q → Timeless (P ∗ Q).
+Proof. rewrite /Timeless=> ??. rewrite only_0_sep. by f_equiv. Qed.
 
-Global Instance wand_timeless `{!BiLöb PROP} P Q : Timeless Q → Timeless (P -∗ Q).
+Global Instance wand_timeless P Q : Timeless Q → Timeless (P -∗ Q).
 Proof.
-  rewrite !timeless_alt=> HQ. rewrite only_0_wand HQ.
+  rewrite /Timeless=> HQ. rewrite only_0_wand HQ.
   apply wand_mono; [apply only_0_intro|done].
 Qed.
 Global Instance forall_timeless {A} (Ψ : A → PROP) :
   (∀ x, Timeless (Ψ x)) → Timeless (∀ x, Ψ x).
-Proof.
-  rewrite /Timeless=> HQ. rewrite except_0_forall later_forall.
-  apply forall_mono; auto.
-Qed.
+Proof. rewrite /Timeless=> HQ. rewrite only_0_forall. by f_equiv. Qed.
 Global Instance exist_timeless {A} (Ψ : A → PROP) :
   (∀ x, Timeless (Ψ x)) → Timeless (∃ x, Ψ x).
-Proof.
-  rewrite /Timeless=> ?. rewrite later_exist_false. apply or_elim.
-  - rewrite /bi_except_0; auto.
-  - apply exist_elim=> x. rewrite -(exist_intro x); auto.
-Qed.
-Global Instance persistently_timeless `{!BiPersistentlyExist PROP} P :
-  Timeless P → Timeless (<pers> P).
-Proof.
-  intros. rewrite /Timeless /bi_except_0 later_persistently_1.
-  by rewrite (timeless P) /bi_except_0 persistently_or {1}persistently_elim.
-Qed.
+Proof. rewrite /Timeless=> ?. rewrite only_0_exist. by f_equiv. Qed.
+
+(** The [Timeless] instances for [<pers> P] and [□ P] can be found in [sbi]. *)
 
 Global Instance only_0_timeless P : Timeless (<only0> P).
-Proof. by rewrite /Timeless later_except_0_only_0 only_0_idemp. Qed.
+Proof. by rewrite /Timeless only_0_idemp. Qed.
 
 Global Instance affinely_timeless P :
   Timeless (PROP:=PROP) emp → Timeless P → Timeless (<affine> P).
 Proof. rewrite /bi_affinely; apply _. Qed.
-Global Instance absorbingly_timeless P : Timeless P → Timeless (<absorb> P).
+Global Instance absorbingly_timeless P :
+  Timeless P → Timeless (<absorb> P).
 Proof. rewrite /bi_absorbingly; apply _. Qed.
-Global Instance intuitionistically_timeless `{!BiPersistentlyExist PROP} P :
-  Timeless (PROP:=PROP) emp → Timeless P → Timeless (□ P).
-Proof. rewrite /bi_intuitionistically; apply _. Qed.
 
 Global Instance from_option_timeless {A} P (Ψ : A → PROP) (mx : option A) :
   (∀ x, Timeless (Ψ x)) → Timeless P → Timeless (from_option Ψ P mx).
 Proof. destruct mx; apply _. Qed.
 
-Lemma timeless_laterN P n : Timeless P → ▷^n P ⊢ ▷^n False ∨ P.
+Lemma later_affinely_1 `{!Timeless (PROP:=PROP) emp} P :
+  ▷ <affine> P ⊢ ◇ <affine> ▷ P.
+Proof.
+  rewrite /bi_affinely later_and (timeless_except_0 emp) except_0_and.
+  by apply and_mono, except_0_intro.
+Qed.
+
+Lemma timeless_laterN `{!SIdxFinite SI} P n :
+  Timeless P → ▷^n P ⊢ ▷^n False ∨ P.
 Proof.
   intros. induction n as [|n IH]; simpl; first by auto.
   rewrite IH later_or. apply or_elim; first by auto.
-  rewrite timeless. apply or_mono; auto.
+  rewrite later_except_0_only_0 timeless. apply or_mono; auto.
 Qed.
 
 (* Big op stuff *)
@@ -633,42 +624,43 @@ Proof.
   - apply except_0_True.
 Qed.
 
-Global Instance bi_later_monoid_or_homomorphism :
+Global Instance bi_later_monoid_or_homomorphism `{!SIdxFinite SI} :
   WeakMonoidHomomorphism bi_or bi_or (≡) (@bi_later _ PROP).
 Proof. split; try apply _. apply later_or. Qed.
-Global Instance bi_laterN_or_homomorphism n :
+Global Instance bi_laterN_or_homomorphism `{!SIdxFinite SI} n :
   WeakMonoidHomomorphism bi_or bi_or (≡) (@bi_laterN _ PROP n).
 Proof. split; try apply _. apply laterN_or. Qed.
-Global Instance bi_except_0_or_homomorphism :
+Global Instance bi_except_0_or_homomorphism `{!SIdxFinite SI} :
   WeakMonoidHomomorphism bi_or bi_or (≡) (@bi_except_0 _ PROP).
 Proof. split; try apply _. apply except_0_or. Qed.
 
-Global Instance bi_later_monoid_sep_weak_homomorphism :
+Global Instance bi_later_monoid_sep_weak_homomorphism `{!SIdxFinite SI} :
   WeakMonoidHomomorphism bi_sep bi_sep (≡) (@bi_later _ PROP).
 Proof. split; try apply _. apply later_sep. Qed.
-Global Instance bi_laterN_sep_weak_homomorphism n :
+Global Instance bi_laterN_sep_weak_homomorphism `{!SIdxFinite SI} n :
   WeakMonoidHomomorphism bi_sep bi_sep (≡) (@bi_laterN _ PROP n).
 Proof. split; try apply _. apply laterN_sep. Qed.
-Global Instance bi_except_0_sep_weak_homomorphism :
+Global Instance bi_except_0_sep_weak_homomorphism `{!SIdxFinite SI} :
   WeakMonoidHomomorphism bi_sep bi_sep (≡) (@bi_except_0 _ PROP).
 Proof. split; try apply _. apply except_0_sep. Qed.
 
-Global Instance bi_later_monoid_sep_homomorphism `{!BiAffine PROP} :
+Global Instance bi_later_monoid_sep_homomorphism
+    `{!SIdxFinite SI, !BiAffine PROP} :
   MonoidHomomorphism bi_sep bi_sep (≡) (@bi_later _ PROP).
 Proof. split; try apply _. apply later_emp. Qed.
-Global Instance bi_laterN_sep_homomorphism `{!BiAffine PROP} n :
+Global Instance bi_laterN_sep_homomorphism `{!SIdxFinite SI, !BiAffine PROP} n :
   MonoidHomomorphism bi_sep bi_sep (≡) (@bi_laterN _ PROP n).
 Proof. split; try apply _. apply laterN_emp. Qed.
-Global Instance bi_except_0_sep_homomorphism `{!BiAffine PROP} :
+Global Instance bi_except_0_sep_homomorphism `{!SIdxFinite SI, !BiAffine PROP} :
   MonoidHomomorphism bi_sep bi_sep (≡) (@bi_except_0 _ PROP).
 Proof. split; try apply _. apply except_0_emp. Qed.
 
 Global Instance bi_later_monoid_sep_entails_weak_homomorphism :
   WeakMonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_later _ PROP).
-Proof. split; try apply _. intros P Q. by rewrite later_sep. Qed.
+Proof. split; try apply _. intros P Q. by rewrite later_sep_2. Qed.
 Global Instance bi_laterN_sep_entails_weak_homomorphism n :
   WeakMonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_laterN _ PROP n).
-Proof. split; try apply _. intros P Q. by rewrite laterN_sep. Qed.
+Proof. split; try apply _. intros P Q. by rewrite laterN_sep_2. Qed.
 Global Instance bi_except_0_sep_entails_weak_homomorphism :
   WeakMonoidHomomorphism bi_sep bi_sep (flip (⊢)) (@bi_except_0 _ PROP).
 Proof. split; try apply _. intros P Q. by rewrite except_0_sep. Qed.

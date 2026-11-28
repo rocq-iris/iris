@@ -67,10 +67,10 @@ Proof. rewrite /FromAnd=><-. by rewrite except_0_and. Qed.
 (** FromSep *)
 Global Instance from_sep_later P Q1 Q2 :
   FromSep P Q1 Q2 → FromSep (▷ P) (▷ Q1) (▷ Q2).
-Proof. rewrite /FromSep=> <-. by rewrite later_sep. Qed.
+Proof. rewrite /FromSep=> <-. by rewrite later_sep_2. Qed.
 Global Instance from_sep_laterN n P Q1 Q2 :
   FromSep P Q1 Q2 → FromSep (▷^n P) (▷^n Q1) (▷^n Q2).
-Proof. rewrite /FromSep=> <-. by rewrite laterN_sep. Qed.
+Proof. rewrite /FromSep=> <-. by rewrite laterN_sep_2. Qed.
 Global Instance from_sep_except_0 P Q1 Q2 :
   FromSep P Q1 Q2 → FromSep (◇ P) (◇ Q1) (◇ Q2).
 Proof. rewrite /FromSep=><-. by rewrite except_0_sep. Qed.
@@ -79,11 +79,11 @@ Proof. rewrite /FromSep=><-. by rewrite except_0_sep. Qed.
 Global Instance maybe_combine_sep_as_later Q1 Q2 P progress :
   MaybeCombineSepAs Q1 Q2 P progress →
   MaybeCombineSepAs (▷ Q1) (▷ Q2) (▷ P) progress.
-Proof. by rewrite /MaybeCombineSepAs -later_sep => <-. Qed.
+Proof. by rewrite /MaybeCombineSepAs later_sep_2 => <-. Qed.
 Global Instance maybe_combine_sep_as_laterN n Q1 Q2 P progress :
   MaybeCombineSepAs Q1 Q2 P progress →
   MaybeCombineSepAs (▷^n Q1) (▷^n Q2) (▷^n P) progress.
-Proof. by rewrite /MaybeCombineSepAs -laterN_sep => <-. Qed.
+Proof. by rewrite /MaybeCombineSepAs laterN_sep_2 => <-. Qed.
 Global Instance maybe_combine_sep_as_except_0 Q1 Q2 P progress :
   MaybeCombineSepAs Q1 Q2 P progress →
   MaybeCombineSepAs (◇ Q1) (◇ Q2) (◇ P) progress.
@@ -93,11 +93,11 @@ Proof. by rewrite /MaybeCombineSepAs -except_0_sep => <-. Qed.
 Global Instance maybe_combine_sep_gives_later Q1 Q2 P :
   CombineSepGives Q1 Q2 P →
   CombineSepGives (▷ Q1) (▷ Q2) (▷ P).
-Proof. by rewrite /CombineSepGives -later_sep -later_persistently => ->. Qed.
+Proof. by rewrite /CombineSepGives later_sep_2 -later_persistently => ->. Qed.
 Global Instance maybe_combine_sep_gives_laterN n Q1 Q2 P :
   CombineSepGives Q1 Q2 P →
   CombineSepGives (▷^n Q1) (▷^n Q2) (▷^n P).
-Proof. by rewrite /CombineSepGives -laterN_sep -laterN_persistently => ->. Qed.
+Proof. by rewrite /CombineSepGives laterN_sep_2 -laterN_persistently => ->. Qed.
 Global Instance maybe_combine_sep_gives_except_0 Q1 Q2 P :
   CombineSepGives Q1 Q2 P →
   CombineSepGives (◇ Q1) (◇ Q2) (◇ P).
@@ -129,10 +129,10 @@ Proof.
 Qed.
 
 (** IntoSep *)
-Global Instance into_sep_later P Q1 Q2 :
+Global Instance into_sep_later `{!SIdxFinite SI} P Q1 Q2 :
   IntoSep P Q1 Q2 → IntoSep (▷ P) (▷ Q1) (▷ Q2).
 Proof. rewrite /IntoSep=> ->. by rewrite later_sep. Qed.
-Global Instance into_sep_laterN n P Q1 Q2 :
+Global Instance into_sep_laterN `{!SIdxFinite SI} n P Q1 Q2 :
   IntoSep P Q1 Q2 → IntoSep (▷^n P) (▷^n Q1) (▷^n Q2).
 Proof. rewrite /IntoSep=> ->. by rewrite laterN_sep. Qed.
 Global Instance into_sep_except_0 P Q1 Q2 :
@@ -140,7 +140,8 @@ Global Instance into_sep_except_0 P Q1 Q2 :
 Proof. rewrite /IntoSep=> ->. by rewrite except_0_sep. Qed.
 
 (* FIXME: This instance is overly specific, generalize it. *)
-Global Instance into_sep_affinely_later `{!Timeless (PROP:=PROP) emp} P Q1 Q2 :
+Global Instance into_sep_affinely_later
+    `{!SIdxFinite SI, !Timeless (PROP:=PROP) emp} P Q1 Q2 :
   IntoSep P Q1 Q2 → Affine Q1 → Affine Q2 →
   IntoSep (<affine> ▷ P) (<affine> ▷ Q1) (<affine> ▷ Q2).
 Proof.
@@ -154,19 +155,19 @@ Qed.
 (** FromOr *)
 Global Instance from_or_later P Q1 Q2 :
   FromOr P Q1 Q2 → FromOr (▷ P) (▷ Q1) (▷ Q2).
-Proof. rewrite /FromOr=><-. by rewrite later_or. Qed.
+Proof. rewrite /FromOr=><-. by rewrite later_or_2. Qed.
 Global Instance from_or_laterN n P Q1 Q2 :
   FromOr P Q1 Q2 → FromOr (▷^n P) (▷^n Q1) (▷^n Q2).
-Proof. rewrite /FromOr=><-. by rewrite laterN_or. Qed.
+Proof. rewrite /FromOr=><-. by rewrite laterN_or_2. Qed.
 Global Instance from_or_except_0 P Q1 Q2 :
   FromOr P Q1 Q2 → FromOr (◇ P) (◇ Q1) (◇ Q2).
 Proof. rewrite /FromOr=><-. by rewrite except_0_or. Qed.
 
 (** IntoOr *)
-Global Instance into_or_later P Q1 Q2 :
+Global Instance into_or_later `{!SIdxFinite SI} P Q1 Q2 :
   IntoOr P Q1 Q2 → IntoOr (▷ P) (▷ Q1) (▷ Q2).
 Proof. rewrite /IntoOr=>->. by rewrite later_or. Qed.
-Global Instance into_or_laterN n P Q1 Q2 :
+Global Instance into_or_laterN `{!SIdxFinite SI} n P Q1 Q2 :
   IntoOr P Q1 Q2 → IntoOr (▷^n P) (▷^n Q1) (▷^n Q2).
 Proof. rewrite /IntoOr=>->. by rewrite laterN_or. Qed.
 Global Instance into_or_except_0 P Q1 Q2 :
@@ -189,10 +190,10 @@ Global Instance from_exist_except_0 {A} P (Φ : A → PROP) :
 Proof. rewrite /FromExist=> <-. by rewrite except_0_exist_2. Qed.
 
 (** IntoExist *)
-Global Instance into_exist_later {A} P (Φ : A → PROP) name :
+Global Instance into_exist_later `{!SIdxFinite SI} {A} P (Φ : A → PROP) name :
   IntoExist P Φ name → Inhabited A → IntoExist (▷ P) (λ a, ▷ (Φ a))%I name.
 Proof. rewrite /IntoExist=> HP ?. by rewrite HP later_exist. Qed.
-Global Instance into_exist_laterN {A} n P (Φ : A → PROP) name :
+Global Instance into_exist_laterN `{!SIdxFinite SI}  {A} n P (Φ : A → PROP) name :
   IntoExist P Φ name → Inhabited A → IntoExist (▷^n P) (λ a, ▷^n (Φ a))%I name.
 Proof. rewrite /IntoExist=> HP ?. by rewrite HP laterN_exist. Qed.
 Global Instance into_exist_except_0 {A} P (Φ : A → PROP) name :
@@ -246,9 +247,12 @@ Proof. by rewrite /FromModal /= -except_0_intro. Qed.
 Global Instance into_except_0_except_0 P : IntoExcept0 (◇ P) P.
 Proof. by rewrite /IntoExcept0. Qed.
 Global Instance into_except_0_later P : Timeless P → IntoExcept0 (▷ P) P.
-Proof. by rewrite /IntoExcept0. Qed.
+Proof. intros. by rewrite /IntoExcept0 timeless_except_0. Qed.
 Global Instance into_except_0_later_if p P : Timeless P → IntoExcept0 (▷?p P) P.
-Proof. rewrite /IntoExcept0. destruct p; auto using except_0_intro. Qed.
+Proof.
+  intros. rewrite /IntoExcept0. destruct p; simpl; last by apply except_0_intro.
+  by rewrite timeless_except_0.
+Qed.
 
 Global Instance into_except_0_affinely P Q :
   IntoExcept0 P Q → IntoExcept0 (<affine> P) (<affine> Q).
@@ -283,13 +287,13 @@ Qed.
 Global Instance add_modal_later_except_0 P Q :
   Timeless P → AddModal (▷ P) P (◇ Q) | 0.
 Proof.
-  intros. rewrite /AddModal (except_0_intro (_ -∗ _)) (timeless P).
+  intros. rewrite /AddModal (except_0_intro (_ -∗ _)) (timeless_except_0 P).
   by rewrite -except_0_sep wand_elim_r except_0_idemp.
 Qed.
 Global Instance add_modal_later P Q :
   Timeless P → AddModal (▷ P) P (▷ Q) | 0.
 Proof.
-  intros. rewrite /AddModal (except_0_intro (_ -∗ _)) (timeless P).
+  intros. rewrite /AddModal (except_0_intro (_ -∗ _)) (timeless_except_0 P).
   by rewrite -except_0_sep wand_elim_r except_0_later.
 Qed.
 Global Instance add_modal_except_0 P Q : AddModal (◇ P) P (◇ Q) | 1.
@@ -376,12 +380,13 @@ Proof. rewrite /IntoLaterN /MaybeIntoLaterN -laterN_exist_2=> ?. by apply exist_
 Global Instance into_laterN_or_l n P1 P2 Q1 Q2 :
   IntoLaterN false n P1 Q1 → MaybeIntoLaterN false n P2 Q2 →
   IntoLaterN false n (P1 ∨ P2) (Q1 ∨ Q2) | 10.
-Proof. rewrite /IntoLaterN /MaybeIntoLaterN=> -> ->. by rewrite laterN_or. Qed.
+Proof. rewrite /IntoLaterN /MaybeIntoLaterN=> -> ->. by rewrite laterN_or_2. Qed.
 Global Instance into_laterN_or_r n P P2 Q2 :
   IntoLaterN false n P2 Q2 →
   IntoLaterN false n (P ∨ P2) (P ∨ Q2) | 11.
 Proof.
-  rewrite /IntoLaterN /MaybeIntoLaterN=> ->. by rewrite laterN_or -(laterN_intro _ P).
+  rewrite /IntoLaterN /MaybeIntoLaterN=> ->.
+  by rewrite -laterN_or_2 -(laterN_intro _ P).
 Qed.
 
 Global Instance into_later_affinely n P Q :
@@ -392,7 +397,7 @@ Global Instance into_later_intuitionistically n P Q :
 Proof. rewrite /IntoLaterN /MaybeIntoLaterN=> ->. by rewrite laterN_intuitionistically_2. Qed.
 Global Instance into_later_absorbingly n P Q :
   IntoLaterN false n P Q → IntoLaterN false n (<absorb> P) (<absorb> Q).
-Proof. rewrite /IntoLaterN /MaybeIntoLaterN=> ->. by rewrite laterN_absorbingly. Qed.
+Proof. rewrite /IntoLaterN /MaybeIntoLaterN=> ->. by rewrite laterN_absorbingly_2. Qed.
 Global Instance into_later_persistently n P Q :
   IntoLaterN false n P Q → IntoLaterN false n (<pers> P) (<pers> Q).
 Proof. rewrite /IntoLaterN /MaybeIntoLaterN=> ->. by rewrite laterN_persistently. Qed.
@@ -400,12 +405,13 @@ Proof. rewrite /IntoLaterN /MaybeIntoLaterN=> ->. by rewrite laterN_persistently
 Global Instance into_laterN_sep_l n P1 P2 Q1 Q2 :
   IntoLaterN false n P1 Q1 → MaybeIntoLaterN false n P2 Q2 →
   IntoLaterN false n (P1 ∗ P2) (Q1 ∗ Q2) | 10.
-Proof. rewrite /IntoLaterN /MaybeIntoLaterN=> -> ->. by rewrite laterN_sep. Qed.
+Proof. rewrite /IntoLaterN /MaybeIntoLaterN=> -> ->. by rewrite laterN_sep_2. Qed.
 Global Instance into_laterN_sep_r n P P2 Q2 :
   IntoLaterN false n P2 Q2 →
   IntoLaterN false n (P ∗ P2) (P ∗ Q2) | 11.
 Proof.
-  rewrite /IntoLaterN /MaybeIntoLaterN=> ->. by rewrite laterN_sep -(laterN_intro _ P).
+  rewrite /IntoLaterN /MaybeIntoLaterN=> ->.
+  by rewrite -laterN_sep_2 -(laterN_intro _ P).
 Qed.
 
 Global Instance into_laterN_big_sepL n {A} (Φ Ψ : nat → A → PROP) (l: list A) :

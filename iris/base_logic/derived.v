@@ -45,8 +45,9 @@ Section derived.
   (** Timeless instances *)
   Global Instance ownM_timeless (a : M) : Discrete a → Timeless (uPred_ownM a).
   Proof.
-    intros ?. rewrite /Timeless later_ownM. apply exist_elim=> b.
-    rewrite (timeless (a≡b)) (except_0_intro (uPred_ownM b)) -except_0_and.
+    intros ?. rewrite timeless_alt later_ownM. apply exist_elim=> b.
+    rewrite (timeless_except_0 (a ≡ b)).
+    rewrite (except_0_intro (uPred_ownM b)) -except_0_and.
     apply except_0_mono. rewrite internal_eq_sym.
     apply (internal_eq_rewrite' b a (uPred_ownM) _);
       [solve_proper|auto using and_elim_l, and_elim_r..].

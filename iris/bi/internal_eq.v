@@ -333,26 +333,24 @@ Section internal_eq.
     by rewrite -si_emp_valid_later bi.later_wand_iff.
   Qed.
 
-  (** TODO: Remove [SIdxFinite] here and below once we use [SI] instead of [nat] for [siProp]
-  in all of the lemmas below. *)
-  Lemma internal_eq_soundness `{!SIdxFinite SI} {A : ofe} (x y : A) :
+  Lemma internal_eq_soundness {A : ofe} (x y : A) :
     (⊢@{PROP} x ≡ y) → x ≡ y.
   Proof.
     intros ?%si_pure_emp_valid. by apply siProp_primitive.internal_eq_soundness.
   Qed.
 
   (** Derive [NonExpansive]/[Contractive] from an internal statement *)
-  Lemma internal_eq_entails `{!SIdxFinite SI} {A B : ofe} (a1 a2 : A) (b1 b2 : B) :
+  Lemma internal_eq_entails {A B : ofe} (a1 a2 : A) (b1 b2 : B) :
     (a1 ≡ a2 ⊢ b1 ≡ b2) ↔ (∀ n, a1 ≡{n}≡ a2 → b1 ≡{n}≡ b2).
   Proof. rewrite si_pure_entails. apply siProp_primitive.internal_eq_entails. Qed.
 
-  Lemma ne_internal_eq `{!SIdxFinite SI} {A B : ofe} (f : A → B) :
+  Lemma ne_internal_eq {A B : ofe} (f : A → B) :
     NonExpansive f ↔ ∀ x1 x2, x1 ≡ x2 ⊢ f x1 ≡ f x2.
   Proof.
     split; [apply f_equivI|]. intros Hf n x1 x2. by apply internal_eq_entails.
   Qed.
 
-  Lemma ne_2_internal_eq `{!SIdxFinite SI} {A B C : ofe} (f : A → B → C) :
+  Lemma ne_2_internal_eq {A B C : ofe} (f : A → B → C) :
     NonExpansive2 f ↔ ∀ x1 x2 y1 y2, x1 ≡ x2 ∧ y1 ≡ y2 ⊢ f x1 y1 ≡ f x2 y2.
   Proof.
     split.
@@ -366,7 +364,7 @@ Section internal_eq.
       intros [??] [??]. rewrite prod_equivI. apply Hf.
   Qed.
 
-  Lemma contractive_internal_eq `{!SIdxFinite SI} {A B : ofe} (f : A → B) :
+  Lemma contractive_internal_eq {A B : ofe} (f : A → B) :
     Contractive f ↔ ∀ x1 x2, ▷ (x1 ≡ x2) ⊢ f x1 ≡ f x2.
   Proof.
     split; [apply f_equivI_contractive|].
@@ -374,13 +372,13 @@ Section internal_eq.
     rewrite -later_equivI internal_eq_entails in Hf. apply Hf. by f_contractive.
   Qed.
 
-  Global Instance sbi_later_contractive `{!SIdxFinite SI} : BiLaterContractive PROP.
+  Global Instance sbi_later_contractive : BiLaterContractive PROP.
   Proof using Type*.
     rewrite /BiLaterContractive.
     apply contractive_internal_eq, later_equivI_prop_2.
   Qed.
 
-  Lemma only_0_internal_eq `{!SIdxFinite SI} P Q :
+  Lemma only_0_internal_eq P Q :
     <only0> (P ≡ Q) ⊣⊢@{PROP} <only0> P ≡ <only0> Q.
   Proof.
     rewrite -si_pure_internal_eq prop_ext_si_emp_valid.

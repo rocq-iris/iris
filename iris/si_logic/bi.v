@@ -5,7 +5,7 @@ Import siProp_primitive.
 (** BI instances for [siProp], and re-stating the remaining primitive laws in
 terms of the BI interface.  This file does *not* unseal. *)
 
-(** We pick [*] and [-*] to coincide with [∧] and [→], respectively. This seems
+(** We pick [∗] and [-∗] to coincide with [∧] and [→], respectively. This seems
 to be the most reasonable choice to fit a "pure" higher-order logic into the
 proofmode's BI framework. *)
 Definition siProp_emp {SI : sidx} : siProp := siProp_pure True.
@@ -97,9 +97,10 @@ Proof.
   - exact: later_mono.
   - exact: later_intro.
   - exact: @later_forall_2.
-  - exact: @later_exist_false.
+  - exact: @later_exist_except_0.
+  - exact: @only_0_exist_1.
   - (* ▷ (P ∗ Q) ⊢ ▷ P ∗ ▷ Q *)
-    intros P Q.
+    intros _ P Q.
     apply and_intro; apply later_mono.
     + apply and_elim_l.
     + apply and_elim_r.
@@ -113,11 +114,15 @@ Proof.
     apply and_intro.
     + refine (forall_elim true).
     + refine (forall_elim false).
+  - (* <only0> (P ∗ Q) ⊢ <only0> P ∗ <only0> Q *)
+    intros P Q. apply and_intro; apply impl_intro_r.
+    + etrans; [|apply and_elim_l]. by apply impl_elim_l'.
+    + etrans; [|apply and_elim_r]. by apply impl_elim_l'.
   - (* ▷ <pers> P ⊢ <pers> ▷ P *)
     done.
   - (* <pers> ▷ P ⊢ ▷ <pers> P *)
     done.
-  - exact: later_false_em.
+  - exact: later_except_0_only_0.
 Qed.
 
 Canonical Structure siPropI {SI : sidx} : bi :=

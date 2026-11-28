@@ -114,17 +114,18 @@ Lemma uPred_bi_later_mixin (M : ucmra) :
     uPred_entails uPred_pure uPred_or uPred_impl
     (@uPred_forall M) (@uPred_exist M) uPred_sep uPred_persistently uPred_later.
 Proof.
-  split.
-  - apply contractive_ne, later_contractive.
+  eapply bi_later_mixin_sidx_finite_contractive, uPred_bi_mixin.
+  - exact: later_contractive.
   - exact: later_mono.
   - exact: later_intro.
   - exact: @later_forall_2.
-  - exact: @later_exist_false.
+  - exact: @later_exist_except_0.
   - exact: later_sep_1.
   - exact: later_sep_2.
   - exact: later_persistently_1.
   - exact: later_persistently_2.
-  - exact: later_false_em.
+  - exact: later_except_0_only_0.
+  - apply _.
 Qed.
 
 Canonical Structure uPredI (M : ucmra) : bi :=

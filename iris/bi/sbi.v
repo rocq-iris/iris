@@ -385,9 +385,7 @@ Section sbi_derived.
 
   Global Instance si_pure_timeless Pi :
     Timeless Pi → Timeless (PROP:=PROP) (<si_pure> Pi).
-  Proof.
-    rewrite /Timeless=> HP. by rewrite -si_pure_later -si_pure_except_0 HP.
-  Qed.
+  Proof. rewrite /Timeless=> ?. rewrite -si_pure_only_0. by f_equiv. Qed.
 
   (** Version of primitive [si_pure_si_emp_valid] for [Absorbing P] and with
   [<affine>] added. *)
@@ -493,21 +491,6 @@ Section sbi_derived.
     by rewrite si_emp_valid_later IH.
   Qed.
 
-  Lemma si_emp_valid_except_0 P :
-    <si_emp_valid> ◇ P ⊣⊢@{siPropI} ◇ <si_emp_valid> P.
-  Proof.
-    apply (anti_symm _).
-    - trans (▷ <si_emp_valid> P ∧ <si_emp_valid> ◇ P)%I.
-      { apply bi.and_intro, reflexivity.
-        by rewrite -si_emp_valid_later bi.except_0_into_later. }
-      rewrite bi.later_false_em bi.and_or_r. apply bi.or_elim.
-      { rewrite bi.and_elim_l. apply bi.or_intro_l. }
-      apply bi.or_intro_r'. rewrite si_emp_valid_impl_si_pure -si_emp_valid_and.
-      f_equiv. rewrite si_pure_later si_pure_pure.
-      by rewrite bi.and_or_l bi.impl_elim_l bi.and_elim_r idemp.
-    - rewrite /bi_except_0 -si_emp_valid_or_2.
-      by rewrite si_emp_valid_later si_emp_valid_pure.
-  Qed.
   Lemma si_emp_valid_only_0 P : <si_emp_valid> <only0> P ⊣⊢ <only0> <si_emp_valid> P.
   Proof.
     rewrite /bi_only_0. apply (anti_symm _); last first.
@@ -516,13 +499,22 @@ Section sbi_derived.
     rewrite -{1}(si_emp_valid_pure False) -si_emp_valid_later.
     by rewrite -si_emp_valid_and bi.impl_elim_r.
   Qed.
+  Lemma si_emp_valid_except_0 P :
+    <si_emp_valid> ◇ P ⊣⊢@{siPropI} ◇ <si_emp_valid> P.
+  Proof.
+    apply (anti_symm _).
+    - rewrite -{2}(bi.except_0_and_only_0_self P).
+      rewrite si_emp_valid_and bi.except_0_and.
+      apply bi.and_intro, bi.except_0_intro.
+      rewrite si_emp_valid_only_0 -bi.later_except_0_only_0.
+      by rewrite -si_emp_valid_later bi.except_0_into_later.
+    - rewrite /bi_except_0 -si_emp_valid_or_2.
+      by rewrite si_emp_valid_later si_emp_valid_pure.
+  Qed.
 
   Global Instance si_emp_valid_timeless P :
     Timeless P → Timeless (<si_emp_valid> P).
-  Proof.
-    rewrite /Timeless=> HP.
-    by rewrite -si_emp_valid_later -si_emp_valid_except_0 HP.
-  Qed.
+  Proof. rewrite /Timeless=> ?. rewrite -si_emp_valid_only_0. by f_equiv. Qed.
 
   Lemma only_0_persistently P : <only0> <pers> P ⊣⊢ <pers> <only0> P.
   Proof.
@@ -531,9 +523,7 @@ Section sbi_derived.
     apply persistently_impl_si_pure.
   Qed.
 
-  (** The [BiLöb] condition is redundant, we could get it from [sbi_later_contractive],
-  but that only appears later in the dependency chain ([iris.bi.internal_eq]). *)
-  Lemma only_0_intuitionistically `{!BiLöb PROP, !Timeless (PROP:=PROP) emp} P :
+  Lemma only_0_intuitionistically `{!Timeless (PROP:=PROP) emp} P :
     <only0> □ P ⊣⊢ □ <only0> P.
   Proof.
     by rewrite /bi_intuitionistically bi.only_0_affinely only_0_persistently.
@@ -541,6 +531,12 @@ Section sbi_derived.
 
   Global Instance only_0_persistent P : Persistent P → Persistent (<only0> P).
   Proof. rewrite /Persistent=> HP. by rewrite {1}HP -only_0_persistently. Qed.
+
+  Global Instance persistently_timeless P : Timeless P → Timeless (<pers> P).
+  Proof. rewrite /Timeless=> ?. rewrite only_0_persistently. by f_equiv. Qed.
+  Global Instance intuitionistically_timeless P :
+    Timeless (PROP:=PROP) emp → Timeless P → Timeless (□ P).
+  Proof. rewrite /bi_intuitionistically; apply _. Qed.
 
   (** Relating [⊢] in [siProp] to [⊢] in [PROP] *)
   Lemma si_emp_valid_emp_valid P : (⊢@{siPropI} <si_emp_valid> P) ↔ ⊢ P.
