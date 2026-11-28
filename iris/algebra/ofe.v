@@ -800,28 +800,34 @@ Section fixpointK.
   Context {SI : sidx} {A : ofe} `{!Cofe A, !Inhabited A} (f : A → A) (k : nat).
   Context {f_contractive : Contractive (Nat.iter k f)} {f_ne : NonExpansive f}.
 
-  (* Note than f_ne is crucial here:  there are functions f such that f^2 is contractive,
-     but f is not non-expansive.
-     Consider for example f: SPred → SPred (where SPred is "downclosed sets of natural numbers").
-     Define f (using informative excluded middle) as follows:
-     f(N) = N  (where N is the set of all natural numbers)
-     f({0, ..., n}) = {0, ... n-1}  if n is even (so n-1 is at least -1, in which case we return the empty set)
-     f({0, ..., n}) = {0, ..., n+2} if n is odd
-     In other words, if we consider elements of SPred as ordinals, then we decreaste odd finite
-     ordinals by 1 and increase even finite ordinals by 2.
-     f is not non-expansive:  Consider f({0}) = ∅ and f({0,1}) = f({0,1,2,3}).
-     The arguments are clearly 0-equal, but the results are not.
+  (* Note that [f_ne] is crucial here: there are functions [f] such that [f^2]
+  is contractive, but [f] is not non-expansive.
+  Consider [f : siProp → siProp] (where [siProp] is "downclosed sets of natural
+  numbers"). Define [f] (using informative excluded middle) as follows:
 
-     Now consider g := f^2. We have
-     g(N) = N
-     g({0, ..., n}) = {0, ... n+1}  if n is even
-     g({0, ..., n}) = {0, ..., n+4} if n is odd
-     g is contractive.  All outputs contain 0, so they are all 0-equal.
-     Now consider two n-equal inputs. We have to show that the outputs are n+1-equal.
-     Either they both do not contain n in which case they have to be fully equal and
-     hence so are the results.  Or else they both contain n, so the results will
-     both contain n+1, so the results are n+1-equal.
-   *)
+    f N           = N  (where N is the set of all natural numbers)
+    f {0, ..., n} = {0, ... n-1}  if n is even (so n-1 is at least -1, in which
+      case we return the empty set)
+    f {0, ..., n} = {0, ..., n+2} if n is odd
+
+  In other words, if we consider elements of [siProp] as ordinals, then we
+  decrease odd finite ordinals by 1 and increase even finite ordinals by 2.
+  We see that [f] is not non-expansive: Consider [f {0} = ∅] and
+  [f {0,1} = f {0,1,2,3}]. The arguments are clearly 0-equal, but the results
+  are not.
+
+  Now consider [g := f^2]. We have:
+
+    g N           = N
+    g {0, ..., n} = {0, ... n+1}  if n is even
+    g {0, ..., n} = {0, ..., n+4} if n is odd
+
+  We see that [g] is contractive. All outputs contain 0, so they are all 0-equal.
+
+  Now consider two [n]-equal inputs. We have to show that the outputs are
+  [n+1]-equal. Either they both do not contain n in which case they have to be
+  fully equal and hence so are the results. Or else they both contain [n], so
+  the results will both contain [n+1], so the results are [n+1]-equal. *)
 
   Let f_proper : Proper ((≡) ==> (≡)) f := ne_proper f.
   Local Existing Instance f_proper.
