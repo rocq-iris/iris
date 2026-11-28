@@ -62,4 +62,24 @@ Section tests.
   Lemma test_forall_impl {A : ofe} (x z : A) :
     ⊢@{PROP} (∀ y, x ≡ y → y ≡ z) → x ≡ z.
   Proof. sbi_unfold. Show. Abort.
+
+  Check "test_only_0".
+  Lemma test_only_0 {A : ofe} (x y z : A) :
+    ⊢@{PROP} <only0> (x ≡ y → y ≡ z).
+  Proof. sbi_unfold. Show. Abort.
+
+  Check "test_except_0".
+  Lemma test_except_0 {A : ofe} (x y z : A) :
+    ⊢@{PROP} ◇ (x ≡ y → y ≡ z).
+  Proof. sbi_unfold. Show. Abort.
+
+  Check "test_only_0_except_0".
+  Lemma test_only_0_except_0 {A : ofe} (x y z : A) :
+    ⊢@{PROP} <only0> ◇ (x ≡ y → y ≡ z).
+  Proof. sbi_unfold. Show. Abort.
+
+  Check "test_except_0_only_0".
+  Lemma test_except_0_only_0 {A : ofe} (x y z : A) :
+    ⊢@{PROP} ◇ <only0> (x ≡ y → y ≡ z).
+  Proof. sbi_unfold. Show. Abort.
 End tests.

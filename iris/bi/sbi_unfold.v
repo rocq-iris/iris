@@ -5,6 +5,7 @@ Local Open Scope sidx_scope.
 Local Hint Extern 1 (_ ≤ _) => etrans; [done|] : core.
 Local Hint Extern 1 (_ < _) => eapply SIdx.lt_le_trans; [done|] : core.
 Local Hint Extern 1 (_ < _) => eapply SIdx.le_lt_trans; [done|] : core.
+Local Hint Resolve SIdx.le_0_l SIdx.lt_le_incl : core.
 
 (** The tactic takes a (bi-)entailment of plain propositions and turns it into a
 a (bi-)implication in the pure step-indexed model. For example, given the goal:
@@ -264,6 +265,31 @@ Section sbi_unfold.
     intros HP. split; [naive_solver|]. etrans; [f_equiv; apply HP|].
     rewrite -si_pure_later. f_equiv.
     split=> n /=; siProp.unseal; destruct clo; naive_solver.
+  Qed.
+
+  Global Instance sbi_unfold_except_0 clo P Pi :
+    SbiUnfold DownClosed P Pi →
+    SbiUnfold clo (◇ P) (λ n, n = 0ᵢ ∨ Pi n).
+  Proof.
+    intros [? HP]. apply: SbiUnfold_closed.
+    { intros n1 n2 [->|?] ?; [left; by apply SIdx.le_0_r|naive_solver]. }
+    intros ?. rewrite HP. rewrite -si_pure_except_0. f_equiv.
+    rewrite /bi_except_0. split=> n /=; siProp.unseal. f_equiv; [|naive_solver].
+    split; [|intros -> ? []%SIdx.nlt_0_r]. intros Hn.
+    destruct (decide (n = 0ᵢ)) as [->|?%SIdx.neq_0_lt_0]; naive_solver.
+  Qed.
+
+  Global Instance sbi_unfold_only_0 clo P Pi :
+    SbiUnfold NotClosed P Pi →
+    SbiUnfold clo (<only0> P) (λ _, Pi 0ᵢ).
+  Proof.
+    intros [? HP]. split; [naive_solver|]. rewrite HP -si_pure_only_0. f_equiv.
+    rewrite /bi_only_0. split=> n /=; siProp.unseal. split.
+    - intros HPi n' _. apply (HPi 0ᵢ); [by auto| |done].
+      intros ? []%SIdx.nlt_0_r.
+    - intros HPi n' ?? n'' Hn''.
+      destruct (decide (n' = 0ᵢ)) as [->|?%SIdx.neq_0_lt_0]; [|naive_solver].
+      apply SIdx.le_0_r in Hn'' as ->. by eapply HPi.
   Qed.
 End sbi_unfold.
 
